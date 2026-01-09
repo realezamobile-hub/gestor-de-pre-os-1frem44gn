@@ -9,11 +9,13 @@ import {
   Activity,
   RefreshCcw,
   Globe,
+  Database,
 } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 import { UserManagement } from '@/components/admin/UserManagement'
 import { PendingRequests } from '@/components/admin/PendingRequests'
 import { DomainSettings } from '@/components/admin/DomainSettings'
+import { BulkCleanup } from '@/components/admin/BulkCleanup'
 
 export default function AdminPage() {
   const { users, fetchUsers, currentUser } = useAuthStore()
@@ -30,7 +32,7 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
           <p className="text-muted-foreground mt-1">
@@ -93,19 +95,28 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
-          <TabsTrigger value="active">Gerenciar Usuários</TabsTrigger>
-          <TabsTrigger value="pending" className="relative">
-            Solicitações
-            {pendingUsers.length > 0 && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="domain" className="flex gap-2">
-            <Globe className="w-4 h-4" />
-            Domínio
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto pb-2">
+          <TabsList className="grid w-full min-w-[600px] grid-cols-4 md:w-auto">
+            <TabsTrigger value="active">Usuários</TabsTrigger>
+            <TabsTrigger value="pending" className="relative">
+              Solicitações
+              {pendingUsers.length > 0 && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="domain" className="flex gap-2">
+              <Globe className="w-4 h-4" />
+              Domínio
+            </TabsTrigger>
+            <TabsTrigger
+              value="maintenance"
+              className="flex gap-2 text-red-600 data-[state=active]:text-red-700"
+            >
+              <Database className="w-4 h-4" />
+              Manutenção
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="active" className="mt-6">
           <UserManagement />
@@ -117,6 +128,10 @@ export default function AdminPage() {
 
         <TabsContent value="domain" className="mt-6">
           <DomainSettings />
+        </TabsContent>
+
+        <TabsContent value="maintenance" className="mt-6">
+          <BulkCleanup />
         </TabsContent>
       </Tabs>
     </div>

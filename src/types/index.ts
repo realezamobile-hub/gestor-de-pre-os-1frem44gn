@@ -16,8 +16,10 @@ export interface User {
   canCreateList: boolean
 }
 
-// Map directly to Supabase table row
-export type Product = Database['public']['Tables']['produtos']['Row']
+// Map directly to Supabase table row and extend with new columns
+export type Product = Database['public']['Tables']['produtos']['Row'] & {
+  ram?: string | null
+}
 
 export interface FilterState {
   search: string

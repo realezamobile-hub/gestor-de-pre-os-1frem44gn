@@ -53,7 +53,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     let query = supabase
       .from('produtos')
       .select('*')
-      .order('criado_em', { ascending: false })
+      // Changed sorting to be by price ascending
+      .order('valor', { ascending: true })
 
     // Apply filters
     if (filters.search) {

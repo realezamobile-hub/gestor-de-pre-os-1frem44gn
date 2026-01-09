@@ -31,6 +31,24 @@ interface AuthState {
   ) => Promise<void>
 }
 
+const SUPER_ADMIN_EMAIL = 'realezamobile@gmail.com'
+
+const mapProfileToUser = (profile: any): User => {
+  const isSuperAdmin = profile.email === SUPER_ADMIN_EMAIL
+
+  return {
+    id: profile.id,
+    name: profile.name || '',
+    email: profile.email || '',
+    role: isSuperAdmin ? 'admin' : (profile.role as 'admin' | 'user') || 'user',
+    status: (profile.status as UserStatus) || 'pending',
+    phone: profile.phone || '',
+    lastActive: profile.last_active || new Date().toISOString(),
+    createdAt: profile.created_at || new Date().toISOString(),
+    canCreateList: isSuperAdmin ? true : profile.can_create_list || false,
+  }
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   currentUser: null,
   session: null,
@@ -54,18 +72,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .single()
 
         if (profile) {
+          // Add email from session if not in profile (it usually is synced but good to be safe for logic)
+          const profileWithEmail = { ...profile, email: session.user.email }
+
           set({
-            currentUser: {
-              id: profile.id,
-              name: profile.name || '',
-              email: profile.email || '',
-              role: (profile.role as 'admin' | 'user') || 'user',
-              status: (profile.status as UserStatus) || 'pending',
-              phone: profile.phone || '',
-              lastActive: profile.last_active || new Date().toISOString(),
-              createdAt: profile.created_at || new Date().toISOString(),
-              canCreateList: profile.can_create_list || false,
-            },
+            currentUser: mapProfileToUser(profileWithEmail),
           })
 
           // Update last active
@@ -93,18 +104,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .single()
 
         if (profile) {
+          const profileWithEmail = { ...profile, email: session.user.email }
           set({
-            currentUser: {
-              id: profile.id,
-              name: profile.name || '',
-              email: profile.email || '',
-              role: (profile.role as 'admin' | 'user') || 'user',
-              status: (profile.status as UserStatus) || 'pending',
-              phone: profile.phone || '',
-              lastActive: profile.last_active || new Date().toISOString(),
-              createdAt: profile.created_at || new Date().toISOString(),
-              canCreateList: profile.can_create_list || false,
-            },
+            currentUser: mapProfileToUser(profileWithEmail),
             isLoading: false,
           })
         } else {
@@ -151,17 +153,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .order('created_at', { ascending: false })
 
     if (!error && profiles) {
-      const mappedUsers: User[] = profiles.map((p) => ({
-        id: p.id,
-        name: p.name || '',
-        email: p.email || '',
-        role: (p.role as 'admin' | 'user') || 'user',
-        status: (p.status as UserStatus) || 'pending',
-        phone: p.phone || '',
-        lastActive: p.last_active || new Date().toISOString(),
-        createdAt: p.created_at || new Date().toISOString(),
-        canCreateList: p.can_create_list || false,
-      }))
+      const mappedUsers: User[] = profiles.map(mapProfileToUser)
       set({ users: mappedUsers })
     }
   },
@@ -182,6 +174,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   toggleUserPermission: async (userId, permission) => {
     const user = get().users.find((u) => u.id === userId)
     if (!user) return
+
+    // Don't allow toggling permissions for super admin via UI if logic prevents it, but here we just update DB
+    // The mapProfileToUser will still enforce true for super admin on read
 
     const newValue = !user[permission]
 

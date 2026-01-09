@@ -18037,7 +18037,7 @@ function handleAndDispatchCustomEvent$1(name, handler, detail, { discrete }) {
 	if (discrete) dispatchDiscreteCustomEvent(target, event);
 	else target.dispatchEvent(event);
 }
-var Root$7 = DismissableLayer;
+var Root$8 = DismissableLayer;
 var Branch = DismissableLayerBranch;
 var useLayoutEffect2 = globalThis?.document ? import_react.useLayoutEffect : () => {};
 var import_react_dom$5 = /* @__PURE__ */ __toESM(require_react_dom(), 1);
@@ -18172,7 +18172,7 @@ function useControllableState({ prop, defaultProp, onChange = () => {}, caller }
 	}
 	return [value, import_react.useCallback((nextValue) => {
 		if (isControlled) {
-			const value2 = isFunction(nextValue) ? nextValue(prop) : nextValue;
+			const value2 = isFunction$1(nextValue) ? nextValue(prop) : nextValue;
 			if (value2 !== prop) onChangeRef.current?.(value2);
 		} else setUncontrolledProp(nextValue);
 	}, [
@@ -18201,7 +18201,7 @@ function useUncontrolledState({ defaultProp, onChange }) {
 		onChangeRef
 	];
 }
-function isFunction(value) {
+function isFunction$1(value) {
 	return typeof value === "function";
 }
 var VISUALLY_HIDDEN_STYLES = Object.freeze({
@@ -18228,7 +18228,7 @@ var VisuallyHidden = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 VisuallyHidden.displayName = NAME$2;
-var Root$6 = VisuallyHidden;
+var Root$7 = VisuallyHidden;
 var import_react_dom$4 = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var PROVIDER_NAME$1 = "ToastProvider";
 var [Collection$2, useCollection$2, createCollectionScope$2] = createCollection("Toast");
@@ -18527,7 +18527,7 @@ var ToastImpl = import_react.forwardRef((props, forwardedRef) => {
 		onClose: handleClose,
 		children: import_react_dom$4.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$2.ItemSlot, {
 			scope: __scopeToast,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$7, {
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$8, {
 				asChild: true,
 				onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
 					if (!context.isFocusedToastEscapeKeyDownRef.current) handleClose();
@@ -19172,6 +19172,44 @@ var ShoppingCart = createLucideIcon("shopping-cart", [
 	["path", {
 		d: "M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12",
 		key: "9zh506"
+	}]
+]);
+var SlidersHorizontal = createLucideIcon("sliders-horizontal", [
+	["path", {
+		d: "M10 5H3",
+		key: "1qgfaw"
+	}],
+	["path", {
+		d: "M12 19H3",
+		key: "yhmn1j"
+	}],
+	["path", {
+		d: "M14 3v4",
+		key: "1sua03"
+	}],
+	["path", {
+		d: "M16 17v4",
+		key: "1q0r14"
+	}],
+	["path", {
+		d: "M21 12h-9",
+		key: "1o4lsq"
+	}],
+	["path", {
+		d: "M21 19h-5",
+		key: "1rlt1p"
+	}],
+	["path", {
+		d: "M21 5h-7",
+		key: "1oszz2"
+	}],
+	["path", {
+		d: "M8 10v4",
+		key: "tgpxqk"
+	}],
+	["path", {
+		d: "M8 12H3",
+		key: "a7s4jb"
 	}]
 ]);
 var Smartphone = createLucideIcon("smartphone", [["rect", {
@@ -21067,10 +21105,10 @@ var Observer = class {
 			if (typeof id !== "string" && typeof id !== "number") return { unwrap };
 			else return Object.assign(id, { unwrap });
 		};
-		this.custom = (jsx$23, data) => {
+		this.custom = (jsx$25, data) => {
 			const id = (data == null ? void 0 : data.id) || toastsCounter++;
 			this.create({
-				jsx: jsx$23(id),
+				jsx: jsx$25(id),
 				id,
 				...data
 			});
@@ -23206,7 +23244,7 @@ var Arrow$1 = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 Arrow$1.displayName = NAME$1;
-var Root$5 = Arrow$1;
+var Root$6 = Arrow$1;
 function useSize(element) {
 	const [size$3, setSize] = import_react.useState(void 0);
 	useLayoutEffect2(() => {
@@ -23423,7 +23461,7 @@ var PopperArrow = import_react.forwardRef(function PopperArrow2(props, forwarded
 			}[contentContext.placedSide],
 			visibility: contentContext.shouldHideArrow ? "hidden" : void 0
 		},
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$6, {
 			...arrowProps,
 			ref: forwardedRef,
 			style: {
@@ -23604,11 +23642,11 @@ var Tooltip$1 = (props) => {
 	});
 };
 Tooltip$1.displayName = TOOLTIP_NAME;
-var TRIGGER_NAME$3 = "TooltipTrigger";
+var TRIGGER_NAME$4 = "TooltipTrigger";
 var TooltipTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeTooltip, ...triggerProps } = props;
-	const context = useTooltipContext(TRIGGER_NAME$3, __scopeTooltip);
-	const providerContext = useTooltipProviderContext(TRIGGER_NAME$3, __scopeTooltip);
+	const context = useTooltipContext(TRIGGER_NAME$4, __scopeTooltip);
+	const providerContext = useTooltipProviderContext(TRIGGER_NAME$4, __scopeTooltip);
 	const popperScope = usePopperScope$1(__scopeTooltip);
 	const composedRefs = useComposedRefs(forwardedRef, import_react.useRef(null), context.onTriggerChange);
 	const isPointerDownRef = import_react.useRef(false);
@@ -23649,7 +23687,7 @@ var TooltipTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-TooltipTrigger$1.displayName = TRIGGER_NAME$3;
+TooltipTrigger$1.displayName = TRIGGER_NAME$4;
 var PORTAL_NAME$2 = "TooltipPortal";
 var [PortalProvider$1, usePortalContext$1] = createTooltipContext(PORTAL_NAME$2, { forceMount: void 0 });
 var TooltipPortal = (props) => {
@@ -23805,7 +23843,7 @@ var TooltipContentImpl = import_react.forwardRef((props, forwardedRef) => {
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slottable, { children }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHiddenContentContextProvider, {
 				scope: __scopeTooltip,
 				isInside: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$6, {
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$7, {
 					id: context.contentId,
 					role: "tooltip",
 					children: ariaLabel || children
@@ -24103,7 +24141,7 @@ var createStoreImpl = (createState) => {
 			listeners$1.forEach((listener) => listener(state, previousState));
 		}
 	};
-	const getState$1 = () => state;
+	const getState$3 = () => state;
 	const getInitialState = () => initialState;
 	const subscribe$1 = (listener) => {
 		listeners$1.add(listener);
@@ -24115,12 +24153,12 @@ var createStoreImpl = (createState) => {
 	};
 	const api = {
 		setState,
-		getState: getState$1,
+		getState: getState$3,
 		getInitialState,
 		subscribe: subscribe$1,
 		destroy
 	};
-	const initialState = state = createState(setState, getState$1, api);
+	const initialState = state = createState(setState, getState$3, api);
 	return api;
 };
 var createStore = (createState) => createState ? createStoreImpl(createState) : createStoreImpl;
@@ -24559,130 +24597,171 @@ const INITIAL_SUPPLIERS = [
 const INITIAL_PRODUCTS = [
 	{
 		id: "p1",
-		name: "iPhone 15 Pro Max 256GB",
+		name: "iPhone 15 Pro Max 256GB Titânio Natural",
+		model: "iPhone 15 Pro Max",
 		brand: "Apple",
 		category: "Smartphone",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=iphone%2015%20pro%20max&dpr=2",
+		memory: "256GB",
+		color: "Titânio Natural",
+		condition: "Novo",
+		battery: "100%",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=iphone%2015%20pro%20max%20natural&dpr=2",
 		prices: [
 			{
 				supplierId: "sup1",
 				price: 6800,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: true
 			},
 			{
 				supplierId: "sup2",
 				price: 6750,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: true
 			},
 			{
 				supplierId: "sup3",
 				price: 6900,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: false
 			}
 		]
 	},
 	{
 		id: "p2",
-		name: "MacBook Air M2 13\"",
+		name: "iPhone 14 128GB Estelar Vitrine",
+		model: "iPhone 14",
 		brand: "Apple",
-		category: "Laptop",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=macbook%20air%20m2&dpr=2",
+		category: "Smartphone",
+		memory: "128GB",
+		color: "Estelar",
+		condition: "Vitrine",
+		battery: "95%+",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=iphone%2014%20white&dpr=2",
 		prices: [{
 			supplierId: "sup1",
-			price: 7200,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
-		}, {
-			supplierId: "sup4",
-			price: 7100,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			price: 3500,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
 		}]
 	},
 	{
 		id: "p3",
-		name: "Xiaomi Redmi Note 13",
+		name: "MacBook Air M2 13\" 256GB Space Grey",
+		model: "MacBook Air M2",
+		brand: "Apple",
+		category: "Laptop",
+		memory: "256GB",
+		color: "Space Grey",
+		condition: "Novo",
+		battery: "100%",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=macbook%20air%20m2&dpr=2",
+		prices: [{
+			supplierId: "sup1",
+			price: 7200,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
+		}, {
+			supplierId: "sup4",
+			price: 7100,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
+		}]
+	},
+	{
+		id: "p4",
+		name: "Xiaomi Redmi Note 13 8GB/256GB Preto",
+		model: "Redmi Note 13",
 		brand: "Xiaomi",
 		category: "Smartphone",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=redmi%20note%2013&dpr=2",
+		memory: "256GB",
+		color: "Preto",
+		condition: "Novo",
+		battery: "100%",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=redmi%20note%2013%20black&dpr=2",
 		prices: [
 			{
 				supplierId: "sup2",
 				price: 1200,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: true
 			},
 			{
 				supplierId: "sup3",
 				price: 1150,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: true
 			},
 			{
 				supplierId: "sup4",
 				price: 1180,
-				lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+				lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+				inStock: true
 			}
 		]
 	},
 	{
-		id: "p4",
-		name: "Samsung Galaxy S24 Ultra",
+		id: "p5",
+		name: "Samsung Galaxy S24 Ultra 512GB Titânio Cinza",
+		model: "Galaxy S24 Ultra",
 		brand: "Samsung",
 		category: "Smartphone",
+		memory: "512GB",
+		color: "Titânio Cinza",
+		condition: "Novo",
+		battery: "100%",
 		imageUrl: "https://img.usecurling.com/p/300/300?q=galaxy%20s24%20ultra&dpr=2",
 		prices: [{
 			supplierId: "sup1",
 			price: 6200,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
 		}, {
 			supplierId: "sup3",
 			price: 6100,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
-		}]
-	},
-	{
-		id: "p5",
-		name: "iPad Air 5",
-		brand: "Apple",
-		category: "Tablet",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=ipad%20air%205&dpr=2",
-		prices: [{
-			supplierId: "sup1",
-			price: 4500,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
-		}, {
-			supplierId: "sup2",
-			price: 4450,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
 		}]
 	},
 	{
 		id: "p6",
-		name: "Xiaomi Pad 6",
-		brand: "Xiaomi",
+		name: "iPad Air 5 64GB Wi-Fi Azul",
+		model: "iPad Air 5",
+		brand: "Apple",
 		category: "Tablet",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=xiaomi%20pad%206&dpr=2",
+		memory: "64GB",
+		color: "Azul",
+		condition: "Novo",
+		battery: "100%",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=ipad%20air%205%20blue&dpr=2",
 		prices: [{
-			supplierId: "sup3",
-			price: 2100,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			supplierId: "sup1",
+			price: 3800,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
 		}, {
-			supplierId: "sup4",
-			price: 2050,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			supplierId: "sup2",
+			price: 3750,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: false
 		}]
 	},
 	{
 		id: "p7",
-		name: "AirPods Pro 2",
+		name: "iPhone 13 128GB Rosa (Usado)",
+		model: "iPhone 13",
 		brand: "Apple",
-		category: "Accessories",
-		imageUrl: "https://img.usecurling.com/p/300/300?q=airpods%20pro%202&dpr=2",
+		category: "Smartphone",
+		memory: "128GB",
+		color: "Rosa",
+		condition: "Usado",
+		battery: "82%",
+		imageUrl: "https://img.usecurling.com/p/300/300?q=iphone%2013%20pink&dpr=2",
 		prices: [{
-			supplierId: "sup1",
-			price: 1300,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
-		}, {
-			supplierId: "sup2",
-			price: 1250,
-			lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+			supplierId: "sup3",
+			price: 2500,
+			lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+			inStock: true
 		}]
 	}
 ];
@@ -24694,7 +24773,8 @@ const INITIAL_ADMIN = {
 	status: "active",
 	lastActive: (/* @__PURE__ */ new Date()).toISOString(),
 	currentSessionId: null,
-	createdAt: (/* @__PURE__ */ new Date()).toISOString()
+	createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+	canCreateList: true
 };
 var byteToHex = [];
 for (let i = 0; i < 256; ++i) byteToHex.push((i + 256).toString(16).slice(1));
@@ -24743,6 +24823,10 @@ const useAuthStore = create()(persist((set, get) => ({
 			success: false,
 			message: "Conta bloqueada."
 		};
+		if (user.status === "pending") return {
+			success: false,
+			message: "Sua conta ainda está em análise."
+		};
 		const newSessionId = v4_default();
 		const updatedUser = {
 			...user,
@@ -24787,7 +24871,8 @@ const useAuthStore = create()(persist((set, get) => ({
 			status: "pending",
 			lastActive: (/* @__PURE__ */ new Date()).toISOString(),
 			currentSessionId: null,
-			createdAt: (/* @__PURE__ */ new Date()).toISOString()
+			createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+			canCreateList: false
 		};
 		set((state) => ({ users: [...state.users, newUser] }));
 	},
@@ -24831,6 +24916,12 @@ const useAuthStore = create()(persist((set, get) => ({
 		set((state) => ({ users: state.users.map((u) => u.id === userId ? {
 			...u,
 			status
+		} : u) }));
+	},
+	toggleUserPermission: (userId, permission) => {
+		set((state) => ({ users: state.users.map((u) => u.id === userId ? {
+			...u,
+			[permission]: !u[permission]
 		} : u) }));
 	},
 	killSession: (userId) => {
@@ -25770,23 +25861,23 @@ var Dialog = (props) => {
 	});
 };
 Dialog.displayName = DIALOG_NAME;
-var TRIGGER_NAME$2 = "DialogTrigger";
+var TRIGGER_NAME$3 = "DialogTrigger";
 var DialogTrigger = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeDialog, ...triggerProps } = props;
-	const context = useDialogContext(TRIGGER_NAME$2, __scopeDialog);
+	const context = useDialogContext(TRIGGER_NAME$3, __scopeDialog);
 	const composedTriggerRef = useComposedRefs(forwardedRef, context.triggerRef);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
 		type: "button",
 		"aria-haspopup": "dialog",
 		"aria-expanded": context.open,
 		"aria-controls": context.contentId,
-		"data-state": getState(context.open),
+		"data-state": getState$2(context.open),
 		...triggerProps,
 		ref: composedTriggerRef,
 		onClick: composeEventHandlers(props.onClick, context.onOpenToggle)
 	});
 });
-DialogTrigger.displayName = TRIGGER_NAME$2;
+DialogTrigger.displayName = TRIGGER_NAME$3;
 var PORTAL_NAME$1 = "DialogPortal";
 var [PortalProvider, usePortalContext] = createDialogContext(PORTAL_NAME$1, { forceMount: void 0 });
 var DialogPortal = (props) => {
@@ -25829,7 +25920,7 @@ var DialogOverlayImpl = import_react.forwardRef((props, forwardedRef) => {
 		allowPinchZoom: true,
 		shards: [context.contentRef],
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-			"data-state": getState(context.open),
+			"data-state": getState$2(context.open),
 			...overlayProps,
 			ref: forwardedRef,
 			style: {
@@ -25928,7 +26019,7 @@ var DialogContentImpl = import_react.forwardRef((props, forwardedRef) => {
 			id: context.contentId,
 			"aria-describedby": context.descriptionId,
 			"aria-labelledby": context.titleId,
-			"data-state": getState(context.open),
+			"data-state": getState$2(context.open),
 			...contentProps,
 			ref: composedRefs,
 			onDismiss: () => context.onOpenChange(false)
@@ -25972,7 +26063,7 @@ var DialogClose = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 DialogClose.displayName = CLOSE_NAME;
-function getState(open) {
+function getState$2(open) {
 	return open ? "open" : "closed";
 }
 var TITLE_WARNING_NAME = "DialogTitleWarning";
@@ -26010,7 +26101,7 @@ var DescriptionWarning = ({ contentRef, descriptionId }) => {
 	]);
 	return null;
 };
-var Root$4 = Dialog;
+var Root$5 = Dialog;
 var Trigger$2 = DialogTrigger;
 var Portal$2 = DialogPortal;
 var Overlay = DialogOverlay;
@@ -26018,7 +26109,7 @@ var Content$1 = DialogContent;
 var Title = DialogTitle;
 var Description = DialogDescription;
 var Close = DialogClose;
-var Sheet = Root$4;
+var Sheet = Root$5;
 var SheetTrigger = Trigger$2;
 var SheetPortal = Portal$2;
 var SheetOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
@@ -26080,21 +26171,21 @@ function Sidebar() {
 			href: "/",
 			label: "Painel de Preços",
 			icon: LayoutDashboard,
-			roles: ["admin", "user"]
+			isVisible: true
 		},
 		{
 			href: "/generator",
 			label: "Gerador de Lista",
 			icon: FileText,
-			roles: ["admin", "user"]
+			isVisible: currentUser?.canCreateList || currentUser?.role === "admin"
 		},
 		{
 			href: "/admin",
 			label: "Administração",
 			icon: Settings,
-			roles: ["admin"]
+			isVisible: currentUser?.role === "admin"
 		}
-	].filter((link) => link.roles.includes(currentUser?.role || ""));
+	].filter((link) => link.isVisible);
 	const NavContent = () => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex flex-col h-full py-6",
 		children: [
@@ -26353,15 +26444,15 @@ function useImageLoadingStatus(src, { referrerPolicy, crossOrigin }) {
 	]);
 	return loadingStatus;
 }
-var Root$3 = Avatar$1;
+var Root$4 = Avatar$1;
 var Image = AvatarImage$1;
 var Fallback = AvatarFallback$1;
-var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$3, {
+var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$4, {
 	ref,
 	className: cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
 	...props
 }));
-Avatar.displayName = Root$3.displayName;
+Avatar.displayName = Root$4.displayName;
 var AvatarImage = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image, {
 	ref,
 	className: cn("aspect-square h-full w-full", className),
@@ -26520,14 +26611,14 @@ var Label$2 = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 Label$2.displayName = NAME;
-var Root$2 = Label$2;
+var Root$3 = Label$2;
 var labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70");
-var Label = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$2, {
+var Label = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$3, {
 	ref,
 	className: cn(labelVariants(), className),
 	...props
 }));
-Label.displayName = Root$2.displayName;
+Label.displayName = Root$3.displayName;
 var Card = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
 	className: cn("rounded-lg border bg-card text-card-foreground shadow-sm", className),
@@ -26807,19 +26898,27 @@ function PendingApprovalPage() {
 		})
 	});
 }
+var INITIAL_FILTERS = {
+	search: "",
+	brand: "all",
+	category: "all",
+	model: "all",
+	memory: "all",
+	color: "all",
+	condition: "all",
+	supplierId: "all",
+	inStockOnly: false
+};
 const useProductStore = create((set, get) => ({
 	products: INITIAL_PRODUCTS,
 	suppliers: INITIAL_SUPPLIERS,
 	selectedProducts: [],
-	filters: {
-		search: "",
-		brand: "all",
-		category: "all"
-	},
+	filters: INITIAL_FILTERS,
 	setFilters: (newFilters) => set((state) => ({ filters: {
 		...state.filters,
 		...newFilters
 	} })),
+	resetFilters: () => set({ filters: INITIAL_FILTERS }),
 	toggleProductSelection: (product) => set((state) => {
 		if (state.selectedProducts.some((p) => p.id === product.id)) return { selectedProducts: state.selectedProducts.filter((p) => p.id !== product.id) };
 		return { selectedProducts: [...state.selectedProducts, product] };
@@ -26827,27 +26926,38 @@ const useProductStore = create((set, get) => ({
 	clearSelection: () => set({ selectedProducts: [] }),
 	getBestPrice: (product) => {
 		if (!product.prices.length) return null;
-		const bestPrice = [...product.prices].sort((a, b$1) => a.price - b$1.price)[0];
+		const sorted = [...product.prices].sort((a, b$1) => a.price - b$1.price);
+		if (sorted.length === 0) return null;
+		const bestPrice = sorted[0];
 		const supplier = get().suppliers.find((s) => s.id === bestPrice.supplierId);
 		return {
 			price: bestPrice.price,
-			supplierName: supplier?.name || "Unknown"
+			supplierName: supplier?.name || "Unknown",
+			inStock: bestPrice.inStock
 		};
 	},
 	getFilteredProducts: () => {
 		const { products, filters } = get();
 		return products.filter((product) => {
-			const matchesSearch = product.name.toLowerCase().includes(filters.search.toLowerCase());
+			const matchesSearch = filters.search === "" || product.name.toLowerCase().includes(filters.search.toLowerCase()) || product.model.toLowerCase().includes(filters.search.toLowerCase());
 			const matchesBrand = filters.brand === "all" || product.brand === filters.brand;
 			const matchesCategory = filters.category === "all" || product.category === filters.category;
-			return matchesSearch && matchesBrand && matchesCategory;
+			const matchesModel = filters.model === "all" || product.model === filters.model;
+			const matchesMemory = filters.memory === "all" || product.memory === filters.memory;
+			const matchesColor = filters.color === "all" || product.color === filters.color;
+			const matchesCondition = filters.condition === "all" || product.condition === filters.condition;
+			const matchesSupplier = filters.supplierId === "all" || product.prices.some((p) => p.supplierId === filters.supplierId);
+			const matchesStock = !filters.inStockOnly || product.prices.some((p) => p.inStock);
+			return matchesSearch && matchesBrand && matchesCategory && matchesModel && matchesMemory && matchesColor && matchesCondition && matchesSupplier && matchesStock;
 		});
 	}
 }));
 function ProductCard({ product, suppliers }) {
 	const { selectedProducts, toggleProductSelection, getBestPrice } = useProductStore();
+	const { currentUser } = useAuthStore();
 	const isSelected = selectedProducts.some((p) => p.id === product.id);
 	const bestOffer = getBestPrice(product);
+	const canCreateList = currentUser?.canCreateList || false;
 	const sortedPrices = [...product.prices].sort((a, b$1) => a.price - b$1.price);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 		className: cn("group overflow-hidden transition-all duration-300 hover:shadow-elevation hover:-translate-y-1", isSelected && "ring-2 ring-primary border-primary shadow-md"),
@@ -26865,12 +26975,12 @@ function ProductCard({ product, suppliers }) {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "absolute top-2 right-2 flex flex-col gap-1 items-end",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-								className: "bg-black/80 backdrop-blur-sm text-xs font-medium",
+								className: "bg-black/80 backdrop-blur-sm text-xs font-medium border-0",
 								children: product.brand
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 								variant: "secondary",
-								className: "bg-white/90 backdrop-blur-sm text-xs shadow-sm",
-								children: product.category
+								className: cn("backdrop-blur-sm text-xs shadow-sm border-0", product.condition === "Novo" ? "bg-emerald-500/90 text-white" : "bg-amber-500/90 text-white"),
+								children: product.condition
 							})]
 						}),
 						bestOffer && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -26895,41 +27005,86 @@ function ProductCard({ product, suppliers }) {
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 				className: "p-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
-					className: "text-base font-bold mb-3 line-clamp-2 min-h-[3rem]",
-					title: product.name,
-					children: product.name
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-3",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-2 text-xs text-muted-foreground",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [suppliers.length, " fornecedores"] })]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						className: "space-y-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100",
-						children: sortedPrices.slice(0, 3).map((price, idx) => {
-							const supplier = suppliers.find((s) => s.id === price.supplierId);
-							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: cn("flex justify-between items-center text-xs p-1.5 rounded transition-colors", idx === 0 ? "bg-emerald-100/50 text-emerald-900 font-medium" : "text-gray-600"),
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+						className: "text-base font-bold mb-1 line-clamp-2 min-h-[3rem]",
+						title: product.name,
+						children: product.name
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-muted-foreground mb-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex gap-1",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "truncate max-w-[120px]",
-									children: supplier?.name
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-									"R$",
-									" ",
-									price.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-								] })]
-							}, price.supplierId);
-						})
-					})]
-				})]
+									className: "font-medium text-gray-900",
+									children: "Cor:"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "truncate",
+									children: product.color
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex gap-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-medium text-gray-900",
+									children: "Mem:"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "truncate",
+									children: product.memory
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex gap-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-medium text-gray-900",
+									children: "Bat:"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "truncate",
+									children: product.battery || "-"
+								})]
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex items-center justify-between text-xs text-muted-foreground border-t pt-2",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-1.5",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [suppliers.length, " ofertas"] })]
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "space-y-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100",
+							children: sortedPrices.slice(0, 3).map((price, idx) => {
+								const supplier = suppliers.find((s) => s.id === price.supplierId);
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: cn("flex justify-between items-center text-xs p-1.5 rounded transition-colors", idx === 0 ? "bg-emerald-100/50 text-emerald-900 font-medium" : "text-gray-600", !price.inStock && "opacity-60 grayscale"),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										className: "truncate max-w-[120px] flex items-center gap-1",
+										children: [supplier?.name, !price.inStock && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "text-[10px] bg-gray-200 px-1 rounded text-gray-500",
+											children: "Sem estoque"
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+										"R$",
+										" ",
+										price.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+									] })]
+								}, price.supplierId);
+							})
+						})]
+					})
+				]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardFooter, {
 				className: "p-4 pt-0",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 					variant: isSelected ? "secondary" : "default",
-					className: cn("w-full transition-all duration-300", isSelected ? "bg-primary/10 text-primary hover:bg-primary/20" : "shadow-sm"),
-					onClick: () => toggleProductSelection(product),
-					children: isSelected ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "w-4 h-4 mr-2" }), " Selecionado"] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShoppingCart, { className: "w-4 h-4 mr-2" }), " Adicionar à Lista"] })
+					disabled: !canCreateList,
+					className: cn("w-full transition-all duration-300", isSelected ? "bg-primary/10 text-primary hover:bg-primary/20" : "shadow-sm", !canCreateList && "opacity-80 cursor-not-allowed"),
+					onClick: () => canCreateList && toggleProductSelection(product),
+					children: !canCreateList ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), " Sem Permissão"] }) : isSelected ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "w-4 h-4 mr-2" }), " Selecionado"] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShoppingCart, { className: "w-4 h-4 mr-2" }), " Adicionar à Lista"] })
 				})
 			})
 		]
@@ -27044,11 +27199,11 @@ var Select$1 = (props) => {
 	});
 };
 Select$1.displayName = SELECT_NAME;
-var TRIGGER_NAME$1 = "SelectTrigger";
+var TRIGGER_NAME$2 = "SelectTrigger";
 var SelectTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeSelect, disabled = false, ...triggerProps } = props;
 	const popperScope = usePopperScope(__scopeSelect);
-	const context = useSelectContext(TRIGGER_NAME$1, __scopeSelect);
+	const context = useSelectContext(TRIGGER_NAME$2, __scopeSelect);
 	const isDisabled = context.disabled || disabled;
 	const composedRefs = useComposedRefs(forwardedRef, context.onTriggerChange);
 	const getItems = useCollection$1(__scopeSelect);
@@ -27110,7 +27265,7 @@ var SelectTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-SelectTrigger$1.displayName = TRIGGER_NAME$1;
+SelectTrigger$1.displayName = TRIGGER_NAME$2;
 var VALUE_NAME = "SelectValue";
 var SelectValue$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeSelect, className, style, children, placeholder = "", ...valueProps } = props;
@@ -27825,7 +27980,7 @@ var SelectArrow = import_react.forwardRef((props, forwardedRef) => {
 	}) : null;
 });
 SelectArrow.displayName = ARROW_NAME;
-var BUBBLE_INPUT_NAME = "SelectBubbleInput";
+var BUBBLE_INPUT_NAME$2 = "SelectBubbleInput";
 var SelectBubbleInput = import_react.forwardRef(({ __scopeSelect, value, ...props }, forwardedRef) => {
 	const ref = import_react.useRef(null);
 	const composedRefs = useComposedRefs(forwardedRef, ref);
@@ -27851,7 +28006,7 @@ var SelectBubbleInput = import_react.forwardRef(({ __scopeSelect, value, ...prop
 		defaultValue: value
 	});
 });
-SelectBubbleInput.displayName = BUBBLE_INPUT_NAME;
+SelectBubbleInput.displayName = BUBBLE_INPUT_NAME$2;
 function shouldShowPlaceholder(value) {
 	return value === "" || value === void 0;
 }
@@ -27969,14 +28124,201 @@ var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => 
 	...props
 }));
 SelectSeparator.displayName = Separator.displayName;
+var CHECKBOX_NAME = "Checkbox";
+var [createCheckboxContext, createCheckboxScope] = createContextScope(CHECKBOX_NAME);
+var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
+function CheckboxProvider(props) {
+	const { __scopeCheckbox, checked: checkedProp, children, defaultChecked, disabled, form, name, onCheckedChange, required, value = "on", internal_do_not_use_render } = props;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: CHECKBOX_NAME
+	});
+	const [control, setControl] = import_react.useState(null);
+	const [bubbleInput, setBubbleInput] = import_react.useState(null);
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = control ? !!form || !!control.closest("form") : true;
+	const context = {
+		checked,
+		disabled,
+		setChecked,
+		control,
+		setControl,
+		name,
+		form,
+		value,
+		hasConsumerStoppedPropagationRef,
+		required,
+		defaultChecked: isIndeterminate(defaultChecked) ? false : defaultChecked,
+		isFormControl,
+		bubbleInput,
+		setBubbleInput
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProviderImpl, {
+		scope: __scopeCheckbox,
+		...context,
+		children: isFunction(internal_do_not_use_render) ? internal_do_not_use_render(context) : children
+	});
+}
+var TRIGGER_NAME$1 = "CheckboxTrigger";
+var CheckboxTrigger = import_react.forwardRef(({ __scopeCheckbox, onKeyDown, onClick, ...checkboxProps }, forwardedRef) => {
+	const { control, value, disabled, checked, required, setControl, setChecked, hasConsumerStoppedPropagationRef, isFormControl, bubbleInput } = useCheckboxContext(TRIGGER_NAME$1, __scopeCheckbox);
+	const composedRefs = useComposedRefs(forwardedRef, setControl);
+	const initialCheckedStateRef = import_react.useRef(checked);
+	import_react.useEffect(() => {
+		const form = control?.form;
+		if (form) {
+			const reset = () => setChecked(initialCheckedStateRef.current);
+			form.addEventListener("reset", reset);
+			return () => form.removeEventListener("reset", reset);
+		}
+	}, [control, setChecked]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+		type: "button",
+		role: "checkbox",
+		"aria-checked": isIndeterminate(checked) ? "mixed" : checked,
+		"aria-required": required,
+		"data-state": getState$1(checked),
+		"data-disabled": disabled ? "" : void 0,
+		disabled,
+		value,
+		...checkboxProps,
+		ref: composedRefs,
+		onKeyDown: composeEventHandlers(onKeyDown, (event) => {
+			if (event.key === "Enter") event.preventDefault();
+		}),
+		onClick: composeEventHandlers(onClick, (event) => {
+			setChecked((prevChecked) => isIndeterminate(prevChecked) ? true : !prevChecked);
+			if (bubbleInput && isFormControl) {
+				hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+				if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+			}
+		})
+	});
+});
+CheckboxTrigger.displayName = TRIGGER_NAME$1;
+var Checkbox$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCheckbox, name, checked, defaultChecked, required, disabled, value, onCheckedChange, form, ...checkboxProps } = props;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProvider, {
+		__scopeCheckbox,
+		checked,
+		defaultChecked,
+		disabled,
+		required,
+		onCheckedChange,
+		name,
+		form,
+		value,
+		internal_do_not_use_render: ({ isFormControl }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxTrigger, {
+			...checkboxProps,
+			ref: forwardedRef,
+			__scopeCheckbox
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxBubbleInput, { __scopeCheckbox })] })
+	});
+});
+Checkbox$1.displayName = CHECKBOX_NAME;
+var INDICATOR_NAME = "CheckboxIndicator";
+var CheckboxIndicator = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
+	const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
+		present: forceMount || isIndeterminate(context.checked) || context.checked === true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+			"data-state": getState$1(context.checked),
+			"data-disabled": context.disabled ? "" : void 0,
+			...indicatorProps,
+			ref: forwardedRef,
+			style: {
+				pointerEvents: "none",
+				...props.style
+			}
+		})
+	});
+});
+CheckboxIndicator.displayName = INDICATOR_NAME;
+var BUBBLE_INPUT_NAME$1 = "CheckboxBubbleInput";
+var CheckboxBubbleInput = import_react.forwardRef(({ __scopeCheckbox, ...props }, forwardedRef) => {
+	const { control, hasConsumerStoppedPropagationRef, checked, defaultChecked, required, disabled, name, value, form, bubbleInput, setBubbleInput } = useCheckboxContext(BUBBLE_INPUT_NAME$1, __scopeCheckbox);
+	const composedRefs = useComposedRefs(forwardedRef, setBubbleInput);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = bubbleInput;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		const bubbles = !hasConsumerStoppedPropagationRef.current;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			input.indeterminate = isIndeterminate(checked);
+			setChecked.call(input, isIndeterminate(checked) ? false : checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		bubbleInput,
+		prevChecked,
+		checked,
+		hasConsumerStoppedPropagationRef
+	]);
+	const defaultCheckedRef = import_react.useRef(isIndeterminate(checked) ? false : checked);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.input, {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: defaultChecked ?? defaultCheckedRef.current,
+		required,
+		disabled,
+		name,
+		value,
+		form,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0,
+			transform: "translateX(-100%)"
+		}
+	});
+});
+CheckboxBubbleInput.displayName = BUBBLE_INPUT_NAME$1;
+function isFunction(value) {
+	return typeof value === "function";
+}
+function isIndeterminate(checked) {
+	return checked === "indeterminate";
+}
+function getState$1(checked) {
+	return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+}
+var Checkbox = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
+	ref,
+	className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
+	...props,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxIndicator, {
+		className: cn("flex items-center justify-center text-current"),
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "h-4 w-4" })
+	})
+}));
+Checkbox.displayName = Checkbox$1.displayName;
 function DashboardPage() {
-	const { products, suppliers, setFilters, getFilteredProducts, selectedProducts, filters } = useProductStore();
+	const { products, suppliers, setFilters, resetFilters, getFilteredProducts, selectedProducts, filters } = useProductStore();
+	const { currentUser } = useAuthStore();
 	const navigate = useNavigate();
 	const filteredProducts = getFilteredProducts();
 	const brands = Array.from(new Set(products.map((p) => p.brand))).sort();
 	const categories = Array.from(new Set(products.map((p) => p.category))).sort();
+	const models = Array.from(new Set(products.map((p) => p.model))).sort();
+	const memories = Array.from(new Set(products.map((p) => p.memory).filter(Boolean))).sort();
+	const colors = Array.from(new Set(products.map((p) => p.color).filter(Boolean))).sort();
+	const conditions = Array.from(new Set(products.map((p) => p.condition))).sort();
+	const activeFiltersCount = Object.values(filters).filter((v) => v !== "all" && v !== "" && v !== false).length;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "space-y-8 pb-12",
+		className: "space-y-6 pb-12",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex flex-col md:flex-row md:items-center justify-between gap-6",
@@ -27988,9 +28330,9 @@ function DashboardPage() {
 					children: [
 						"Compare preços em tempo real entre ",
 						suppliers.length,
-						" fornecedores conectados e encontre as melhores ofertas para o seu negócio."
+						" fornecedores e encontre as melhores ofertas."
 					]
-				})] }), selectedProducts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+				})] }), currentUser?.canCreateList && selectedProducts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 					onClick: () => navigate("/generator"),
 					size: "lg",
 					className: "animate-in fade-in slide-in-from-right-4 bg-primary shadow-lg hover:shadow-xl transition-all",
@@ -28005,61 +28347,172 @@ function DashboardPage() {
 					]
 				})]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "bg-white p-4 rounded-xl shadow-sm border space-y-4 md:space-y-0 md:flex md:items-center md:gap-4 sticky top-16 z-30 transition-all duration-300",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "relative flex-1 group",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-						placeholder: "Buscar produto por nome, modelo...",
-						className: "pl-10 bg-gray-50/50 focus:bg-white transition-colors",
-						value: filters.search,
-						onChange: (e) => setFilters({ search: e.target.value })
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.brand,
-							onValueChange: (val) => setFilters({ brand: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-								className: "w-[160px] bg-gray-50/50",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Marca" })
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas Marcas"
-							}), brands.map((brand) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: brand,
-								children: brand
-							}, brand))] })]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.category,
-							onValueChange: (val) => setFilters({ category: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-								className: "w-[160px] bg-gray-50/50",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Categoria" })
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas Categorias"
-							}), categories.map((cat) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: cat,
-								children: cat
-							}, cat))] })]
-						}),
-						(filters.search || filters.brand !== "all" || filters.category !== "all") && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "bg-white p-4 rounded-xl shadow-sm border sticky top-16 z-30 transition-all duration-300",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col md:flex-row gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "relative flex-1 group",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							placeholder: "Buscar por nome, modelo, marca...",
+							className: "pl-10 bg-gray-50/50 focus:bg-white transition-colors",
+							value: filters.search,
+							onChange: (e) => setFilters({ search: e.target.value })
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "outline",
+								className: "flex gap-2 min-w-[120px]",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlidersHorizontal, { className: "w-4 h-4" }),
+									"Filtros",
+									activeFiltersCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+										variant: "secondary",
+										className: "h-5 px-1.5 ml-1",
+										children: activeFiltersCount
+									})
+								]
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetContent, {
+							className: "overflow-y-auto",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTitle, { children: "Filtros Avançados" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetDescription, { children: "Refine sua busca por características específicas." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "py-6 space-y-6",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Marca" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												value: filters.brand,
+												onValueChange: (val) => setFilters({ brand: val }),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "all",
+													children: "Todas"
+												}), brands.map((b$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: b$1,
+													children: b$1
+												}, b$1))] })]
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Categoria" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												value: filters.category,
+												onValueChange: (val) => setFilters({ category: val }),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "all",
+													children: "Todas"
+												}), categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: c,
+													children: c
+												}, c))] })]
+											})]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Modelo" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+											value: filters.model,
+											onValueChange: (val) => setFilters({ model: val }),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todos" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: "all",
+												children: "Todos"
+											}), models.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: m,
+												children: m
+											}, m))] })]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "grid grid-cols-2 gap-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Memória" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												value: filters.memory,
+												onValueChange: (val) => setFilters({ memory: val }),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "all",
+													children: "Todas"
+												}), memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: m,
+													children: m
+												}, m))] })]
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												value: filters.color,
+												onValueChange: (val) => setFilters({ color: val }),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "all",
+													children: "Todas"
+												}), colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: c,
+													children: c
+												}, c))] })]
+											})]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Condição" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+											value: filters.condition,
+											onValueChange: (val) => setFilters({ condition: val }),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: "all",
+												children: "Todas"
+											}), conditions.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: c,
+												children: c
+											}, c))] })]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Fornecedor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+											value: filters.supplierId,
+											onValueChange: (val) => setFilters({ supplierId: val }),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todos" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: "all",
+												children: "Todos"
+											}), suppliers.map((s) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+												value: s.id,
+												children: s.name
+											}, s.id))] })]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center space-x-2 pt-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+											id: "inStock",
+											checked: filters.inStockOnly,
+											onCheckedChange: (checked) => setFilters({ inStockOnly: checked })
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "inStock",
+											className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+											children: "Apenas em estoque"
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+										variant: "outline",
+										className: "w-full mt-4",
+										onClick: resetFilters,
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FunnelX, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
+									})
+								]
+							})]
+						})] }), activeFiltersCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							variant: "ghost",
 							size: "icon",
-							onClick: () => setFilters({
-								search: "",
-								brand: "all",
-								category: "all"
-							}),
-							title: "Limpar filtros",
-							className: "text-muted-foreground hover:text-destructive",
+							onClick: resetFilters,
+							title: "Limpar todos filtros",
+							className: "text-muted-foreground hover:text-destructive shrink-0",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FunnelX, { className: "w-4 h-4" })
-						})
-					]
-				})]
+						})]
+					})]
+				})
 			}),
 			filteredProducts.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "text-center py-24 bg-white rounded-xl border border-dashed animate-in fade-in zoom-in-95 duration-500",
@@ -28079,11 +28532,7 @@ function DashboardPage() {
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 						variant: "link",
 						className: "mt-4",
-						onClick: () => setFilters({
-							search: "",
-							brand: "all",
-							category: "all"
-						}),
+						onClick: resetFilters,
 						children: "Limpar todos os filtros"
 					})
 				]
@@ -28555,10 +29004,10 @@ var ScrollAreaScrollbarImpl = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-var THUMB_NAME = "ScrollAreaThumb";
+var THUMB_NAME$1 = "ScrollAreaThumb";
 var ScrollAreaThumb = import_react.forwardRef((props, forwardedRef) => {
 	const { forceMount, ...thumbProps } = props;
-	const scrollbarContext = useScrollbarContext(THUMB_NAME, props.__scopeScrollArea);
+	const scrollbarContext = useScrollbarContext(THUMB_NAME$1, props.__scopeScrollArea);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
 		present: forceMount || scrollbarContext.hasThumb,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaThumbImpl, {
@@ -28569,8 +29018,8 @@ var ScrollAreaThumb = import_react.forwardRef((props, forwardedRef) => {
 });
 var ScrollAreaThumbImpl = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeScrollArea, style, ...thumbProps } = props;
-	const scrollAreaContext = useScrollAreaContext(THUMB_NAME, __scopeScrollArea);
-	const scrollbarContext = useScrollbarContext(THUMB_NAME, __scopeScrollArea);
+	const scrollAreaContext = useScrollAreaContext(THUMB_NAME$1, __scopeScrollArea);
+	const scrollbarContext = useScrollbarContext(THUMB_NAME$1, __scopeScrollArea);
 	const { onThumbPositionChange } = scrollbarContext;
 	const composedRef = useComposedRefs(forwardedRef, (node) => scrollbarContext.onThumbChange(node));
 	const removeUnlinkedScrollListenerRef = import_react.useRef(void 0);
@@ -28620,7 +29069,7 @@ var ScrollAreaThumbImpl = import_react.forwardRef((props, forwardedRef) => {
 		onPointerUp: composeEventHandlers(props.onPointerUp, scrollbarContext.onThumbPointerUp)
 	});
 });
-ScrollAreaThumb.displayName = THUMB_NAME;
+ScrollAreaThumb.displayName = THUMB_NAME$1;
 var CORNER_NAME = "ScrollAreaCorner";
 var ScrollAreaCorner = import_react.forwardRef((props, forwardedRef) => {
 	const context = useScrollAreaContext(CORNER_NAME, props.__scopeScrollArea);
@@ -28749,10 +29198,10 @@ function useResizeObserver(element, onResize) {
 		}
 	}, [element, handleResize]);
 }
-var Root$1 = ScrollArea$1;
+var Root$2 = ScrollArea$1;
 var Viewport = ScrollAreaViewport;
 var Corner = ScrollAreaCorner;
-var ScrollArea = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$1, {
+var ScrollArea = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$2, {
 	ref,
 	className: cn("relative overflow-hidden", className),
 	...props,
@@ -28765,7 +29214,7 @@ var ScrollArea = import_react.forwardRef(({ className, children, ...props }, ref
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Corner, {})
 	]
 }));
-ScrollArea.displayName = Root$1.displayName;
+ScrollArea.displayName = Root$2.displayName;
 var ScrollBar = import_react.forwardRef(({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaScrollbar, {
 	ref,
 	orientation,
@@ -28776,9 +29225,31 @@ var ScrollBar = import_react.forwardRef(({ className, orientation = "vertical", 
 ScrollBar.displayName = ScrollAreaScrollbar.displayName;
 function ListGeneratorPage() {
 	const { selectedProducts, toggleProductSelection, getBestPrice, clearSelection } = useProductStore();
+	const { currentUser } = useAuthStore();
 	const [headerConfig, setHeaderConfig] = (0, import_react.useState)({
 		companyName: "Minha Loja",
-		listTitle: "Ofertas Especiais"
+		listTitle: "Smartphones e Eletrônicos"
+	});
+	if (!currentUser?.canCreateList && currentUser?.role !== "admin") return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-full flex flex-col items-center justify-center space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-16 h-16 text-gray-300" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				className: "text-2xl font-bold text-gray-900",
+				children: "Acesso Negado"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground text-center max-w-md",
+				children: "Você não tem permissão para gerar listas de preços. Entre em contato com o administrador para solicitar acesso."
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+					to: "/",
+					children: "Voltar ao Painel"
+				})
+			})
+		]
 	});
 	const generateListText = () => {
 		const today = (/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR");
@@ -28795,11 +29266,14 @@ function ListGeneratorPage() {
 			products.forEach((p) => {
 				const best = getBestPrice(p);
 				const priceStr = best ? `R$ ${best.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				text += `📱 ${p.name}\n💰 ${priceStr}\n\n`;
+				const specs = [p.memory, p.color].filter(Boolean).join(" • ");
+				const nameDisplay = `${p.model} ${specs ? `(${specs})` : ""}`;
+				text += `📱 ${nameDisplay}\n`;
+				text += `💰 ${priceStr} ${p.condition !== "Novo" ? `(${p.condition})` : ""}\n\n`;
 			});
 		});
 		text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`;
-		text += `📦 _Consulte disponibilidade._`;
+		text += `📦 _Consulte disponibilidade e cores._`;
 		return text;
 	};
 	const listText = generateListText();
@@ -28942,7 +29416,7 @@ function ListGeneratorPage() {
 												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 													className: "text-xs text-muted-foreground",
 													children: [
-														product.brand,
+														product.model,
 														" •",
 														" ",
 														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -29250,7 +29724,7 @@ function focusFirst(candidates, preventScroll = false) {
 function wrapArray(array, startIndex) {
 	return array.map((_$1, index$1) => array[(startIndex + index$1) % array.length]);
 }
-var Root = RovingFocusGroup;
+var Root$1 = RovingFocusGroup;
 var Item = RovingFocusGroupItem;
 var TABS_NAME = "Tabs";
 var [createTabsContext, createTabsScope] = createContextScope(TABS_NAME, [createRovingFocusGroupScope]);
@@ -29287,7 +29761,7 @@ var TabsList$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeTabs, loop = true, ...listProps } = props;
 	const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
 	const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$1, {
 		asChild: true,
 		...rovingFocusGroupScope,
 		orientation: context.orientation,
@@ -30516,8 +30990,122 @@ const ptBR = {
 		firstWeekContainsDate: 1
 	}
 };
+var SWITCH_NAME = "Switch";
+var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
+var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
+var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
+	const [button, setButton] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = button ? form || !!button.closest("form") : true;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: SWITCH_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
+		scope: __scopeSwitch,
+		checked,
+		disabled,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+			type: "button",
+			role: "switch",
+			"aria-checked": checked,
+			"aria-required": required,
+			"data-state": getState(checked),
+			"data-disabled": disabled ? "" : void 0,
+			disabled,
+			value,
+			...switchProps,
+			ref: composedRefs,
+			onClick: composeEventHandlers(props.onClick, (event) => {
+				setChecked((prevChecked) => !prevChecked);
+				if (isFormControl) {
+					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+				}
+			})
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
+			control: button,
+			bubbles: !hasConsumerStoppedPropagationRef.current,
+			name,
+			value,
+			checked,
+			required,
+			disabled,
+			form,
+			style: { transform: "translateX(-100%)" }
+		})]
+	});
+});
+Switch$1.displayName = SWITCH_NAME;
+var THUMB_NAME = "SwitchThumb";
+var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, ...thumbProps } = props;
+	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-state": getState(context.checked),
+		"data-disabled": context.disabled ? "" : void 0,
+		...thumbProps,
+		ref: forwardedRef
+	});
+});
+SwitchThumb.displayName = THUMB_NAME;
+var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
+var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(ref, forwardedRef);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = ref.current;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			setChecked.call(input, checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		prevChecked,
+		checked,
+		bubbles
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: checked,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0
+		}
+	});
+});
+SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function getState(checked) {
+	return checked ? "checked" : "unchecked";
+}
+var Root = Switch$1;
+var Thumb = SwitchThumb;
+var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	...props,
+	ref,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+}));
+Switch.displayName = Root.displayName;
 function AdminPage() {
-	const { users, updateUserStatus, killSession, currentUser } = useAuthStore();
+	const { users, updateUserStatus, killSession, toggleUserPermission, currentUser } = useAuthStore();
 	if (currentUser?.role !== "admin") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Navigate, {
 		to: "/",
 		replace: true
@@ -30533,6 +31121,10 @@ function AdminPage() {
 	const handleKillSession = (id) => {
 		killSession(id);
 		toast.warning("Sessão do usuário derrubada");
+	};
+	const handleToggleListPermission = (id) => {
+		toggleUserPermission(id, "canCreateList");
+		toast.success("Permissão de criar lista atualizada");
 	};
 	const pendingUsers = users.filter((u) => u.status === "pending");
 	const activeUsers = users.filter((u) => u.status !== "pending");
@@ -30617,10 +31209,13 @@ function AdminPage() {
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "active",
 						className: "mt-6",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie o acesso e monitore a atividade dos usuários." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie permissões, acesso e monitore a atividade." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Atividade" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+								className: "text-center",
+								children: "Permissão Lista"
+							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 								className: "text-center",
 								children: "Sessão"
@@ -30651,24 +31246,38 @@ function AdminPage() {
 									children: user.status === "active" ? "Ativo" : "Bloqueado"
 								}) }),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-									className: "text-muted-foreground text-sm",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-										className: "flex flex-col",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatDistanceToNow(new Date(user.lastActive), {
-											addSuffix: true,
-											locale: ptBR
-										}) })
+									className: "text-center",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-col items-center gap-1",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+											checked: user.canCreateList,
+											onCheckedChange: () => handleToggleListPermission(user.id),
+											disabled: user.id === currentUser.id,
+											"aria-label": "Alternar permissão de criar lista"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "text-[10px] text-muted-foreground",
+											children: user.canCreateList ? "Permitido" : "Negado"
+										})]
 									})
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 									className: "text-center",
-									children: isOnline ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-										variant: "secondary",
-										className: "text-emerald-600 bg-emerald-50 border-0",
-										children: "Online"
-									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-muted-foreground text-xs",
-										children: "Offline"
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-col items-center",
+										children: [isOnline ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+											variant: "secondary",
+											className: "text-emerald-600 bg-emerald-50 border-0 mb-1",
+											children: "Online"
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "text-muted-foreground text-xs block mb-1",
+											children: "Offline"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "text-[10px] text-muted-foreground",
+											children: formatDistanceToNow(new Date(user.lastActive), {
+												addSuffix: true,
+												locale: ptBR
+											})
+										})]
 									})
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -30828,4 +31437,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-hdj_GREl.js.map
+//# sourceMappingURL=index-B6Quz59f.js.map

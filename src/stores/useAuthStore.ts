@@ -18,6 +18,7 @@ interface AuthState {
   // Admin actions
   getUsers: () => User[]
   updateUserStatus: (userId: string, status: UserStatus) => void
+  toggleUserPermission: (userId: string, permission: keyof User) => void
   killSession: (userId: string) => void
 }
 
@@ -41,6 +42,13 @@ export const useAuthStore = create<AuthState>()(
 
         if (user.status === 'blocked') {
           return { success: false, message: 'Conta bloqueada.' }
+        }
+
+        if (user.status === 'pending') {
+          return {
+            success: false,
+            message: 'Sua conta ainda está em análise.',
+          }
         }
 
         // Generate new session ID to invalidate previous sessions (Single Session Logic)
@@ -89,6 +97,7 @@ export const useAuthStore = create<AuthState>()(
           lastActive: new Date().toISOString(),
           currentSessionId: null,
           createdAt: new Date().toISOString(),
+          canCreateList: false, // Default to false
         }
         set((state) => ({ users: [...state.users, newUser] }))
       },
@@ -106,8 +115,6 @@ export const useAuthStore = create<AuthState>()(
         }
 
         // Check simultaneous access (Session Security)
-        // If the session ID in the "DB" is different from the local one,
-        // it means logged in somewhere else or session killed
         if (freshUser.currentSessionId !== currentSessionId) {
           get().logout()
           return
@@ -148,6 +155,16 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({
           users: state.users.map((u) =>
             u.id === userId ? { ...u, status } : u,
+          ),
+        }))
+      },
+
+      toggleUserPermission: (userId, permission) => {
+        set((state) => ({
+          users: state.users.map((u) =>
+            u.id === userId
+              ? { ...u, [permission]: !u[permission as keyof User] }
+              : u,
           ),
         }))
       },

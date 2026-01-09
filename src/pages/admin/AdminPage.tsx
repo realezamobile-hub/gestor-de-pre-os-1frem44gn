@@ -26,14 +26,22 @@ import {
   Activity,
   Lock,
   Unlock,
+  FileEdit,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { Navigate } from 'react-router-dom'
+import { Switch } from '@/components/ui/switch'
 
 export default function AdminPage() {
-  const { users, updateUserStatus, killSession, currentUser } = useAuthStore()
+  const {
+    users,
+    updateUserStatus,
+    killSession,
+    toggleUserPermission,
+    currentUser,
+  } = useAuthStore()
 
   if (currentUser?.role !== 'admin') {
     return <Navigate to="/" replace />
@@ -52,6 +60,11 @@ export default function AdminPage() {
   const handleKillSession = (id: string) => {
     killSession(id)
     toast.warning('Sessão do usuário derrubada')
+  }
+
+  const handleToggleListPermission = (id: string) => {
+    toggleUserPermission(id, 'canCreateList')
+    toast.success('Permissão de criar lista atualizada')
   }
 
   const pendingUsers = users.filter((u) => u.status === 'pending')
@@ -136,7 +149,7 @@ export default function AdminPage() {
             <CardHeader>
               <CardTitle>Base de Usuários</CardTitle>
               <CardDescription>
-                Gerencie o acesso e monitore a atividade dos usuários.
+                Gerencie permissões, acesso e monitore a atividade.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -145,7 +158,9 @@ export default function AdminPage() {
                   <TableRow>
                     <TableHead>Usuário</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Atividade</TableHead>
+                    <TableHead className="text-center">
+                      Permissão Lista
+                    </TableHead>
                     <TableHead className="text-center">Sessão</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -185,29 +200,42 @@ export default function AdminPage() {
                             {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-sm">
-                          <div className="flex flex-col">
-                            <span>
+                        <TableCell className="text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <Switch
+                              checked={user.canCreateList}
+                              onCheckedChange={() =>
+                                handleToggleListPermission(user.id)
+                              }
+                              disabled={user.id === currentUser.id}
+                              aria-label="Alternar permissão de criar lista"
+                            />
+                            <span className="text-[10px] text-muted-foreground">
+                              {user.canCreateList ? 'Permitido' : 'Negado'}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex flex-col items-center">
+                            {isOnline ? (
+                              <Badge
+                                variant="secondary"
+                                className="text-emerald-600 bg-emerald-50 border-0 mb-1"
+                              >
+                                Online
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground text-xs block mb-1">
+                                Offline
+                              </span>
+                            )}
+                            <span className="text-[10px] text-muted-foreground">
                               {formatDistanceToNow(new Date(user.lastActive), {
                                 addSuffix: true,
                                 locale: ptBR,
                               })}
                             </span>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {isOnline ? (
-                            <Badge
-                              variant="secondary"
-                              className="text-emerald-600 bg-emerald-50 border-0"
-                            >
-                              Online
-                            </Badge>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">
-                              Offline
-                            </span>
-                          )}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">

@@ -11,30 +11,29 @@ export function Sidebar() {
   const { currentUser, logout } = useAuthStore()
   const [open, setOpen] = useState(false)
 
+  // Define visibility logic for each link
   const links = [
     {
       href: '/',
       label: 'Painel de Preços',
       icon: LayoutDashboard,
-      roles: ['admin', 'user'],
+      isVisible: true,
     },
     {
       href: '/generator',
       label: 'Gerador de Lista',
       icon: FileText,
-      roles: ['admin', 'user'],
+      isVisible: currentUser?.canCreateList || currentUser?.role === 'admin',
     },
     {
       href: '/admin',
       label: 'Administração',
       icon: Settings,
-      roles: ['admin'],
+      isVisible: currentUser?.role === 'admin',
     },
   ]
 
-  const filteredLinks = links.filter((link) =>
-    link.roles.includes(currentUser?.role || ''),
-  )
+  const filteredLinks = links.filter((link) => link.isVisible)
 
   const NavContent = () => (
     <div className="flex flex-col h-full py-6">

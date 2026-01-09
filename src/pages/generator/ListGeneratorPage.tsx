@@ -1,13 +1,8 @@
 import { useState } from 'react'
 import { useProductStore } from '@/stores/useProductStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,9 +13,9 @@ import {
   RefreshCw,
   Settings2,
   Smartphone,
-  Check,
+  Lock,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -32,10 +27,29 @@ export default function ListGeneratorPage() {
     clearSelection,
   } = useProductStore()
 
+  const { currentUser } = useAuthStore()
+
   const [headerConfig, setHeaderConfig] = useState({
     companyName: 'Minha Loja',
-    listTitle: 'Ofertas Especiais',
+    listTitle: 'Smartphones e Eletrônicos',
   })
+
+  // Permission check
+  if (!currentUser?.canCreateList && currentUser?.role !== 'admin') {
+    return (
+      <div className="h-full flex flex-col items-center justify-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-300" />
+        <h2 className="text-2xl font-bold text-gray-900">Acesso Negado</h2>
+        <p className="text-muted-foreground text-center max-w-md">
+          Você não tem permissão para gerar listas de preços. Entre em contato
+          com o administrador para solicitar acesso.
+        </p>
+        <Button asChild>
+          <Link to="/">Voltar ao Painel</Link>
+        </Button>
+      </div>
+    )
+  }
 
   const generateListText = () => {
     const today = new Date().toLocaleDateString('pt-BR')
@@ -63,12 +77,18 @@ export default function ListGeneratorPage() {
         const priceStr = best
           ? `R$ ${best.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
-        text += `📱 ${p.name}\n💰 ${priceStr}\n\n`
+
+        // Product Line: Model + Specs
+        const specs = [p.memory, p.color].filter(Boolean).join(' • ')
+        const nameDisplay = `${p.model} ${specs ? `(${specs})` : ''}`
+
+        text += `📱 ${nameDisplay}\n`
+        text += `💰 ${priceStr} ${p.condition !== 'Novo' ? `(${p.condition})` : ''}\n\n`
       })
     })
 
     text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`
-    text += `📦 _Consulte disponibilidade._`
+    text += `📦 _Consulte disponibilidade e cores._`
     return text
   }
 
@@ -204,7 +224,7 @@ export default function ListGeneratorPage() {
                               {product.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {product.brand} •{' '}
+                              {product.model} •{' '}
                               <span className="text-emerald-600 font-semibold">
                                 {best
                                   ? `R$ ${best.price.toLocaleString('pt-BR')}`

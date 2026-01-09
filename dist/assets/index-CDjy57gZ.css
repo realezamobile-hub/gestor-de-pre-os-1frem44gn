@@ -998,9 +998,6 @@ section[aria-label='Notifications alt+T'] {
 .w-\[100px\]{
   width: 100px;
 }
-.w-\[160px\]{
-  width: 160px;
-}
 .w-\[1px\]{
   width: 1px;
 }
@@ -1038,6 +1035,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .min-w-\[--cell-size\]{
   min-width: var(--cell-size);
+}
+.min-w-\[120px\]{
+  min-width: 120px;
 }
 .min-w-\[12rem\]{
   min-width: 12rem;
@@ -1166,6 +1166,9 @@ section[aria-label='Notifications alt+T'] {
 .cursor-default{
   cursor: default;
 }
+.cursor-not-allowed{
+  cursor: not-allowed;
+}
 .cursor-pointer{
   cursor: pointer;
 }
@@ -1243,6 +1246,13 @@ section[aria-label='Notifications alt+T'] {
 .gap-6{
   gap: 1.5rem;
 }
+.gap-x-2{
+  -moz-column-gap: 0.5rem;
+       column-gap: 0.5rem;
+}
+.gap-y-1{
+  row-gap: 0.25rem;
+}
 .space-x-1 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--tw-space-x-reverse));
@@ -1288,6 +1298,11 @@ section[aria-label='Notifications alt+T'] {
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
+.space-y-6 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
+}
 .space-y-8 > :not([hidden]) ~ :not([hidden]){
   --tw-space-y-reverse: 0;
   margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1303,9 +1318,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .overflow-hidden{
   overflow: hidden;
-}
-.overflow-x-auto{
-  overflow-x: auto;
 }
 .overflow-y-auto{
   overflow-y: auto;
@@ -1470,6 +1482,9 @@ section[aria-label='Notifications alt+T'] {
 .bg-amber-50\/30{
   background-color: rgb(255 251 235 / 0.3);
 }
+.bg-amber-500\/90{
+  background-color: rgb(245 158 11 / 0.9);
+}
 .bg-background{
   background-color: hsl(var(--background));
 }
@@ -1506,6 +1521,9 @@ section[aria-label='Notifications alt+T'] {
   --tw-bg-opacity: 1;
   background-color: rgb(16 185 129 / var(--tw-bg-opacity, 1));
 }
+.bg-emerald-500\/90{
+  background-color: rgb(16 185 129 / 0.9);
+}
 .bg-emerald-600{
   --tw-bg-opacity: 1;
   background-color: rgb(5 150 105 / var(--tw-bg-opacity, 1));
@@ -1519,6 +1537,10 @@ section[aria-label='Notifications alt+T'] {
 .bg-gray-100{
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+.bg-gray-200{
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
 }
 .bg-gray-50{
   --tw-bg-opacity: 1;
@@ -1588,9 +1610,6 @@ section[aria-label='Notifications alt+T'] {
 .bg-white\/20{
   background-color: rgb(255 255 255 / 0.2);
 }
-.bg-white\/90{
-  background-color: rgb(255 255 255 / 0.9);
-}
 .bg-yellow-500{
   --tw-bg-opacity: 1;
   background-color: rgb(234 179 8 / var(--tw-bg-opacity, 1));
@@ -1632,6 +1651,10 @@ section[aria-label='Notifications alt+T'] {
 .px-1{
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+}
+.px-1\.5{
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
 }
 .px-2{
   padding-left: 0.5rem;
@@ -1746,6 +1769,9 @@ section[aria-label='Notifications alt+T'] {
 .pt-0{
   padding-top: 0px;
 }
+.pt-2{
+  padding-top: 0.5rem;
+}
 .pt-3{
   padding-top: 0.75rem;
 }
@@ -1781,6 +1807,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .text-\[0\.8rem\]{
   font-size: 0.8rem;
+}
+.text-\[10px\]{
+  font-size: 10px;
 }
 .text-base{
   font-size: 1rem;
@@ -1984,6 +2013,9 @@ section[aria-label='Notifications alt+T'] {
 .opacity-70{
   opacity: 0.7;
 }
+.opacity-80{
+  opacity: 0.8;
+}
 .opacity-90{
   opacity: 0.9;
 }
@@ -2050,6 +2082,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .ring-offset-background{
   --tw-ring-offset-color: hsl(var(--background));
+}
+.grayscale{
+  --tw-grayscale: grayscale(100%);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 .filter{
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
@@ -3251,19 +3287,8 @@ section[aria-label='Notifications alt+T'] {
   .md\:items-center{
     align-items: center;
   }
-  .md\:gap-4{
-    gap: 1rem;
-  }
-  .md\:space-y-0 > :not([hidden]) ~ :not([hidden]){
-    --tw-space-y-reverse: 0;
-    margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(0px * var(--tw-space-y-reverse));
-  }
   .md\:p-8{
     padding: 2rem;
-  }
-  .md\:pb-0{
-    padding-bottom: 0px;
   }
   .md\:text-sm{
     font-size: 0.875rem;

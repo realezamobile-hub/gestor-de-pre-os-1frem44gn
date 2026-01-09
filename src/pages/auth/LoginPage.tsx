@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuthStore()
@@ -26,15 +27,15 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await login(email)
+      const result = await login(email, password)
       if (result.success) {
         toast.success('Login realizado com sucesso!')
         navigate('/')
       } else {
-        toast.error(result.message)
+        toast.error(result.error?.message || 'Erro ao realizar login')
       }
     } catch (error) {
-      toast.error('Erro ao realizar login')
+      toast.error('Erro inesperado')
     } finally {
       setLoading(false)
     }
@@ -70,13 +71,10 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                disabled
-                title="Simulação: Apenas email é verificado"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="text-[0.8rem] text-muted-foreground">
-                * Senha desabilitada para demonstração (use admin@app.com para
-                admin)
-              </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

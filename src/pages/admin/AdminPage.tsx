@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
 import {
   Card,
@@ -22,11 +23,10 @@ import {
   UserCheck,
   UserX,
   ShieldAlert,
-  Power,
   Activity,
   Lock,
   Unlock,
-  FileEdit,
+  RefreshCcw,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -37,33 +37,32 @@ import { Switch } from '@/components/ui/switch'
 export default function AdminPage() {
   const {
     users,
+    fetchUsers,
     updateUserStatus,
-    killSession,
     toggleUserPermission,
     currentUser,
   } = useAuthStore()
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   if (currentUser?.role !== 'admin') {
     return <Navigate to="/" replace />
   }
 
-  const handleApprove = (id: string) => {
-    updateUserStatus(id, 'active')
+  const handleApprove = async (id: string) => {
+    await updateUserStatus(id, 'active')
     toast.success('Usuário aprovado com sucesso')
   }
 
-  const handleReject = (id: string) => {
-    updateUserStatus(id, 'blocked')
+  const handleReject = async (id: string) => {
+    await updateUserStatus(id, 'blocked')
     toast.info('Usuário bloqueado')
   }
 
-  const handleKillSession = (id: string) => {
-    killSession(id)
-    toast.warning('Sessão do usuário derrubada')
-  }
-
-  const handleToggleListPermission = (id: string) => {
-    toggleUserPermission(id, 'canCreateList')
+  const handleToggleListPermission = async (id: string) => {
+    await toggleUserPermission(id, 'canCreateList')
     toast.success('Permissão de criar lista atualizada')
   }
 
@@ -72,11 +71,17 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
-        <p className="text-muted-foreground mt-1">
-          Painel de controle de usuários e acessos.
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
+          <p className="text-muted-foreground mt-1">
+            Painel de controle de usuários e acessos.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
+          <RefreshCcw className="w-4 h-4 mr-2" />
+          Atualizar Lista
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -89,9 +94,6 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{users.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Registrados na plataforma
-            </p>
           </CardContent>
         </Card>
         <Card className="shadow-sm border-amber-200 bg-amber-50/30">
@@ -105,13 +107,12 @@ export default function AdminPage() {
             <div className="text-2xl font-bold text-amber-900">
               {pendingUsers.length}
             </div>
-            <p className="text-xs text-amber-700 mt-1">Aguardando liberação</p>
           </CardContent>
         </Card>
         <Card className="shadow-sm border-emerald-200 bg-emerald-50/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-emerald-900">
-              Usuários Online
+              Usuários Recentes
             </CardTitle>
             <Activity className="h-4 w-4 text-emerald-500" />
           </CardHeader>
@@ -120,14 +121,13 @@ export default function AdminPage() {
               {
                 users.filter(
                   (u) =>
-                    u.currentSessionId &&
                     new Date().getTime() - new Date(u.lastActive).getTime() <
-                      300000,
+                    24 * 60 * 60 * 1000,
                 ).length
               }
             </div>
             <p className="text-xs text-emerald-700 mt-1">
-              Ativos nos últimos 5 min
+              Ativos nas últimas 24h
             </p>
           </CardContent>
         </Card>
@@ -148,9 +148,7 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>Base de Usuários</CardTitle>
-              <CardDescription>
-                Gerencie permissões, acesso e monitore a atividade.
-              </CardDescription>
+              <CardDescription>Gerencie permissões e acesso.</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -161,128 +159,92 @@ export default function AdminPage() {
                     <TableHead className="text-center">
                       Permissão Lista
                     </TableHead>
-                    <TableHead className="text-center">Sessão</TableHead>
+                    <TableHead className="text-center">Último Acesso</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {activeUsers.map((user) => {
-                    const isOnline =
-                      user.currentSessionId &&
-                      new Date().getTime() -
-                        new Date(user.lastActive).getTime() <
-                        300000
-                    return (
-                      <TableRow key={user.id}>
-                        <TableCell className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9 border">
-                            <AvatarImage
-                              src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
-                            />
-                            <AvatarFallback>{user.name[0]}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{user.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {user.email}
-                            </div>
+                  {activeUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 border">
+                          <AvatarImage
+                            src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
+                          />
+                          <AvatarFallback>{user.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {user.email}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={
-                              user.status === 'active'
-                                ? 'bg-green-50 text-green-700 border-green-200'
-                                : 'bg-red-50 text-red-700 border-red-200'
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={
+                            user.status === 'active'
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : 'bg-red-50 text-red-700 border-red-200'
+                          }
+                        >
+                          {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex flex-col items-center gap-1">
+                          <Switch
+                            checked={user.canCreateList}
+                            onCheckedChange={() =>
+                              handleToggleListPermission(user.id)
                             }
-                          >
-                            {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex flex-col items-center gap-1">
-                            <Switch
-                              checked={user.canCreateList}
-                              onCheckedChange={() =>
-                                handleToggleListPermission(user.id)
-                              }
-                              disabled={user.id === currentUser.id}
-                              aria-label="Alternar permissão de criar lista"
-                            />
-                            <span className="text-[10px] text-muted-foreground">
-                              {user.canCreateList ? 'Permitido' : 'Negado'}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex flex-col items-center">
-                            {isOnline ? (
-                              <Badge
-                                variant="secondary"
-                                className="text-emerald-600 bg-emerald-50 border-0 mb-1"
-                              >
-                                Online
-                              </Badge>
-                            ) : (
-                              <span className="text-muted-foreground text-xs block mb-1">
-                                Offline
-                              </span>
-                            )}
-                            <span className="text-[10px] text-muted-foreground">
-                              {formatDistanceToNow(new Date(user.lastActive), {
-                                addSuffix: true,
-                                locale: ptBR,
-                              })}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            {user.id !== currentUser.id && (
-                              <>
-                                {user.status === 'active' ? (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleReject(user.id)}
-                                    className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                    title="Bloquear Acesso"
-                                  >
-                                    <Lock className="w-4 h-4 mr-1" />
-                                    Bloquear
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleApprove(user.id)}
-                                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                    title="Restaurar Acesso"
-                                  >
-                                    <Unlock className="w-4 h-4 mr-1" />
-                                    Ativar
-                                  </Button>
-                                )}
-
-                                {isOnline && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleKillSession(user.id)}
-                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    title="Forçar Logout"
-                                  >
-                                    <Power className="w-4 h-4" />
-                                  </Button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
+                            disabled={user.id === currentUser.id}
+                            aria-label="Alternar permissão de criar lista"
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(user.lastActive), {
+                            addSuffix: true,
+                            locale: ptBR,
+                          })}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {user.id !== currentUser.id && (
+                            <>
+                              {user.status === 'active' ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleReject(user.id)}
+                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                  title="Bloquear Acesso"
+                                >
+                                  <Lock className="w-4 h-4 mr-1" />
+                                  Bloquear
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleApprove(user.id)}
+                                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                  title="Restaurar Acesso"
+                                >
+                                  <Unlock className="w-4 h-4 mr-1" />
+                                  Ativar
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>
@@ -293,9 +255,6 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>Solicitações Pendentes</CardTitle>
-              <CardDescription>
-                Novos usuários aguardando aprovação para acessar o sistema.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               {pendingUsers.length === 0 ? (

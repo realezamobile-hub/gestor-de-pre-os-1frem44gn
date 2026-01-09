@@ -2,14 +2,23 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { TopHeader } from './TopHeader'
 import { useAuthStore } from '@/stores/useAuthStore'
-import { useInactivity } from '@/hooks/use-inactivity'
+import { useEffect } from 'react'
 
 export default function DashboardLayout() {
-  const { currentUser } = useAuthStore()
+  const { currentUser, isLoading, initialize } = useAuthStore()
   const location = useLocation()
 
-  // Initialize inactivity monitor
-  useInactivity()
+  useEffect(() => {
+    initialize()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   if (!currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />
@@ -17,6 +26,10 @@ export default function DashboardLayout() {
 
   if (currentUser.status === 'pending') {
     return <Navigate to="/pending" replace />
+  }
+
+  if (currentUser.status === 'blocked') {
+    return <Navigate to="/login" replace />
   }
 
   return (

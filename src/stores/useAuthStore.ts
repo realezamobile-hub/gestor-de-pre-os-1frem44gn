@@ -1,184 +1,204 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { User, UserStatus } from '@/types'
-import { INITIAL_ADMIN } from '@/lib/data'
-import { v4 as uuidv4 } from 'uuid'
+import { supabase } from '@/lib/supabase/client'
+import { Session } from '@supabase/supabase-js'
 
 interface AuthState {
   currentUser: User | null
-  users: User[]
-  currentSessionId: string | null
+  session: Session | null
+  isLoading: boolean
 
-  login: (email: string) => Promise<{ success: boolean; message?: string }>
-  logout: () => void
-  register: (name: string, email: string, phone: string) => Promise<void>
-  checkSession: () => void
-  updateActivity: () => void
+  initialize: () => Promise<void>
+  login: (
+    email: string,
+    password: string,
+  ) => Promise<{ success: boolean; error?: any }>
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    phone: string,
+  ) => Promise<{ success: boolean; error?: any }>
+  logout: () => Promise<void>
 
   // Admin actions
-  getUsers: () => User[]
-  updateUserStatus: (userId: string, status: UserStatus) => void
-  toggleUserPermission: (userId: string, permission: keyof User) => void
-  killSession: (userId: string) => void
+  users: User[]
+  fetchUsers: () => Promise<void>
+  updateUserStatus: (userId: string, status: UserStatus) => Promise<void>
+  toggleUserPermission: (
+    userId: string,
+    permission: keyof User,
+  ) => Promise<void>
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      currentUser: null,
-      users: [INITIAL_ADMIN],
-      currentSessionId: null,
+export const useAuthStore = create<AuthState>((set, get) => ({
+  currentUser: null,
+  session: null,
+  isLoading: true,
+  users: [],
 
-      login: async (email) => {
-        // Mock delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
+  initialize: async () => {
+    try {
+      // Get initial session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      set({ session })
 
-        const userIndex = get().users.findIndex((u) => u.email === email)
-        const user = get().users[userIndex]
+      if (session?.user) {
+        // Fetch profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
 
-        if (!user) {
-          return { success: false, message: 'Usuário não encontrado.' }
-        }
-
-        if (user.status === 'blocked') {
-          return { success: false, message: 'Conta bloqueada.' }
-        }
-
-        if (user.status === 'pending') {
-          return {
-            success: false,
-            message: 'Sua conta ainda está em análise.',
-          }
-        }
-
-        // Generate new session ID to invalidate previous sessions (Single Session Logic)
-        const newSessionId = uuidv4()
-
-        const updatedUser = {
-          ...user,
-          lastActive: new Date().toISOString(),
-          currentSessionId: newSessionId,
-        }
-
-        const updatedUsers = [...get().users]
-        updatedUsers[userIndex] = updatedUser
-
-        set({
-          users: updatedUsers,
-          currentUser: updatedUser,
-          currentSessionId: newSessionId,
-        })
-
-        return { success: true }
-      },
-
-      logout: () => {
-        const { currentUser, users } = get()
-        if (currentUser) {
-          const userIndex = users.findIndex((u) => u.id === currentUser.id)
-          if (userIndex !== -1) {
-            const updatedUsers = [...users]
-            updatedUsers[userIndex] = { ...currentUser, currentSessionId: null }
-            set({ users: updatedUsers })
-          }
-        }
-        set({ currentUser: null, currentSessionId: null })
-      },
-
-      register: async (name, email, phone) => {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        const newUser: User = {
-          id: uuidv4(),
-          name,
-          email,
-          phone,
-          role: 'user',
-          status: 'pending',
-          lastActive: new Date().toISOString(),
-          currentSessionId: null,
-          createdAt: new Date().toISOString(),
-          canCreateList: false, // Default to false
-        }
-        set((state) => ({ users: [...state.users, newUser] }))
-      },
-
-      checkSession: () => {
-        const { currentUser, currentSessionId, users } = get()
-        if (!currentUser || !currentSessionId) return
-
-        // Fetch fresh user data from "DB" (persisted state)
-        const freshUser = users.find((u) => u.id === currentUser.id)
-
-        if (!freshUser) {
-          get().logout()
-          return
-        }
-
-        // Check simultaneous access (Session Security)
-        if (freshUser.currentSessionId !== currentSessionId) {
-          get().logout()
-          return
-        }
-
-        // Check timeout (double check alongside hook)
-        const lastActiveTime = new Date(freshUser.lastActive).getTime()
-        const now = new Date().getTime()
-        if (now - lastActiveTime > 60 * 60 * 1000) {
-          // 1 hour
-          get().logout()
-        }
-      },
-
-      updateActivity: () => {
-        const { currentUser, users } = get()
-        if (!currentUser) return
-
-        const now = new Date().toISOString()
-        const userIndex = users.findIndex((u) => u.id === currentUser.id)
-
-        if (userIndex !== -1) {
-          const updatedUsers = [...users]
-          updatedUsers[userIndex] = {
-            ...updatedUsers[userIndex],
-            lastActive: now,
-          }
+        if (profile) {
           set({
-            users: updatedUsers,
-            currentUser: { ...currentUser, lastActive: now },
+            currentUser: {
+              id: profile.id,
+              name: profile.name || '',
+              email: profile.email || '',
+              role: (profile.role as 'admin' | 'user') || 'user',
+              status: (profile.status as UserStatus) || 'pending',
+              phone: profile.phone || '',
+              lastActive: profile.last_active || new Date().toISOString(),
+              createdAt: profile.created_at || new Date().toISOString(),
+              canCreateList: profile.can_create_list || false,
+            },
           })
+
+          // Update last active
+          await supabase
+            .from('profiles')
+            .update({ last_active: new Date().toISOString() })
+            .eq('id', profile.id)
         }
-      },
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error)
+    } finally {
+      set({ isLoading: false })
+    }
 
-      getUsers: () => get().users,
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      set({ session, isLoading: true })
 
-      updateUserStatus: (userId, status) => {
-        set((state) => ({
-          users: state.users.map((u) =>
-            u.id === userId ? { ...u, status } : u,
-          ),
-        }))
-      },
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
 
-      toggleUserPermission: (userId, permission) => {
-        set((state) => ({
-          users: state.users.map((u) =>
-            u.id === userId
-              ? { ...u, [permission]: !u[permission as keyof User] }
-              : u,
-          ),
-        }))
-      },
+        if (profile) {
+          set({
+            currentUser: {
+              id: profile.id,
+              name: profile.name || '',
+              email: profile.email || '',
+              role: (profile.role as 'admin' | 'user') || 'user',
+              status: (profile.status as UserStatus) || 'pending',
+              phone: profile.phone || '',
+              lastActive: profile.last_active || new Date().toISOString(),
+              createdAt: profile.created_at || new Date().toISOString(),
+              canCreateList: profile.can_create_list || false,
+            },
+            isLoading: false,
+          })
+        } else {
+          set({ currentUser: null, isLoading: false })
+        }
+      } else {
+        set({ currentUser: null, isLoading: false })
+      }
+    })
+  },
 
-      killSession: (userId) => {
-        set((state) => ({
-          users: state.users.map((u) =>
-            u.id === userId ? { ...u, currentSessionId: null } : u,
-          ),
-        }))
+  login: async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    if (error) return { success: false, error }
+    return { success: true }
+  },
+
+  register: async (name, email, password, phone) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name, phone },
       },
-    }),
-    {
-      name: 'app-auth-storage',
-    },
-  ),
-)
+    })
+
+    if (error) return { success: false, error }
+    return { success: true }
+  },
+
+  logout: async () => {
+    await supabase.auth.signOut()
+    set({ currentUser: null, session: null })
+  },
+
+  fetchUsers: async () => {
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (!error && profiles) {
+      const mappedUsers: User[] = profiles.map((p) => ({
+        id: p.id,
+        name: p.name || '',
+        email: p.email || '',
+        role: (p.role as 'admin' | 'user') || 'user',
+        status: (p.status as UserStatus) || 'pending',
+        phone: p.phone || '',
+        lastActive: p.last_active || new Date().toISOString(),
+        createdAt: p.created_at || new Date().toISOString(),
+        canCreateList: p.can_create_list || false,
+      }))
+      set({ users: mappedUsers })
+    }
+  },
+
+  updateUserStatus: async (userId, status) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status })
+      .eq('id', userId)
+
+    if (!error) {
+      set((state) => ({
+        users: state.users.map((u) => (u.id === userId ? { ...u, status } : u)),
+      }))
+    }
+  },
+
+  toggleUserPermission: async (userId, permission) => {
+    const user = get().users.find((u) => u.id === userId)
+    if (!user) return
+
+    const newValue = !user[permission]
+
+    // Map TS property to DB column
+    const dbColumn =
+      permission === 'canCreateList' ? 'can_create_list' : permission
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ [dbColumn]: newValue })
+      .eq('id', userId)
+
+    if (!error) {
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === userId ? { ...u, [permission]: newValue } : u,
+        ),
+      }))
+    }
+  },
+}))

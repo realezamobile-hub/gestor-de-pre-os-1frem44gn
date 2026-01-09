@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     phone: '',
   })
 
@@ -30,9 +31,18 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(formData.name, formData.email, formData.phone)
-      toast.success('Cadastro realizado com sucesso!')
-      navigate('/pending')
+      const result = await register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.phone,
+      )
+      if (result.success) {
+        toast.success('Cadastro realizado com sucesso!')
+        navigate('/pending')
+      } else {
+        toast.error(result.error?.message || 'Erro ao cadastrar')
+      }
     } catch (error) {
       toast.error('Erro ao realizar cadastro')
     } finally {
@@ -73,6 +83,18 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
                 }
               />
             </div>

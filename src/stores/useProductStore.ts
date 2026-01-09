@@ -55,6 +55,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true })
     const { filters } = get()
 
+    // Explicitly fetching data ensuring 'valor' is retrieved
     let query = supabase
       .from('produtos')
       .select('*')

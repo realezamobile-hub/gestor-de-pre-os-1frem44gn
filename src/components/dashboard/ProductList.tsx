@@ -19,9 +19,10 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
   const canCreateList = currentUser?.canCreateList || false
 
   // Helper for currency formatting
+  // Ensures null values are handled gracefully without defaulting to zero
   const formatPrice = (value: number | null | undefined) => {
     if (value === null || value === undefined) {
-      return 'R$ 0,00'
+      return 'Sob Consulta'
     }
     return value.toLocaleString('pt-BR', {
       style: 'currency',
@@ -29,7 +30,7 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
     })
   }
 
-  // Calculate lowest price in current view
+  // Calculate lowest price in current view, ignoring null/undefined
   const lowestPrice = products.reduce((min, p) => {
     if (p.valor === null || p.valor === undefined) return min
     return p.valor < min ? p.valor : min

@@ -112,6 +112,8 @@ export function ProductMobileList({
                       isLowestPrice
                         ? 'text-emerald-600 scale-110 origin-right'
                         : 'text-gray-900',
+                      product.valor === null &&
+                        'text-sm font-normal text-muted-foreground',
                     )}
                   >
                     {formatPrice(product.valor)}

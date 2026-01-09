@@ -130,6 +130,8 @@ export function ProductTable({
                     className={cn(
                       isLowestPrice &&
                         'text-emerald-700 scale-110 origin-right transition-transform',
+                      product.valor === null &&
+                        'text-sm font-normal text-muted-foreground',
                     )}
                   >
                     {formatPrice(product.valor)}

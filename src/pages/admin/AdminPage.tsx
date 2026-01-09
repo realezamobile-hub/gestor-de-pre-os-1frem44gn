@@ -18,7 +18,15 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { UserCheck, UserX, ShieldAlert, Power, Activity } from 'lucide-react'
+import {
+  UserCheck,
+  UserX,
+  ShieldAlert,
+  Power,
+  Activity,
+  Lock,
+  Unlock,
+} from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
@@ -50,42 +58,52 @@ export default function AdminPage() {
   const activeUsers = users.filter((u) => u.status !== 'pending')
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
-        <p className="text-muted-foreground">
-          Gerencie usuários e acessos do sistema.
+        <p className="text-muted-foreground mt-1">
+          Painel de controle de usuários e acessos.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Usuários Totais
+              Total de Usuários
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{users.length}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Registrados na plataforma
+            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-sm border-amber-200 bg-amber-50/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
+            <CardTitle className="text-sm font-medium text-amber-900">
+              Aprovações Pendentes
+            </CardTitle>
             <ShieldAlert className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingUsers.length}</div>
+            <div className="text-2xl font-bold text-amber-900">
+              {pendingUsers.length}
+            </div>
+            <p className="text-xs text-amber-700 mt-1">Aguardando liberação</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-sm border-emerald-200 bg-emerald-50/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Online Agora</CardTitle>
+            <CardTitle className="text-sm font-medium text-emerald-900">
+              Usuários Online
+            </CardTitle>
             <Activity className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-emerald-900">
               {
                 users.filter(
                   (u) =>
@@ -95,34 +113,30 @@ export default function AdminPage() {
                 ).length
               }
             </div>
+            <p className="text-xs text-emerald-700 mt-1">
+              Ativos nos últimos 5 min
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="active" className="w-full">
-        <TabsList>
-          <TabsTrigger value="active">
-            Usuários ({activeUsers.length})
-          </TabsTrigger>
-          <TabsTrigger value="pending">
-            Pendentes
+        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsTrigger value="active">Gerenciar Usuários</TabsTrigger>
+          <TabsTrigger value="pending" className="relative">
+            Solicitações
             {pendingUsers.length > 0 && (
-              <Badge
-                variant="destructive"
-                className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]"
-              >
-                {pendingUsers.length}
-              </Badge>
+              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
             )}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="active" className="mt-4">
+        <TabsContent value="active" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Usuários Registrados</CardTitle>
+              <CardTitle>Base de Usuários</CardTitle>
               <CardDescription>
-                Visão geral de todos os usuários com acesso à plataforma.
+                Gerencie o acesso e monitore a atividade dos usuários.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -131,8 +145,8 @@ export default function AdminPage() {
                   <TableRow>
                     <TableHead>Usuário</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Visto por último</TableHead>
-                    <TableHead>Sessão</TableHead>
+                    <TableHead>Atividade</TableHead>
+                    <TableHead className="text-center">Sessão</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -146,7 +160,7 @@ export default function AdminPage() {
                     return (
                       <TableRow key={user.id}>
                         <TableCell className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
+                          <Avatar className="h-9 w-9 border">
                             <AvatarImage
                               src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
                             />
@@ -161,76 +175,82 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <Badge
-                            variant={
-                              user.status === 'blocked'
-                                ? 'destructive'
-                                : 'secondary'
-                            }
+                            variant="outline"
                             className={
                               user.status === 'active'
-                                ? 'bg-green-100 text-green-700'
-                                : ''
+                                ? 'bg-green-50 text-green-700 border-green-200'
+                                : 'bg-red-50 text-red-700 border-red-200'
                             }
                           >
                             {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">
-                          {formatDistanceToNow(new Date(user.lastActive), {
-                            addSuffix: true,
-                            locale: ptBR,
-                          })}
+                          <div className="flex flex-col">
+                            <span>
+                              {formatDistanceToNow(new Date(user.lastActive), {
+                                addSuffix: true,
+                                locale: ptBR,
+                              })}
+                            </span>
+                          </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           {isOnline ? (
                             <Badge
-                              variant="outline"
-                              className="border-emerald-200 text-emerald-600 bg-emerald-50"
+                              variant="secondary"
+                              className="text-emerald-600 bg-emerald-50 border-0"
                             >
                               Online
                             </Badge>
                           ) : (
                             <span className="text-muted-foreground text-xs">
-                              -
+                              Offline
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
-                          {user.id !== currentUser.id && (
-                            <>
-                              {user.status === 'active' ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleReject(user.id)}
-                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                >
-                                  Bloquear
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleApprove(user.id)}
-                                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                >
-                                  Ativar
-                                </Button>
-                              )}
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            {user.id !== currentUser.id && (
+                              <>
+                                {user.status === 'active' ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleReject(user.id)}
+                                    className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                    title="Bloquear Acesso"
+                                  >
+                                    <Lock className="w-4 h-4 mr-1" />
+                                    Bloquear
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleApprove(user.id)}
+                                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                    title="Restaurar Acesso"
+                                  >
+                                    <Unlock className="w-4 h-4 mr-1" />
+                                    Ativar
+                                  </Button>
+                                )}
 
-                              {isOnline && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleKillSession(user.id)}
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  title="Derrubar sessão"
-                                >
-                                  <Power className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </>
-                          )}
+                                {isOnline && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleKillSession(user.id)}
+                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    title="Forçar Logout"
+                                  >
+                                    <Power className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     )
@@ -241,18 +261,19 @@ export default function AdminPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="pending" className="mt-4">
+        <TabsContent value="pending" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Solicitações de Acesso</CardTitle>
+              <CardTitle>Solicitações Pendentes</CardTitle>
               <CardDescription>
-                Aprove ou rejeite novos cadastros.
+                Novos usuários aguardando aprovação para acessar o sistema.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {pendingUsers.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Nenhuma solicitação pendente.
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
+                  <UserCheck className="w-12 h-12 mb-3 text-gray-300" />
+                  <p>Nenhuma solicitação pendente.</p>
                 </div>
               ) : (
                 <Table>
@@ -260,7 +281,7 @@ export default function AdminPage() {
                     <TableRow>
                       <TableHead>Usuário</TableHead>
                       <TableHead>Contato</TableHead>
-                      <TableHead>Data</TableHead>
+                      <TableHead>Solicitado em</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -268,11 +289,17 @@ export default function AdminPage() {
                     {pendingUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
-                          {user.name}
-                          <br />
-                          <span className="text-xs font-normal text-muted-foreground">
-                            {user.email}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback>{user.name[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div>{user.name}</div>
+                              <div className="text-xs font-normal text-muted-foreground">
+                                {user.email}
+                              </div>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>{user.phone || '-'}</TableCell>
                         <TableCell className="text-muted-foreground text-sm">
@@ -282,17 +309,17 @@ export default function AdminPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-destructive hover:bg-destructive hover:text-white"
+                            className="text-destructive hover:bg-destructive hover:text-white border-destructive/20"
                             onClick={() => handleReject(user.id)}
                           >
-                            <UserX className="w-4 h-4 mr-1" /> Rejeitar
+                            <UserX className="w-4 h-4 mr-2" /> Rejeitar
                           </Button>
                           <Button
                             size="sm"
                             className="bg-emerald-600 hover:bg-emerald-700"
                             onClick={() => handleApprove(user.id)}
                           >
-                            <UserCheck className="w-4 h-4 mr-1" /> Aprovar
+                            <UserCheck className="w-4 h-4 mr-2" /> Aprovar
                           </Button>
                         </TableCell>
                       </TableRow>

@@ -39,17 +39,11 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, message: 'Usuário não encontrado.' }
         }
 
-        if (user.status === 'pending') {
-          return {
-            success: false,
-            message: 'Conta aguardando aprovação do administrador.',
-          }
-        }
-
         if (user.status === 'blocked') {
           return { success: false, message: 'Conta bloqueada.' }
         }
 
+        // Generate new session ID to invalidate previous sessions (Single Session Logic)
         const newSessionId = uuidv4()
 
         const updatedUser = {
@@ -103,7 +97,7 @@ export const useAuthStore = create<AuthState>()(
         const { currentUser, currentSessionId, users } = get()
         if (!currentUser || !currentSessionId) return
 
-        // Fetch fresh user data from "DB"
+        // Fetch fresh user data from "DB" (persisted state)
         const freshUser = users.find((u) => u.id === currentUser.id)
 
         if (!freshUser) {
@@ -111,13 +105,15 @@ export const useAuthStore = create<AuthState>()(
           return
         }
 
-        // Check simultaneous access
+        // Check simultaneous access (Session Security)
+        // If the session ID in the "DB" is different from the local one,
+        // it means logged in somewhere else or session killed
         if (freshUser.currentSessionId !== currentSessionId) {
           get().logout()
           return
         }
 
-        // Check timeout (handled by inactivity hook mostly, but good here too)
+        // Check timeout (double check alongside hook)
         const lastActiveTime = new Date(freshUser.lastActive).getTime()
         const now = new Date().getTime()
         if (now - lastActiveTime > 60 * 60 * 1000) {

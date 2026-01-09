@@ -1,11 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Copy,
   Trash2,
@@ -13,10 +32,14 @@ import {
   Settings2,
   Smartphone,
   Lock,
+  CalendarIcon,
+  Wand2,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export default function ListGeneratorPage() {
   const {
@@ -24,6 +47,10 @@ export default function ListGeneratorPage() {
     toggleProductSelection,
     clearSelection,
     getSelectedProducts,
+    categories,
+    fetchCategories,
+    generateList,
+    isLoading,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -32,6 +59,14 @@ export default function ListGeneratorPage() {
   const [headerConfig, setHeaderConfig] = useState({
     companyName: 'Minha Loja',
   })
+
+  // Generator State
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   // Permission check
   if (!currentUser?.canCreateList) {
@@ -47,6 +82,10 @@ export default function ListGeneratorPage() {
         </Button>
       </div>
     )
+  }
+
+  const handleGenerate = async () => {
+    await generateList(selectedDate || null, selectedCategory)
   }
 
   const generateListText = () => {
@@ -76,7 +115,7 @@ export default function ListGeneratorPage() {
 
         // Format: • [Modelo] [Memoria] [Cor] - R$ [Valor]
         // Adding other details if relevant and brief
-        text += ` • ${p.modelo} ${p.memoria || ''} ${p.cor || ''}`
+        text += ` • ${p.modelo} ${p.ram ? p.ram + ' ' : ''}${p.memoria || ''} ${p.cor || ''}`
         if (p.estado && p.estado !== 'Novo') text += ` (${p.estado})`
         text += ` - *${priceStr}*\n`
       })
@@ -140,6 +179,78 @@ export default function ListGeneratorPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
         <div className="lg:col-span-5 flex flex-col gap-6 h-full overflow-hidden">
+          {/* Generator Controls */}
+          <Card className="bg-blue-50/50 border-blue-100">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2 text-blue-900">
+                <Wand2 className="w-4 h-4 text-blue-600" />
+                Gerador Automático
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Filtre e gere uma lista baseada em critérios.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs">Data de Entrada</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full justify-start text-left font-normal h-9 px-3 text-xs',
+                          !selectedDate && 'text-muted-foreground',
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                        {selectedDate ? (
+                          format(selectedDate, 'P', { locale: ptBR })
+                        ) : (
+                          <span>Selecione</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Categoria</Label>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                  >
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue placeholder="Todas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      {categories.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button
+                onClick={handleGenerate}
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs"
+              >
+                {isLoading ? 'Gerando...' : 'Gerar Lista'}
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -149,7 +260,9 @@ export default function ListGeneratorPage() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="companyName">Nome da Empresa</Label>
+                <Label htmlFor="companyName" className="text-xs">
+                  Nome da Empresa
+                </Label>
                 <Input
                   id="companyName"
                   value={headerConfig.companyName}
@@ -160,6 +273,7 @@ export default function ListGeneratorPage() {
                     })
                   }
                   placeholder="Ex: Minha Loja"
+                  className="h-9 text-sm"
                 />
               </div>
             </CardContent>
@@ -182,18 +296,30 @@ export default function ListGeneratorPage() {
                       key={product.id}
                       className="p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors group"
                     >
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {product.modelo}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {product.memoria} • {product.cor} •{' '}
-                          <span className="text-emerald-600 font-semibold">
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex justify-between items-start">
+                          <p className="font-medium text-sm truncate pr-2">
+                            {product.modelo}
+                          </p>
+                          <span className="text-emerald-600 font-bold text-sm whitespace-nowrap">
                             {product.valor
                               ? `R$ ${product.valor.toLocaleString('pt-BR')}`
                               : '-'}
                           </span>
-                        </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                          <span className="bg-gray-100 px-1.5 rounded">
+                            {product.ram || '-'} RAM
+                          </span>
+                          <span>{product.memoria}</span>
+                          <span>{product.cor}</span>
+                          {product.fornecedor && (
+                            <span className="text-blue-600 font-medium">
+                              Fornecedor: {product.fornecedor}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <Button
                         variant="ghost"

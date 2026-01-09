@@ -1,17 +1,21 @@
 import { create } from 'zustand'
 import { Product, FilterState } from '@/types'
 import { supabase } from '@/lib/supabase/client'
-import { startOfToday, startOfDay, subDays } from 'date-fns'
+import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
+import { toast } from 'sonner'
 
 interface ProductStore {
   products: Product[]
   isLoading: boolean
   filters: FilterState
   selectedProductIds: Set<number>
+  categories: string[]
 
   setFilters: (filters: Partial<FilterState>) => void
   resetFilters: () => void
   fetchProducts: () => Promise<void>
+  fetchCategories: () => Promise<void>
+  generateList: (date: Date | null, category: string) => Promise<void>
   toggleProductSelection: (productId: number) => void
   clearSelection: () => void
   getSelectedProducts: () => Product[]
@@ -35,6 +39,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   isLoading: false,
   filters: INITIAL_FILTERS,
   selectedProductIds: new Set(),
+  categories: [],
 
   setFilters: (newFilters) => {
     set((state) => ({ filters: { ...state.filters, ...newFilters } }))
@@ -53,7 +58,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     let query = supabase
       .from('produtos')
       .select('*')
-      // Changed sorting to be by price ascending
       .order('valor', { ascending: true })
 
     // Apply filters
@@ -113,6 +117,77 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
   },
 
+  fetchCategories: async () => {
+    const { data } = await supabase
+      .from('produtos')
+      .select('categoria')
+      .not('categoria', 'is', null)
+
+    if (data) {
+      const uniqueCategories = Array.from(
+        new Set(data.map((item) => item.categoria).filter(Boolean) as string[]),
+      ).sort()
+      set({ categories: uniqueCategories })
+    }
+  },
+
+  generateList: async (date, category) => {
+    set({ isLoading: true })
+
+    try {
+      let query = supabase
+        .from('produtos')
+        .select('*')
+        .order('valor', { ascending: true })
+
+      if (date) {
+        const start = startOfDay(date).toISOString()
+        const end = endOfDay(date).toISOString()
+        query = query.gte('criado_em', start).lte('criado_em', end)
+      }
+
+      if (category && category !== 'all') {
+        query = query.eq('categoria', category)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+
+      if (data) {
+        if (data.length === 0) {
+          toast.info('Nenhum produto encontrado com os filtros selecionados.')
+        } else {
+          set((state) => {
+            // Merge new products into existing products to ensure they are available
+            const existingIds = new Set(state.products.map((p) => p.id))
+            const newProducts = [...state.products]
+            data.forEach((p) => {
+              if (!existingIds.has(p.id)) {
+                newProducts.push(p)
+              }
+            })
+
+            // Set selection to ONLY the generated items
+            const newSelection = new Set(data.map((p) => p.id))
+
+            toast.success(`${data.length} produtos adicionados à lista!`)
+
+            return {
+              products: newProducts,
+              selectedProductIds: newSelection,
+            }
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error generating list:', error)
+      toast.error('Erro ao gerar a lista. Tente novamente.')
+    } finally {
+      set({ isLoading: false })
+    }
+  },
+
   toggleProductSelection: (productId) =>
     set((state) => {
       const newSelection = new Set(state.selectedProductIds)
@@ -128,6 +203,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   getSelectedProducts: () => {
     const { products, selectedProductIds } = get()
+    // Map selection to products, ensuring we have the product data
+    // Even if product list changes, we might want to keep selection if data is present
     return products.filter((p) => selectedProductIds.has(p.id))
   },
 

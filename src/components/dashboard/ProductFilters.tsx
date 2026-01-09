@@ -24,11 +24,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 
 export function ProductFilters() {
-  const { filters, setFilters, resetFilters } = useProductStore()
+  const { filters, setFilters, resetFilters, categories, fetchCategories } =
+    useProductStore()
 
-  // Local state for dropdown options
+  // Local state for other dropdown options
   const [options, setOptions] = useState({
-    categories: [] as string[],
     memories: [] as string[],
     colors: [] as string[],
     conditions: [] as string[],
@@ -37,11 +37,12 @@ export function ProductFilters() {
   })
 
   useEffect(() => {
-    // Fetch distinct values for filters
+    fetchCategories()
+    // Fetch distinct values for other filters
     const fetchOptions = async () => {
       const { data } = await supabase
         .from('produtos')
-        .select('categoria, memoria, cor, estado, fornecedor, bateria')
+        .select('memoria, cor, estado, fornecedor, bateria')
 
       if (data) {
         const unique = (key: keyof (typeof data)[0]) =>
@@ -50,7 +51,6 @@ export function ProductFilters() {
           ).sort()
 
         setOptions({
-          categories: unique('categoria'),
           memories: unique('memoria'),
           colors: unique('cor'),
           conditions: unique('estado'),
@@ -107,7 +107,7 @@ export function ProductFilters() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                {options.categories.map((c) => (
+                {categories.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
                   </SelectItem>

@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { MessageCircle, Battery, Cpu, Smartphone } from 'lucide-react'
+import { MessageCircle, Battery, Cpu, Smartphone, Truck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface ProductListProps {
@@ -126,6 +126,13 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
                     </span>
                   </div>
 
+                  {product.fornecedor && (
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                      <Truck className="w-3 h-3" />
+                      <span className="truncate">{product.fornecedor}</span>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2">
                       <Badge
@@ -195,6 +202,7 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
             <TableHead>Cor</TableHead>
             <TableHead>Condição</TableHead>
             <TableHead>Bateria</TableHead>
+            <TableHead>Fornecedor</TableHead>
             <TableHead className="w-[50px] text-center">Zap</TableHead>
             <TableHead className="text-right">Valor</TableHead>
           </TableRow>
@@ -251,6 +259,9 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell>{product.bateria || '-'}</TableCell>
+                <TableCell className="text-gray-600">
+                  {product.fornecedor || '-'}
+                </TableCell>
                 <TableCell className="text-center">
                   {product.link_whatsapp || product.telefone ? (
                     <Button

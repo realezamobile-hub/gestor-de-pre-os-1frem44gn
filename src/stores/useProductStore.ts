@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Product, FilterState } from '@/types'
 import { supabase } from '@/lib/supabase/client'
-import { RealtimeChannel } from '@supabase/supabase-js'
+import { startOfToday, startOfDay, subDays } from 'date-fns'
 
 interface ProductStore {
   products: Product[]
@@ -27,6 +27,7 @@ const INITIAL_FILTERS: FilterState = {
   supplier: 'all',
   battery: 'all',
   inStockOnly: false,
+  dateRange: 'all',
 }
 
 export const useProductStore = create<ProductStore>((set, get) => ({
@@ -52,13 +53,16 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     let query = supabase
       .from('produtos')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('criado_em', { ascending: false })
 
     // Apply filters
     if (filters.search) {
-      query = query.or(
-        `modelo.ilike.%${filters.search}%,obs.ilike.%${filters.search}%`,
-      )
+      const searchTerm = filters.search.trim()
+      if (searchTerm) {
+        query = query.or(
+          `modelo.ilike.%${searchTerm}%,categoria.ilike.%${searchTerm}%,fornecedor.ilike.%${searchTerm}%`,
+        )
+      }
     }
 
     if (filters.category && filters.category !== 'all') {
@@ -87,6 +91,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     if (filters.inStockOnly) {
       query = query.eq('em_estoque', true)
+    }
+
+    // Date Range Logic
+    if (filters.dateRange === 'today') {
+      const today = startOfToday().toISOString()
+      query = query.gte('criado_em', today)
+    } else if (filters.dateRange === 'last_2_days') {
+      const twoDaysAgo = startOfDay(subDays(new Date(), 1)).toISOString()
+      query = query.gte('criado_em', twoDaysAgo)
     }
 
     const { data, error } = await query

@@ -28,4 +28,5 @@ export interface FilterState {
   supplier: string
   battery: string
   inStockOnly: boolean
+  dateRange: 'today' | 'last_2_days' | 'all'
 }

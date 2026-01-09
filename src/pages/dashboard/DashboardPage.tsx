@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Store, ShoppingCart, Search, RefreshCcw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function DashboardPage() {
   const {
@@ -63,19 +64,31 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border sticky top-16 z-30 transition-all duration-300">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1 group">
+      <div className="bg-white p-4 rounded-xl shadow-sm border sticky top-16 z-30 transition-all duration-300 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div className="relative flex-1 group w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
             <Input
-              placeholder="Buscar por modelo, obs..."
+              placeholder="Buscar por modelo, categoria, fornecedor..."
               className="pl-10 bg-gray-50/50 focus:bg-white transition-colors"
               value={filters.search}
               onChange={(e) => setFilters({ search: e.target.value })}
             />
           </div>
 
-          <div className="flex gap-2">
+          <Tabs
+            value={filters.dateRange}
+            onValueChange={(val) => setFilters({ dateRange: val as any })}
+            className="w-full md:w-auto"
+          >
+            <TabsList className="grid w-full grid-cols-3 md:w-auto">
+              <TabsTrigger value="today">Hoje</TabsTrigger>
+              <TabsTrigger value="last_2_days">2 Dias</TabsTrigger>
+              <TabsTrigger value="all">Todos</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className="flex gap-2 w-full md:w-auto justify-end">
             <ProductFilters />
             <Button
               variant="ghost"
@@ -91,13 +104,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <ProductList products={products} />
-
-      {isLoading && products.length === 0 && (
-        <div className="flex justify-center py-12">
-          <RefreshCcw className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      )}
+      <div className={isLoading ? 'opacity-70 transition-opacity' : ''}>
+        <ProductList products={products} isLoading={isLoading} />
+      </div>
     </div>
   )
 }

@@ -705,6 +705,15 @@ section[aria-label='Notifications alt+T'] {
 .z-\[1\]{
   z-index: 1;
 }
+.col-span-3{
+  grid-column: span 3 / span 3;
+}
+.col-span-4{
+  grid-column: span 4 / span 4;
+}
+.col-span-5{
+  grid-column: span 5 / span 5;
+}
 .-mx-1{
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -1192,8 +1201,14 @@ section[aria-label='Notifications alt+T'] {
 .grid-cols-1{
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+.grid-cols-12{
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
 .grid-cols-2{
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid-cols-3{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .flex-row{
   flex-direction: row;
@@ -1421,6 +1436,10 @@ section[aria-label='Notifications alt+T'] {
 .border-amber-200{
   --tw-border-opacity: 1;
   border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
+}
+.border-blue-100{
+  --tw-border-opacity: 1;
+  border-color: rgb(219 234 254 / var(--tw-border-opacity, 1));
 }
 .border-border\/50{
   border-color: hsl(var(--border) / 0.5);
@@ -1783,6 +1802,9 @@ section[aria-label='Notifications alt+T'] {
 .pt-4{
   padding-top: 1rem;
 }
+.pt-6{
+  padding-top: 1.5rem;
+}
 .text-left{
   text-align: left;
 }
@@ -1847,6 +1869,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .font-semibold{
   font-weight: 600;
+}
+.uppercase{
+  text-transform: uppercase;
 }
 .italic{
   font-style: italic;
@@ -3282,6 +3307,9 @@ section[aria-label='Notifications alt+T'] {
   .md\:max-w-\[420px\]{
     max-width: 420px;
   }
+  .md\:grid-cols-2{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .md\:grid-cols-3{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -3330,8 +3358,8 @@ section[aria-label='Notifications alt+T'] {
   .lg\:col-span-7{
     grid-column: span 7 / span 7;
   }
-  .lg\:w-\[400px\]{
-    width: 400px;
+  .lg\:w-\[600px\]{
+    width: 600px;
   }
   .lg\:grid-cols-12{
     grid-template-columns: repeat(12, minmax(0, 1fr));

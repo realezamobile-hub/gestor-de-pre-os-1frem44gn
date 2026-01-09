@@ -18933,6 +18933,20 @@ var Copy = createLucideIcon("copy", [["rect", {
 	d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2",
 	key: "zix9uf"
 }]]);
+var ExternalLink = createLucideIcon("external-link", [
+	["path", {
+		d: "M15 3h6v6",
+		key: "1q9fwt"
+	}],
+	["path", {
+		d: "M10 14 21 3",
+		key: "gplh6r"
+	}],
+	["path", {
+		d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",
+		key: "a6xqqp"
+	}]
+]);
 var FileText = createLucideIcon("file-text", [
 	["path", {
 		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
@@ -18967,6 +18981,22 @@ var FunnelX = createLucideIcon("funnel-x", [
 	["path", {
 		d: "m21.5 3.5-5 5",
 		key: "m0lwru"
+	}]
+]);
+var Globe = createLucideIcon("globe", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20",
+		key: "13o1zl"
+	}],
+	["path", {
+		d: "M2 12h20",
+		key: "9i4pu4"
 	}]
 ]);
 var LayoutDashboard = createLucideIcon("layout-dashboard", [
@@ -19086,6 +19116,40 @@ var Search = createLucideIcon("search", [["path", {
 	r: "8",
 	key: "4ej97u"
 }]]);
+var Server = createLucideIcon("server", [
+	["rect", {
+		width: "20",
+		height: "8",
+		x: "2",
+		y: "2",
+		rx: "2",
+		ry: "2",
+		key: "ngkwjq"
+	}],
+	["rect", {
+		width: "20",
+		height: "8",
+		x: "2",
+		y: "14",
+		rx: "2",
+		ry: "2",
+		key: "iecqi9"
+	}],
+	["line", {
+		x1: "6",
+		x2: "6.01",
+		y1: "6",
+		y2: "6",
+		key: "16zg32"
+	}],
+	["line", {
+		x1: "6",
+		x2: "6.01",
+		y1: "18",
+		y2: "18",
+		key: "nzw8ys"
+	}]
+]);
 var Settings = createLucideIcon("settings", [["path", {
 	d: "M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915",
 	key: "1i5ecw"
@@ -24151,7 +24215,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$6({ inst: {
+			cachedValue = useState$7({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24188,7 +24252,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$2 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$6 = React$2.useState, useEffect$4 = React$2.useEffect, useLayoutEffect$1 = React$2.useLayoutEffect, useDebugValue$1 = React$2.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$2 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$7 = React$2.useState, useEffect$4 = React$2.useEffect, useLayoutEffect$1 = React$2.useLayoutEffect, useDebugValue$1 = React$2.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$2.useSyncExternalStore ? React$2.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -32269,10 +32333,13 @@ const useAuthStore = create((set, get$1) => ({
 		const { error } = await supabase.auth.signUp({
 			email,
 			password,
-			options: { data: {
-				name,
-				phone
-			} }
+			options: {
+				data: {
+					name,
+					phone
+				},
+				emailRedirectTo: window.location.origin
+			}
 		});
 		if (error) return {
 			success: false,
@@ -37113,6 +37180,120 @@ var TabsContent = import_react.forwardRef(({ className, ...props }, ref) => /* @
 	...props
 }));
 TabsContent.displayName = Content.displayName;
+var SWITCH_NAME = "Switch";
+var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
+var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
+var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
+	const [button, setButton] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = button ? form || !!button.closest("form") : true;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: SWITCH_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
+		scope: __scopeSwitch,
+		checked,
+		disabled,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+			type: "button",
+			role: "switch",
+			"aria-checked": checked,
+			"aria-required": required,
+			"data-state": getState(checked),
+			"data-disabled": disabled ? "" : void 0,
+			disabled,
+			value,
+			...switchProps,
+			ref: composedRefs,
+			onClick: composeEventHandlers(props.onClick, (event) => {
+				setChecked((prevChecked) => !prevChecked);
+				if (isFormControl) {
+					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+				}
+			})
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
+			control: button,
+			bubbles: !hasConsumerStoppedPropagationRef.current,
+			name,
+			value,
+			checked,
+			required,
+			disabled,
+			form,
+			style: { transform: "translateX(-100%)" }
+		})]
+	});
+});
+Switch$1.displayName = SWITCH_NAME;
+var THUMB_NAME = "SwitchThumb";
+var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, ...thumbProps } = props;
+	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-state": getState(context.checked),
+		"data-disabled": context.disabled ? "" : void 0,
+		...thumbProps,
+		ref: forwardedRef
+	});
+});
+SwitchThumb.displayName = THUMB_NAME;
+var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
+var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(ref, forwardedRef);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = ref.current;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			setChecked.call(input, checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		prevChecked,
+		checked,
+		bubbles
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: checked,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0
+		}
+	});
+});
+SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function getState(checked) {
+	return checked ? "checked" : "unchecked";
+}
+var Root = Switch$1;
+var Thumb = SwitchThumb;
+var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	...props,
+	ref,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+}));
+Switch.displayName = Root.displayName;
 const daysInYear = 365.2425;
 Math.pow(10, 8) * 24 * 60 * 60 * 1e3;
 const minutesInMonth = 43200;
@@ -38226,132 +38407,12 @@ const ptBR = {
 		firstWeekContainsDate: 1
 	}
 };
-var SWITCH_NAME = "Switch";
-var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
-var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
-var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
-	const [button, setButton] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
-	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
-	const isFormControl = button ? form || !!button.closest("form") : true;
-	const [checked, setChecked] = useControllableState({
-		prop: checkedProp,
-		defaultProp: defaultChecked ?? false,
-		onChange: onCheckedChange,
-		caller: SWITCH_NAME
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
-		scope: __scopeSwitch,
-		checked,
-		disabled,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
-			type: "button",
-			role: "switch",
-			"aria-checked": checked,
-			"aria-required": required,
-			"data-state": getState(checked),
-			"data-disabled": disabled ? "" : void 0,
-			disabled,
-			value,
-			...switchProps,
-			ref: composedRefs,
-			onClick: composeEventHandlers(props.onClick, (event) => {
-				setChecked((prevChecked) => !prevChecked);
-				if (isFormControl) {
-					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
-					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
-				}
-			})
-		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
-			control: button,
-			bubbles: !hasConsumerStoppedPropagationRef.current,
-			name,
-			value,
-			checked,
-			required,
-			disabled,
-			form,
-			style: { transform: "translateX(-100%)" }
-		})]
-	});
-});
-Switch$1.displayName = SWITCH_NAME;
-var THUMB_NAME = "SwitchThumb";
-var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, ...thumbProps } = props;
-	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
-		"data-state": getState(context.checked),
-		"data-disabled": context.disabled ? "" : void 0,
-		...thumbProps,
-		ref: forwardedRef
-	});
-});
-SwitchThumb.displayName = THUMB_NAME;
-var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
-var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(ref, forwardedRef);
-	const prevChecked = usePrevious(checked);
-	const controlSize = useSize(control);
-	import_react.useEffect(() => {
-		const input = ref.current;
-		if (!input) return;
-		const inputProto = window.HTMLInputElement.prototype;
-		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
-		if (prevChecked !== checked && setChecked) {
-			const event = new Event("click", { bubbles });
-			setChecked.call(input, checked);
-			input.dispatchEvent(event);
-		}
-	}, [
-		prevChecked,
-		checked,
-		bubbles
-	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-		type: "checkbox",
-		"aria-hidden": true,
-		defaultChecked: checked,
-		...props,
-		tabIndex: -1,
-		ref: composedRefs,
-		style: {
-			...props.style,
-			...controlSize,
-			position: "absolute",
-			pointerEvents: "none",
-			opacity: 0,
-			margin: 0
-		}
-	});
-});
-SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
-function getState(checked) {
-	return checked ? "checked" : "unchecked";
-}
-var Root = Switch$1;
-var Thumb = SwitchThumb;
-var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
-	...props,
-	ref,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
-}));
-Switch.displayName = Root.displayName;
-function AdminPage() {
-	const { users, fetchUsers, updateUserStatus, toggleUserPermission, currentUser } = useAuthStore();
-	(0, import_react.useEffect)(() => {
-		fetchUsers();
-	}, []);
-	if (currentUser?.role !== "admin") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Navigate, {
-		to: "/",
-		replace: true
-	});
+function UserManagement() {
+	const { users, currentUser, updateUserStatus, toggleUserPermission } = useAuthStore();
+	const activeUsers = users.filter((u) => u.status !== "pending");
 	const handleApprove = async (id) => {
 		await updateUserStatus(id, "active");
-		toast.success("Usuário aprovado com sucesso");
+		toast.success("Usuário ativado com sucesso");
 	};
 	const handleReject = async (id) => {
 		await updateUserStatus(id, "blocked");
@@ -38361,8 +38422,281 @@ function AdminPage() {
 		await toggleUserPermission(id, "canCreateList");
 		toast.success("Permissão de criar lista atualizada");
 	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie permissões e acesso." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+			className: "text-center",
+			children: "Permissão Lista"
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+			className: "text-center",
+			children: "Último Acesso"
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+			className: "text-right",
+			children: "Ações"
+		})
+	] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: activeUsers.map((user) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+			className: "flex items-center gap-3",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+				className: "h-9 w-9 border",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: `https://img.usecurling.com/ppl/thumbnail?seed=${user.id}` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "font-medium",
+				children: user.name
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "text-xs text-muted-foreground",
+				children: user.email
+			})] })]
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+			variant: "outline",
+			className: user.status === "active" ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200",
+			children: user.status === "active" ? "Ativo" : "Bloqueado"
+		}) }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+			className: "text-center",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-col items-center gap-1",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+					checked: user.canCreateList,
+					onCheckedChange: () => handleToggleListPermission(user.id),
+					disabled: user.id === currentUser?.id,
+					"aria-label": "Alternar permissão de criar lista"
+				})
+			})
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+			className: "text-center",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "text-xs text-muted-foreground",
+				children: formatDistanceToNow(new Date(user.lastActive), {
+					addSuffix: true,
+					locale: ptBR
+				})
+			})
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+			className: "text-right",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex justify-end gap-2",
+				children: user.id !== currentUser?.id && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: user.status === "active" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "ghost",
+					size: "sm",
+					onClick: () => handleReject(user.id),
+					className: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",
+					title: "Bloquear Acesso",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-1" }), "Bloquear"]
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "ghost",
+					size: "sm",
+					onClick: () => handleApprove(user.id),
+					className: "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50",
+					title: "Restaurar Acesso",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LockOpen, { className: "w-4 h-4 mr-1" }), "Ativar"]
+				}) })
+			})
+		})
+	] }, user.id)) })] }) })] });
+}
+function PendingRequests() {
+	const { users, updateUserStatus } = useAuthStore();
 	const pendingUsers = users.filter((u) => u.status === "pending");
-	const activeUsers = users.filter((u) => u.status !== "pending");
+	const handleApprove = async (id) => {
+		await updateUserStatus(id, "active");
+		toast.success("Usuário aprovado com sucesso");
+	};
+	const handleReject = async (id) => {
+		await updateUserStatus(id, "blocked");
+		toast.info("Usuário bloqueado");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Solicitações Pendentes" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: pendingUsers.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col items-center justify-center py-12 text-muted-foreground border-2 border-dashed rounded-lg",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserCheck, { className: "w-12 h-12 mb-3 text-gray-300" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Nenhuma solicitação pendente." })]
+	}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Contato" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Solicitado em" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+			className: "text-right",
+			children: "Ações"
+		})
+	] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: pendingUsers.map((user) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+			className: "font-medium",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-3",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar, {
+					className: "h-8 w-8",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: user.name }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "text-xs font-normal text-muted-foreground",
+					children: user.email
+				})] })]
+			})
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: user.phone || "-" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+			className: "text-muted-foreground text-sm",
+			children: new Date(user.createdAt).toLocaleDateString("pt-BR")
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+			className: "text-right space-x-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+				size: "sm",
+				variant: "outline",
+				className: "text-destructive hover:bg-destructive hover:text-white border-destructive/20",
+				onClick: () => handleReject(user.id),
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserX, { className: "w-4 h-4 mr-2" }), " Rejeitar"]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+				size: "sm",
+				className: "bg-emerald-600 hover:bg-emerald-700",
+				onClick: () => handleApprove(user.id),
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserCheck, { className: "w-4 h-4 mr-2" }), " Aprovar"]
+			})]
+		})
+	] }, user.id)) })] }) })] });
+}
+function DomainSettings() {
+	const [copied, setCopied] = (0, import_react.useState)(null);
+	const domainInfo = {
+		subdomain: "gestorlista",
+		domain: "realezamobile.com.br",
+		target: "app-lista-de-precos.skip.app",
+		fullUrl: "https://gestorlista.realezamobile.com.br"
+	};
+	const copyToClipboard = (text, key) => {
+		navigator.clipboard.writeText(text);
+		setCopied(key);
+		toast.success("Copiado para a área de transferência");
+		setTimeout(() => setCopied(null), 2e3);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "grid gap-6",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+			className: "flex items-center gap-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, { className: "w-5 h-5 text-primary" }), "Configuração de Domínio Personalizado"]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: ["Configure o acesso através de ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: domainInfo.fullUrl })] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+			className: "space-y-6",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800",
+					children: "Para utilizar seu domínio personalizado, você precisa adicionar um registro DNS no painel do seu provedor (Registro.br)."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid gap-4 md:grid-cols-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Endereço Desejado (URL)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								readOnly: true,
+								value: domainInfo.fullUrl,
+								className: "bg-gray-50"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "outline",
+								size: "icon",
+								onClick: () => copyToClipboard(domainInfo.fullUrl, "url"),
+								children: copied === "url" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4" })
+							})]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Status do SSL" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center h-10 px-3 border rounded-md bg-green-50 text-green-700 border-green-200 text-sm font-medium",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4 mr-2" }), "Automático (Let's Encrypt)"]
+						})]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "border-t pt-6",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+						className: "text-lg font-medium mb-4 flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Server, { className: "w-4 h-4" }), "Registros DNS Necessários"]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "rounded-md border",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "grid grid-cols-12 gap-4 p-4 bg-muted/50 font-medium text-xs uppercase text-muted-foreground border-b",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "col-span-3",
+									children: "Tipo"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "col-span-4",
+									children: "Nome (Entrada)"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "col-span-5",
+									children: "Dados (Valor)"
+								})
+							]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "grid grid-cols-12 gap-4 p-4 items-center text-sm",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "col-span-3 font-mono",
+									children: "CNAME"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "col-span-4 flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", {
+										className: "bg-gray-100 px-2 py-1 rounded",
+										children: domainInfo.subdomain
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+										variant: "ghost",
+										size: "icon",
+										className: "h-6 w-6",
+										onClick: () => copyToClipboard(domainInfo.subdomain, "name"),
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-3 h-3" })
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "col-span-5 flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", {
+										className: "bg-gray-100 px-2 py-1 rounded truncate flex-1",
+										children: domainInfo.target
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+										variant: "ghost",
+										size: "icon",
+										className: "h-6 w-6",
+										onClick: () => copyToClipboard(domainInfo.target, "target"),
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-3 h-3" })
+									})]
+								})
+							]
+						})]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex justify-end",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "outline",
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+							href: "https://registro.br/tecnologia/ferramentas/dns/",
+							target: "_blank",
+							rel: "noopener noreferrer",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4 mr-2" }), "Ajuda do Registro.br"]
+						})
+					})
+				})
+			]
+		})] })
+	});
+}
+function AdminPage() {
+	const { users, fetchUsers, currentUser } = useAuthStore();
+	(0, import_react.useEffect)(() => {
+		fetchUsers();
+	}, []);
+	if (currentUser?.role !== "admin") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Navigate, {
+		to: "/",
+		replace: true
+	});
+	const pendingUsers = users.filter((u) => u.status === "pending");
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-8 pb-12",
 		children: [
@@ -38433,147 +38767,38 @@ function AdminPage() {
 				className: "w-full",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
-						className: "grid w-full grid-cols-2 lg:w-[400px]",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
-							value: "active",
-							children: "Gerenciar Usuários"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-							value: "pending",
-							className: "relative",
-							children: ["Solicitações", pendingUsers.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" })]
-						})]
+						className: "grid w-full grid-cols-3 lg:w-[600px]",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+								value: "active",
+								children: "Gerenciar Usuários"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								value: "pending",
+								className: "relative",
+								children: ["Solicitações", pendingUsers.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" })]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								value: "domain",
+								className: "flex gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, { className: "w-4 h-4" }), "Domínio"]
+							})
+						]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "active",
 						className: "mt-6",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie permissões e acesso." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-								className: "text-center",
-								children: "Permissão Lista"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-								className: "text-center",
-								children: "Último Acesso"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-								className: "text-right",
-								children: "Ações"
-							})
-						] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: activeUsers.map((user) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-								className: "flex items-center gap-3",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-									className: "h-9 w-9 border",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: `https://img.usecurling.com/ppl/thumbnail?seed=${user.id}` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "font-medium",
-									children: user.name
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-xs text-muted-foreground",
-									children: user.email
-								})] })]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-								variant: "outline",
-								className: user.status === "active" ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200",
-								children: user.status === "active" ? "Ativo" : "Bloqueado"
-							}) }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "text-center",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "flex flex-col items-center gap-1",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-										checked: user.canCreateList,
-										onCheckedChange: () => handleToggleListPermission(user.id),
-										disabled: user.id === currentUser.id,
-										"aria-label": "Alternar permissão de criar lista"
-									})
-								})
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "text-center",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-xs text-muted-foreground",
-									children: formatDistanceToNow(new Date(user.lastActive), {
-										addSuffix: true,
-										locale: ptBR
-									})
-								})
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "text-right",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "flex justify-end gap-2",
-									children: user.id !== currentUser.id && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: user.status === "active" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-										variant: "ghost",
-										size: "sm",
-										onClick: () => handleReject(user.id),
-										className: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",
-										title: "Bloquear Acesso",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-1" }), "Bloquear"]
-									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-										variant: "ghost",
-										size: "sm",
-										onClick: () => handleApprove(user.id),
-										className: "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50",
-										title: "Restaurar Acesso",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LockOpen, { className: "w-4 h-4 mr-1" }), "Ativar"]
-									}) })
-								})
-							})
-						] }, user.id)) })] }) })] })
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserManagement, {})
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "pending",
 						className: "mt-6",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Solicitações Pendentes" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: pendingUsers.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex flex-col items-center justify-center py-12 text-muted-foreground border-2 border-dashed rounded-lg",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserCheck, { className: "w-12 h-12 mb-3 text-gray-300" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Nenhuma solicitação pendente." })]
-						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Contato" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Solicitado em" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-								className: "text-right",
-								children: "Ações"
-							})
-						] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: pendingUsers.map((user) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "font-medium",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center gap-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar, {
-										className: "h-8 w-8",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: user.name }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-										className: "text-xs font-normal text-muted-foreground",
-										children: user.email
-									})] })]
-								})
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: user.phone || "-" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "text-muted-foreground text-sm",
-								children: new Date(user.createdAt).toLocaleDateString("pt-BR")
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-								className: "text-right space-x-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									size: "sm",
-									variant: "outline",
-									className: "text-destructive hover:bg-destructive hover:text-white border-destructive/20",
-									onClick: () => handleReject(user.id),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserX, { className: "w-4 h-4 mr-2" }), " Rejeitar"]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									size: "sm",
-									className: "bg-emerald-600 hover:bg-emerald-700",
-									onClick: () => handleApprove(user.id),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserCheck, { className: "w-4 h-4 mr-2" }), " Aprovar"]
-								})]
-							})
-						] }, user.id)) })] }) })] })
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PendingRequests, {})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+						value: "domain",
+						className: "mt-6",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DomainSettings, {})
 					})
 				]
 			})
@@ -38651,4 +38876,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-B8xN8Akn.js.map
+//# sourceMappingURL=index-MlyqklFs.js.map

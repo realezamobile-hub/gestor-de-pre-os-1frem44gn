@@ -131,6 +131,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       password,
       options: {
         data: { name, phone },
+        emailRedirectTo: window.location.origin,
       },
     })
 

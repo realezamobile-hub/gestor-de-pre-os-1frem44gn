@@ -55,7 +55,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true })
     const { filters } = get()
 
-    // Explicitly fetching data ensuring 'valor' is retrieved
+    // Explicitly fetching data ensuring 'valor' and 'fornecedor' are retrieved via '*'
     let query = supabase
       .from('produtos')
       .select('*')
@@ -142,6 +142,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         .order('valor', { ascending: true })
 
       if (date) {
+        // Filter by specific date (entire day)
         const start = startOfDay(date).toISOString()
         const end = endOfDay(date).toISOString()
         query = query.gte('criado_em', start).lte('criado_em', end)
@@ -204,8 +205,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   getSelectedProducts: () => {
     const { products, selectedProductIds } = get()
-    // Map selection to products, ensuring we have the product data
-    // Even if product list changes, we might want to keep selection if data is present
     return products.filter((p) => selectedProductIds.has(p.id))
   },
 
@@ -216,7 +215,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         'postgres_changes',
         { event: '*', schema: 'public', table: 'produtos' },
         () => {
-          // Refresh products when change happens
           get().fetchProducts()
         },
       )

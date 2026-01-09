@@ -87,7 +87,9 @@ export function ProductMobileList({
                 {product.fornecedor && (
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
                     <Truck className="w-3 h-3" />
-                    <span className="truncate">{product.fornecedor}</span>
+                    <span className="truncate font-medium">
+                      {product.fornecedor}
+                    </span>
                   </div>
                 )}
 

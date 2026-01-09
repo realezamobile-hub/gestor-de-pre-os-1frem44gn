@@ -20,6 +20,7 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
 
   // Helper for currency formatting
   // Ensures null values are handled gracefully without defaulting to zero
+  // Formats value from 'valor' column
   const formatPrice = (value: number | null | undefined) => {
     if (value === null || value === undefined) {
       return 'Sob Consulta'

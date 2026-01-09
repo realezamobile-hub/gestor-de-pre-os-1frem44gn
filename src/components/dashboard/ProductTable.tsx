@@ -105,7 +105,7 @@ export function ProductTable({
                   </Badge>
                 </TableCell>
                 <TableCell>{product.bateria || '-'}</TableCell>
-                <TableCell className="text-gray-600">
+                <TableCell className="text-gray-600 font-medium">
                   {product.fornecedor || '-'}
                 </TableCell>
                 <TableCell className="text-center">

@@ -46,6 +46,7 @@ export function ProductTable({
             <TableHead>Condição</TableHead>
             <TableHead>Bateria</TableHead>
             <TableHead>Fornecedor</TableHead>
+            <TableHead>Telefone</TableHead>
             <TableHead className="w-[50px] text-center">Zap</TableHead>
             <TableHead className="text-right">Valor</TableHead>
           </TableRow>
@@ -107,6 +108,9 @@ export function ProductTable({
                 <TableCell>{product.bateria || '-'}</TableCell>
                 <TableCell className="text-gray-600 font-medium">
                   {product.fornecedor || '-'}
+                </TableCell>
+                <TableCell className="text-gray-600 text-sm whitespace-nowrap">
+                  {product.telefone || '-'}
                 </TableCell>
                 <TableCell className="text-center">
                   {product.link_whatsapp || product.telefone ? (

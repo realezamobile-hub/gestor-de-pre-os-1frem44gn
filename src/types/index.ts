@@ -23,7 +23,7 @@ export type Product = Database['public']['Tables']['produtos']['Row'] & {
 
 export interface FilterState {
   search: string
-  category: string
+  category: string[]
   memory: string
   color: string
   condition: string

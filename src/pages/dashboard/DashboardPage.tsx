@@ -1,14 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { ProductList } from '@/components/dashboard/ProductList'
 import { ProductFilters } from '@/components/dashboard/ProductFilters'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Store, ShoppingCart, Search, RefreshCcw } from 'lucide-react'
+import {
+  Store,
+  ShoppingCart,
+  Search,
+  RefreshCcw,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useDebounce } from '@/hooks/use-debounce'
 
 export default function DashboardPage() {
   const {
@@ -19,10 +27,23 @@ export default function DashboardPage() {
     isLoading,
     selectedProductIds,
     subscribeToProducts,
+    page,
+    pageSize,
+    total,
+    setPage,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
   const navigate = useNavigate()
+
+  // Local state for search input to handle debounce
+  const [searchTerm, setSearchTerm] = useState(filters.search)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+
+  // Effect to sync debounced search with store
+  useEffect(() => {
+    setFilters({ search: debouncedSearchTerm })
+  }, [debouncedSearchTerm])
 
   useEffect(() => {
     fetchProducts()
@@ -32,6 +53,8 @@ export default function DashboardPage() {
       unsubscribe()
     }
   }, [])
+
+  const totalPages = Math.ceil(total / pageSize)
 
   return (
     <div className="space-y-6 pb-12">
@@ -71,8 +94,8 @@ export default function DashboardPage() {
             <Input
               placeholder="Buscar por modelo, categoria, fornecedor..."
               className="pl-10 bg-gray-50/50 focus:bg-white transition-colors"
-              value={filters.search}
-              onChange={(e) => setFilters({ search: e.target.value })}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -106,6 +129,37 @@ export default function DashboardPage() {
 
       <div className={isLoading ? 'opacity-70 transition-opacity' : ''}>
         <ProductList products={products} isLoading={isLoading} />
+
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between py-4">
+          <div className="text-sm text-gray-500">
+            Mostrando {products.length > 0 ? page * pageSize + 1 : 0} até{' '}
+            {Math.min((page + 1) * pageSize, total)} de {total} produtos
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page - 1)}
+              disabled={page === 0 || isLoading}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
+            </Button>
+            <div className="text-sm font-medium">
+              Página {page + 1} de {totalPages || 1}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages - 1 || isLoading}
+            >
+              Próximo
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )

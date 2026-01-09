@@ -12,13 +12,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
@@ -34,12 +27,16 @@ import {
   Lock,
   CalendarIcon,
   Wand2,
+  FileText,
+  DollarSign,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { MultiSelect } from '@/components/MultiSelect'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 export default function ListGeneratorPage() {
   const {
@@ -62,7 +59,8 @@ export default function ListGeneratorPage() {
 
   // Generator State
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [markup, setMarkup] = useState<number>(0)
 
   useEffect(() => {
     fetchCategories()
@@ -85,10 +83,10 @@ export default function ListGeneratorPage() {
   }
 
   const handleGenerate = async () => {
-    await generateList(selectedDate || null, selectedCategory)
+    await generateList(selectedDate || null, selectedCategories)
   }
 
-  const generateListText = () => {
+  const generateListText = (internal: boolean = false) => {
     if (selectedProducts.length === 0) {
       return '(Nenhum produto selecionado)'
     }
@@ -106,35 +104,56 @@ export default function ListGeneratorPage() {
 
     let text = ''
 
+    if (internal) {
+      text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n\n`
+    } else {
+      text += `🔥 *${headerConfig.companyName} - ${new Date().toLocaleDateString('pt-BR')}* 🔥\n\n`
+    }
+
     Object.entries(grouped).forEach(([category, products]) => {
-      text += `🔥 *${headerConfig.companyName} - ${category}* 🔥\n`
+      text += `*${category}*\n`
       products.forEach((p) => {
-        const priceStr = p.valor
-          ? `R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+        let priceValue = p.valor
+        if (priceValue !== null && priceValue !== undefined && !internal) {
+          priceValue += markup
+        }
+
+        const priceStr = priceValue
+          ? `R$ ${priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
 
         // Format: • [Modelo] [Memoria] [Cor] - R$ [Valor]
-        // Adding other details if relevant and brief
         text += ` • ${p.modelo} ${p.ram ? p.ram + ' ' : ''}${p.memoria || ''} ${p.cor || ''}`
         if (p.estado && p.estado !== 'Novo') text += ` (${p.estado})`
-        text += ` - *${priceStr}*\n`
+
+        if (internal) {
+          text += `\n   ↳ Custo: ${priceStr} | Forn: ${p.fornecedor || 'N/A'}`
+          if (p.telefone) text += ` | Tel: ${p.telefone}`
+        } else {
+          text += ` - *${priceStr}*`
+        }
+        text += `\n`
       })
       text += '\n'
     })
 
-    text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`
-    text += `📦 _Consulte disponibilidade._`
+    if (!internal) {
+      text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`
+      text += `📦 _Consulte disponibilidade._`
+    }
+
     return text
   }
 
-  const listText = generateListText()
+  const customerListText = generateListText(false)
+  const internalListText = generateListText(true)
 
-  const handleCopy = () => {
+  const handleCopy = (text: string) => {
     if (selectedProducts.length === 0) {
       toast.error('Selecione produtos antes de copiar a lista')
       return
     }
-    navigator.clipboard.writeText(listText)
+    navigator.clipboard.writeText(text)
     toast.success('Lista copiada para a área de transferência!')
   }
 
@@ -165,14 +184,6 @@ export default function ListGeneratorPage() {
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Limpar
-          </Button>
-          <Button
-            onClick={handleCopy}
-            disabled={selectedProducts.length === 0}
-            className="bg-emerald-600 hover:bg-emerald-700"
-          >
-            <Copy className="w-4 h-4 mr-2" />
-            Copiar para WhatsApp
           </Button>
         </div>
       </div>
@@ -222,23 +233,13 @@ export default function ListGeneratorPage() {
                   </Popover>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs">Categoria</Label>
-                  <Select
-                    value={selectedCategory}
-                    onValueChange={setSelectedCategory}
-                  >
-                    <SelectTrigger className="h-9 text-xs">
-                      <SelectValue placeholder="Todas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      {categories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs">Categorias</Label>
+                  <MultiSelect
+                    options={categories}
+                    selected={selectedCategories}
+                    onChange={setSelectedCategories}
+                    placeholder="Selecione"
+                  />
                 </div>
               </div>
               <Button
@@ -255,26 +256,46 @@ export default function ListGeneratorPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
-                Configuração do Cabeçalho
+                Configuração
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="companyName" className="text-xs">
-                  Nome da Empresa
-                </Label>
-                <Input
-                  id="companyName"
-                  value={headerConfig.companyName}
-                  onChange={(e) =>
-                    setHeaderConfig({
-                      ...headerConfig,
-                      companyName: e.target.value,
-                    })
-                  }
-                  placeholder="Ex: Minha Loja"
-                  className="h-9 text-sm"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName" className="text-xs">
+                    Nome da Empresa
+                  </Label>
+                  <Input
+                    id="companyName"
+                    value={headerConfig.companyName}
+                    onChange={(e) =>
+                      setHeaderConfig({
+                        ...headerConfig,
+                        companyName: e.target.value,
+                      })
+                    }
+                    placeholder="Ex: Minha Loja"
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="markup"
+                    className="text-xs flex items-center gap-1"
+                  >
+                    <DollarSign className="w-3 h-3" />
+                    Acréscimo (R$)
+                  </Label>
+                  <Input
+                    id="markup"
+                    type="number"
+                    min="0"
+                    step="10"
+                    value={markup}
+                    onChange={(e) => setMarkup(Number(e.target.value))}
+                    className="h-9 text-sm"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -338,49 +359,102 @@ export default function ListGeneratorPage() {
         </div>
 
         <div className="lg:col-span-7 h-full">
-          <Card className="flex flex-col h-full overflow-hidden bg-slate-950 border-slate-800 shadow-2xl">
-            <CardHeader className="bg-slate-900 border-b border-slate-800 py-3 px-4 flex flex-row items-center justify-between space-y-0">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="w-3 h-3 rounded-full bg-green-500" />
-                </div>
-                <span className="ml-3 text-xs font-mono text-slate-400">
-                  whatsapp-preview.txt
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-slate-500" />
-                <span className="text-xs text-slate-500">Preview</span>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0 flex-1 overflow-hidden relative group">
-              <textarea
-                readOnly
-                value={
-                  selectedProducts.length > 0
-                    ? listText
-                    : 'Adicione produtos para gerar o preview...'
-                }
-                className={cn(
-                  'w-full h-full bg-transparent text-slate-300 font-mono text-sm p-6 resize-none focus:outline-none leading-relaxed',
-                  selectedProducts.length === 0 && 'opacity-30 italic',
-                )}
-              />
-              {selectedProducts.length > 0 && (
-                <div className="absolute bottom-6 right-6 flex gap-2">
-                  <Button
-                    onClick={handleCopy}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-emerald-900/20 transition-all hover:-translate-y-1"
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copiar Texto
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="customer" className="h-full flex flex-col">
+            <TabsList className="w-full justify-start mb-2">
+              <TabsTrigger value="customer" className="flex-1">
+                <Smartphone className="w-4 h-4 mr-2" />
+                Lista Cliente (WhatsApp)
+              </TabsTrigger>
+              <TabsTrigger value="internal" className="flex-1">
+                <FileText className="w-4 h-4 mr-2" />
+                Lista Interna
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="customer" className="flex-1 mt-0">
+              <Card className="flex flex-col h-full overflow-hidden bg-slate-950 border-slate-800 shadow-2xl">
+                <CardHeader className="bg-slate-900 border-b border-slate-800 py-3 px-4 flex flex-row items-center justify-between space-y-0">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <span className="w-3 h-3 rounded-full bg-red-500" />
+                      <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                      <span className="w-3 h-3 rounded-full bg-green-500" />
+                    </div>
+                    <span className="ml-3 text-xs font-mono text-slate-400">
+                      preview.txt
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">Visualização</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 flex-1 overflow-hidden relative group">
+                  <textarea
+                    readOnly
+                    value={
+                      selectedProducts.length > 0
+                        ? customerListText
+                        : 'Adicione produtos para gerar o preview...'
+                    }
+                    className={cn(
+                      'w-full h-full bg-transparent text-slate-300 font-mono text-sm p-6 resize-none focus:outline-none leading-relaxed',
+                      selectedProducts.length === 0 && 'opacity-30 italic',
+                    )}
+                  />
+                  {selectedProducts.length > 0 && (
+                    <div className="absolute bottom-6 right-6 flex gap-2">
+                      <Button
+                        onClick={() => handleCopy(customerListText)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-emerald-900/20 transition-all hover:-translate-y-1"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copiar Lista
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="internal" className="flex-1 mt-0">
+              <Card className="flex flex-col h-full overflow-hidden bg-white border-slate-200 shadow-lg">
+                <CardHeader className="bg-slate-50 border-b border-slate-200 py-3 px-4 flex flex-row items-center justify-between space-y-0">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-slate-500" />
+                    <span className="text-sm font-semibold text-slate-700">
+                      Uso Interno
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 flex-1 overflow-hidden relative group">
+                  <textarea
+                    readOnly
+                    value={
+                      selectedProducts.length > 0
+                        ? internalListText
+                        : 'Adicione produtos para gerar o preview...'
+                    }
+                    className={cn(
+                      'w-full h-full bg-transparent text-slate-800 font-mono text-sm p-6 resize-none focus:outline-none leading-relaxed',
+                      selectedProducts.length === 0 && 'opacity-30 italic',
+                    )}
+                  />
+                  {selectedProducts.length > 0 && (
+                    <div className="absolute bottom-6 right-6 flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleCopy(internalListText)}
+                        className="bg-white hover:bg-slate-50"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copiar Interna
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

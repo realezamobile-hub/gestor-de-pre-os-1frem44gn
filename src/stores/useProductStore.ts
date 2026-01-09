@@ -11,11 +11,17 @@ interface ProductStore {
   selectedProductIds: Set<number>
   categories: string[]
 
+  // Pagination
+  page: number
+  pageSize: number
+  total: number
+
   setFilters: (filters: Partial<FilterState>) => void
   resetFilters: () => void
+  setPage: (page: number) => void
   fetchProducts: () => Promise<void>
   fetchCategories: () => Promise<void>
-  generateList: (date: Date | null, category: string) => Promise<void>
+  generateList: (date: Date | null, categories: string[]) => Promise<void>
   toggleProductSelection: (productId: number) => void
   clearSelection: () => void
   getSelectedProducts: () => Product[]
@@ -24,7 +30,7 @@ interface ProductStore {
 
 const INITIAL_FILTERS: FilterState = {
   search: '',
-  category: 'all',
+  category: [],
   memory: 'all',
   color: 'all',
   condition: 'all',
@@ -40,26 +46,36 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   filters: INITIAL_FILTERS,
   selectedProductIds: new Set(),
   categories: [],
+  page: 0,
+  pageSize: 20,
+  total: 0,
 
   setFilters: (newFilters) => {
-    set((state) => ({ filters: { ...state.filters, ...newFilters } }))
+    // Reset page to 0 when filters change
+    set((state) => ({
+      filters: { ...state.filters, ...newFilters },
+      page: 0,
+    }))
     get().fetchProducts()
   },
 
   resetFilters: () => {
-    set({ filters: INITIAL_FILTERS })
+    set({ filters: INITIAL_FILTERS, page: 0 })
+    get().fetchProducts()
+  },
+
+  setPage: (page) => {
+    set({ page })
     get().fetchProducts()
   },
 
   fetchProducts: async () => {
     set({ isLoading: true })
-    const { filters } = get()
+    const { filters, page, pageSize } = get()
 
-    // Explicitly fetching data ensuring 'valor' is retrieved via '*'
-    // 'valor' is crucial for displaying the price in the dashboard
     let query = supabase
       .from('produtos')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('valor', { ascending: true })
 
     // Apply filters
@@ -72,8 +88,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     }
 
-    if (filters.category && filters.category !== 'all') {
-      query = query.eq('categoria', filters.category)
+    if (filters.category && filters.category.length > 0) {
+      query = query.in('categoria', filters.category)
     }
 
     if (filters.memory && filters.memory !== 'all') {
@@ -109,13 +125,18 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       query = query.gte('criado_em', twoDaysAgo)
     }
 
-    const { data, error } = await query
+    // Pagination
+    const from = page * pageSize
+    const to = from + pageSize - 1
+    query = query.range(from, to)
+
+    const { data, error, count } = await query
 
     if (!error && data) {
-      set({ products: data, isLoading: false })
+      set({ products: data, total: count || 0, isLoading: false })
     } else {
       console.error('Error fetching products:', error)
-      set({ products: [], isLoading: false })
+      set({ products: [], total: 0, isLoading: false })
     }
   },
 
@@ -133,7 +154,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
   },
 
-  generateList: async (date, category) => {
+  generateList: async (date, categories) => {
     set({ isLoading: true })
 
     try {
@@ -149,8 +170,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         query = query.gte('criado_em', start).lte('criado_em', end)
       }
 
-      if (category && category !== 'all') {
-        query = query.eq('categoria', category)
+      if (categories && categories.length > 0) {
+        query = query.in('categoria', categories)
       }
 
       const { data, error } = await query
@@ -206,6 +227,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   getSelectedProducts: () => {
     const { products, selectedProductIds } = get()
+    // Returns products that are currently in the store and selected
     return products.filter((p) => selectedProductIds.has(p.id))
   },
 

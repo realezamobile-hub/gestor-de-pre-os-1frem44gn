@@ -2,7 +2,14 @@ import { Product } from '@/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MessageCircle, Battery, Cpu, Smartphone, Truck } from 'lucide-react'
+import {
+  MessageCircle,
+  Battery,
+  Cpu,
+  Smartphone,
+  Truck,
+  Phone,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useProductStore } from '@/stores/useProductStore'
 
@@ -84,14 +91,24 @@ export function ProductMobileList({
                   </span>
                 </div>
 
-                {product.fornecedor && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
-                    <Truck className="w-3 h-3" />
-                    <span className="truncate font-medium">
-                      {product.fornecedor}
-                    </span>
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {product.fornecedor && (
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Truck className="w-3 h-3" />
+                      <span className="truncate font-medium">
+                        {product.fornecedor}
+                      </span>
+                    </div>
+                  )}
+                  {product.telefone && (
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Phone className="w-3 h-3" />
+                      <span className="truncate font-medium">
+                        {product.telefone}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-2">

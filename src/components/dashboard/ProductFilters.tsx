@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge'
 import { FilterX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { MultiSelect } from '@/components/MultiSelect'
 
 export function ProductFilters() {
   const { filters, setFilters, resetFilters, categories, fetchCategories } =
@@ -62,9 +63,10 @@ export function ProductFilters() {
     fetchOptions()
   }, [])
 
-  const activeFiltersCount = Object.entries(filters).filter(
-    ([k, v]) => v !== 'all' && v !== '' && v !== false,
-  ).length
+  const activeFiltersCount = Object.entries(filters).filter(([k, v]) => {
+    if (Array.isArray(v)) return v.length > 0
+    return v !== 'all' && v !== '' && v !== false
+  }).length
 
   return (
     <Sheet>
@@ -97,23 +99,13 @@ export function ProductFilters() {
           </div>
 
           <div className="space-y-2">
-            <Label>Categoria</Label>
-            <Select
-              value={filters.category}
-              onValueChange={(val) => setFilters({ category: val })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Categorias</Label>
+            <MultiSelect
+              options={categories}
+              selected={filters.category}
+              onChange={(selected) => setFilters({ category: selected })}
+              placeholder="Selecione as categorias"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

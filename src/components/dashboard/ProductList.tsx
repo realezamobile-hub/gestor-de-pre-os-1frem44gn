@@ -42,6 +42,7 @@ export function ProductList({ products }: ProductListProps) {
             <TableHead>Memória</TableHead>
             <TableHead>Cor</TableHead>
             <TableHead>Condição</TableHead>
+            <TableHead>Bateria</TableHead>
             <TableHead>Fornecedor</TableHead>
             <TableHead>Estoque</TableHead>
             <TableHead className="text-right">Valor</TableHead>
@@ -84,6 +85,7 @@ export function ProductList({ products }: ProductListProps) {
                     {product.estado}
                   </Badge>
                 </TableCell>
+                <TableCell>{product.bateria || '-'}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {product.fornecedor}
                 </TableCell>

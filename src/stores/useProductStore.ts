@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Product, FilterState } from '@/types'
 import { supabase } from '@/lib/supabase/client'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 interface ProductStore {
   products: Product[]
@@ -14,6 +15,7 @@ interface ProductStore {
   toggleProductSelection: (productId: number) => void
   clearSelection: () => void
   getSelectedProducts: () => Product[]
+  subscribeToProducts: () => () => void
 }
 
 const INITIAL_FILTERS: FilterState = {
@@ -80,7 +82,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     if (filters.battery && filters.battery !== 'all') {
-      // Basic text match for now as battery is string
       query = query.eq('bateria', filters.battery)
     }
 
@@ -114,5 +115,23 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   getSelectedProducts: () => {
     const { products, selectedProductIds } = get()
     return products.filter((p) => selectedProductIds.has(p.id))
+  },
+
+  subscribeToProducts: () => {
+    const channel = supabase
+      .channel('public:produtos')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'produtos' },
+        () => {
+          // Refresh products when change happens
+          get().fetchProducts()
+        },
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   },
 }))

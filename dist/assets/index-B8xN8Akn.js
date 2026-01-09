@@ -34298,6 +34298,18 @@ const useProductStore = create((set, get$1) => ({
 	getSelectedProducts: () => {
 		const { products, selectedProductIds } = get$1();
 		return products.filter((p) => selectedProductIds.has(p.id));
+	},
+	subscribeToProducts: () => {
+		const channel = supabase.channel("public:produtos").on("postgres_changes", {
+			event: "*",
+			schema: "public",
+			table: "produtos"
+		}, () => {
+			get$1().fetchProducts();
+		}).subscribe();
+		return () => {
+			supabase.removeChannel(channel);
+		};
 	}
 }));
 var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -34567,6 +34579,7 @@ function ProductList({ products }) {
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Memória" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cor" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Condição" }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Bateria" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Fornecedor" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Estoque" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
@@ -34596,6 +34609,7 @@ function ProductList({ products }) {
 						className: cn("text-xs font-normal", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
 						children: product.estado
 					}) }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: product.bateria || "-" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "text-muted-foreground",
 						children: product.fornecedor
@@ -35644,11 +35658,12 @@ function ProductFilters() {
 		memories: [],
 		colors: [],
 		conditions: [],
-		suppliers: []
+		suppliers: [],
+		batteries: []
 	});
 	(0, import_react.useEffect)(() => {
 		const fetchOptions = async () => {
-			const { data } = await supabase.from("produtos").select("categoria, memoria, cor, estado, fornecedor");
+			const { data } = await supabase.from("produtos").select("categoria, memoria, cor, estado, fornecedor, bateria");
 			if (data) {
 				const unique = (key) => Array.from(new Set(data.map((item) => item[key]).filter(Boolean))).sort();
 				setOptions({
@@ -35656,7 +35671,8 @@ function ProductFilters() {
 					memories: unique("memoria"),
 					colors: unique("cor"),
 					conditions: unique("estado"),
-					suppliers: unique("fornecedor")
+					suppliers: unique("fornecedor"),
+					batteries: unique("bateria")
 				});
 			}
 		};
@@ -35736,17 +35752,33 @@ function ProductFilters() {
 					})]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Condição" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-						value: filters.condition,
-						onValueChange: (val) => setFilters({ condition: val }),
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: "all",
-							children: "Todas"
-						}), options$1.conditions.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: c,
-							children: c
-						}, c))] })]
+					className: "grid grid-cols-2 gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Condição" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+							value: filters.condition,
+							onValueChange: (val) => setFilters({ condition: val }),
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: "all",
+								children: "Todas"
+							}), options$1.conditions.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: c,
+								children: c
+							}, c))] })]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Saúde da Bateria" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+							value: filters.battery,
+							onValueChange: (val) => setFilters({ battery: val }),
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: "all",
+								children: "Todas"
+							}), options$1.batteries.map((b$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: b$1,
+								children: b$1
+							}, b$1))] })]
+						})]
 					})]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -35786,11 +35818,15 @@ function ProductFilters() {
 	})] });
 }
 function DashboardPage() {
-	const { products, fetchProducts, filters, setFilters, isLoading, selectedProductIds } = useProductStore();
+	const { products, fetchProducts, filters, setFilters, isLoading, selectedProductIds, subscribeToProducts } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const navigate = useNavigate();
 	(0, import_react.useEffect)(() => {
 		fetchProducts();
+		const unsubscribe = subscribeToProducts();
+		return () => {
+			unsubscribe();
+		};
 	}, []);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-6 pb-12",
@@ -36531,10 +36567,7 @@ function ListGeneratorPage() {
 	const { selectedProductIds, toggleProductSelection, clearSelection, getSelectedProducts } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const selectedProducts = getSelectedProducts();
-	const [headerConfig, setHeaderConfig] = (0, import_react.useState)({
-		companyName: "Minha Loja",
-		listTitle: "Smartphones e Eletrônicos"
-	});
+	const [headerConfig, setHeaderConfig] = (0, import_react.useState)({ companyName: "Minha Loja" });
 	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-full flex flex-col items-center justify-center space-y-4",
 		children: [
@@ -36557,30 +36590,23 @@ function ListGeneratorPage() {
 		]
 	});
 	const generateListText = () => {
-		const today = (/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR");
-		let text = `🔥 *${headerConfig.companyName.toUpperCase()}* 🔥\n`;
-		text += `📢 *${headerConfig.listTitle} - ${today}*\n\n`;
-		if (selectedProducts.length === 0) return text + "(Nenhum produto selecionado)";
+		if (selectedProducts.length === 0) return "(Nenhum produto selecionado)";
 		const grouped = selectedProducts.reduce((acc, product) => {
 			const key = product.categoria || "Outros";
 			if (!acc[key]) acc[key] = [];
 			acc[key].push(product);
 			return acc;
 		}, {});
+		let text = "";
 		Object.entries(grouped).forEach(([category, products]) => {
-			text += `*--- ${category.toUpperCase()} ---*\n`;
+			text += `🔥 *${headerConfig.companyName} - ${category}* 🔥\n`;
 			products.forEach((p) => {
-				const specs = [
-					p.memoria,
-					p.cor,
-					p.bateria ? `Bat: ${p.bateria}` : null
-				].filter(Boolean).join(" - ");
 				const priceStr = p.valor ? `R$ ${p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				const condition = p.estado !== "Novo" ? `(${p.estado})` : "";
-				text += `📱 ${p.modelo} ${condition}\n`;
-				text += `   ${specs}\n`;
-				text += `   💰 ${priceStr}\n\n`;
+				text += ` • ${p.modelo} ${p.memoria || ""} ${p.cor || ""}`;
+				if (p.estado && p.estado !== "Novo") text += ` (${p.estado})`;
+				text += ` - *${priceStr}*\n`;
 			});
+			text += "\n";
 		});
 		text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`;
 		text += `📦 _Consulte disponibilidade._`;
@@ -36641,9 +36667,9 @@ function ListGeneratorPage() {
 						className: "text-base flex items-center gap-2",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Settings2, { className: "w-4 h-4 text-primary" }), "Configuração do Cabeçalho"]
 					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
 					className: "grid gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "grid gap-2",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
 							htmlFor: "companyName",
@@ -36657,21 +36683,7 @@ function ListGeneratorPage() {
 							}),
 							placeholder: "Ex: Minha Loja"
 						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "grid gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-							htmlFor: "listTitle",
-							children: "Título da Lista (Grupo)"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							id: "listTitle",
-							value: headerConfig.listTitle,
-							onChange: (e) => setHeaderConfig({
-								...headerConfig,
-								listTitle: e.target.value
-							}),
-							placeholder: "Ex: Ofertas Especiais"
-						})]
-					})]
+					})
 				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 					className: "flex-1 flex flex-col min-h-0 border-2",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
@@ -38639,4 +38651,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BirK3tYv.js.map
+//# sourceMappingURL=index-B8xN8Akn.js.map

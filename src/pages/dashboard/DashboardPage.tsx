@@ -17,6 +17,7 @@ export default function DashboardPage() {
     setFilters,
     isLoading,
     selectedProductIds,
+    subscribeToProducts,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -24,9 +25,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchProducts()
+    const unsubscribe = subscribeToProducts()
 
-    // Subscribe to realtime updates for products
-    // (Optional: Implement supabase realtime subscription here if needed)
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   return (

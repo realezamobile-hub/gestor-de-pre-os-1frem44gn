@@ -31,7 +31,6 @@ export default function ListGeneratorPage() {
 
   const [headerConfig, setHeaderConfig] = useState({
     companyName: 'Minha Loja',
-    listTitle: 'Smartphones e Eletrônicos',
   })
 
   // Permission check
@@ -51,16 +50,11 @@ export default function ListGeneratorPage() {
   }
 
   const generateListText = () => {
-    const today = new Date().toLocaleDateString('pt-BR')
-    let text = `🔥 *${headerConfig.companyName.toUpperCase()}* 🔥\n`
-    text += `📢 *${headerConfig.listTitle} - ${today}*\n\n`
-
     if (selectedProducts.length === 0) {
-      return text + '(Nenhum produto selecionado)'
+      return '(Nenhum produto selecionado)'
     }
 
-    // Group by Brand/Model or Category to make it look nicer?
-    // Let's group by Category first
+    // Group by Category
     const grouped = selectedProducts.reduce(
       (acc, product) => {
         const key = product.categoria || 'Outros'
@@ -71,22 +65,22 @@ export default function ListGeneratorPage() {
       {} as Record<string, typeof selectedProducts>,
     )
 
+    let text = ''
+
     Object.entries(grouped).forEach(([category, products]) => {
-      text += `*--- ${category.toUpperCase()} ---*\n`
+      text += `🔥 *${headerConfig.companyName} - ${category}* 🔥\n`
       products.forEach((p) => {
-        const specs = [p.memoria, p.cor, p.bateria ? `Bat: ${p.bateria}` : null]
-          .filter(Boolean)
-          .join(' - ')
         const priceStr = p.valor
           ? `R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
-        const condition = p.estado !== 'Novo' ? `(${p.estado})` : ''
 
-        // Format: Model - Specs - Price
-        text += `📱 ${p.modelo} ${condition}\n`
-        text += `   ${specs}\n`
-        text += `   💰 ${priceStr}\n\n`
+        // Format: • [Modelo] [Memoria] [Cor] - R$ [Valor]
+        // Adding other details if relevant and brief
+        text += ` • ${p.modelo} ${p.memoria || ''} ${p.cor || ''}`
+        if (p.estado && p.estado !== 'Novo') text += ` (${p.estado})`
+        text += ` - *${priceStr}*\n`
       })
+      text += '\n'
     })
 
     text += `⚠️ _Preços sujeitos a alteração sem aviso prévio._\n`
@@ -166,20 +160,6 @@ export default function ListGeneratorPage() {
                     })
                   }
                   placeholder="Ex: Minha Loja"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="listTitle">Título da Lista (Grupo)</Label>
-                <Input
-                  id="listTitle"
-                  value={headerConfig.listTitle}
-                  onChange={(e) =>
-                    setHeaderConfig({
-                      ...headerConfig,
-                      listTitle: e.target.value,
-                    })
-                  }
-                  placeholder="Ex: Ofertas Especiais"
                 />
               </div>
             </CardContent>

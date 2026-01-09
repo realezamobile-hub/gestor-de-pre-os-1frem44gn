@@ -33,6 +33,7 @@ export function ProductFilters() {
     colors: [] as string[],
     conditions: [] as string[],
     suppliers: [] as string[],
+    batteries: [] as string[],
   })
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function ProductFilters() {
     const fetchOptions = async () => {
       const { data } = await supabase
         .from('produtos')
-        .select('categoria, memoria, cor, estado, fornecedor')
+        .select('categoria, memoria, cor, estado, fornecedor, bateria')
 
       if (data) {
         const unique = (key: keyof (typeof data)[0]) =>
@@ -54,6 +55,7 @@ export function ProductFilters() {
           colors: unique('cor'),
           conditions: unique('estado'),
           suppliers: unique('fornecedor'),
+          batteries: unique('bateria'),
         })
       }
     }
@@ -156,24 +158,46 @@ export function ProductFilters() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Condição</Label>
-            <Select
-              value={filters.condition}
-              onValueChange={(val) => setFilters({ condition: val })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {options.conditions.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Condição</Label>
+              <Select
+                value={filters.condition}
+                onValueChange={(val) => setFilters({ condition: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {options.conditions.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Saúde da Bateria</Label>
+              <Select
+                value={filters.battery}
+                onValueChange={(val) => setFilters({ battery: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {options.batteries.map((b) => (
+                    <SelectItem key={b} value={b}>
+                      {b}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

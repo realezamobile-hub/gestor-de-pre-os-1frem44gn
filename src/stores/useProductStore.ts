@@ -55,7 +55,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true })
     const { filters } = get()
 
-    // Explicitly fetching data ensuring 'valor' and 'fornecedor' are retrieved via '*'
+    // Explicitly fetching data ensuring 'valor' is retrieved via '*'
+    // 'valor' is crucial for displaying the price in the dashboard
     let query = supabase
       .from('produtos')
       .select('*')

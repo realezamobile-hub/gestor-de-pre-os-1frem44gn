@@ -45,6 +45,11 @@ export default function DashboardPage() {
     setFilters({ search: debouncedSearchTerm })
   }, [debouncedSearchTerm])
 
+  // Effect to sync local search term if filters are reset externally
+  useEffect(() => {
+    setSearchTerm(filters.search)
+  }, [filters.search])
+
   useEffect(() => {
     fetchProducts()
     const unsubscribe = subscribeToProducts()

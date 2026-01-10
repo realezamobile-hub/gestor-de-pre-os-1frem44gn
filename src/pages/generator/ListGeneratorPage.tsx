@@ -284,7 +284,7 @@ export default function ListGeneratorPage() {
                     className="text-xs flex items-center gap-1"
                   >
                     <DollarSign className="w-3 h-3" />
-                    Acréscimo (R$)
+                    Valor Adicional (R$)
                   </Label>
                   <Input
                     id="markup"

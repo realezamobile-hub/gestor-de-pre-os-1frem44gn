@@ -46,10 +46,11 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
     }
   }
 
-  if (isLoading && products.length === 0) {
+  // Show skeleton on any loading state to provide visual feedback during transitions (e.g. pagination, filtering)
+  if (isLoading) {
     return (
       <div className="rounded-md border bg-white shadow-sm overflow-hidden p-4 space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="flex items-center space-x-4">
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className="space-y-2">

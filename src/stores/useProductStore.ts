@@ -47,7 +47,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   selectedProductIds: new Set(),
   categories: [],
   page: 0,
-  pageSize: 20,
+  pageSize: 50, // Updated to 50 as per requirements
   total: 0,
 
   setFilters: (newFilters) => {

@@ -7,6 +7,7 @@ interface AuthState {
   currentUser: User | null
   session: Session | null
   isLoading: boolean
+  initialized: boolean
 
   initialize: () => Promise<void>
   login: (
@@ -53,69 +54,63 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   currentUser: null,
   session: null,
   isLoading: true,
+  initialized: false,
   users: [],
 
   initialize: async () => {
-    try {
-      // Get initial session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      set({ session })
+    if (get().initialized) return
+    set({ initialized: true })
 
+    const syncUser = async (session: Session | null) => {
       if (session?.user) {
-        // Fetch profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        if (profile) {
-          // Add email from session if not in profile (it usually is synced but good to be safe for logic)
-          const profileWithEmail = { ...profile, email: session.user.email }
-
-          set({
-            currentUser: mapProfileToUser(profileWithEmail),
-          })
-
-          // Update last active
-          await supabase
+        try {
+          const { data: profile, error } = await supabase
             .from('profiles')
-            .update({ last_active: new Date().toISOString() })
-            .eq('id', profile.id)
-        }
-      }
-    } catch (error) {
-      console.error('Auth initialization error:', error)
-    } finally {
-      set({ isLoading: false })
-    }
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
 
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      set({ session, isLoading: true })
+          if (profile && !error) {
+            const profileWithEmail = { ...profile, email: session.user.email }
+            set({
+              currentUser: mapProfileToUser(profileWithEmail),
+              isLoading: false,
+            })
 
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        if (profile) {
-          const profileWithEmail = { ...profile, email: session.user.email }
-          set({
-            currentUser: mapProfileToUser(profileWithEmail),
-            isLoading: false,
-          })
-        } else {
+            // Update last active silently
+            await supabase
+              .from('profiles')
+              .update({ last_active: new Date().toISOString() })
+              .eq('id', profile.id)
+          } else {
+            set({ currentUser: null, isLoading: false })
+          }
+        } catch (e) {
+          console.error('Error fetching profile', e)
           set({ currentUser: null, isLoading: false })
         }
       } else {
         set({ currentUser: null, isLoading: false })
       }
+    }
+
+    // Set up auth state listener FIRST
+    supabase.auth.onAuthStateChange((event, session) => {
+      set({ session, isLoading: true })
+      syncUser(session)
     })
+
+    // THEN check for existing session
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      set({ session })
+      await syncUser(session)
+    } catch (error) {
+      console.error('Auth initialization error:', error)
+      set({ isLoading: false })
+    }
   },
 
   login: async (email, password) => {
@@ -175,12 +170,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const user = get().users.find((u) => u.id === userId)
     if (!user) return
 
-    // Don't allow toggling permissions for super admin via UI if logic prevents it, but here we just update DB
-    // The mapProfileToUser will still enforce true for super admin on read
-
     const newValue = !user[permission]
-
-    // Map TS property to DB column
     const dbColumn =
       permission === 'canCreateList' ? 'can_create_list' : permission
 

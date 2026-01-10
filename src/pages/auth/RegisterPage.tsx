@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
@@ -17,8 +17,8 @@ import { Loader2 } from 'lucide-react'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { register } = useAuthStore()
-  const [loading, setLoading] = useState(false)
+  const { register, currentUser, isLoading } = useAuthStore()
+  const [localLoading, setLocalLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,9 +26,20 @@ export default function RegisterPage() {
     phone: '',
   })
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && currentUser) {
+      if (currentUser.status === 'active' || currentUser.role === 'admin') {
+        navigate('/')
+      } else if (currentUser.status === 'pending') {
+        navigate('/pending')
+      }
+    }
+  }, [currentUser, isLoading, navigate])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setLocalLoading(true)
 
     try {
       const result = await register(
@@ -46,8 +57,16 @@ export default function RegisterPage() {
     } catch (error) {
       toast.error('Erro ao realizar cadastro')
     } finally {
-      setLoading(false)
+      setLocalLoading(false)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -113,8 +132,10 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full" type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button className="w-full" type="submit" disabled={localLoading}>
+              {localLoading && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Solicitar Acesso
             </Button>
             <div className="text-center text-sm">

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -10,32 +10,42 @@ import DashboardPage from './pages/dashboard/DashboardPage'
 import ListGeneratorPage from './pages/generator/ListGeneratorPage'
 import AdminPage from './pages/admin/AdminPage'
 import NotFound from './pages/NotFound'
+import { useEffect } from 'react'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-const App = () => (
-  <BrowserRouter
-    future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
-  >
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-right" />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/pending" element={<PendingApprovalPage />} />
+const App = () => {
+  const { initialize } = useAuthStore()
 
-        {/* Protected Routes */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/generator" element={<ListGeneratorPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Route>
+  useEffect(() => {
+    initialize()
+  }, [])
 
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </TooltipProvider>
-  </BrowserRouter>
-)
+  return (
+    <BrowserRouter
+      future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
+    >
+      <TooltipProvider>
+        <Toaster />
+        <Sonner position="top-right" />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/pending" element={<PendingApprovalPage />} />
+
+          {/* Protected Routes */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/generator" element={<ListGeneratorPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </TooltipProvider>
+    </BrowserRouter>
+  )
+}
 
 export default App

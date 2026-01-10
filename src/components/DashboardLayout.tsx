@@ -2,15 +2,10 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { TopHeader } from './TopHeader'
 import { useAuthStore } from '@/stores/useAuthStore'
-import { useEffect } from 'react'
 
 export default function DashboardLayout() {
-  const { currentUser, isLoading, initialize } = useAuthStore()
+  const { currentUser, isLoading } = useAuthStore()
   const location = useLocation()
-
-  useEffect(() => {
-    initialize()
-  }, [])
 
   if (isLoading) {
     return (

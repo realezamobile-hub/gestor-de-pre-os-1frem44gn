@@ -10,12 +10,16 @@ import {
   RefreshCcw,
   Globe,
   Database,
+  Ban,
+  TrendingDown,
 } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 import { UserManagement } from '@/components/admin/UserManagement'
 import { PendingRequests } from '@/components/admin/PendingRequests'
 import { DomainSettings } from '@/components/admin/DomainSettings'
 import { BulkCleanup } from '@/components/admin/BulkCleanup'
+import { SupplierBlacklist } from '@/components/admin/SupplierBlacklist'
+import { PriceMonitor } from '@/components/admin/PriceMonitor'
 
 export default function AdminPage() {
   const { users, fetchUsers, currentUser } = useAuthStore()
@@ -36,12 +40,12 @@ export default function AdminPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
           <p className="text-muted-foreground mt-1">
-            Painel de controle de usuários e acessos.
+            Painel de controle de usuários, dados e monitoramento.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
           <RefreshCcw className="w-4 h-4 mr-2" />
-          Atualizar Lista
+          Atualizar Dados
         </Button>
       </div>
 
@@ -94,9 +98,17 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="active" className="w-full">
+      <Tabs defaultValue="monitor" className="w-full">
         <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="grid w-full min-w-[600px] grid-cols-4 md:w-auto">
+          <TabsList className="grid w-full min-w-[800px] grid-cols-6 md:w-auto">
+            <TabsTrigger value="monitor" className="flex gap-2">
+              <TrendingDown className="w-4 h-4" />
+              Monitor
+            </TabsTrigger>
+            <TabsTrigger value="blacklist" className="flex gap-2">
+              <Ban className="w-4 h-4" />
+              Blacklist
+            </TabsTrigger>
             <TabsTrigger value="active">Usuários</TabsTrigger>
             <TabsTrigger value="pending" className="relative">
               Solicitações
@@ -118,19 +130,27 @@ export default function AdminPage() {
           </TabsList>
         </div>
 
-        <TabsContent value="active" className="mt-6">
+        <TabsContent value="monitor" className="mt-6 animate-fade-in">
+          <PriceMonitor />
+        </TabsContent>
+
+        <TabsContent value="blacklist" className="mt-6 animate-fade-in">
+          <SupplierBlacklist />
+        </TabsContent>
+
+        <TabsContent value="active" className="mt-6 animate-fade-in">
           <UserManagement />
         </TabsContent>
 
-        <TabsContent value="pending" className="mt-6">
+        <TabsContent value="pending" className="mt-6 animate-fade-in">
           <PendingRequests />
         </TabsContent>
 
-        <TabsContent value="domain" className="mt-6">
+        <TabsContent value="domain" className="mt-6 animate-fade-in">
           <DomainSettings />
         </TabsContent>
 
-        <TabsContent value="maintenance" className="mt-6">
+        <TabsContent value="maintenance" className="mt-6 animate-fade-in">
           <BulkCleanup />
         </TabsContent>
       </Tabs>

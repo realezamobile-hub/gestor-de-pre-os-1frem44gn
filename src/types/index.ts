@@ -21,6 +21,23 @@ export type Product = Database['public']['Tables']['produtos']['Row'] & {
   ram?: string | null
 }
 
+export interface ExcludedSupplier {
+  id: string
+  nome: string | null
+  telefone: string | null
+  criado_em: string
+}
+
+export interface PriceMonitorItem {
+  id: number
+  modelo: string
+  categoria: string | null
+  valor: number
+  fornecedor: string | null
+  telefone: string | null
+  criado_em: string
+}
+
 export interface FilterState {
   search: string
   category: string[]

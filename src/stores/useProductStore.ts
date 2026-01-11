@@ -1,11 +1,18 @@
 import { create } from 'zustand'
-import { Product, FilterState } from '@/types'
+import {
+  Product,
+  FilterState,
+  ExcludedSupplier,
+  PriceMonitorItem,
+} from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
 import { toast } from 'sonner'
 
 interface ProductStore {
   products: Product[]
+  monitorItems: PriceMonitorItem[]
+  excludedSuppliers: ExcludedSupplier[]
   isLoading: boolean
   filters: FilterState
   selectedProductIds: Set<number>
@@ -26,6 +33,18 @@ interface ProductStore {
   clearSelection: () => void
   getSelectedProducts: () => Product[]
   subscribeToProducts: () => () => void
+
+  // Admin Features
+  fetchExcludedSuppliers: () => Promise<void>
+  addExcludedSupplier: (
+    name: string | null,
+    phone: string | null,
+  ) => Promise<{ success: boolean; error?: any }>
+  removeExcludedSupplier: (
+    id: string,
+  ) => Promise<{ success: boolean; error?: any }>
+  fetchPriceMonitor: () => Promise<void>
+  clearAllProducts: () => Promise<{ success: boolean; error?: any }>
 }
 
 const INITIAL_FILTERS: FilterState = {
@@ -40,18 +59,23 @@ const INITIAL_FILTERS: FilterState = {
   dateRange: 'all',
 }
 
+// Helper to cast table name for views since they are not in Database types
+const VIEW_PRODUCTS = 'v_produtos_visiveis' as any
+const VIEW_MONITOR = 'v_monitor_precos' as any
+
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
+  monitorItems: [],
+  excludedSuppliers: [],
   isLoading: false,
   filters: INITIAL_FILTERS,
   selectedProductIds: new Set(),
   categories: [],
   page: 0,
-  pageSize: 50, // Updated to 50 as per requirements
+  pageSize: 50,
   total: 0,
 
   setFilters: (newFilters) => {
-    // Reset page to 0 when filters change
     set((state) => ({
       filters: { ...state.filters, ...newFilters },
       page: 0,
@@ -74,11 +98,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const { filters, page, pageSize } = get()
 
     let query = supabase
-      .from('produtos')
+      .from(VIEW_PRODUCTS)
       .select('*', { count: 'exact' })
       .order('valor', { ascending: true })
 
-    // Apply filters
     if (filters.search) {
       const searchTerm = filters.search.trim()
       if (searchTerm) {
@@ -116,7 +139,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       query = query.eq('em_estoque', true)
     }
 
-    // Date Range Logic
     if (filters.dateRange === 'today') {
       const today = startOfToday().toISOString()
       query = query.gte('criado_em', today)
@@ -125,7 +147,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       query = query.gte('criado_em', twoDaysAgo)
     }
 
-    // Pagination
     const from = page * pageSize
     const to = from + pageSize - 1
     query = query.range(from, to)
@@ -142,7 +163,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   fetchCategories: async () => {
     const { data } = await supabase
-      .from('produtos')
+      .from(VIEW_PRODUCTS)
       .select('categoria')
       .not('categoria', 'is', null)
 
@@ -159,12 +180,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     try {
       let query = supabase
-        .from('produtos')
+        .from(VIEW_PRODUCTS)
         .select('*')
         .order('valor', { ascending: true })
 
       if (date) {
-        // Filter by specific date (entire day)
         const start = startOfDay(date).toISOString()
         const end = endOfDay(date).toISOString()
         query = query.gte('criado_em', start).lte('criado_em', end)
@@ -183,7 +203,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           toast.info('Nenhum produto encontrado com os filtros selecionados.')
         } else {
           set((state) => {
-            // Merge new products into existing products to ensure they are available
             const existingIds = new Set(state.products.map((p) => p.id))
             const newProducts = [...state.products]
             data.forEach((p) => {
@@ -191,12 +210,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
                 newProducts.push(p)
               }
             })
-
-            // Set selection to ONLY the generated items
             const newSelection = new Set(data.map((p) => p.id))
-
             toast.success(`${data.length} produtos adicionados à lista!`)
-
             return {
               products: newProducts,
               selectedProductIds: newSelection,
@@ -227,11 +242,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   getSelectedProducts: () => {
     const { products, selectedProductIds } = get()
-    // Returns products that are currently in the store and selected
     return products.filter((p) => selectedProductIds.has(p.id))
   },
 
   subscribeToProducts: () => {
+    // Listen to changes in the 'produtos' table, but fetch from the view
     const channel = supabase
       .channel('public:produtos')
       .on(
@@ -246,5 +261,66 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     return () => {
       supabase.removeChannel(channel)
     }
+  },
+
+  // Admin Features Implementation
+
+  fetchExcludedSuppliers: async () => {
+    const { data, error } = await supabase
+      .from('fornecedores_excluidos')
+      .select('*')
+      .order('criado_em', { ascending: false })
+
+    if (!error && data) {
+      set({ excludedSuppliers: data })
+    }
+  },
+
+  addExcludedSupplier: async (name, phone) => {
+    if (!name && !phone)
+      return { success: false, error: { message: 'Dados inválidos' } }
+
+    const { error } = await supabase
+      .from('fornecedores_excluidos')
+      .insert({ nome: name || null, telefone: phone || null })
+
+    if (error) return { success: false, error }
+    await get().fetchExcludedSuppliers()
+    // Refresh products as they might be filtered now
+    get().fetchProducts()
+    return { success: true }
+  },
+
+  removeExcludedSupplier: async (id) => {
+    const { error } = await supabase
+      .from('fornecedores_excluidos')
+      .delete()
+      .eq('id', id)
+
+    if (error) return { success: false, error }
+    await get().fetchExcludedSuppliers()
+    // Refresh products as they might reappear
+    get().fetchProducts()
+    return { success: true }
+  },
+
+  fetchPriceMonitor: async () => {
+    const { data, error } = await supabase
+      .from(VIEW_MONITOR)
+      .select('*')
+      .order('modelo', { ascending: true })
+
+    if (!error && data) {
+      set({ monitorItems: data })
+    }
+  },
+
+  clearAllProducts: async () => {
+    const { error } = await supabase.from('produtos').delete().neq('id', 0) // Delete all
+
+    if (error) return { success: false, error }
+
+    set({ products: [], total: 0, monitorItems: [] })
+    return { success: true }
   },
 }))

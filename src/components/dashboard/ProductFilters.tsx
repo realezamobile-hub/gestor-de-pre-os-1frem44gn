@@ -23,10 +23,27 @@ import { FilterX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { MultiSelect } from '@/components/MultiSelect'
+import { useDebounce } from '@/hooks/use-debounce'
 
 export function ProductFilters() {
   const { filters, setFilters, resetFilters, categories, fetchCategories } =
     useProductStore()
+
+  // Local state for debouncing search
+  const [localSearch, setLocalSearch] = useState(filters.search)
+  const debouncedSearch = useDebounce(localSearch, 300)
+
+  // Sync local state with global filter changes (e.g. clear filters)
+  useEffect(() => {
+    setLocalSearch(filters.search)
+  }, [filters.search])
+
+  // Update store when debounced value changes
+  useEffect(() => {
+    if (debouncedSearch !== filters.search) {
+      setFilters({ search: debouncedSearch })
+    }
+  }, [debouncedSearch, setFilters, filters.search])
 
   // Local state for other dropdown options
   const [options, setOptions] = useState({
@@ -68,6 +85,11 @@ export function ProductFilters() {
     return v !== 'all' && v !== '' && v !== false
   }).length
 
+  const handleReset = () => {
+    setLocalSearch('')
+    resetFilters()
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -90,12 +112,15 @@ export function ProductFilters() {
         </SheetHeader>
         <div className="py-6 space-y-6">
           <div className="space-y-2">
-            <Label>Buscar Modelo</Label>
+            <Label>Buscar Produto</Label>
             <Input
-              placeholder="Ex: iPhone 15"
-              value={filters.search}
-              onChange={(e) => setFilters({ search: e.target.value })}
+              placeholder="Ex: iPhone 15, Apple, Dourado..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
             />
+            <p className="text-[10px] text-muted-foreground">
+              Busca em: modelo, categoria, cor, memória, ram, fornecedor, obs.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -231,7 +256,7 @@ export function ProductFilters() {
           <Button
             variant="outline"
             className="w-full mt-4"
-            onClick={resetFilters}
+            onClick={handleReset}
           >
             <FilterX className="w-4 h-4 mr-2" />
             Limpar Filtros

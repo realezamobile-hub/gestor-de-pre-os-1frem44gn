@@ -97,66 +97,46 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true })
     const { filters, page, pageSize } = get()
 
-    let query = supabase
-      .from(VIEW_PRODUCTS)
-      .select('*', { count: 'exact' })
-      .order('valor', { ascending: true })
-
-    if (filters.search) {
-      const searchTerm = filters.search.trim()
-      if (searchTerm) {
-        query = query.or(
-          `modelo.ilike.%${searchTerm}%,categoria.ilike.%${searchTerm}%,fornecedor.ilike.%${searchTerm}%`,
-        )
+    try {
+      // Calculate date filter for RPC
+      let minDate: string | null = null
+      if (filters.dateRange === 'today') {
+        minDate = startOfToday().toISOString()
+      } else if (filters.dateRange === 'last_2_days') {
+        minDate = startOfDay(subDays(new Date(), 1)).toISOString()
       }
-    }
 
-    if (filters.category && filters.category.length > 0) {
-      query = query.in('categoria', filters.category)
-    }
+      // Use the RPC for enhanced search and filtering
+      // This allows multi-column search and relevance sorting (Model matches first)
+      const { data, error, count } = await supabase
+        .rpc(
+          'search_products',
+          {
+            search_query: filters.search.trim() || null,
+            category_filters:
+              filters.category.length > 0 ? filters.category : null,
+            memory_filter: filters.memory !== 'all' ? filters.memory : null,
+            color_filter: filters.color !== 'all' ? filters.color : null,
+            condition_filter:
+              filters.condition !== 'all' ? filters.condition : null,
+            supplier_filter:
+              filters.supplier !== 'all' ? filters.supplier : null,
+            battery_filter: filters.battery !== 'all' ? filters.battery : null,
+            in_stock_only: filters.inStockOnly || null,
+            min_date: minDate,
+          },
+          { count: 'exact' },
+        )
+        .range(page * pageSize, (page + 1) * pageSize - 1)
 
-    if (filters.memory && filters.memory !== 'all') {
-      query = query.eq('memoria', filters.memory)
-    }
-
-    if (filters.color && filters.color !== 'all') {
-      query = query.eq('cor', filters.color)
-    }
-
-    if (filters.condition && filters.condition !== 'all') {
-      query = query.eq('estado', filters.condition)
-    }
-
-    if (filters.supplier && filters.supplier !== 'all') {
-      query = query.eq('fornecedor', filters.supplier)
-    }
-
-    if (filters.battery && filters.battery !== 'all') {
-      query = query.eq('bateria', filters.battery)
-    }
-
-    if (filters.inStockOnly) {
-      query = query.eq('em_estoque', true)
-    }
-
-    if (filters.dateRange === 'today') {
-      const today = startOfToday().toISOString()
-      query = query.gte('criado_em', today)
-    } else if (filters.dateRange === 'last_2_days') {
-      const twoDaysAgo = startOfDay(subDays(new Date(), 1)).toISOString()
-      query = query.gte('criado_em', twoDaysAgo)
-    }
-
-    const from = page * pageSize
-    const to = from + pageSize - 1
-    query = query.range(from, to)
-
-    const { data, error, count } = await query
-
-    if (!error && data) {
-      set({ products: data, total: count || 0, isLoading: false })
-    } else {
-      console.error('Error fetching products:', error)
+      if (!error && data) {
+        set({ products: data, total: count || 0, isLoading: false })
+      } else {
+        console.error('Error fetching products:', error)
+        set({ products: [], total: 0, isLoading: false })
+      }
+    } catch (e) {
+      console.error('Unexpected error fetching products', e)
       set({ products: [], total: 0, isLoading: false })
     }
   },

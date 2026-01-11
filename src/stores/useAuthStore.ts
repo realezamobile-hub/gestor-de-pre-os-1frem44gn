@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { User, UserStatus } from '@/types'
+import { User, UserStatus, Role } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { Session } from '@supabase/supabase-js'
 
@@ -26,6 +26,7 @@ interface AuthState {
   users: User[]
   fetchUsers: () => Promise<void>
   updateUserStatus: (userId: string, status: UserStatus) => Promise<void>
+  updateUserRole: (userId: string, role: Role) => Promise<void>
   toggleUserPermission: (
     userId: string,
     permission: keyof User,
@@ -162,6 +163,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!error) {
       set((state) => ({
         users: state.users.map((u) => (u.id === userId ? { ...u, status } : u)),
+      }))
+    }
+  },
+
+  updateUserRole: async (userId, role) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('id', userId)
+
+    if (!error) {
+      set((state) => ({
+        users: state.users.map((u) => (u.id === userId ? { ...u, role } : u)),
       }))
     }
   },

@@ -22,10 +22,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Role } from '@/types'
 
 export function UserManagement() {
-  const { users, currentUser, updateUserStatus, toggleUserPermission } =
-    useAuthStore()
+  const {
+    users,
+    currentUser,
+    updateUserStatus,
+    toggleUserPermission,
+    updateUserRole,
+  } = useAuthStore()
 
   const activeUsers = users.filter((u) => u.status !== 'pending')
 
@@ -44,17 +57,27 @@ export function UserManagement() {
     toast.success('Permissão de criar lista atualizada')
   }
 
+  const handleRoleChange = async (id: string, newRole: Role) => {
+    await updateUserRole(id, newRole)
+    toast.success(
+      `Usuário promovido para ${newRole === 'admin' ? 'Administrador' : 'Usuário Padrão'}`,
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Base de Usuários</CardTitle>
-        <CardDescription>Gerencie permissões e acesso.</CardDescription>
+        <CardDescription>
+          Gerencie funções, permissões e acesso.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Usuário</TableHead>
+              <TableHead>Função</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-center">Permissão Lista</TableHead>
               <TableHead className="text-center">Último Acesso</TableHead>
@@ -77,6 +100,23 @@ export function UserManagement() {
                       {user.email}
                     </div>
                   </div>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={user.role}
+                    onValueChange={(val: Role) =>
+                      handleRoleChange(user.id, val)
+                    }
+                    disabled={user.id === currentUser?.id}
+                  >
+                    <SelectTrigger className="w-[130px] h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Usuário</SelectItem>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell>
                   <Badge

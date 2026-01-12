@@ -104,7 +104,7 @@ export default function DashboardPage() {
           <div className="relative flex-1 group w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
             <Input
-              placeholder="Buscar por modelo, categoria, fornecedor..."
+              placeholder="Buscar por modelo, memória, cor (ex: iPhone 15 256 Azul)..."
               className="pl-10 bg-gray-50/50 focus:bg-white transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

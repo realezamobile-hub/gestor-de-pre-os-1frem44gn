@@ -119,12 +119,13 @@ export function ProductFilters() {
           <div className="space-y-2">
             <Label>Buscar Produto</Label>
             <Input
-              placeholder="Ex: iPhone 15, Apple, Dourado..."
+              placeholder="Ex: 15 Pro Max 256 Azul..."
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
             />
             <p className="text-[10px] text-muted-foreground">
-              Busca em: modelo, categoria, cor, memória, ram, fornecedor, obs.
+              Busca combinada em: modelo, categoria, cor, memória, ram,
+              fornecedor, obs.
             </p>
           </div>
 

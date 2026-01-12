@@ -13,8 +13,19 @@ interface EvaluationStore {
     modelo: string,
     preco: number,
   ) => Promise<{ success: boolean; error?: any }>
+  updateBasePrice: (
+    id: string,
+    modelo: string,
+    preco: number,
+  ) => Promise<{ success: boolean; error?: any }>
   deleteBasePrice: (id: string) => Promise<{ success: boolean; error?: any }>
+
   addDiscount: (
+    nome: string,
+    valor: number,
+  ) => Promise<{ success: boolean; error?: any }>
+  updateDiscount: (
+    id: string,
     nome: string,
     valor: number,
   ) => Promise<{ success: boolean; error?: any }>
@@ -66,6 +77,16 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     return { success: !error, error }
   },
 
+  updateBasePrice: async (id, modelo, preco) => {
+    const { error } = await supabase
+      .from('config_precos_base')
+      .update({ modelo, preco_base: preco })
+      .eq('id', id)
+
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
   deleteBasePrice: async (id) => {
     const { error } = await supabase
       .from('config_precos_base')
@@ -80,6 +101,16 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     const { error } = await supabase
       .from('config_descontos_perifericos')
       .insert({ nome, valor_desconto: valor })
+
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
+  updateDiscount: async (id, nome, valor) => {
+    const { error } = await supabase
+      .from('config_descontos_perifericos')
+      .update({ nome, valor_desconto: valor })
+      .eq('id', id)
 
     if (!error) await get().fetchConfigs()
     return { success: !error, error }

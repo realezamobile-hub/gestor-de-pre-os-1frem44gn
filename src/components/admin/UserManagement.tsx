@@ -147,7 +147,7 @@ export function UserManagement() {
                       />
                       <Label
                         htmlFor={`list-${user.id}`}
-                        className="text-xs font-normal"
+                        className="text-xs font-normal cursor-pointer"
                       >
                         Criar Lista
                       </Label>
@@ -163,7 +163,7 @@ export function UserManagement() {
                       />
                       <Label
                         htmlFor={`eval-${user.id}`}
-                        className="text-xs font-normal"
+                        className="text-xs font-normal cursor-pointer"
                       >
                         Avaliação
                       </Label>

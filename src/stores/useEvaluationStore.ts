@@ -122,7 +122,7 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('avaliacoes_iphone')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(50)
+      .limit(100)
 
     if (!error && data) {
       set({ evaluations: data as any, isLoading: false })

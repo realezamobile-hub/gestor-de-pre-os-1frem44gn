@@ -6,7 +6,6 @@ import { EvaluationChecklist } from '@/components/evaluation/EvaluationChecklist
 import { EvaluationHistory } from '@/components/evaluation/EvaluationHistory'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ClipboardCheck, History, Settings2, ShieldAlert } from 'lucide-react'
-import { Navigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 
@@ -25,6 +24,8 @@ export default function EvaluationPage() {
         <h2 className="text-2xl font-bold text-gray-900">Acesso Restrito</h2>
         <p className="text-muted-foreground text-center max-w-md">
           Você não tem permissão para acessar o módulo de avaliação.
+          <br />
+          Solicite acesso ao administrador.
         </p>
         <Button asChild>
           <Link to="/">Voltar ao Painel</Link>
@@ -36,20 +37,20 @@ export default function EvaluationPage() {
   const isAdmin = currentUser?.role === 'admin'
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+    <div className="h-[calc(100vh-6rem)] flex flex-col space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-gray-900">
           <ClipboardCheck className="w-8 h-8 text-primary" />
-          Avaliação de iPhone
+          Avaliação Técnica
         </h1>
         <p className="text-muted-foreground mt-1">
-          Inspeção técnica e calculadora de preços de compra.
+          Inspeção guiada, cálculo de preço e histórico de avaliações.
         </p>
       </div>
 
       <Tabs defaultValue="new" className="flex-1 flex flex-col min-h-0">
         <div className="flex items-center justify-between mb-4">
-          <TabsList>
+          <TabsList className="grid grid-cols-2 md:grid-cols-3 w-full md:w-auto">
             <TabsTrigger value="new">
               <ClipboardCheck className="w-4 h-4 mr-2" />
               Nova Avaliação

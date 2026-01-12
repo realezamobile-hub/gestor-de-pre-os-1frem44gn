@@ -24,30 +24,42 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { startOfDay } from 'date-fns'
+import { addDays, format } from 'date-fns'
 
 export function BulkCleanup() {
   const [date, setDate] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const { clearAllProducts } = useProductStore()
+  const { clearAllProducts, fetchProducts } = useProductStore()
 
   const handleCleanup = async () => {
     if (!date) return
 
     setLoading(true)
     try {
-      const cleanupDate = startOfDay(new Date(date)).toISOString()
+      // Create date object from YYYY-MM-DD input string
+      // Appending T00:00:00 ensures local time interpretation to avoid timezone shifts when using addDays
+      const selectedDate = new Date(date + 'T00:00:00')
+
+      // Calculate the next day to use as upper bound (exclusive)
+      // This ensures we capture all records from the selected date regardless of time component
+      // Logic: data_venda < nextDay (means data_venda <= selectedDate 23:59:59)
+      const nextDay = addDays(selectedDate, 1)
+      const cutoffDate = format(nextDay, 'yyyy-MM-dd')
 
       const { error, count } = await supabase
         .from('produtos')
         .delete({ count: 'exact' })
-        .lt('criado_em', cleanupDate)
+        .lt('data_venda', cutoffDate)
 
       if (error) throw error
 
       toast.success(
-        `${count ?? 0} produtos antigos foram removidos com sucesso.`,
+        `${count ?? 0} produtos vendidos foram removidos com sucesso.`,
       )
+
+      // Refresh products list
+      fetchProducts()
+
       setDate('')
     } catch (error) {
       console.error('Cleanup error:', error)
@@ -80,16 +92,16 @@ export function BulkCleanup() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-900">
             <AlertTriangle className="w-5 h-5 text-red-600" />
-            Limpeza por Data
+            Limpeza por Data de Venda
           </CardTitle>
           <CardDescription>
-            Remova produtos obsoletos do banco de dados anteriores a uma data.
+            Remova produtos vendidos do banco de dados até uma data específica.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="cleanup-date">
-              Remover produtos criados antes de:
+              Remover produtos vendidos em ou antes de:
             </Label>
             <Input
               id="cleanup-date"
@@ -108,17 +120,18 @@ export function BulkCleanup() {
                 disabled={!date || loading}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                {loading ? 'Processando...' : 'Excluir Registros Antigos'}
+                {loading ? 'Processando...' : 'Excluir Registros Vendidos'}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta ação excluirá permanentemente todos os produtos criados
-                  antes de{' '}
+                  Esta ação excluirá permanentemente todos os produtos com data
+                  de venda em ou antes de{' '}
                   <span className="font-bold">
-                    {date && new Date(date).toLocaleDateString('pt-BR')}
+                    {date &&
+                      new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}
                   </span>
                   . Os dados não poderão ser recuperados.
                 </AlertDialogDescription>

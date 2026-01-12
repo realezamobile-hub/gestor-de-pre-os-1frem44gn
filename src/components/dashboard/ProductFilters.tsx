@@ -33,17 +33,22 @@ export function ProductFilters() {
   const [localSearch, setLocalSearch] = useState(filters.search)
   const debouncedSearch = useDebounce(localSearch, 300)
 
-  // Sync local state with global filter changes (e.g. clear filters)
+  // Sync local state with global filter changes (e.g. clear filters or changes from DashboardPage)
+  // Only sync if the external value is different from our current debounced value
+  // This prevents the "revert" bug where a stale local state overwrites a new global state
   useEffect(() => {
-    setLocalSearch(filters.search)
-  }, [filters.search])
+    if (filters.search !== debouncedSearch) {
+      setLocalSearch(filters.search)
+    }
+  }, [filters.search]) // Exclude debouncedSearch to avoid pulling partial state
 
   // Update store when debounced value changes
+  // Only update if the value is actually different to avoid cycles
   useEffect(() => {
     if (debouncedSearch !== filters.search) {
       setFilters({ search: debouncedSearch })
     }
-  }, [debouncedSearch, setFilters, filters.search])
+  }, [debouncedSearch, setFilters]) // Exclude filters.search to prevent the loop
 
   // Local state for other dropdown options
   const [options, setOptions] = useState({

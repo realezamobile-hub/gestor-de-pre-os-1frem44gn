@@ -41,14 +41,21 @@ export default function DashboardPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
   // Effect to sync debounced search with store
+  // We only update the store if the debounced value is different to avoid infinite loops
   useEffect(() => {
-    setFilters({ search: debouncedSearchTerm })
-  }, [debouncedSearchTerm])
+    if (debouncedSearchTerm !== filters.search) {
+      setFilters({ search: debouncedSearchTerm })
+    }
+  }, [debouncedSearchTerm, setFilters]) // Exclude filters.search from dependencies to prevent loop
 
   // Effect to sync local search term if filters are reset externally
+  // We only update local state if the external filter value is different from our derived state
+  // This prevents overwriting user input while they are typing (when debounced value hasn't caught up yet)
   useEffect(() => {
-    setSearchTerm(filters.search)
-  }, [filters.search])
+    if (filters.search !== debouncedSearchTerm) {
+      setSearchTerm(filters.search)
+    }
+  }, [filters.search]) // Exclude debouncedSearchTerm from dependencies to avoid pulling partial state
 
   useEffect(() => {
     fetchProducts()

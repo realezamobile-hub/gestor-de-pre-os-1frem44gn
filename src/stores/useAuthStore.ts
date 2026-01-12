@@ -48,6 +48,9 @@ const mapProfileToUser = (profile: any): User => {
     lastActive: profile.last_active || new Date().toISOString(),
     createdAt: profile.created_at || new Date().toISOString(),
     canCreateList: isSuperAdmin ? true : profile.can_create_list || false,
+    canAccessEvaluation: isSuperAdmin
+      ? true
+      : profile.can_access_evaluation || false,
   }
 }
 
@@ -185,8 +188,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!user) return
 
     const newValue = !user[permission]
-    const dbColumn =
-      permission === 'canCreateList' ? 'can_create_list' : permission
+    let dbColumn = ''
+
+    if (permission === 'canCreateList') dbColumn = 'can_create_list'
+    if (permission === 'canAccessEvaluation') dbColumn = 'can_access_evaluation'
+
+    if (!dbColumn) return
 
     const { error } = await supabase
       .from('profiles')

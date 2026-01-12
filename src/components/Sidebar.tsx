@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   X,
+  ClipboardCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -36,6 +37,13 @@ export function Sidebar() {
       label: 'Gerador',
       icon: FileText,
       isVisible: currentUser?.canCreateList || currentUser?.role === 'admin',
+    },
+    {
+      href: '/evaluation',
+      label: 'Avaliação',
+      icon: ClipboardCheck,
+      isVisible:
+        currentUser?.canAccessEvaluation || currentUser?.role === 'admin',
     },
     {
       href: '/admin',

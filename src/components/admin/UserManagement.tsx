@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Role } from '@/types'
+import { Label } from '@/components/ui/label'
 
 export function UserManagement() {
   const {
@@ -52,9 +53,12 @@ export function UserManagement() {
     toast.info('Usuário bloqueado')
   }
 
-  const handleToggleListPermission = async (id: string) => {
-    await toggleUserPermission(id, 'canCreateList')
-    toast.success('Permissão de criar lista atualizada')
+  const handleTogglePermission = async (
+    id: string,
+    permission: 'canCreateList' | 'canAccessEvaluation',
+  ) => {
+    await toggleUserPermission(id, permission)
+    toast.success('Permissão atualizada')
   }
 
   const handleRoleChange = async (id: string, newRole: Role) => {
@@ -79,7 +83,7 @@ export function UserManagement() {
               <TableHead>Usuário</TableHead>
               <TableHead>Função</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-center">Permissão Lista</TableHead>
+              <TableHead className="text-center">Permissões</TableHead>
               <TableHead className="text-center">Último Acesso</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -131,15 +135,39 @@ export function UserManagement() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <Switch
-                      checked={user.canCreateList}
-                      onCheckedChange={() =>
-                        handleToggleListPermission(user.id)
-                      }
-                      disabled={user.id === currentUser?.id}
-                      aria-label="Alternar permissão de criar lista"
-                    />
+                  <div className="flex flex-col items-start gap-2 max-w-[150px] mx-auto">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={user.canCreateList}
+                        onCheckedChange={() =>
+                          handleTogglePermission(user.id, 'canCreateList')
+                        }
+                        disabled={user.id === currentUser?.id}
+                        id={`list-${user.id}`}
+                      />
+                      <Label
+                        htmlFor={`list-${user.id}`}
+                        className="text-xs font-normal"
+                      >
+                        Criar Lista
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={user.canAccessEvaluation}
+                        onCheckedChange={() =>
+                          handleTogglePermission(user.id, 'canAccessEvaluation')
+                        }
+                        disabled={user.id === currentUser?.id}
+                        id={`eval-${user.id}`}
+                      />
+                      <Label
+                        htmlFor={`eval-${user.id}`}
+                        className="text-xs font-normal"
+                      >
+                        Avaliação
+                      </Label>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">

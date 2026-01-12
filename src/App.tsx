@@ -9,6 +9,7 @@ import PendingApprovalPage from './pages/auth/PendingApprovalPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import ListGeneratorPage from './pages/generator/ListGeneratorPage'
 import AdminPage from './pages/admin/AdminPage'
+import EvaluationPage from './pages/evaluation/EvaluationPage'
 import NotFound from './pages/NotFound'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -37,6 +38,7 @@ const App = () => {
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/generator" element={<ListGeneratorPage />} />
+            <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Route>
 

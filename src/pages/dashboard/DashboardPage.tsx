@@ -37,6 +37,7 @@ export default function DashboardPage() {
   const navigate = useNavigate()
 
   // Local state for search input to handle debounce
+  // Initialize with filters.search to persist state on navigation
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
@@ -46,16 +47,16 @@ export default function DashboardPage() {
     if (debouncedSearchTerm !== filters.search) {
       setFilters({ search: debouncedSearchTerm })
     }
-  }, [debouncedSearchTerm, setFilters]) // Exclude filters.search from dependencies to prevent loop
+  }, [debouncedSearchTerm, setFilters]) // filters.search is deliberately excluded
 
-  // Effect to sync local search term if filters are reset externally
+  // Effect to sync local search term if filters are reset externally (e.g. "Clear Filters" button)
   // We only update local state if the external filter value is different from our derived state
   // This prevents overwriting user input while they are typing (when debounced value hasn't caught up yet)
   useEffect(() => {
     if (filters.search !== debouncedSearchTerm) {
       setSearchTerm(filters.search)
     }
-  }, [filters.search]) // Exclude debouncedSearchTerm from dependencies to avoid pulling partial state
+  }, [filters.search]) // debouncedSearchTerm is deliberately excluded to detect external changes
 
   useEffect(() => {
     fetchProducts()
@@ -108,6 +109,7 @@ export default function DashboardPage() {
               className="pl-10 bg-gray-50/50 focus:bg-white transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoComplete="off"
             />
           </div>
 

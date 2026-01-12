@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,32 +22,10 @@ import { FilterX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { MultiSelect } from '@/components/MultiSelect'
-import { useDebounce } from '@/hooks/use-debounce'
 
 export function ProductFilters() {
   const { filters, setFilters, resetFilters, categories, fetchCategories } =
     useProductStore()
-
-  // Local state for debouncing search
-  const [localSearch, setLocalSearch] = useState(filters.search)
-  const debouncedSearch = useDebounce(localSearch, 300)
-
-  // Sync local state with global filter changes (e.g. clear filters or changes from DashboardPage)
-  // Only sync if the external value is different from our current debounced value
-  // This prevents the "revert" bug where a stale local state overwrites a new global state
-  useEffect(() => {
-    if (filters.search !== debouncedSearch) {
-      setLocalSearch(filters.search)
-    }
-  }, [filters.search]) // Exclude debouncedSearch to avoid pulling partial state
-
-  // Update store when debounced value changes
-  // Only update if the value is actually different to avoid cycles
-  useEffect(() => {
-    if (debouncedSearch !== filters.search) {
-      setFilters({ search: debouncedSearch })
-    }
-  }, [debouncedSearch, setFilters]) // Exclude filters.search to prevent the loop
 
   // Local state for other dropdown options
   const [options, setOptions] = useState({
@@ -91,7 +68,6 @@ export function ProductFilters() {
   }).length
 
   const handleReset = () => {
-    setLocalSearch('')
     resetFilters()
   }
 
@@ -116,19 +92,6 @@ export function ProductFilters() {
           </SheetDescription>
         </SheetHeader>
         <div className="py-6 space-y-6">
-          <div className="space-y-2">
-            <Label>Buscar Produto</Label>
-            <Input
-              placeholder="Ex: 15 Pro Max 256 Azul..."
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-            />
-            <p className="text-[10px] text-muted-foreground">
-              Busca combinada em: modelo, categoria, cor, memória, ram,
-              fornecedor, obs.
-            </p>
-          </div>
-
           <div className="space-y-2">
             <Label>Categorias</Label>
             <MultiSelect

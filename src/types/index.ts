@@ -22,6 +22,17 @@ export type Product = Database['public']['Tables']['produtos']['Row'] & {
   ram?: string | null
 }
 
+export interface DraftItem {
+  id: string
+  user_id: string
+  product_id: number
+  custom_model?: string | null
+  custom_details?: string | null
+  custom_price?: number | null
+  created_at: string
+  product?: Product // Joined product data
+}
+
 export interface ExcludedSupplier {
   id: string
   nome: string | null

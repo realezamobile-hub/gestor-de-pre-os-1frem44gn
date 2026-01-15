@@ -26,6 +26,7 @@ export default function DashboardPage() {
     setFilters,
     isLoading,
     selectedProductIds,
+    fetchDraftItems,
     subscribeToProducts,
     page,
     pageSize,
@@ -36,30 +37,24 @@ export default function DashboardPage() {
   const { currentUser } = useAuthStore()
   const navigate = useNavigate()
 
-  // Local state for search input to handle debounce
-  // Initialize with filters.search to persist state on navigation
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
-  // Effect to sync debounced search with store
-  // We only update the store if the debounced value is different to avoid infinite loops
   useEffect(() => {
     if (debouncedSearchTerm !== filters.search) {
       setFilters({ search: debouncedSearchTerm })
     }
-  }, [debouncedSearchTerm, setFilters]) // filters.search is deliberately excluded
+  }, [debouncedSearchTerm, setFilters])
 
-  // Effect to sync local search term if filters are reset externally (e.g. "Clear Filters" button)
-  // We only update local state if the external filter value is different from our derived state
-  // This prevents overwriting user input while they are typing (when debounced value hasn't caught up yet)
   useEffect(() => {
     if (filters.search !== debouncedSearchTerm) {
       setSearchTerm(filters.search)
     }
-  }, [filters.search]) // debouncedSearchTerm is deliberately excluded to detect external changes
+  }, [filters.search])
 
   useEffect(() => {
     fetchProducts()
+    fetchDraftItems() // Fetch user draft items on load
     const unsubscribe = subscribeToProducts()
 
     return () => {
@@ -82,7 +77,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {currentUser?.canCreateList && selectedProductIds.size > 0 && (
+        {currentUser?.canCreateList && (
           <Button
             onClick={() => navigate('/generator')}
             size="lg"
@@ -90,12 +85,14 @@ export default function DashboardPage() {
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
             Gerar Lista
-            <Badge
-              variant="secondary"
-              className="ml-2 bg-white/20 text-white border-0"
-            >
-              {selectedProductIds.size}
-            </Badge>
+            {selectedProductIds.size > 0 && (
+              <Badge
+                variant="secondary"
+                className="ml-2 bg-white/20 text-white border-0"
+              >
+                {selectedProductIds.size}
+              </Badge>
+            )}
           </Button>
         )}
       </div>

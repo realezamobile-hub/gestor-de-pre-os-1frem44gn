@@ -12,15 +12,12 @@ interface ProductListProps {
 }
 
 export function ProductList({ products, isLoading = false }: ProductListProps) {
-  const { toggleProductSelection } = useProductStore()
+  const { toggleDraftItem } = useProductStore()
   const { currentUser } = useAuthStore()
   const isMobile = useIsMobile()
 
   const canCreateList = currentUser?.canCreateList || false
 
-  // Helper for currency formatting
-  // Ensures null values are handled gracefully without defaulting to zero
-  // Formats value from 'valor' column
   const formatPrice = (value: number | null | undefined) => {
     if (value === null || value === undefined) {
       return 'Sob Consulta'
@@ -31,7 +28,6 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
     })
   }
 
-  // Calculate lowest price in current view, ignoring null/undefined
   const lowestPrice = products.reduce((min, p) => {
     if (p.valor === null || p.valor === undefined) return min
     return p.valor < min ? p.valor : min
@@ -46,7 +42,6 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
     }
   }
 
-  // Show skeleton on any loading state to provide visual feedback during transitions (e.g. pagination, filtering)
   if (isLoading) {
     return (
       <div className="rounded-md border bg-white shadow-sm overflow-hidden p-4 space-y-4">
@@ -79,7 +74,10 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
         formatPrice={formatPrice}
         onWhatsAppClick={handleWhatsAppClick}
         canCreateList={canCreateList}
-        toggleProductSelection={toggleProductSelection}
+        toggleProductSelection={(id) => {
+          const product = products.find((p) => p.id === id)
+          if (product) toggleDraftItem(product)
+        }}
       />
     )
   }
@@ -91,7 +89,10 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
       formatPrice={formatPrice}
       onWhatsAppClick={handleWhatsAppClick}
       canCreateList={canCreateList}
-      toggleProductSelection={toggleProductSelection}
+      toggleProductSelection={(id) => {
+        const product = products.find((p) => p.id === id)
+        if (product) toggleDraftItem(product)
+      }}
     />
   )
 }

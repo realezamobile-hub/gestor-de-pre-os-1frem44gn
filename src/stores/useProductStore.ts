@@ -4,6 +4,7 @@ import {
   FilterState,
   ExcludedSupplier,
   PriceMonitorItem,
+  DraftItem,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
@@ -13,10 +14,13 @@ interface ProductStore {
   products: Product[]
   monitorItems: PriceMonitorItem[]
   excludedSuppliers: ExcludedSupplier[]
+  draftItems: DraftItem[]
   isLoading: boolean
   filters: FilterState
-  selectedProductIds: Set<number>
   categories: string[]
+
+  // Derived state helper
+  selectedProductIds: Set<number>
 
   // Pagination
   page: number
@@ -28,10 +32,21 @@ interface ProductStore {
   setPage: (page: number) => void
   fetchProducts: () => Promise<void>
   fetchCategories: () => Promise<void>
-  generateList: (date: Date | null, categories: string[]) => Promise<void>
-  toggleProductSelection: (productId: number) => void
-  clearSelection: () => void
-  getSelectedProducts: () => Product[]
+
+  // Draft Actions
+  fetchDraftItems: () => Promise<void>
+  toggleDraftItem: (product: Product) => Promise<void>
+  addToDraft: (products: Product[]) => Promise<void>
+  removeFromDraft: (draftId: string) => Promise<void>
+  updateDraftItem: (id: string, updates: Partial<DraftItem>) => Promise<void>
+  clearDraft: () => Promise<void>
+
+  // Legacy/Auto-Generator using Draft
+  generateListFromFilters: (
+    date: Date | null,
+    categories: string[],
+  ) => Promise<void>
+
   subscribeToProducts: () => () => void
 
   // Admin Features
@@ -67,6 +82,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
   monitorItems: [],
   excludedSuppliers: [],
+  draftItems: [],
   isLoading: false,
   filters: INITIAL_FILTERS,
   selectedProductIds: new Set(),
@@ -98,7 +114,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const { filters, page, pageSize } = get()
 
     try {
-      // Calculate date filter for RPC
       let minDate: string | null = null
       if (filters.dateRange === 'today') {
         minDate = startOfToday().toISOString()
@@ -106,8 +121,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         minDate = startOfDay(subDays(new Date(), 1)).toISOString()
       }
 
-      // Use the RPC for enhanced search and filtering
-      // This allows multi-column search and relevance sorting (Model matches first)
       const { data, error, count } = await supabase
         .rpc(
           'search_products',
@@ -155,7 +168,174 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
   },
 
-  generateList: async (date, categories) => {
+  fetchDraftItems: async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from('whatsapp_draft_items')
+      .select('*, product:produtos(*)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true })
+
+    if (!error && data) {
+      const selectedIds = new Set(data.map((i) => i.product_id))
+      set({ draftItems: data as any, selectedProductIds: selectedIds })
+    }
+  },
+
+  toggleDraftItem: async (product) => {
+    const { draftItems } = get()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      toast.error('Você precisa estar logado.')
+      return
+    }
+
+    const existing = draftItems.find((i) => i.product_id === product.id)
+
+    // Optimistic update
+    const prevDraftItems = [...draftItems]
+    const prevSelectedIds = new Set(get().selectedProductIds)
+
+    if (existing) {
+      // Remove
+      const newItems = draftItems.filter((i) => i.product_id !== product.id)
+      const newIds = new Set(prevSelectedIds)
+      newIds.delete(product.id)
+      set({ draftItems: newItems, selectedProductIds: newIds })
+
+      const { error } = await supabase
+        .from('whatsapp_draft_items')
+        .delete()
+        .eq('id', existing.id)
+
+      if (error) {
+        toast.error('Erro ao remover item')
+        set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
+      }
+    } else {
+      // Add
+      // Create temp item for UI
+      const tempId = crypto.randomUUID()
+      const tempItem: DraftItem = {
+        id: tempId,
+        user_id: user.id,
+        product_id: product.id,
+        created_at: new Date().toISOString(),
+        product: product,
+      }
+
+      const newItems = [...draftItems, tempItem]
+      const newIds = new Set(prevSelectedIds)
+      newIds.add(product.id)
+      set({ draftItems: newItems, selectedProductIds: newIds })
+
+      const { data, error } = await supabase
+        .from('whatsapp_draft_items')
+        .insert({
+          user_id: user.id,
+          product_id: product.id,
+        })
+        .select('*, product:produtos(*)')
+        .single()
+
+      if (error) {
+        toast.error('Erro ao adicionar item')
+        set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
+      } else if (data) {
+        // Replace temp item with real one
+        const realItems = get().draftItems.map((i) =>
+          i.id === tempId ? (data as any) : i,
+        )
+        set({ draftItems: realItems })
+      }
+    }
+  },
+
+  addToDraft: async (products) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user || products.length === 0) return
+
+    set({ isLoading: true })
+    const itemsToInsert = products.map((p) => ({
+      user_id: user.id,
+      product_id: p.id,
+    }))
+
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .upsert(itemsToInsert, { onConflict: 'user_id, product_id' })
+
+    if (error) {
+      toast.error('Erro ao adicionar produtos')
+    } else {
+      await get().fetchDraftItems()
+      toast.success(`${products.length} produtos adicionados ao rascunho`)
+    }
+    set({ isLoading: false })
+  },
+
+  removeFromDraft: async (draftId) => {
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .delete()
+      .eq('id', draftId)
+
+    if (!error) {
+      const newItems = get().draftItems.filter((i) => i.id !== draftId)
+      const newIds = new Set(newItems.map((i) => i.product_id))
+      set({ draftItems: newItems, selectedProductIds: newIds })
+    } else {
+      toast.error('Erro ao remover item')
+    }
+  },
+
+  updateDraftItem: async (id, updates) => {
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .update({
+        custom_model: updates.custom_model,
+        custom_details: updates.custom_details,
+        custom_price: updates.custom_price,
+      })
+      .eq('id', id)
+
+    if (!error) {
+      const newItems = get().draftItems.map((i) =>
+        i.id === id ? { ...i, ...updates } : i,
+      )
+      set({ draftItems: newItems })
+      toast.success('Item atualizado')
+    } else {
+      toast.error('Erro ao atualizar item')
+    }
+  },
+
+  clearDraft: async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (!error) {
+      set({ draftItems: [], selectedProductIds: new Set() })
+      toast.success('Lista limpa com sucesso')
+    }
+  },
+
+  generateListFromFilters: async (date, categories) => {
     set({ isLoading: true })
 
     try {
@@ -182,21 +362,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         if (data.length === 0) {
           toast.info('Nenhum produto encontrado com os filtros selecionados.')
         } else {
-          set((state) => {
-            const existingIds = new Set(state.products.map((p) => p.id))
-            const newProducts = [...state.products]
-            data.forEach((p) => {
-              if (!existingIds.has(p.id)) {
-                newProducts.push(p)
-              }
-            })
-            const newSelection = new Set(data.map((p) => p.id))
-            toast.success(`${data.length} produtos adicionados à lista!`)
-            return {
-              products: newProducts,
-              selectedProductIds: newSelection,
-            }
-          })
+          await get().addToDraft(data as any)
         }
       }
     } catch (error) {
@@ -207,26 +373,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
   },
 
-  toggleProductSelection: (productId) =>
-    set((state) => {
-      const newSelection = new Set(state.selectedProductIds)
-      if (newSelection.has(productId)) {
-        newSelection.delete(productId)
-      } else {
-        newSelection.add(productId)
-      }
-      return { selectedProductIds: newSelection }
-    }),
-
-  clearSelection: () => set({ selectedProductIds: new Set() }),
-
-  getSelectedProducts: () => {
-    const { products, selectedProductIds } = get()
-    return products.filter((p) => selectedProductIds.has(p.id))
-  },
-
   subscribeToProducts: () => {
-    // Listen to changes in the 'produtos' table, but fetch from the view
     const channel = supabase
       .channel('public:produtos')
       .on(
@@ -242,8 +389,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       supabase.removeChannel(channel)
     }
   },
-
-  // Admin Features Implementation
 
   fetchExcludedSuppliers: async () => {
     const { data, error } = await supabase
@@ -266,7 +411,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     if (error) return { success: false, error }
     await get().fetchExcludedSuppliers()
-    // Refresh products as they might be filtered now
     get().fetchProducts()
     return { success: true }
   },
@@ -279,7 +423,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     if (error) return { success: false, error }
     await get().fetchExcludedSuppliers()
-    // Refresh products as they might reappear
     get().fetchProducts()
     return { success: true }
   },
@@ -296,7 +439,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   },
 
   clearAllProducts: async () => {
-    const { error } = await supabase.from('produtos').delete().neq('id', 0) // Delete all
+    const { error } = await supabase.from('produtos').delete().neq('id', 0)
 
     if (error) return { success: false, error }
 

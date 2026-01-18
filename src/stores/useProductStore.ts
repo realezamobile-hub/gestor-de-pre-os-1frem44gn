@@ -403,7 +403,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       title,
       content,
       type,
-      header_footer_data: config as any, // Cast to any because supabase types expect Json
+      header_footer_data: config as any,
     })
 
     if (error) {

@@ -11,7 +11,6 @@ import { DraftItemCard } from './DraftItemCard'
 
 interface DraftListGroupedProps {
   items: DraftItem[]
-  onEdit?: (item: DraftItem) => void // Deprecated/Unused but kept for interface compat if needed
   onRemove: (id: string) => Promise<void>
   onUpdate: (id: string, updates: Partial<DraftItem>) => Promise<void>
 }
@@ -21,7 +20,7 @@ export function DraftListGrouped({
   onRemove,
   onUpdate,
 }: DraftListGroupedProps) {
-  // Group items
+  // Group items by group_name
   const grouped = items.reduce(
     (acc, item) => {
       const groupName = item.group_name || item.product?.categoria || 'Outros'

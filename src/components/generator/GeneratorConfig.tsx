@@ -9,14 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { DollarSign, FileText, Link as LinkIcon, Phone } from 'lucide-react'
-
-export interface GeneratorConfigData {
-  header: string
-  footer: string
-  communityLink: string
-  contactNumber: string
-  markup: number
-}
+import { GeneratorConfigData } from '@/types'
 
 interface GeneratorConfigProps {
   config: GeneratorConfigData

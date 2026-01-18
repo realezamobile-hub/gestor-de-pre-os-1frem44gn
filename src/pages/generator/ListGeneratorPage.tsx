@@ -11,16 +11,14 @@ import {
   Save,
   Copy,
   Loader2,
+  RefreshCw,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { DraftItem } from '@/types'
-import {
-  GeneratorConfig,
-  GeneratorConfigData,
-} from '@/components/generator/GeneratorConfig'
+import { DraftItem, GeneratorConfigData } from '@/types'
+import { GeneratorConfig } from '@/components/generator/GeneratorConfig'
 import { DraftListGrouped } from '@/components/generator/DraftListGrouped'
 
 export default function ListGeneratorPage() {
@@ -75,14 +73,12 @@ export default function ListGeneratorPage() {
     fetchDraftItems()
   }, [])
 
-  // Regenerate text when dependencies change
+  // Reset/Clear text if draft is empty
   useEffect(() => {
-    if (draftItems.length > 0) {
-      setGeneratedText(generateListText(isInternal))
-    } else {
+    if (draftItems.length === 0) {
       setGeneratedText('')
     }
-  }, [draftItems, config, isInternal])
+  }, [draftItems.length])
 
   // Permission check
   if (!currentUser?.canCreateList) {
@@ -100,8 +96,11 @@ export default function ListGeneratorPage() {
     )
   }
 
-  const generateListText = (internal: boolean = false) => {
-    if (draftItems.length === 0) return ''
+  const handleGenerate = () => {
+    if (draftItems.length === 0) {
+      setGeneratedText('')
+      return
+    }
 
     // Group by Group Name
     const grouped = draftItems.reduce(
@@ -118,7 +117,8 @@ export default function ListGeneratorPage() {
 
     let text = ''
 
-    if (internal) {
+    // 1. Header
+    if (isInternal) {
       text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n`
       text += `📅 Data: ${new Date().toLocaleDateString('pt-BR')} \n\n`
     } else {
@@ -126,6 +126,7 @@ export default function ListGeneratorPage() {
       if (!config.header.endsWith('\n\n')) text += '\n\n'
     }
 
+    // 2. Groups and Items
     sortedKeys.forEach((groupName) => {
       text += `*${groupName}*\n`
       const items = grouped[groupName]
@@ -134,9 +135,8 @@ export default function ListGeneratorPage() {
         const product = item.product
         if (!product) return
 
-        // Prefer custom_model (full description)
+        // 1. Details: Custom Model or fallback
         let model = item.custom_model || product.modelo || ''
-
         // If empty custom_model (legacy), construct it
         if (!item.custom_model) {
           model = [
@@ -149,10 +149,16 @@ export default function ListGeneratorPage() {
             .join(' ')
         }
 
+        // Append details if present
+        if (item.custom_details) {
+          model += ` (${item.custom_details})`
+        }
+
+        // 2. Price
         const basePrice = item.custom_price ?? product.valor
 
         let finalPrice = basePrice
-        if (finalPrice !== null && finalPrice !== undefined && !internal) {
+        if (finalPrice !== null && finalPrice !== undefined && !isInternal) {
           finalPrice += config.markup
         }
 
@@ -160,22 +166,12 @@ export default function ListGeneratorPage() {
           ? `R$ ${finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
 
-        // Format: - [Item Description]: [Price]
-        // Appending details if present
-        if (item.custom_details) {
-          text += ` - ${model} (${item.custom_details}): ${internal ? '' : '*'}${priceStr}${internal ? '' : '*'}`
-        } else {
-          text += ` - ${model}: ${internal ? '' : '*'}${priceStr}${internal ? '' : '*'}`
-        }
+        // 3. Format Line: [Details] - [Price]
+        // Example: - iPhone 11 64GB - R$ 2.000,00
+        text += ` - ${model} - ${isInternal ? '' : '*'}${priceStr}${isInternal ? '' : '*'}`
 
-        if (
-          product.estado &&
-          product.estado !== 'Novo' &&
-          !model.includes(product.estado)
-        )
-          text += ` (${product.estado})`
-
-        if (internal) {
+        // Internal Extras
+        if (isInternal) {
           text += `\n   ↳ Forn: ${product.fornecedor || 'N/A'}`
           if (product.telefone) text += ` | Tel: ${product.telefone}`
         }
@@ -185,7 +181,8 @@ export default function ListGeneratorPage() {
       text += '\n'
     })
 
-    if (!internal) {
+    // 3. Footer and Links (Public only)
+    if (!isInternal) {
       if (config.communityLink) {
         text += `\n${config.communityLink}\n`
       }
@@ -201,7 +198,7 @@ export default function ListGeneratorPage() {
       if (!config.footer.endsWith('\n')) text += '\n'
     }
 
-    return text
+    setGeneratedText(text)
   }
 
   const handleCopy = () => {
@@ -241,7 +238,7 @@ export default function ListGeneratorPage() {
               Gerador de Lista WhatsApp
             </h1>
             <p className="text-muted-foreground">
-              Edite seus itens, organize e exporte suas listas de ofertas.
+              Edite seus itens, organize e gere a prévia antes de exportar.
             </p>
           </div>
         </div>
@@ -289,13 +286,16 @@ export default function ListGeneratorPage() {
         <div className="xl:col-span-4 h-full">
           <Tabs
             value={isInternal ? 'internal' : 'customer'}
-            onValueChange={(v) => setIsInternal(v === 'internal')}
+            onValueChange={(v) => {
+              setIsInternal(v === 'internal')
+              setGeneratedText('') // Clear preview on tab switch to force regenerate
+            }}
             className="h-full flex flex-col"
           >
             <TabsList className="w-full justify-start mb-2">
               <TabsTrigger value="customer" className="flex-1">
                 <Smartphone className="w-4 h-4 mr-2" />
-                Lista Cliente (WhatsApp)
+                Lista Cliente
               </TabsTrigger>
               <TabsTrigger value="internal" className="flex-1">
                 <Lock className="w-4 h-4 mr-2" />
@@ -303,99 +303,99 @@ export default function ListGeneratorPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="customer" className="flex-1 mt-0">
-              <Card className="flex flex-col h-full overflow-hidden bg-slate-950 border-slate-800 shadow-2xl">
-                <CardHeader className="bg-slate-900 border-b border-slate-800 py-3 px-4 flex flex-row items-center justify-between space-y-0">
+            <div className="flex-1 relative flex flex-col">
+              <Card
+                className={cn(
+                  'flex flex-col h-full overflow-hidden shadow-xl transition-all',
+                  isInternal
+                    ? 'bg-white border-slate-200'
+                    : 'bg-slate-950 border-slate-800',
+                )}
+              >
+                <CardHeader
+                  className={cn(
+                    'py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b',
+                    isInternal
+                      ? 'bg-slate-50 border-slate-200'
+                      : 'bg-slate-900 border-slate-800',
+                  )}
+                >
                   <div className="flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <span className="w-3 h-3 rounded-full bg-red-500" />
-                      <span className="w-3 h-3 rounded-full bg-yellow-500" />
-                      <span className="w-3 h-3 rounded-full bg-green-500" />
-                    </div>
-                    <span className="ml-3 text-xs font-mono text-slate-400">
-                      output.txt
+                    {!isInternal && (
+                      <div className="flex gap-1.5">
+                        <span className="w-3 h-3 rounded-full bg-red-500" />
+                        <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <span className="w-3 h-3 rounded-full bg-green-500" />
+                      </div>
+                    )}
+                    {isInternal && <Lock className="w-4 h-4 text-slate-500" />}
+                    <span
+                      className={cn(
+                        'text-xs font-mono',
+                        isInternal ? 'text-slate-600' : 'text-slate-400 ml-3',
+                      )}
+                    >
+                      {isInternal
+                        ? 'internal_preview.txt'
+                        : 'whatsapp_preview.txt'}
                     </span>
                   </div>
+                  <Button
+                    onClick={handleGenerate}
+                    size="sm"
+                    variant={isInternal ? 'outline' : 'secondary'}
+                    className="h-7 text-xs"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1.5" />
+                    Gerar Prévia
+                  </Button>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 overflow-hidden relative group">
                   <textarea
                     value={generatedText}
                     readOnly
                     className={cn(
-                      'w-full h-full bg-transparent text-slate-300 font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed',
-                      draftItems.length === 0 && 'opacity-30 italic',
+                      'w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed',
+                      isInternal ? 'text-slate-800' : 'text-slate-300',
+                      !generatedText && 'opacity-50 italic text-center pt-20',
                     )}
-                    placeholder="Adicione produtos para gerar o texto..."
+                    placeholder={
+                      draftItems.length > 0
+                        ? "Clique em 'Gerar Prévia' para visualizar o resultado..."
+                        : 'Adicione produtos para gerar o texto...'
+                    }
                   />
-                  {draftItems.length > 0 && (
-                    <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-                      <Button
-                        onClick={handleSaveList}
-                        disabled={isSaving}
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-                      >
-                        {isSaving ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        ) : (
-                          <Save className="w-4 h-4 mr-2" />
-                        )}
-                        Gerar e Salvar
-                      </Button>
-                      <Button
-                        onClick={handleCopy}
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg"
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copiar
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
 
-            <TabsContent value="internal" className="flex-1 mt-0">
-              <Card className="flex flex-col h-full overflow-hidden bg-white border-slate-200 shadow-lg">
-                <CardHeader className="bg-slate-50 border-b border-slate-200 py-3 px-4 flex flex-row items-center justify-between space-y-0">
-                  <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-slate-500" />
-                    <span className="text-sm font-semibold text-slate-700">
-                      Uso Interno
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0 flex-1 overflow-hidden relative group">
-                  <textarea
-                    value={generatedText}
-                    readOnly
-                    className={cn(
-                      'w-full h-full bg-transparent text-slate-800 font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed',
-                      draftItems.length === 0 && 'opacity-30 italic',
-                    )}
-                  />
-                  {draftItems.length > 0 && (
+                  {generatedText && (
                     <div className="absolute bottom-6 right-6 flex flex-col gap-2">
                       <Button
-                        variant="outline"
                         onClick={handleSaveList}
                         disabled={isSaving}
                         size="sm"
-                        className="bg-white"
+                        className={cn(
+                          'shadow-lg',
+                          isInternal
+                            ? 'bg-slate-800 text-white hover:bg-slate-900'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white',
+                        )}
                       >
                         {isSaving ? (
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
                           <Save className="w-4 h-4 mr-2" />
                         )}
-                        Salvar
+                        Salvar no Histórico
                       </Button>
                       <Button
-                        variant="outline"
                         onClick={handleCopy}
                         size="sm"
-                        className="bg-white hover:bg-slate-50"
+                        variant="outline"
+                        className={cn(
+                          'shadow-lg',
+                          isInternal
+                            ? 'bg-white'
+                            : 'bg-white text-slate-900 hover:bg-slate-100 border-none',
+                        )}
                       >
                         <Copy className="w-4 h-4 mr-2" />
                         Copiar
@@ -404,7 +404,7 @@ export default function ListGeneratorPage() {
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
+            </div>
           </Tabs>
         </div>
       </div>

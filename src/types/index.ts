@@ -34,18 +34,21 @@ export interface DraftItem {
   product?: Product // Joined product data
 }
 
+export interface GeneratorConfigData {
+  header: string
+  footer: string
+  communityLink: string
+  contactNumber: string
+  markup: number
+}
+
 export interface GeneratedList {
   id: string
   user_id: string
   title: string | null
   content: string | null
   type: 'supplier' | 'posting' | null
-  header_footer_data: {
-    header: string
-    footer: string
-    communityLink: string
-    contactNumber: string
-  } | null
+  header_footer_data: GeneratorConfigData | null
   created_at: string
 }
 

@@ -36315,17 +36315,22 @@ const useProductStore = create((set, get$1) => ({
 		} else toast.error("Erro ao remover item");
 	},
 	updateDraftItem: async (id, updates) => {
+		const { draftItems } = get$1();
+		const originalItems = [...draftItems];
+		set({ draftItems: draftItems.map((i) => i.id === id ? {
+			...i,
+			...updates
+		} : i) });
 		const { error } = await supabase.from("whatsapp_draft_items").update({
 			custom_model: updates.custom_model,
 			custom_details: updates.custom_details,
 			custom_price: updates.custom_price,
 			group_name: updates.group_name
 		}).eq("id", id);
-		if (!error) set({ draftItems: get$1().draftItems.map((i) => i.id === id ? {
-			...i,
-			...updates
-		} : i) });
-		else toast.error("Erro ao atualizar item");
+		if (error) {
+			toast.error("Erro ao atualizar item");
+			set({ draftItems: originalItems });
+		}
 	},
 	clearDraft: async () => {
 		const { data: { user } } = await supabase.auth.getUser();
@@ -40662,23 +40667,11 @@ var CollapsibleTrigger = CollapsibleTrigger$1;
 var CollapsibleContent = CollapsibleContent$1;
 function DraftItemCard({ item, onUpdate, onRemove }) {
 	const { categories } = useProductStore();
-	const [model, setModel] = (0, import_react.useState)(() => {
-		if (item.custom_model) return item.custom_model;
-		if (!item.product) return "";
-		return [
-			item.product.modelo,
-			item.product.memoria,
-			item.product.ram ? `${item.product.ram} RAM` : null,
-			item.product.cor
-		].filter(Boolean).join(" ");
-	});
-	const [details, setDetails] = (0, import_react.useState)(item.custom_details || "");
-	const [price, setPrice] = (0, import_react.useState)(() => {
-		const p$1 = item.custom_price ?? item.product?.valor;
-		return p$1 !== void 0 && p$1 !== null ? p$1.toString() : "";
-	});
-	const [group, setGroup] = (0, import_react.useState)(item.group_name || item.product?.categoria || "Outros");
-	const [showDetails, setShowDetails] = (0, import_react.useState)(!!item.custom_details);
+	const [model, setModel] = (0, import_react.useState)("");
+	const [details, setDetails] = (0, import_react.useState)("");
+	const [price, setPrice] = (0, import_react.useState)("");
+	const [group, setGroup] = (0, import_react.useState)("");
+	const [showDetails, setShowDetails] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	const [isRemoving, setIsRemoving] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
@@ -40689,6 +40682,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 			item.product.ram ? `${item.product.ram} RAM` : null,
 			item.product.cor
 		].filter(Boolean).join(" "));
+		else setModel("");
 		setDetails(item.custom_details || "");
 		const p$1 = item.custom_price ?? item.product?.valor;
 		setPrice(p$1 !== void 0 && p$1 !== null ? p$1.toString() : "");
@@ -40697,12 +40691,14 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 	}, [item]);
 	const handleBlur = async () => {
 		const currentPrice = price ? parseFloat(price) : null;
-		if (model !== (item.custom_model || (item.product ? [
+		const originalPrice = item.custom_price ?? item.product?.valor;
+		const defaultModel = item.product ? [
 			item.product.modelo,
 			item.product.memoria,
 			item.product.ram ? `${item.product.ram} RAM` : null,
 			item.product.cor
-		].filter(Boolean).join(" ") : "")) || details !== (item.custom_details || "") || currentPrice !== (item.custom_price ?? item.product?.valor) || group !== (item.group_name || item.product?.categoria)) {
+		].filter(Boolean).join(" ") : "";
+		if (model !== (item.custom_model || defaultModel) || details !== (item.custom_details || "") || currentPrice !== originalPrice || group !== (item.group_name || item.product?.categoria)) {
 			setIsSaving(true);
 			await onUpdate(item.id, {
 				custom_model: model,
@@ -40718,6 +40714,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 		await onRemove(item.id);
 		setIsRemoving(false);
 	};
+	const listId = `groups-list-${item.id}`;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "group relative rounded-lg border bg-card p-3 shadow-sm transition-all hover:shadow-md",
 		children: [
@@ -40732,7 +40729,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 								children: "Grupo"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								list: "groups-list",
+								list: listId,
 								value: group,
 								onChange: (e) => setGroup(e.target.value),
 								onBlur: handleBlur,
@@ -40740,7 +40737,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 								placeholder: "Grupo..."
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("datalist", {
-								id: "groups-list",
+								id: listId,
 								children: [categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: c }, c)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "Outros" })]
 							})
 						]
@@ -40749,7 +40746,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 						className: "col-span-12 sm:col-span-6 space-y-1",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
 							className: "text-xs text-muted-foreground",
-							children: "Descrição do Item"
+							children: "Descrição (Modelo + Specs)"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 							value: model,
 							onChange: (e) => setModel(e.target.value),
@@ -40803,7 +40800,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 							variant: "ghost",
 							size: "sm",
 							className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Obs" : "Adicionar Observação"]
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Detalhes" : "Adicionar Detalhes"]
 						})
 					})
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContent, {
@@ -40813,7 +40810,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 						onChange: (e) => setDetails(e.target.value),
 						onBlur: handleBlur,
 						className: "h-8 text-xs text-muted-foreground",
-						placeholder: "Obs. adicional (opcional)"
+						placeholder: "Detalhes adicionais (aparecem ao lado do modelo)"
 					})
 				})]
 			}),
@@ -40907,13 +40904,8 @@ function ListGeneratorPage() {
 		fetchDraftItems();
 	}, []);
 	(0, import_react.useEffect)(() => {
-		if (draftItems.length > 0) setGeneratedText(generateListText(isInternal));
-		else setGeneratedText("");
-	}, [
-		draftItems,
-		config,
-		isInternal
-	]);
+		if (draftItems.length === 0) setGeneratedText("");
+	}, [draftItems.length]);
 	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-full flex flex-col items-center justify-center space-y-4",
 		children: [
@@ -40935,8 +40927,11 @@ function ListGeneratorPage() {
 			})
 		]
 	});
-	const generateListText = (internal = false) => {
-		if (draftItems.length === 0) return "";
+	const handleGenerate = () => {
+		if (draftItems.length === 0) {
+			setGeneratedText("");
+			return;
+		}
 		const grouped = draftItems.reduce((acc, item) => {
 			const key = item.group_name || item.product?.categoria || "Outros";
 			if (!acc[key]) acc[key] = [];
@@ -40945,7 +40940,7 @@ function ListGeneratorPage() {
 		}, {});
 		const sortedKeys = Object.keys(grouped).sort();
 		let text = "";
-		if (internal) {
+		if (isInternal) {
 			text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n`;
 			text += `📅 Data: ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")} \n\n`;
 		} else {
@@ -40964,13 +40959,12 @@ function ListGeneratorPage() {
 					product.ram ? `${product.ram} RAM` : null,
 					product.cor
 				].filter(Boolean).join(" ");
+				if (item.custom_details) model += ` (${item.custom_details})`;
 				let finalPrice = item.custom_price ?? product.valor;
-				if (finalPrice !== null && finalPrice !== void 0 && !internal) finalPrice += config.markup;
+				if (finalPrice !== null && finalPrice !== void 0 && !isInternal) finalPrice += config.markup;
 				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				if (item.custom_details) text += ` - ${model} (${item.custom_details}): ${internal ? "" : "*"}${priceStr}${internal ? "" : "*"}`;
-				else text += ` - ${model}: ${internal ? "" : "*"}${priceStr}${internal ? "" : "*"}`;
-				if (product.estado && product.estado !== "Novo" && !model.includes(product.estado)) text += ` (${product.estado})`;
-				if (internal) {
+				text += ` - ${model} - ${isInternal ? "" : "*"}${priceStr}${isInternal ? "" : "*"}`;
+				if (isInternal) {
 					text += `\n   ↳ Forn: ${product.fornecedor || "N/A"}`;
 					if (product.telefone) text += ` | Tel: ${product.telefone}`;
 				}
@@ -40978,7 +40972,7 @@ function ListGeneratorPage() {
 			});
 			text += "\n";
 		});
-		if (!internal) {
+		if (!isInternal) {
 			if (config.communityLink) text += `\n${config.communityLink}\n`;
 			if (config.contactNumber) {
 				const cleanNumber = config.contactNumber.replace(/\D/g, "");
@@ -40988,7 +40982,7 @@ function ListGeneratorPage() {
 			text += config.footer;
 			if (!config.footer.endsWith("\n")) text += "\n";
 		}
-		return text;
+		setGeneratedText(text);
 	};
 	const handleCopy = () => {
 		if (!generatedText) return;
@@ -41022,7 +41016,7 @@ function ListGeneratorPage() {
 					children: "Gerador de Lista WhatsApp"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					className: "text-muted-foreground",
-					children: "Edite seus itens, organize e exporte suas listas de ofertas."
+					children: "Edite seus itens, organize e gere a prévia antes de exportar."
 				})] })]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				className: "flex gap-2",
@@ -41071,108 +41065,78 @@ function ListGeneratorPage() {
 					className: "xl:col-span-4 h-full",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
 						value: isInternal ? "internal" : "customer",
-						onValueChange: (v) => setIsInternal(v === "internal"),
+						onValueChange: (v) => {
+							setIsInternal(v === "internal");
+							setGeneratedText("");
+						},
 						className: "h-full flex flex-col",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
-								className: "w-full justify-start mb-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-									value: "customer",
-									className: "flex-1",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente (WhatsApp)"]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-									value: "internal",
-									className: "flex-1",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
-								})]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+							className: "w-full justify-start mb-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
 								value: "customer",
-								className: "flex-1 mt-0",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-									className: "flex flex-col h-full overflow-hidden bg-slate-950 border-slate-800 shadow-2xl",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
-										className: "bg-slate-900 border-b border-slate-800 py-3 px-4 flex flex-row items-center justify-between space-y-0",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "flex items-center gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente"]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								value: "internal",
+								className: "flex-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex-1 relative flex flex-col",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2",
+										children: [
+											!isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 												className: "flex gap-1.5",
 												children: [
 													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-red-500" }),
 													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-yellow-500" }),
 													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-green-500" })
 												]
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "ml-3 text-xs font-mono text-slate-400",
-												children: "output.txt"
-											})]
-										})
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-										className: "p-0 flex-1 overflow-hidden relative group",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-											value: generatedText,
-											readOnly: true,
-											className: cn("w-full h-full bg-transparent text-slate-300 font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", draftItems.length === 0 && "opacity-30 italic"),
-											placeholder: "Adicione produtos para gerar o texto..."
-										}), draftItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "absolute bottom-6 right-6 flex flex-col gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-												onClick: handleSaveList,
-												disabled: isSaving,
-												size: "sm",
-												className: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg",
-												children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Gerar e Salvar"]
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-												onClick: handleCopy,
-												size: "sm",
-												className: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
-											})]
+											}),
+											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
+												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
+											})
+										]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+										onClick: handleGenerate,
+										size: "sm",
+										variant: isInternal ? "outline" : "secondary",
+										className: "h-7 text-xs",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévia"]
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+									className: "p-0 flex-1 overflow-hidden relative group",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
+										value: generatedText,
+										readOnly: true,
+										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !generatedText && "opacity-50 italic text-center pt-20"),
+										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévia' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
+									}), generatedText && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "absolute bottom-6 right-6 flex flex-col gap-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											onClick: handleSaveList,
+											disabled: isSaving,
+											size: "sm",
+											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
+											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar no Histórico"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											onClick: handleCopy,
+											size: "sm",
+											variant: "outline",
+											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
 										})]
 									})]
-								})
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
-								value: "internal",
-								className: "flex-1 mt-0",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-									className: "flex flex-col h-full overflow-hidden bg-white border-slate-200 shadow-lg",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
-										className: "bg-slate-50 border-b border-slate-200 py-3 px-4 flex flex-row items-center justify-between space-y-0",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "flex items-center gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-sm font-semibold text-slate-700",
-												children: "Uso Interno"
-											})]
-										})
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-										className: "p-0 flex-1 overflow-hidden relative group",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-											value: generatedText,
-											readOnly: true,
-											className: cn("w-full h-full bg-transparent text-slate-800 font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", draftItems.length === 0 && "opacity-30 italic")
-										}), draftItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "absolute bottom-6 right-6 flex flex-col gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-												variant: "outline",
-												onClick: handleSaveList,
-												disabled: isSaving,
-												size: "sm",
-												className: "bg-white",
-												children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-												variant: "outline",
-												onClick: handleCopy,
-												size: "sm",
-												className: "bg-white hover:bg-slate-50",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
-											})]
-										})]
-									})]
-								})
+								})]
 							})
-						]
+						})]
 					})
 				})
 			]
@@ -43981,4 +43945,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-C3izfO6-.js.map
+//# sourceMappingURL=index-Catng1lH.js.map

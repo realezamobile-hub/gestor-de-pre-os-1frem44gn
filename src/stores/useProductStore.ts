@@ -5,6 +5,7 @@ import {
   ExcludedSupplier,
   PriceMonitorItem,
   DraftItem,
+  GeneratorConfigData,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
@@ -46,7 +47,7 @@ interface ProductStore {
     title: string,
     content: string,
     type: 'supplier' | 'posting',
-    config: any,
+    config: GeneratorConfigData,
   ) => Promise<{ success: boolean; error?: any }>
 
   // Legacy/Auto-Generator using Draft
@@ -116,7 +117,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   getBestPrice: (product) => {
     // This is a placeholder as the real logic might be more complex depending on requirements
-    // Assuming product.valor is the best price for now or implementing basic logic
     if (product.valor) return { price: product.valor, supplierId: 'default' }
     return null
   },
@@ -259,7 +259,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
       }
     } else {
-      // Add with Smart Data Mapping
+      // Add
       const tempId = crypto.randomUUID()
       const fullDescription = formatProductDescription(product)
 
@@ -350,6 +350,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   },
 
   updateDraftItem: async (id, updates) => {
+    // Optimistic Update
+    const { draftItems } = get()
+    const originalItems = [...draftItems]
+
+    const newItems = draftItems.map((i) =>
+      i.id === id ? { ...i, ...updates } : i,
+    )
+    set({ draftItems: newItems })
+
     const { error } = await supabase
       .from('whatsapp_draft_items')
       .update({
@@ -360,13 +369,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       })
       .eq('id', id)
 
-    if (!error) {
-      const newItems = get().draftItems.map((i) =>
-        i.id === id ? { ...i, ...updates } : i,
-      )
-      set({ draftItems: newItems })
-    } else {
+    if (error) {
       toast.error('Erro ao atualizar item')
+      set({ draftItems: originalItems }) // Revert
     }
   },
 
@@ -398,7 +403,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       title,
       content,
       type,
-      header_footer_data: config,
+      header_footer_data: config as any, // Cast to any because supabase types expect Json
     })
 
     if (error) {

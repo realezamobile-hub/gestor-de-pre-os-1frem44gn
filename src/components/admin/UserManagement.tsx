@@ -55,7 +55,7 @@ export function UserManagement() {
 
   const handleTogglePermission = async (
     id: string,
-    permission: 'canCreateList' | 'canAccessEvaluation',
+    permission: 'canCreateList' | 'canAccessEvaluation' | 'canDeleteRecords',
   ) => {
     await toggleUserPermission(id, permission)
     toast.success('Permissão atualizada')
@@ -135,7 +135,7 @@ export function UserManagement() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <div className="flex flex-col items-start gap-2 max-w-[150px] mx-auto">
+                  <div className="flex flex-col items-start gap-2 max-w-[180px] mx-auto">
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={user.canCreateList}
@@ -166,6 +166,23 @@ export function UserManagement() {
                         className="text-xs font-normal cursor-pointer"
                       >
                         Avaliação
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={user.canDeleteRecords}
+                        onCheckedChange={() =>
+                          handleTogglePermission(user.id, 'canDeleteRecords')
+                        }
+                        disabled={user.id === currentUser?.id}
+                        id={`del-${user.id}`}
+                        className="data-[state=checked]:bg-red-500"
+                      />
+                      <Label
+                        htmlFor={`del-${user.id}`}
+                        className="text-xs font-normal cursor-pointer text-red-700"
+                      >
+                        Pode Deletar Registros
                       </Label>
                     </div>
                   </div>

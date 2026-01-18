@@ -51,6 +51,7 @@ const mapProfileToUser = (profile: any): User => {
     canAccessEvaluation: isSuperAdmin
       ? true
       : profile.can_access_evaluation || false,
+    canDeleteRecords: isSuperAdmin ? true : profile.can_delete_records || false,
   }
 }
 
@@ -192,6 +193,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (permission === 'canCreateList') dbColumn = 'can_create_list'
     if (permission === 'canAccessEvaluation') dbColumn = 'can_access_evaluation'
+    if (permission === 'canDeleteRecords') dbColumn = 'can_delete_records'
 
     if (!dbColumn) return
 

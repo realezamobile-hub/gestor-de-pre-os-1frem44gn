@@ -15,6 +15,7 @@ export interface User {
   createdAt: string
   canCreateList: boolean
   canAccessEvaluation: boolean
+  canDeleteRecords: boolean
 }
 
 // Map directly to Supabase table row and extend with new columns

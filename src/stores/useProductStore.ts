@@ -79,6 +79,11 @@ interface ProductStore {
   cleanupByDate: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
+  deleteSoldItems: () => Promise<{
+    success: boolean
+    count?: number
+    error?: any
+  }>
 
   // Helper
   getBestPrice: (
@@ -556,6 +561,18 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       return { success: true, data }
     } catch (error) {
       console.error('Cleanup by date error:', error)
+      return { success: false, error }
+    }
+  },
+
+  deleteSoldItems: async () => {
+    try {
+      const { data, error } = await supabase.rpc('delete_sold_items')
+      if (error) throw error
+      get().fetchProducts()
+      return { success: true, count: data }
+    } catch (error) {
+      console.error('Delete sold items error:', error)
       return { success: false, error }
     }
   },

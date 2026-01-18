@@ -25,12 +25,17 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { addDays, format } from 'date-fns'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 export function BulkCleanup() {
   const [date, setDate] = useState<string>('')
   const [dailyDate, setDailyDate] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const { clearAllProducts, fetchProducts, cleanupByDate } = useProductStore()
+  const { clearAllProducts, fetchProducts, cleanupByDate, deleteSoldItems } =
+    useProductStore()
+  const { currentUser } = useAuthStore()
+
+  const canDelete = currentUser?.canDeleteRecords || false
 
   const handleCleanup = async () => {
     if (!date) return
@@ -38,10 +43,7 @@ export function BulkCleanup() {
     setLoading(true)
     try {
       // Cleanup by SOLD DATE
-      // Create date object from YYYY-MM-DD input string
       const selectedDate = new Date(date + 'T00:00:00')
-
-      // Calculate the next day to use as upper bound (exclusive)
       const nextDay = addDays(selectedDate, 1)
       const cutoffDate = format(nextDay, 'yyyy-MM-dd')
 
@@ -56,9 +58,7 @@ export function BulkCleanup() {
         `${count ?? 0} produtos vendidos foram removidos com sucesso.`,
       )
 
-      // Refresh products list
       fetchProducts()
-
       setDate('')
     } catch (error) {
       console.error('Cleanup error:', error)
@@ -90,6 +90,25 @@ export function BulkCleanup() {
     }
   }
 
+  const handleDeleteSold = async () => {
+    setLoading(true)
+    try {
+      const result = await deleteSoldItems()
+      if (result.success) {
+        toast.success(
+          `${result.count} produtos vendidos/sem estoque foram removidos.`,
+        )
+      } else {
+        throw result.error
+      }
+    } catch (error) {
+      console.error('Delete sold error:', error)
+      toast.error('Erro ao excluir produtos vendidos.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleClearAll = async () => {
     setLoading(true)
     try {
@@ -105,6 +124,18 @@ export function BulkCleanup() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!canDelete) {
+    return (
+      <Card className="border-red-200 bg-red-50">
+        <CardContent className="pt-6 text-center text-red-800">
+          <ShieldAlert className="w-12 h-12 mx-auto mb-2 text-red-500" />
+          <h3 className="text-lg font-semibold">Acesso Restrito</h3>
+          <p>Você não tem permissão para executar ferramentas de limpeza.</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -177,7 +208,7 @@ export function BulkCleanup() {
           </CardContent>
         </Card>
 
-        {/* Sales Cleanup Card */}
+        {/* Sold Cleanup Card (Date based) */}
         <Card className="border-red-100 bg-red-50/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-900">
@@ -208,7 +239,7 @@ export function BulkCleanup() {
                   disabled={!date || loading}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  {loading ? 'Processando...' : 'Excluir Vendidos'}
+                  {loading ? 'Processando...' : 'Excluir Vendidos (Data)'}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -235,6 +266,54 @@ export function BulkCleanup() {
                     className="bg-red-600 hover:bg-red-700"
                   >
                     Sim, excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
+
+        {/* Full Sold Cleanup Card */}
+        <Card className="border-blue-100 bg-blue-50/10 md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-900">
+              <Trash2 className="w-5 h-5 text-blue-600" />
+              Excluir Todos os Vendidos / Sem Estoque
+            </CardTitle>
+            <CardDescription>
+              Remove imediatamente todos os produtos marcados como sem estoque
+              ou com data de venda.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={loading}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {loading
+                    ? 'Processando...'
+                    : 'Limpar Todos os Vendidos e Sem Estoque'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar Catálogo?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Isso removerá <strong>todos</strong> os produtos que não
+                    estão em estoque ou que já foram vendidos, independentemente
+                    da data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteSold}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Confirmar Limpeza
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

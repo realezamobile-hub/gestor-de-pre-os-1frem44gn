@@ -68,6 +68,13 @@ interface ProductStore {
   ) => Promise<{ success: boolean; error?: any }>
   fetchPriceMonitor: () => Promise<void>
   clearAllProducts: () => Promise<{ success: boolean; error?: any }>
+
+  // Helper
+  getBestPrice: (
+    product: Product,
+  ) => { price: number; supplierId: string } | null
+  selectedProducts: Product[] // Helper to get full objects
+  toggleProductSelection: (product: Product | number) => void
 }
 
 const INITIAL_FILTERS: FilterState = {
@@ -86,6 +93,13 @@ const INITIAL_FILTERS: FilterState = {
 const VIEW_PRODUCTS = 'v_produtos_visiveis' as any
 const VIEW_MONITOR = 'v_monitor_precos' as any
 
+// Helper to format full product description
+const formatProductDescription = (p: Product) => {
+  return [p.modelo, p.memoria, p.ram ? `${p.ram} RAM` : null, p.cor]
+    .filter(Boolean)
+    .join(' ')
+}
+
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
   monitorItems: [],
@@ -98,6 +112,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   page: 0,
   pageSize: 50,
   total: 0,
+  selectedProducts: [], // Placeholder, derived actually
+
+  getBestPrice: (product) => {
+    // This is a placeholder as the real logic might be more complex depending on requirements
+    // Assuming product.valor is the best price for now or implementing basic logic
+    if (product.valor) return { price: product.valor, supplierId: 'default' }
+    return null
+  },
+
+  toggleProductSelection: (productOrId) => {
+    const { selectedProductIds } = get()
+    const id = typeof productOrId === 'number' ? productOrId : productOrId.id
+    const newIds = new Set(selectedProductIds)
+    if (newIds.has(id)) {
+      newIds.delete(id)
+    } else {
+      newIds.add(id)
+    }
+    set({ selectedProductIds: newIds })
+  },
 
   setFilters: (newFilters) => {
     set((state) => ({
@@ -225,15 +259,20 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
       }
     } else {
-      // Add
+      // Add with Smart Data Mapping
       const tempId = crypto.randomUUID()
+      const fullDescription = formatProductDescription(product)
+
       const tempItem: DraftItem = {
         id: tempId,
         user_id: user.id,
         product_id: product.id,
         created_at: new Date().toISOString(),
         product: product,
-        group_name: product.categoria, // Default group
+        group_name: product.categoria,
+        custom_model: fullDescription,
+        custom_price: product.valor,
+        custom_details: '',
       }
 
       const newItems = [...draftItems, tempItem]
@@ -247,6 +286,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           user_id: user.id,
           product_id: product.id,
           group_name: product.categoria,
+          custom_model: fullDescription,
+          custom_price: product.valor,
+          custom_details: '',
         })
         .select('*, product:produtos(*)')
         .single()
@@ -274,6 +316,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       user_id: user.id,
       product_id: p.id,
       group_name: p.categoria,
+      custom_model: formatProductDescription(p),
+      custom_price: p.valor,
+      custom_details: '',
     }))
 
     const { error } = await supabase
@@ -320,7 +365,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         i.id === id ? { ...i, ...updates } : i,
       )
       set({ draftItems: newItems })
-      // No success toast to avoid spamming during inline editing
     } else {
       toast.error('Erro ao atualizar item')
     }

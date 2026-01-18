@@ -19523,6 +19523,13 @@ var Smartphone = createLucideIcon("smartphone", [["rect", {
 	d: "M12 18h.01",
 	key: "mhygvu"
 }]]);
+var StickyNote = createLucideIcon("sticky-note", [["path", {
+	d: "M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z",
+	key: "1dfntj"
+}], ["path", {
+	d: "M15 3v5a1 1 0 0 0 1 1h5",
+	key: "6s6qgf"
+}]]);
 var Store = createLucideIcon("store", [
 	["path", {
 		d: "M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5",
@@ -36103,6 +36110,14 @@ var INITIAL_FILTERS = {
 };
 var VIEW_PRODUCTS = "v_produtos_visiveis";
 var VIEW_MONITOR = "v_monitor_precos";
+var formatProductDescription = (p$1) => {
+	return [
+		p$1.modelo,
+		p$1.memoria,
+		p$1.ram ? `${p$1.ram} RAM` : null,
+		p$1.cor
+	].filter(Boolean).join(" ");
+};
 const useProductStore = create((set, get$1) => ({
 	products: [],
 	monitorItems: [],
@@ -36115,6 +36130,22 @@ const useProductStore = create((set, get$1) => ({
 	page: 0,
 	pageSize: 50,
 	total: 0,
+	selectedProducts: [],
+	getBestPrice: (product) => {
+		if (product.valor) return {
+			price: product.valor,
+			supplierId: "default"
+		};
+		return null;
+	},
+	toggleProductSelection: (productOrId) => {
+		const { selectedProductIds } = get$1();
+		const id = typeof productOrId === "number" ? productOrId : productOrId.id;
+		const newIds = new Set(selectedProductIds);
+		if (newIds.has(id)) newIds.delete(id);
+		else newIds.add(id);
+		set({ selectedProductIds: newIds });
+	},
 	setFilters: (newFilters) => {
 		set((state) => ({
 			filters: {
@@ -36217,13 +36248,17 @@ const useProductStore = create((set, get$1) => ({
 			}
 		} else {
 			const tempId = crypto.randomUUID();
+			const fullDescription = formatProductDescription(product);
 			const tempItem = {
 				id: tempId,
 				user_id: user.id,
 				product_id: product.id,
 				created_at: (/* @__PURE__ */ new Date()).toISOString(),
 				product,
-				group_name: product.categoria
+				group_name: product.categoria,
+				custom_model: fullDescription,
+				custom_price: product.valor,
+				custom_details: ""
 			};
 			const newItems = [...draftItems, tempItem];
 			const newIds = new Set(prevSelectedIds);
@@ -36235,7 +36270,10 @@ const useProductStore = create((set, get$1) => ({
 			const { data, error } = await supabase.from("whatsapp_draft_items").insert({
 				user_id: user.id,
 				product_id: product.id,
-				group_name: product.categoria
+				group_name: product.categoria,
+				custom_model: fullDescription,
+				custom_price: product.valor,
+				custom_details: ""
 			}).select("*, product:produtos(*)").single();
 			if (error) {
 				toast.error("Erro ao adicionar item");
@@ -36253,7 +36291,10 @@ const useProductStore = create((set, get$1) => ({
 		const itemsToInsert = products.map((p$1) => ({
 			user_id: user.id,
 			product_id: p$1.id,
-			group_name: p$1.categoria
+			group_name: p$1.categoria,
+			custom_model: formatProductDescription(p$1),
+			custom_price: p$1.valor,
+			custom_details: ""
 		}));
 		const { error } = await supabase.from("whatsapp_draft_items").upsert(itemsToInsert, { onConflict: "user_id, product_id" });
 		if (error) toast.error("Erro ao adicionar produtos");
@@ -40241,7 +40282,7 @@ ScrollBar.displayName = ScrollAreaScrollbar.displayName;
 var COLLAPSIBLE_NAME = "Collapsible";
 var [createCollapsibleContext, createCollapsibleScope] = createContextScope(COLLAPSIBLE_NAME);
 var [CollapsibleProvider, useCollapsibleContext] = createCollapsibleContext(COLLAPSIBLE_NAME);
-var Collapsible = import_react.forwardRef((props, forwardedRef) => {
+var Collapsible$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeCollapsible, open: openProp, defaultOpen, disabled, onOpenChange, ...collapsibleProps } = props;
 	const [open, setOpen] = useControllableState({
 		prop: openProp,
@@ -40263,9 +40304,9 @@ var Collapsible = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-Collapsible.displayName = COLLAPSIBLE_NAME;
+Collapsible$1.displayName = COLLAPSIBLE_NAME;
 var TRIGGER_NAME$2 = "CollapsibleTrigger";
-var CollapsibleTrigger = import_react.forwardRef((props, forwardedRef) => {
+var CollapsibleTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeCollapsible, ...triggerProps } = props;
 	const context = useCollapsibleContext(TRIGGER_NAME$2, __scopeCollapsible);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
@@ -40280,9 +40321,9 @@ var CollapsibleTrigger = import_react.forwardRef((props, forwardedRef) => {
 		onClick: composeEventHandlers(props.onClick, context.onOpenToggle)
 	});
 });
-CollapsibleTrigger.displayName = TRIGGER_NAME$2;
+CollapsibleTrigger$1.displayName = TRIGGER_NAME$2;
 var CONTENT_NAME$2 = "CollapsibleContent";
-var CollapsibleContent = import_react.forwardRef((props, forwardedRef) => {
+var CollapsibleContent$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { forceMount, ...contentProps } = props;
 	const context = useCollapsibleContext(CONTENT_NAME$2, props.__scopeCollapsible);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
@@ -40294,7 +40335,7 @@ var CollapsibleContent = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-CollapsibleContent.displayName = CONTENT_NAME$2;
+CollapsibleContent$1.displayName = CONTENT_NAME$2;
 var CollapsibleContentImpl = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeCollapsible, present, children, ...contentProps } = props;
 	const context = useCollapsibleContext(CONTENT_NAME$2, __scopeCollapsible);
@@ -40349,9 +40390,9 @@ var CollapsibleContentImpl = import_react.forwardRef((props, forwardedRef) => {
 function getState$2(open) {
 	return open ? "open" : "closed";
 }
-var Root$1 = Collapsible;
-var Trigger = CollapsibleTrigger;
-var Content = CollapsibleContent;
+var Root$1 = Collapsible$1;
+var Trigger = CollapsibleTrigger$1;
+var Content = CollapsibleContent$1;
 var ACCORDION_NAME = "Accordion";
 var ACCORDION_KEYS = [
 	"Home",
@@ -40616,44 +40657,52 @@ var AccordionContent = import_react.forwardRef(({ className, children, ...props 
 	})
 }));
 AccordionContent.displayName = Content2$1.displayName;
+var Collapsible = Root$1;
+var CollapsibleTrigger = CollapsibleTrigger$1;
+var CollapsibleContent = CollapsibleContent$1;
 function DraftItemCard({ item, onUpdate, onRemove }) {
 	const { categories } = useProductStore();
-	const [model, setModel] = (0, import_react.useState)(item.custom_model || item.product?.modelo || "");
-	const [details, setDetails] = (0, import_react.useState)(() => {
-		if (item.custom_details) return item.custom_details;
+	const [model, setModel] = (0, import_react.useState)(() => {
+		if (item.custom_model) return item.custom_model;
 		if (!item.product) return "";
 		return [
-			item.product.ram && `${item.product.ram} RAM`,
+			item.product.modelo,
 			item.product.memoria,
+			item.product.ram ? `${item.product.ram} RAM` : null,
 			item.product.cor
 		].filter(Boolean).join(" ");
 	});
+	const [details, setDetails] = (0, import_react.useState)(item.custom_details || "");
 	const [price, setPrice] = (0, import_react.useState)(() => {
 		const p$1 = item.custom_price ?? item.product?.valor;
 		return p$1 !== void 0 && p$1 !== null ? p$1.toString() : "";
 	});
 	const [group, setGroup] = (0, import_react.useState)(item.group_name || item.product?.categoria || "Outros");
+	const [showDetails, setShowDetails] = (0, import_react.useState)(!!item.custom_details);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	const [isRemoving, setIsRemoving] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
-		setModel(item.custom_model || item.product?.modelo || "");
-		if (item.custom_details) setDetails(item.custom_details);
-		else if (item.product) setDetails([
-			item.product.ram && `${item.product.ram} RAM`,
+		if (item.custom_model) setModel(item.custom_model);
+		else if (item.product) setModel([
+			item.product.modelo,
 			item.product.memoria,
+			item.product.ram ? `${item.product.ram} RAM` : null,
 			item.product.cor
 		].filter(Boolean).join(" "));
+		setDetails(item.custom_details || "");
 		const p$1 = item.custom_price ?? item.product?.valor;
 		setPrice(p$1 !== void 0 && p$1 !== null ? p$1.toString() : "");
 		setGroup(item.group_name || item.product?.categoria || "Outros");
+		if (item.custom_details) setShowDetails(true);
 	}, [item]);
 	const handleBlur = async () => {
 		const currentPrice = price ? parseFloat(price) : null;
-		if (model !== (item.custom_model || item.product?.modelo) || details !== item.custom_details && details !== [
-			item.product?.ram && `${item.product?.ram} RAM`,
-			item.product?.memoria,
-			item.product?.cor
-		].filter(Boolean).join(" ") || currentPrice !== (item.custom_price ?? item.product?.valor) || group !== (item.group_name || item.product?.categoria)) {
+		if (model !== (item.custom_model || (item.product ? [
+			item.product.modelo,
+			item.product.memoria,
+			item.product.ram ? `${item.product.ram} RAM` : null,
+			item.product.cor
+		].filter(Boolean).join(" ") : "")) || details !== (item.custom_details || "") || currentPrice !== (item.custom_price ?? item.product?.valor) || group !== (item.group_name || item.product?.categoria)) {
 			setIsSaving(true);
 			await onUpdate(item.id, {
 				custom_model: model,
@@ -40671,92 +40720,108 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "group relative rounded-lg border bg-card p-3 shadow-sm transition-all hover:shadow-md",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "grid grid-cols-12 gap-3 items-end",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "col-span-12 sm:col-span-3 space-y-1",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-12 gap-3 items-end",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "col-span-12 sm:col-span-3 space-y-1",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								className: "text-xs text-muted-foreground",
+								children: "Grupo"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								list: "groups-list",
+								value: group,
+								onChange: (e) => setGroup(e.target.value),
+								onBlur: handleBlur,
+								className: "h-9 text-sm font-medium",
+								placeholder: "Grupo..."
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("datalist", {
+								id: "groups-list",
+								children: [categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: c }, c)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "Outros" })]
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "col-span-12 sm:col-span-6 space-y-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
 							className: "text-xs text-muted-foreground",
-							children: "Grupo"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							list: "groups-list",
-							value: group,
-							onChange: (e) => setGroup(e.target.value),
-							onBlur: handleBlur,
-							className: "h-8 text-xs font-medium",
-							placeholder: "Grupo..."
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("datalist", {
-							id: "groups-list",
-							children: [categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: c }, c)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "Outros" })]
-						})
-					]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "col-span-12 sm:col-span-5 space-y-1",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-						className: "text-xs text-muted-foreground",
-						children: "Modelo"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-						value: model,
-						onChange: (e) => setModel(e.target.value),
-						onBlur: handleBlur,
-						className: "h-8 text-xs font-semibold",
-						placeholder: "Ex: iPhone 13"
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "col-span-10 sm:col-span-3 space-y-1",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-						className: "text-xs text-muted-foreground",
-						children: "Preço (R$)"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "relative",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground",
-							children: "R$"
+							children: "Descrição do Item"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							type: "number",
-							value: price,
-							onChange: (e) => setPrice(e.target.value),
+							value: model,
+							onChange: (e) => setModel(e.target.value),
 							onBlur: handleBlur,
-							className: "h-8 text-xs font-bold pl-7 text-emerald-600",
-							placeholder: "0,00"
+							className: "h-9 text-sm font-semibold",
+							placeholder: "Ex: iPhone 13 128GB Preto"
 						})]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "col-span-2 sm:col-span-1 flex justify-end",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-						variant: "ghost",
-						size: "icon",
-						className: "h-8 w-8 text-muted-foreground hover:text-destructive",
-						onClick: handleRemove,
-						disabled: isRemoving,
-						children: isRemoving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "col-span-10 sm:col-span-2 space-y-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							className: "text-xs text-muted-foreground",
+							children: "Preço (R$)"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "relative",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground",
+								children: "R$"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								type: "number",
+								value: price,
+								onChange: (e) => setPrice(e.target.value),
+								onBlur: handleBlur,
+								className: "h-9 text-sm font-bold pl-7 text-emerald-600",
+								placeholder: "0,00"
+							})]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "col-span-2 sm:col-span-1 flex justify-end pb-0.5",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "ghost",
+							size: "icon",
+							className: "h-8 w-8 text-muted-foreground hover:text-destructive",
+							onClick: handleRemove,
+							disabled: isRemoving,
+							children: isRemoving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+						})
 					})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "col-span-12 space-y-1",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-						className: "text-xs text-muted-foreground",
-						children: "Detalhes / Specs"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Collapsible, {
+				open: showDetails,
+				onOpenChange: setShowDetails,
+				className: "mt-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex items-center gap-2",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleTrigger, {
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							variant: "ghost",
+							size: "sm",
+							className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Obs" : "Adicionar Observação"]
+						})
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContent, {
+					className: "pt-2",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 						value: details,
 						onChange: (e) => setDetails(e.target.value),
 						onBlur: handleBlur,
 						className: "h-8 text-xs text-muted-foreground",
-						placeholder: "Ex: 128GB Preto"
-					})]
-				})
-			]
-		}), isSaving && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "absolute top-2 right-2",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "h-2 w-2 rounded-full bg-blue-500 animate-pulse block" })
-		})]
+						placeholder: "Obs. adicional (opcional)"
+					})
+				})]
+			}),
+			isSaving && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "absolute top-2 right-2",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "h-2 w-2 rounded-full bg-blue-500 animate-pulse block" })
+			})
+		]
 	});
 }
 function DraftListGrouped({ items, onRemove, onUpdate }) {
@@ -40892,31 +40957,36 @@ function ListGeneratorPage() {
 			grouped[groupName].forEach((item) => {
 				const product = item.product;
 				if (!product) return;
-				const model = item.custom_model || product.modelo;
-				const defaultDetails = [
-					product.ram && `${product.ram} RAM`,
+				let model = item.custom_model || product.modelo || "";
+				if (!item.custom_model) model = [
+					product.modelo,
 					product.memoria,
+					product.ram ? `${product.ram} RAM` : null,
 					product.cor
 				].filter(Boolean).join(" ");
-				const details = item.custom_details || defaultDetails;
 				let finalPrice = item.custom_price ?? product.valor;
 				if (finalPrice !== null && finalPrice !== void 0 && !internal) finalPrice += config.markup;
 				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				text += ` • ${model} ${details}`;
-				if (product.estado && product.estado !== "Novo") text += ` (${product.estado})`;
+				if (item.custom_details) text += ` - ${model} (${item.custom_details}): ${internal ? "" : "*"}${priceStr}${internal ? "" : "*"}`;
+				else text += ` - ${model}: ${internal ? "" : "*"}${priceStr}${internal ? "" : "*"}`;
+				if (product.estado && product.estado !== "Novo" && !model.includes(product.estado)) text += ` (${product.estado})`;
 				if (internal) {
-					text += `\n   ↳ Custo: ${priceStr} | Forn: ${product.fornecedor || "N/A"}`;
+					text += `\n   ↳ Forn: ${product.fornecedor || "N/A"}`;
 					if (product.telefone) text += ` | Tel: ${product.telefone}`;
-				} else text += ` - *${priceStr}*`;
+				}
 				text += `\n`;
 			});
 			text += "\n";
 		});
 		if (!internal) {
+			if (config.communityLink) text += `\n${config.communityLink}\n`;
+			if (config.contactNumber) {
+				const cleanNumber = config.contactNumber.replace(/\D/g, "");
+				text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`;
+			}
+			text += "\n";
 			text += config.footer;
 			if (!config.footer.endsWith("\n")) text += "\n";
-			if (config.communityLink) text += `\n👥 *Entre na nossa comunidade:*\n${config.communityLink}\n`;
-			if (config.contactNumber) text += `\n📲 *Me chame no WhatsApp:*\nhttps://wa.me/${config.contactNumber}\n`;
 		}
 		return text;
 	};
@@ -41051,7 +41121,7 @@ function ListGeneratorPage() {
 												disabled: isSaving,
 												size: "sm",
 												className: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
+												children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Gerar e Salvar"]
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 												onClick: handleCopy,
 												size: "sm",
@@ -41090,7 +41160,7 @@ function ListGeneratorPage() {
 												disabled: isSaving,
 												size: "sm",
 												className: "bg-white",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
+												children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 												variant: "outline",
 												onClick: handleCopy,
@@ -43911,4 +43981,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-wY_9I4r-.js.map
+//# sourceMappingURL=index-C3izfO6-.js.map

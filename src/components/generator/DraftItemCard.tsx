@@ -3,9 +3,13 @@ import { DraftItem } from '@/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Trash2, GripVertical, Loader2 } from 'lucide-react'
+import { Trash2, Loader2, StickyNote } from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
-import { cn } from '@/lib/utils'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 
 interface DraftItemCardProps {
   item: DraftItem
@@ -21,70 +25,84 @@ export function DraftItemCard({
   const { categories } = useProductStore()
 
   // Initialize state with item values or defaults
-  const [model, setModel] = useState(
-    item.custom_model || item.product?.modelo || '',
-  )
-  const [details, setDetails] = useState(() => {
-    if (item.custom_details) return item.custom_details
+  // Fallback to product data if custom_model is missing (for legacy items)
+  const [model, setModel] = useState(() => {
+    if (item.custom_model) return item.custom_model
     if (!item.product) return ''
     return [
-      item.product.ram && `${item.product.ram} RAM`,
+      item.product.modelo,
       item.product.memoria,
+      item.product.ram ? `${item.product.ram} RAM` : null,
       item.product.cor,
     ]
       .filter(Boolean)
       .join(' ')
   })
+
+  const [details, setDetails] = useState(item.custom_details || '')
+
   const [price, setPrice] = useState<string>(() => {
     const p = item.custom_price ?? item.product?.valor
     return p !== undefined && p !== null ? p.toString() : ''
   })
+
   const [group, setGroup] = useState(
     item.group_name || item.product?.categoria || 'Outros',
   )
 
+  const [showDetails, setShowDetails] = useState(!!item.custom_details)
+
   const [isSaving, setIsSaving] = useState(false)
   const [isRemoving, setIsRemoving] = useState(false)
 
-  // Sync state if item changes from outside (e.g. after reorder/refresh)
+  // Sync state if item changes from outside
   useEffect(() => {
-    setModel(item.custom_model || item.product?.modelo || '')
-
-    if (item.custom_details) {
-      setDetails(item.custom_details)
+    if (item.custom_model) {
+      setModel(item.custom_model)
     } else if (item.product) {
-      setDetails(
-        [
-          item.product.ram && `${item.product.ram} RAM`,
-          item.product.memoria,
-          item.product.cor,
-        ]
-          .filter(Boolean)
-          .join(' '),
-      )
+      // Legacy fallback logic
+      const full = [
+        item.product.modelo,
+        item.product.memoria,
+        item.product.ram ? `${item.product.ram} RAM` : null,
+        item.product.cor,
+      ]
+        .filter(Boolean)
+        .join(' ')
+      setModel(full)
     }
+
+    setDetails(item.custom_details || '')
 
     const p = item.custom_price ?? item.product?.valor
     setPrice(p !== undefined && p !== null ? p.toString() : '')
 
     setGroup(item.group_name || item.product?.categoria || 'Outros')
+
+    if (item.custom_details) setShowDetails(true)
   }, [item])
 
   const handleBlur = async () => {
     // Check if changes exist
     const currentPrice = price ? parseFloat(price) : null
 
-    const hasChanges =
-      model !== (item.custom_model || item.product?.modelo) ||
-      (details !== item.custom_details &&
-        details !==
-          [
-            item.product?.ram && `${item.product?.ram} RAM`,
-            item.product?.memoria,
-            item.product?.cor,
+    // Construct default for comparison to avoid save if unchanged
+    const defaultModel =
+      item.custom_model ||
+      (item.product
+        ? [
+            item.product.modelo,
+            item.product.memoria,
+            item.product.ram ? `${item.product.ram} RAM` : null,
+            item.product.cor,
           ]
             .filter(Boolean)
-            .join(' ')) ||
+            .join(' ')
+        : '')
+
+    const hasChanges =
+      model !== defaultModel ||
+      details !== (item.custom_details || '') ||
       currentPrice !== (item.custom_price ?? item.product?.valor) ||
       group !== (item.group_name || item.product?.categoria)
 
@@ -117,7 +135,7 @@ export function DraftItemCard({
             value={group}
             onChange={(e) => setGroup(e.target.value)}
             onBlur={handleBlur}
-            className="h-8 text-xs font-medium"
+            className="h-9 text-sm font-medium"
             placeholder="Grupo..."
           />
           <datalist id="groups-list">
@@ -128,20 +146,22 @@ export function DraftItemCard({
           </datalist>
         </div>
 
-        {/* Model - Col 5 */}
-        <div className="col-span-12 sm:col-span-5 space-y-1">
-          <Label className="text-xs text-muted-foreground">Modelo</Label>
+        {/* Model (Description) - Col 6 */}
+        <div className="col-span-12 sm:col-span-6 space-y-1">
+          <Label className="text-xs text-muted-foreground">
+            Descrição do Item
+          </Label>
           <Input
             value={model}
             onChange={(e) => setModel(e.target.value)}
             onBlur={handleBlur}
-            className="h-8 text-xs font-semibold"
-            placeholder="Ex: iPhone 13"
+            className="h-9 text-sm font-semibold"
+            placeholder="Ex: iPhone 13 128GB Preto"
           />
         </div>
 
         {/* Price - Col 3 */}
-        <div className="col-span-10 sm:col-span-3 space-y-1">
+        <div className="col-span-10 sm:col-span-2 space-y-1">
           <Label className="text-xs text-muted-foreground">Preço (R$)</Label>
           <div className="relative">
             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
@@ -152,14 +172,14 @@ export function DraftItemCard({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               onBlur={handleBlur}
-              className="h-8 text-xs font-bold pl-7 text-emerald-600"
+              className="h-9 text-sm font-bold pl-7 text-emerald-600"
               placeholder="0,00"
             />
           </div>
         </div>
 
         {/* Actions - Col 1 */}
-        <div className="col-span-2 sm:col-span-1 flex justify-end">
+        <div className="col-span-2 sm:col-span-1 flex justify-end pb-0.5">
           <Button
             variant="ghost"
             size="icon"
@@ -174,21 +194,35 @@ export function DraftItemCard({
             )}
           </Button>
         </div>
+      </div>
 
-        {/* Details - Full Width Row 2 */}
-        <div className="col-span-12 space-y-1">
-          <Label className="text-xs text-muted-foreground">
-            Detalhes / Specs
-          </Label>
+      <Collapsible
+        open={showDetails}
+        onOpenChange={setShowDetails}
+        className="mt-2"
+      >
+        <div className="flex items-center gap-2">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <StickyNote className="w-3 h-3 mr-1.5" />
+              {showDetails ? 'Ocultar Obs' : 'Adicionar Observação'}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+        <CollapsibleContent className="pt-2">
           <Input
             value={details}
             onChange={(e) => setDetails(e.target.value)}
             onBlur={handleBlur}
             className="h-8 text-xs text-muted-foreground"
-            placeholder="Ex: 128GB Preto"
+            placeholder="Obs. adicional (opcional)"
           />
-        </div>
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {isSaving && (
         <div className="absolute top-2 right-2">

@@ -3,7 +3,15 @@ import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Trash2, ArrowLeft, Smartphone, Lock, Save, Copy } from 'lucide-react'
+import {
+  Trash2,
+  ArrowLeft,
+  Smartphone,
+  Lock,
+  Save,
+  Copy,
+  Loader2,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -126,16 +134,21 @@ export default function ListGeneratorPage() {
         const product = item.product
         if (!product) return
 
-        const model = item.custom_model || product.modelo
-        const defaultDetails = [
-          product.ram && `${product.ram} RAM`,
-          product.memoria,
-          product.cor,
-        ]
-          .filter(Boolean)
-          .join(' ')
+        // Prefer custom_model (full description)
+        let model = item.custom_model || product.modelo || ''
 
-        const details = item.custom_details || defaultDetails
+        // If empty custom_model (legacy), construct it
+        if (!item.custom_model) {
+          model = [
+            product.modelo,
+            product.memoria,
+            product.ram ? `${product.ram} RAM` : null,
+            product.cor,
+          ]
+            .filter(Boolean)
+            .join(' ')
+        }
+
         const basePrice = item.custom_price ?? product.valor
 
         let finalPrice = basePrice
@@ -147,33 +160,45 @@ export default function ListGeneratorPage() {
           ? `R$ ${finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
 
-        // Format: • [Modelo] [Details] - R$ [Valor]
-        text += ` • ${model} ${details}`
-        if (product.estado && product.estado !== 'Novo')
+        // Format: - [Item Description]: [Price]
+        // Appending details if present
+        if (item.custom_details) {
+          text += ` - ${model} (${item.custom_details}): ${internal ? '' : '*'}${priceStr}${internal ? '' : '*'}`
+        } else {
+          text += ` - ${model}: ${internal ? '' : '*'}${priceStr}${internal ? '' : '*'}`
+        }
+
+        if (
+          product.estado &&
+          product.estado !== 'Novo' &&
+          !model.includes(product.estado)
+        )
           text += ` (${product.estado})`
 
         if (internal) {
-          text += `\n   ↳ Custo: ${priceStr} | Forn: ${product.fornecedor || 'N/A'}`
+          text += `\n   ↳ Forn: ${product.fornecedor || 'N/A'}`
           if (product.telefone) text += ` | Tel: ${product.telefone}`
-        } else {
-          text += ` - *${priceStr}*`
         }
+
         text += `\n`
       })
       text += '\n'
     })
 
     if (!internal) {
-      text += config.footer
-      if (!config.footer.endsWith('\n')) text += '\n'
-
       if (config.communityLink) {
-        text += `\n👥 *Entre na nossa comunidade:*\n${config.communityLink}\n`
+        text += `\n${config.communityLink}\n`
       }
 
       if (config.contactNumber) {
-        text += `\n📲 *Me chame no WhatsApp:*\nhttps://wa.me/${config.contactNumber}\n`
+        // Simple numeric clean up
+        const cleanNumber = config.contactNumber.replace(/\D/g, '')
+        text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`
       }
+
+      text += '\n'
+      text += config.footer
+      if (!config.footer.endsWith('\n')) text += '\n'
     }
 
     return text
@@ -310,8 +335,12 @@ export default function ListGeneratorPage() {
                         size="sm"
                         className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
                       >
-                        <Save className="w-4 h-4 mr-2" />
-                        Salvar
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Save className="w-4 h-4 mr-2" />
+                        )}
+                        Gerar e Salvar
                       </Button>
                       <Button
                         onClick={handleCopy}
@@ -355,7 +384,11 @@ export default function ListGeneratorPage() {
                         size="sm"
                         className="bg-white"
                       >
-                        <Save className="w-4 h-4 mr-2" />
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Save className="w-4 h-4 mr-2" />
+                        )}
                         Salvar
                       </Button>
                       <Button

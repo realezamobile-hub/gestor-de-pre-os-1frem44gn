@@ -29,8 +29,24 @@ export interface DraftItem {
   custom_model?: string | null
   custom_details?: string | null
   custom_price?: number | null
+  group_name?: string | null
   created_at: string
   product?: Product // Joined product data
+}
+
+export interface GeneratedList {
+  id: string
+  user_id: string
+  title: string | null
+  content: string | null
+  type: 'supplier' | 'posting' | null
+  header_footer_data: {
+    header: string
+    footer: string
+    communityLink: string
+    contactNumber: string
+  } | null
+  created_at: string
 }
 
 export interface ExcludedSupplier {

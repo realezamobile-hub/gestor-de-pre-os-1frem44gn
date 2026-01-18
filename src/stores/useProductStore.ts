@@ -5,6 +5,7 @@ import {
   ExcludedSupplier,
   PriceMonitorItem,
   DraftItem,
+  GeneratedList,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
@@ -40,6 +41,14 @@ interface ProductStore {
   removeFromDraft: (draftId: string) => Promise<void>
   updateDraftItem: (id: string, updates: Partial<DraftItem>) => Promise<void>
   clearDraft: () => Promise<void>
+
+  // Generated Lists
+  saveGeneratedList: (
+    title: string,
+    content: string,
+    type: 'supplier' | 'posting',
+    config: any,
+  ) => Promise<{ success: boolean; error?: any }>
 
   // Legacy/Auto-Generator using Draft
   generateListFromFilters: (
@@ -197,8 +206,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     const existing = draftItems.find((i) => i.product_id === product.id)
-
-    // Optimistic update
     const prevDraftItems = [...draftItems]
     const prevSelectedIds = new Set(get().selectedProductIds)
 
@@ -220,7 +227,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     } else {
       // Add
-      // Create temp item for UI
       const tempId = crypto.randomUUID()
       const tempItem: DraftItem = {
         id: tempId,
@@ -228,6 +234,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         product_id: product.id,
         created_at: new Date().toISOString(),
         product: product,
+        group_name: product.categoria, // Default group
       }
 
       const newItems = [...draftItems, tempItem]
@@ -240,6 +247,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         .insert({
           user_id: user.id,
           product_id: product.id,
+          group_name: product.categoria,
         })
         .select('*, product:produtos(*)')
         .single()
@@ -248,7 +256,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         toast.error('Erro ao adicionar item')
         set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
       } else if (data) {
-        // Replace temp item with real one
         const realItems = get().draftItems.map((i) =>
           i.id === tempId ? (data as any) : i,
         )
@@ -267,6 +274,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const itemsToInsert = products.map((p) => ({
       user_id: user.id,
       product_id: p.id,
+      group_name: p.categoria,
     }))
 
     const { error } = await supabase
@@ -304,6 +312,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         custom_model: updates.custom_model,
         custom_details: updates.custom_details,
         custom_price: updates.custom_price,
+        group_name: updates.group_name,
       })
       .eq('id', id)
 
@@ -333,6 +342,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       set({ draftItems: [], selectedProductIds: new Set() })
       toast.success('Lista limpa com sucesso')
     }
+  },
+
+  saveGeneratedList: async (title, content, type, config) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'User not found' }
+
+    const { error } = await supabase.from('generated_lists').insert({
+      user_id: user.id,
+      title,
+      content,
+      type,
+      header_footer_data: config,
+    })
+
+    if (error) {
+      return { success: false, error }
+    }
+    return { success: true }
   },
 
   generateListFromFilters: async (date, categories) => {

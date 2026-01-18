@@ -11,6 +11,14 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useProductStore } from '@/stores/useProductStore'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface DraftItemEditDialogProps {
   open: boolean
@@ -25,9 +33,12 @@ export function DraftItemEditDialog({
   item,
   onSave,
 }: DraftItemEditDialogProps) {
+  const { categories } = useProductStore()
   const [model, setModel] = useState('')
   const [details, setDetails] = useState('')
   const [price, setPrice] = useState('')
+  const [group, setGroup] = useState('')
+  const [customGroup, setCustomGroup] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
@@ -46,6 +57,9 @@ export function DraftItemEditDialog({
 
       const p = item.custom_price ?? item.product.valor
       setPrice(p ? p.toString() : '')
+
+      setGroup(item.group_name || item.product.categoria || 'Outros')
+      setCustomGroup('')
     }
   }, [item])
 
@@ -58,9 +72,19 @@ export function DraftItemEditDialog({
       custom_model: model,
       custom_details: details,
       custom_price: price ? parseFloat(price) : null,
+      group_name: customGroup || group,
     })
     setIsSaving(false)
     onOpenChange(false)
+  }
+
+  const handleGroupChange = (value: string) => {
+    if (value === 'custom') {
+      setGroup('custom')
+    } else {
+      setGroup(value)
+      setCustomGroup('')
+    }
   }
 
   return (
@@ -73,6 +97,35 @@ export function DraftItemEditDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSave} className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label>Grupo</Label>
+            <div className="flex gap-2">
+              <Select value={group} onValueChange={handleGroupChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione um grupo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="Outros">Outros</SelectItem>
+                  <SelectItem value="custom">Novo Grupo...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {group === 'custom' && (
+              <Input
+                value={customGroup}
+                onChange={(e) => setCustomGroup(e.target.value)}
+                placeholder="Nome do novo grupo"
+                className="mt-2"
+                autoFocus
+              />
+            )}
+          </div>
+
           <div className="space-y-2">
             <Label>Modelo</Label>
             <Input
@@ -98,7 +151,7 @@ export function DraftItemEditDialog({
               onChange={(e) => setPrice(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              O markup global será aplicado sobre este valor.
+              O markup global será aplicado sobre este valor na lista pública.
             </p>
           </div>
           <DialogFooter>

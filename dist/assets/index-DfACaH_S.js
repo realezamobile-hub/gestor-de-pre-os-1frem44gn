@@ -42267,9 +42267,9 @@ function BulkCleanup() {
 			]
 		})
 	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "grid gap-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "grid grid-cols-1 md:grid-cols-2 gap-6",
 			children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
@@ -42377,39 +42377,40 @@ function BulkCleanup() {
 						className: "bg-blue-600 hover:bg-blue-700",
 						children: "Confirmar Limpeza"
 					})] })] })] }) })]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+					className: "border-destructive/30 bg-destructive/5",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+						className: "flex items-center gap-2 text-destructive",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-5 h-5" }), "Resetar Banco de Dados"]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ação crítica. Remove TODOS os produtos do sistema." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							variant: "destructive",
+							className: "w-full sm:w-auto",
+							disabled: loading,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Limpando..." : "LIMPAR TUDO (TODOS OS PRODUTOS)"]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, {
+						className: "text-destructive",
+						children: "PERIGO: Limpar Tudo?"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+						"Você está prestes a excluir ",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "TODOS" }),
+						" os produtos do banco de dados.",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+						"Isso geralmente é feito para reiniciar o sistema ou limpar dados de teste. Esta ação é ",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "irreversível" }),
+						"."
+					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						onClick: handleClearAll,
+						className: "bg-destructive hover:bg-destructive/90",
+						children: "Confirmar Exclusão Total"
+					})] })] })] }) })]
 				})
 			]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-			className: "border-destructive/30 bg-destructive/5",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-				className: "flex items-center gap-2 text-destructive",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-5 h-5" }), "Resetar Banco de Dados"]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ação crítica. Remove TODOS os produtos do sistema." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "destructive",
-					className: "w-full sm:w-auto",
-					disabled: loading,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Limpando..." : "LIMPAR TUDO (TODOS OS PRODUTOS)"]
-				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, {
-				className: "text-destructive",
-				children: "PERIGO: Limpar Tudo?"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-				"Você está prestes a excluir ",
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "TODOS" }),
-				" os produtos do banco de dados.",
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-				"Isso geralmente é feito para reiniciar o sistema ou limpar dados de teste. Esta ação é ",
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "irreversível" }),
-				"."
-			] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-				onClick: handleClearAll,
-				className: "bg-destructive hover:bg-destructive/90",
-				children: "Confirmar Exclusão Total"
-			})] })] })] }) })]
-		})]
+		})
 	});
 }
 var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
@@ -44014,4 +44015,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-MWQ-k8F9.js.map
+//# sourceMappingURL=index-DfACaH_S.js.map

@@ -131,7 +131,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   selectedProducts: [], // Placeholder, derived actually
 
   getBestPrice: (product) => {
-    // This is a placeholder as the real logic might be more complex depending on requirements
     if (product.valor) return { price: product.valor, supplierId: 'default' }
     return null
   },

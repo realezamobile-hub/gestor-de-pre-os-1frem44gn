@@ -320,57 +320,57 @@ export function BulkCleanup() {
             </AlertDialog>
           </CardContent>
         </Card>
-      </div>
 
-      <Card className="border-destructive/30 bg-destructive/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <ShieldAlert className="w-5 h-5" />
-            Resetar Banco de Dados
-          </CardTitle>
-          <CardDescription>
-            Ação crítica. Remove TODOS os produtos do sistema.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                className="w-full sm:w-auto"
-                disabled={loading}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {loading ? 'Limpando...' : 'LIMPAR TUDO (TODOS OS PRODUTOS)'}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-destructive">
-                  PERIGO: Limpar Tudo?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Você está prestes a excluir <strong>TODOS</strong> os produtos
-                  do banco de dados.
-                  <br />
-                  <br />
-                  Isso geralmente é feito para reiniciar o sistema ou limpar
-                  dados de teste. Esta ação é <strong>irreversível</strong>.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleClearAll}
-                  className="bg-destructive hover:bg-destructive/90"
+        <Card className="border-destructive/30 bg-destructive/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <ShieldAlert className="w-5 h-5" />
+              Resetar Banco de Dados
+            </CardTitle>
+            <CardDescription>
+              Ação crítica. Remove TODOS os produtos do sistema.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="w-full sm:w-auto"
+                  disabled={loading}
                 >
-                  Confirmar Exclusão Total
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardContent>
-      </Card>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {loading ? 'Limpando...' : 'LIMPAR TUDO (TODOS OS PRODUTOS)'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-destructive">
+                    PERIGO: Limpar Tudo?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Você está prestes a excluir <strong>TODOS</strong> os
+                    produtos do banco de dados.
+                    <br />
+                    <br />
+                    Isso geralmente é feito para reiniciar o sistema ou limpar
+                    dados de teste. Esta ação é <strong>irreversível</strong>.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleClearAll}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
+                    Confirmar Exclusão Total
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

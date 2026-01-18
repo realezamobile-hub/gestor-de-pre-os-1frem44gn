@@ -70,6 +70,16 @@ interface ProductStore {
   fetchPriceMonitor: () => Promise<void>
   clearAllProducts: () => Promise<{ success: boolean; error?: any }>
 
+  // New Maintenance Features
+  deleteZeroValueProducts: () => Promise<{
+    success: boolean
+    count?: number
+    error?: any
+  }>
+  cleanupByDate: (
+    date: string,
+  ) => Promise<{ success: boolean; data?: any; error?: any }>
+
   // Helper
   getBestPrice: (
     product: Product,
@@ -522,5 +532,31 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     set({ products: [], total: 0, monitorItems: [] })
     return { success: true }
+  },
+
+  deleteZeroValueProducts: async () => {
+    try {
+      const { data, error } = await supabase.rpc('delete_zero_value_products')
+      if (error) throw error
+      get().fetchProducts()
+      return { success: true, count: data }
+    } catch (error) {
+      console.error('Delete zero value error:', error)
+      return { success: false, error }
+    }
+  },
+
+  cleanupByDate: async (date) => {
+    try {
+      const { data, error } = await supabase.rpc('cleanup_by_date', {
+        target_date: date,
+      })
+      if (error) throw error
+      get().fetchProducts()
+      return { success: true, data }
+    } catch (error) {
+      console.error('Cleanup by date error:', error)
+      return { success: false, error }
+    }
   },
 }))

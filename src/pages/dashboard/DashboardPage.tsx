@@ -12,11 +12,24 @@ import {
   RefreshCcw,
   ChevronLeft,
   ChevronRight,
+  Trash2,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDebounce } from '@/hooks/use-debounce'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { toast } from 'sonner'
 
 export default function DashboardPage() {
   const {
@@ -32,6 +45,7 @@ export default function DashboardPage() {
     pageSize,
     total,
     setPage,
+    deleteZeroValueProducts,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -39,6 +53,7 @@ export default function DashboardPage() {
 
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  const [isDeletingZero, setIsDeletingZero] = useState(false)
 
   useEffect(() => {
     if (debouncedSearchTerm !== filters.search) {
@@ -61,6 +76,17 @@ export default function DashboardPage() {
       unsubscribe()
     }
   }, [])
+
+  const handleCleanupZero = async () => {
+    setIsDeletingZero(true)
+    const result = await deleteZeroValueProducts()
+    setIsDeletingZero(false)
+    if (result.success) {
+      toast.success(`${result.count} produtos com valor zero foram removidos.`)
+    } else {
+      toast.error('Erro ao limpar produtos.')
+    }
+  }
 
   const totalPages = Math.ceil(total / pageSize)
 
@@ -124,6 +150,43 @@ export default function DashboardPage() {
 
           <div className="flex gap-2 w-full md:w-auto justify-end">
             <ProductFilters />
+
+            {currentUser?.canCreateList && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    title="Limpar produtos com valor R$ 0,00"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Limpar produtos sem preço?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Isso excluirá permanentemente todos os produtos com valor{' '}
+                      <strong>R$ 0,00</strong>. Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCleanupZero}
+                      className="bg-red-600 hover:bg-red-700"
+                      disabled={isDeletingZero}
+                    >
+                      {isDeletingZero ? 'Removendo...' : 'Sim, excluir'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
             <Button
               variant="ghost"
               size="icon"

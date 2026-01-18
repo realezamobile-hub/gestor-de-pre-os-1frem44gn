@@ -154,7 +154,7 @@ export default function ListGeneratorPage() {
           model += ` (${item.custom_details})`
         }
 
-        // 2. Price
+        // 2. Price (with Global Markup)
         const basePrice = item.custom_price ?? product.valor
 
         let finalPrice = basePrice
@@ -181,7 +181,7 @@ export default function ListGeneratorPage() {
       text += '\n'
     })
 
-    // 3. Footer and Links (Public only)
+    // 4. Links (Public only) - BEFORE Footer
     if (!isInternal) {
       if (config.communityLink) {
         text += `\n${config.communityLink}\n`
@@ -192,8 +192,11 @@ export default function ListGeneratorPage() {
         const cleanNumber = config.contactNumber.replace(/\D/g, '')
         text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`
       }
-
       text += '\n'
+    }
+
+    // 5. Footer (Public only)
+    if (!isInternal) {
       text += config.footer
       if (!config.footer.endsWith('\n')) text += '\n'
     }

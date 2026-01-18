@@ -5,7 +5,6 @@ import {
   ExcludedSupplier,
   PriceMonitorItem,
   DraftItem,
-  GeneratedList,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
@@ -321,7 +320,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         i.id === id ? { ...i, ...updates } : i,
       )
       set({ draftItems: newItems })
-      toast.success('Item atualizado')
+      // No success toast to avoid spamming during inline editing
     } else {
       toast.error('Erro ao atualizar item')
     }

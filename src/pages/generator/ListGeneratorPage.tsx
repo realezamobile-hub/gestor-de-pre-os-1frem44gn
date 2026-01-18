@@ -3,31 +3,11 @@ import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Copy,
-  Trash2,
-  ArrowLeft,
-  CalendarIcon,
-  Wand2,
-  Smartphone,
-  Lock,
-  RefreshCw,
-  Save,
-} from 'lucide-react'
+import { Trash2, ArrowLeft, Smartphone, Lock, Save, Copy } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { MultiSelect } from '@/components/MultiSelect'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Calendar } from '@/components/ui/calendar'
-import { DraftItemEditDialog } from '@/components/generator/DraftItemEditDialog'
 import { DraftItem } from '@/types'
 import {
   GeneratorConfig,
@@ -42,11 +22,8 @@ export default function ListGeneratorPage() {
     removeFromDraft,
     updateDraftItem,
     clearDraft,
-    categories,
     fetchCategories,
-    generateListFromFilters,
     saveGeneratedList,
-    isLoading,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -81,9 +58,6 @@ export default function ListGeneratorPage() {
   }, [config.contactNumber, config.communityLink])
 
   // Generator State
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [editingItem, setEditingItem] = useState<DraftItem | null>(null)
   const [generatedText, setGeneratedText] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -116,10 +90,6 @@ export default function ListGeneratorPage() {
         </Button>
       </div>
     )
-  }
-
-  const handleAutoFill = async () => {
-    await generateListFromFilters(selectedDate || null, selectedCategories)
   }
 
   const generateListText = (internal: boolean = false) => {
@@ -246,7 +216,7 @@ export default function ListGeneratorPage() {
               Gerador de Lista WhatsApp
             </h1>
             <p className="text-muted-foreground">
-              Personalize, organize e exporte suas listas de ofertas.
+              Edite seus itens, organize e exporte suas listas de ofertas.
             </p>
           </div>
         </div>
@@ -264,71 +234,12 @@ export default function ListGeneratorPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0">
-        {/* Left Column: Controls & Configuration */}
+        {/* Left Column: Configuration */}
         <div className="xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2">
-          {/* Auto-Fill Controls */}
-          <Card className="bg-blue-50/50 border-blue-100">
-            <CardHeader className="pb-3 pt-4 px-4">
-              <CardTitle className="text-sm flex items-center gap-2 text-blue-900">
-                <Wand2 className="w-4 h-4 text-blue-600" />
-                Preencher Automaticamente
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 px-4 pb-4">
-              <div className="flex flex-col gap-3">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={'outline'}
-                      className={cn(
-                        'w-full justify-start text-left font-normal text-xs',
-                        !selectedDate && 'text-muted-foreground',
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                      {selectedDate ? (
-                        format(selectedDate, 'P', { locale: ptBR })
-                      ) : (
-                        <span>Filtrar por Data</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <MultiSelect
-                  options={categories}
-                  selected={selectedCategories}
-                  onChange={setSelectedCategories}
-                  placeholder="Categorias"
-                  className="text-xs"
-                />
-                <Button
-                  onClick={handleAutoFill}
-                  disabled={isLoading}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 w-full"
-                >
-                  <RefreshCw
-                    className={cn('w-4 h-4 mr-2', isLoading && 'animate-spin')}
-                  />
-                  Buscar Produtos
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Manual Config */}
           <GeneratorConfig config={config} onChange={setConfig} />
         </div>
 
-        {/* Middle Column: Draft Items */}
+        {/* Middle Column: Draft Items (Expanded) */}
         <div className="xl:col-span-5 flex flex-col h-full min-h-0">
           <Card className="flex-1 flex flex-col min-h-0 border-2 shadow-sm">
             <CardHeader className="bg-gray-50 border-b py-3">
@@ -342,8 +253,8 @@ export default function ListGeneratorPage() {
             <CardContent className="p-4 flex-1 overflow-hidden bg-gray-50/30">
               <DraftListGrouped
                 items={draftItems}
-                onEdit={setEditingItem}
                 onRemove={removeFromDraft}
+                onUpdate={updateDraftItem}
               />
             </CardContent>
           </Card>
@@ -464,13 +375,6 @@ export default function ListGeneratorPage() {
           </Tabs>
         </div>
       </div>
-
-      <DraftItemEditDialog
-        open={!!editingItem}
-        onOpenChange={(open) => !open && setEditingItem(null)}
-        item={editingItem}
-        onSave={updateDraftItem}
-      />
     </div>
   )
 }

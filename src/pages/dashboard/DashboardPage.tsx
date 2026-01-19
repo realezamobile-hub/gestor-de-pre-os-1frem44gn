@@ -16,12 +16,24 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function DashboardPage() {
   const { currentUser } = useAuthStore()
-  const { deleteZeroValueProducts } = useProductStore()
+  const {
+    products,
+    isLoading,
+    fetchProducts,
+    subscribeToProducts,
+    deleteZeroValueProducts,
+  } = useProductStore()
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    fetchProducts()
+    const unsubscribe = subscribeToProducts()
+    return () => unsubscribe()
+  }, [])
 
   const canDelete = currentUser?.canDeleteRecords || false
 
@@ -30,14 +42,14 @@ export default function DashboardPage() {
     try {
       const result = await deleteZeroValueProducts()
       if (result.success) {
-        toast.success(
-          `${result.count ?? 0} produtos com valor zero ou negativo foram removidos.`,
-        )
+        toast.success('Limpeza concluída com sucesso!')
       } else {
-        toast.error('Erro ao remover produtos.')
+        toast.error(
+          `Erro ao limpar: ${result.error?.message || result.error || 'Erro desconhecido'}`,
+        )
       }
     } catch (e) {
-      toast.error('Erro inesperado ao tentar remover produtos.')
+      toast.error('Erro ao limpar: Erro inesperado ao tentar remover produtos.')
     } finally {
       setIsDeleting(false)
     }
@@ -92,7 +104,7 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-      <ProductList />
+      <ProductList products={products} isLoading={isLoading} />
     </div>
   )
 }

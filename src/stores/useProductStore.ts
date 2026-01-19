@@ -540,10 +540,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   deleteZeroValueProducts: async () => {
     try {
-      const { data, error } = await supabase.rpc('delete_zero_value_products')
+      const { error } = await supabase.rpc('limpar_produtos_sem_valor')
       if (error) throw error
       get().fetchProducts()
-      return { success: true, count: data }
+      return { success: true }
     } catch (error) {
       console.error('Delete zero value error:', error)
       return { success: false, error }

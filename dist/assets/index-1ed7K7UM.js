@@ -24547,7 +24547,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$13(function() {
+			useEffect$14(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24570,7 +24570,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$17 = React$3.useState, useEffect$13 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$17 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24593,7 +24593,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$13 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef(null);
 			if (null === instRef.current) {
@@ -24635,7 +24635,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$13(function() {
+			useEffect$14(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -36444,13 +36444,10 @@ const useProductStore = create((set, get$1) => ({
 	},
 	deleteZeroValueProducts: async () => {
 		try {
-			const { data, error } = await supabase.rpc("delete_zero_value_products");
+			const { error } = await supabase.rpc("limpar_produtos_sem_valor");
 			if (error) throw error;
 			get$1().fetchProducts();
-			return {
-				success: true,
-				count: data
-			};
+			return { success: true };
 		} catch (error) {
 			console.error("Delete zero value error:", error);
 			return {
@@ -39255,17 +39252,22 @@ var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) =
 AlertDialogCancel.displayName = Cancel.displayName;
 function DashboardPage() {
 	const { currentUser } = useAuthStore();
-	const { deleteZeroValueProducts } = useProductStore();
+	const { products, isLoading, fetchProducts, subscribeToProducts, deleteZeroValueProducts } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		fetchProducts();
+		const unsubscribe = subscribeToProducts();
+		return () => unsubscribe();
+	}, []);
 	const canDelete = currentUser?.canDeleteRecords || false;
 	const handleDeleteZeros = async () => {
 		setIsDeleting(true);
 		try {
 			const result = await deleteZeroValueProducts();
-			if (result.success) toast.success(`${result.count ?? 0} produtos com valor zero ou negativo foram removidos.`);
-			else toast.error("Erro ao remover produtos.");
+			if (result.success) toast.success("Limpeza concluída com sucesso!");
+			else toast.error(`Erro ao limpar: ${result.error?.message || result.error || "Erro desconhecido"}`);
 		} catch (e) {
-			toast.error("Erro inesperado ao tentar remover produtos.");
+			toast.error("Erro ao limpar: Erro inesperado ao tentar remover produtos.");
 		} finally {
 			setIsDeleting(false);
 		}
@@ -39298,7 +39300,10 @@ function DashboardPage() {
 					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
 				})] })] })] })]
 			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
+			products,
+			isLoading
+		})]
 	});
 }
 var ENTRY_FOCUS = "rovingFocusGroup.onEntryFocus";
@@ -44015,4 +44020,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-C8pThR-O.js.map
+//# sourceMappingURL=index-1ed7K7UM.js.map

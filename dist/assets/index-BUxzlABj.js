@@ -24533,7 +24533,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$17({ inst: {
+			cachedValue = useState$18({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24547,7 +24547,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$14(function() {
+			useEffect$15(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24570,7 +24570,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$17 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$18 = React$3.useState, useEffect$15 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24593,7 +24593,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$15 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef(null);
 			if (null === instRef.current) {
@@ -24635,7 +24635,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$14(function() {
+			useEffect$15(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -36099,6 +36099,7 @@ var INITIAL_FILTERS = {
 	search: "",
 	category: [],
 	memory: "all",
+	ram: "all",
 	color: "all",
 	condition: "all",
 	supplier: "all",
@@ -36172,17 +36173,19 @@ const useProductStore = create((set, get$1) => ({
 			let minDate = null;
 			if (filters.dateRange === "today") minDate = startOfToday().toISOString();
 			else if (filters.dateRange === "last_2_days") minDate = startOfDay(subDays(/* @__PURE__ */ new Date(), 1)).toISOString();
-			const { data, error, count: count$3 } = await supabase.rpc("search_products", {
+			const rpcArgs = {
 				search_query: filters.search.trim() || null,
 				category_filters: filters.category.length > 0 ? filters.category : null,
 				memory_filter: filters.memory !== "all" ? filters.memory : null,
+				ram_filter: filters.ram !== "all" ? filters.ram : null,
 				color_filter: filters.color !== "all" ? filters.color : null,
 				condition_filter: filters.condition !== "all" ? filters.condition : null,
 				supplier_filter: filters.supplier !== "all" ? filters.supplier : null,
 				battery_filter: filters.battery !== "all" ? filters.battery : null,
 				in_stock_only: filters.inStockOnly || null,
 				min_date: minDate
-			}, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
+			};
+			const { data, error, count: count$3 } = await supabase.rpc("search_products", rpcArgs, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
 			if (!error && data) set({
 				products: data,
 				total: count$3 || 0,
@@ -38901,6 +38904,7 @@ function ProductFilters() {
 	const { filters, setFilters, resetFilters, categories, fetchCategories } = useProductStore();
 	const [options$1, setOptions] = (0, import_react.useState)({
 		memories: [],
+		rams: [],
 		colors: [],
 		conditions: [],
 		suppliers: [],
@@ -38909,11 +38913,12 @@ function ProductFilters() {
 	(0, import_react.useEffect)(() => {
 		fetchCategories();
 		const fetchOptions = async () => {
-			const { data } = await supabase.from("produtos").select("memoria, cor, estado, fornecedor, bateria");
+			const { data } = await supabase.from("produtos").select("memoria, cor, estado, fornecedor, bateria, ram");
 			if (data) {
 				const unique = (key) => Array.from(new Set(data.map((item) => item[key]).filter(Boolean))).sort();
 				setOptions({
 					memories: unique("memoria"),
+					rams: unique("ram"),
 					colors: unique("cor"),
 					conditions: unique("estado"),
 					suppliers: unique("fornecedor"),
@@ -38934,7 +38939,7 @@ function ProductFilters() {
 		asChild: true,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 			variant: "outline",
-			className: "flex gap-2 min-w-[120px]",
+			className: "flex gap-2 min-w-[100px]",
 			children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlidersHorizontal, { className: "w-4 h-4" }),
 				"Filtros",
@@ -38963,6 +38968,19 @@ function ProductFilters() {
 					className: "grid grid-cols-2 gap-4",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "RAM" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+							value: filters.ram,
+							onValueChange: (val) => setFilters({ ram: val }),
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: "all",
+								children: "Todas"
+							}), options$1.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: r$1,
+								children: r$1
+							}, r$1))] })]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Memória" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 							value: filters.memory,
 							onValueChange: (val) => setFilters({ memory: val }),
@@ -38974,19 +38992,20 @@ function ProductFilters() {
 								children: m$1
 							}, m$1))] })]
 						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.color,
-							onValueChange: (val) => setFilters({ color: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas"
-							}), options$1.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: c,
-								children: c
-							}, c))] })]
-						})]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: filters.color,
+						onValueChange: (val) => setFilters({ color: val }),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: "all",
+							children: "Todas"
+						}), options$1.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: c,
+							children: c
+						}, c))] })]
 					})]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -39054,6 +39073,18 @@ function ProductFilters() {
 			]
 		})]
 	})] });
+}
+function useDebounce(value, delay) {
+	const [debouncedValue, setDebouncedValue] = (0, import_react.useState)(value);
+	(0, import_react.useEffect)(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [value, delay]);
+	return debouncedValue;
 }
 var ROOT_NAME = "AlertDialog";
 var [createAlertDialogContext, createAlertDialogScope] = createContextScope(ROOT_NAME, [createDialogScope]);
@@ -39252,8 +39283,20 @@ var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) =
 AlertDialogCancel.displayName = Cancel.displayName;
 function DashboardPage() {
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, subscribeToProducts, deleteZeroValueProducts } = useProductStore();
+	const { products, isLoading, fetchProducts, subscribeToProducts, deleteZeroValueProducts, setFilters, filters } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
+	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
+	(0, import_react.useEffect)(() => {
+		setSearchTerm(filters.search);
+	}, [filters.search]);
+	const debouncedSearch = useDebounce(searchTerm, 300);
+	(0, import_react.useEffect)(() => {
+		if (debouncedSearch !== filters.search) setFilters({ search: debouncedSearch });
+	}, [
+		debouncedSearch,
+		setFilters,
+		filters.search
+	]);
 	(0, import_react.useEffect)(() => {
 		fetchProducts();
 		const unsubscribe = subscribeToProducts();
@@ -39276,29 +39319,54 @@ function DashboardPage() {
 		className: "space-y-6",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex flex-col gap-4 md:flex-row md:items-center md:justify-between sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-				className: "text-2xl font-bold tracking-tight",
-				children: "Catálogo"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				className: "text-muted-foreground",
-				children: "Gerencie e visualize os produtos disponíveis."
-			})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex items-center gap-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-					asChild: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						variant: "destructive",
-						size: "sm",
-						className: "ml-2",
-						title: "Deletar produtos com valor menor ou igual a R$ 0,00",
-						disabled: isDeleting,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Deletar Zerados"]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-					onClick: handleDeleteZeros,
-					className: "bg-destructive hover:bg-destructive/90",
-					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
-				})] })] })] })]
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex-1 min-w-0",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					className: "text-2xl font-bold tracking-tight",
+					children: "Catálogo"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-muted-foreground hidden md:block",
+					children: "Gerencie e visualize os produtos disponíveis."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col sm:flex-row items-center gap-2 w-full md:max-w-xl",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "relative flex-1 w-full",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						type: "search",
+						placeholder: "Buscar por modelo, RAM, memória...",
+						className: "pl-8 w-full bg-background",
+						value: searchTerm,
+						onChange: (e) => setSearchTerm(e.target.value)
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2 w-full sm:w-auto",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							variant: "destructive",
+							size: "sm",
+							className: "ml-0 md:ml-2 whitespace-nowrap",
+							title: "Deletar produtos com valor menor ou igual a R$ 0,00",
+							disabled: isDeleting,
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 md:mr-2" }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "hidden md:inline",
+									children: "Deletar Zerados"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "md:hidden",
+									children: "Deletar"
+								})
+							]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						onClick: handleDeleteZeros,
+						className: "bg-destructive hover:bg-destructive/90",
+						children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
+					})] })] })] })]
+				})]
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
 			products,
@@ -44020,4 +44088,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-1ed7K7UM.js.map
+//# sourceMappingURL=index-BUxzlABj.js.map

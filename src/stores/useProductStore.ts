@@ -97,6 +97,7 @@ const INITIAL_FILTERS: FilterState = {
   search: '',
   category: [],
   memory: 'all',
+  ram: 'all',
   color: 'all',
   condition: 'all',
   supplier: 'all',
@@ -177,29 +178,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         minDate = startOfDay(subDays(new Date(), 1)).toISOString()
       }
 
+      const rpcArgs: any = {
+        search_query: filters.search.trim() || null,
+        category_filters: filters.category.length > 0 ? filters.category : null,
+        memory_filter: filters.memory !== 'all' ? filters.memory : null,
+        ram_filter: filters.ram !== 'all' ? filters.ram : null,
+        color_filter: filters.color !== 'all' ? filters.color : null,
+        condition_filter:
+          filters.condition !== 'all' ? filters.condition : null,
+        supplier_filter: filters.supplier !== 'all' ? filters.supplier : null,
+        battery_filter: filters.battery !== 'all' ? filters.battery : null,
+        in_stock_only: filters.inStockOnly || null,
+        min_date: minDate,
+      }
+
       const { data, error, count } = await supabase
-        .rpc(
-          'search_products',
-          {
-            search_query: filters.search.trim() || null,
-            category_filters:
-              filters.category.length > 0 ? filters.category : null,
-            memory_filter: filters.memory !== 'all' ? filters.memory : null,
-            color_filter: filters.color !== 'all' ? filters.color : null,
-            condition_filter:
-              filters.condition !== 'all' ? filters.condition : null,
-            supplier_filter:
-              filters.supplier !== 'all' ? filters.supplier : null,
-            battery_filter: filters.battery !== 'all' ? filters.battery : null,
-            in_stock_only: filters.inStockOnly || null,
-            min_date: minDate,
-          },
-          { count: 'exact' },
-        )
+        .rpc('search_products', rpcArgs, { count: 'exact' })
         .range(page * pageSize, (page + 1) * pageSize - 1)
 
       if (!error && data) {
-        set({ products: data, total: count || 0, isLoading: false })
+        set({ products: data as any, total: count || 0, isLoading: false })
       } else {
         console.error('Error fetching products:', error)
         set({ products: [], total: 0, isLoading: false })

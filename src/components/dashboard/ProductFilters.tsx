@@ -30,6 +30,7 @@ export function ProductFilters() {
   // Local state for other dropdown options
   const [options, setOptions] = useState({
     memories: [] as string[],
+    rams: [] as string[],
     colors: [] as string[],
     conditions: [] as string[],
     suppliers: [] as string[],
@@ -42,7 +43,7 @@ export function ProductFilters() {
     const fetchOptions = async () => {
       const { data } = await supabase
         .from('produtos')
-        .select('memoria, cor, estado, fornecedor, bateria')
+        .select('memoria, cor, estado, fornecedor, bateria, ram')
 
       if (data) {
         const unique = (key: keyof (typeof data)[0]) =>
@@ -52,6 +53,7 @@ export function ProductFilters() {
 
         setOptions({
           memories: unique('memoria'),
+          rams: unique('ram'),
           colors: unique('cor'),
           conditions: unique('estado'),
           suppliers: unique('fornecedor'),
@@ -74,7 +76,7 @@ export function ProductFilters() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="flex gap-2 min-w-[120px]">
+        <Button variant="outline" className="flex gap-2 min-w-[100px]">
           <SlidersHorizontal className="w-4 h-4" />
           Filtros
           {activeFiltersCount > 0 && (
@@ -104,6 +106,26 @@ export function ProductFilters() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label>RAM</Label>
+              <Select
+                value={filters.ram}
+                onValueChange={(val) => setFilters({ ram: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {options.rams.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label>Memória</Label>
               <Select
                 value={filters.memory}
@@ -122,26 +144,26 @@ export function ProductFilters() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Cor</Label>
-              <Select
-                value={filters.color}
-                onValueChange={(val) => setFilters({ color: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  {options.colors.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label>Cor</Label>
+            <Select
+              value={filters.color}
+              onValueChange={(val) => setFilters({ color: val })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Todas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {options.colors.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

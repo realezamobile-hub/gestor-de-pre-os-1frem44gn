@@ -39262,10 +39262,10 @@ function DashboardPage() {
 		setIsDeleting(true);
 		try {
 			const result = await deleteZeroValueProducts();
-			if (result.success) toast.success(`${result.count} produtos com valor zero foram removidos.`);
+			if (result.success) toast.success(`${result.count ?? 0} produtos com valor zero ou negativo foram removidos.`);
 			else toast.error("Erro ao remover produtos.");
 		} catch (e) {
-			toast.error("Erro inesperado.");
+			toast.error("Erro inesperado ao tentar remover produtos.");
 		} finally {
 			setIsDeleting(false);
 		}
@@ -39288,14 +39288,14 @@ function DashboardPage() {
 						variant: "destructive",
 						size: "sm",
 						className: "ml-2",
-						title: "Deletar produtos com valor R$ 0,00",
+						title: "Deletar produtos com valor menor ou igual a R$ 0,00",
 						disabled: isDeleting,
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Deletar Zerados"]
 					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor R$ 0,00 do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
 					onClick: handleDeleteZeros,
 					className: "bg-destructive hover:bg-destructive/90",
-					children: "Confirmar Exclusão"
+					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
 				})] })] })] })]
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {})]
@@ -44015,4 +44015,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DfACaH_S.js.map
+//# sourceMappingURL=index-C8pThR-O.js.map

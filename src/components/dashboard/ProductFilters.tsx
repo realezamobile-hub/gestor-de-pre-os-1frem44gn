@@ -21,11 +21,9 @@ import { Badge } from '@/components/ui/badge'
 import { FilterX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { MultiSelect } from '@/components/MultiSelect'
 
 export function ProductFilters() {
-  const { filters, setFilters, resetFilters, categories, fetchCategories } =
-    useProductStore()
+  const { filters, setFilters, resetFilters } = useProductStore()
 
   // Local state for other dropdown options
   const [options, setOptions] = useState({
@@ -38,7 +36,6 @@ export function ProductFilters() {
   })
 
   useEffect(() => {
-    fetchCategories()
     // Fetch distinct values for other filters
     const fetchOptions = async () => {
       const { data } = await supabase
@@ -94,16 +91,6 @@ export function ProductFilters() {
           </SheetDescription>
         </SheetHeader>
         <div className="py-6 space-y-6">
-          <div className="space-y-2">
-            <Label>Categorias</Label>
-            <MultiSelect
-              options={categories}
-              selected={filters.category}
-              onChange={(selected) => setFilters({ category: selected })}
-              placeholder="Selecione as categorias"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>RAM</Label>

@@ -95,7 +95,6 @@ interface ProductStore {
 
 const INITIAL_FILTERS: FilterState = {
   search: '',
-  category: [],
   memory: 'all',
   ram: 'all',
   color: 'all',
@@ -180,7 +179,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
-        category_filters: filters.category.length > 0 ? filters.category : null,
+        category_filters: null,
         memory_filter: filters.memory !== 'all' ? filters.memory : null,
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,

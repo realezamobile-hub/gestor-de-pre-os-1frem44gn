@@ -72,7 +72,6 @@ export interface PriceMonitorItem {
 
 export interface FilterState {
   search: string
-  category: string[]
   memory: string
   ram: string
   color: string

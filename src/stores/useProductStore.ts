@@ -8,7 +8,7 @@ import {
   GeneratorConfigData,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
-import { startOfToday, startOfDay, subDays, endOfDay } from 'date-fns'
+import { startOfDay, endOfDay } from 'date-fns'
 import { toast } from 'sonner'
 
 interface ProductStore {
@@ -98,11 +98,6 @@ const INITIAL_FILTERS: FilterState = {
   memory: 'all',
   ram: 'all',
   color: 'all',
-  condition: 'all',
-  supplier: 'all',
-  battery: 'all',
-  inStockOnly: false,
-  dateRange: 'all',
 }
 
 // Helper to cast table name for views since they are not in Database types
@@ -170,25 +165,17 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const { filters, page, pageSize } = get()
 
     try {
-      let minDate: string | null = null
-      if (filters.dateRange === 'today') {
-        minDate = startOfToday().toISOString()
-      } else if (filters.dateRange === 'last_2_days') {
-        minDate = startOfDay(subDays(new Date(), 1)).toISOString()
-      }
-
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
         category_filters: null,
         memory_filter: filters.memory !== 'all' ? filters.memory : null,
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,
-        condition_filter:
-          filters.condition !== 'all' ? filters.condition : null,
-        supplier_filter: filters.supplier !== 'all' ? filters.supplier : null,
-        battery_filter: filters.battery !== 'all' ? filters.battery : null,
-        in_stock_only: filters.inStockOnly || null,
-        min_date: minDate,
+        condition_filter: null,
+        supplier_filter: null,
+        battery_filter: null,
+        in_stock_only: false,
+        min_date: null,
       }
 
       const { data, error, count } = await supabase

@@ -1,46 +1,33 @@
 import { useProductStore } from '@/stores/useProductStore'
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
-import { FilterX, SlidersHorizontal } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 
 export function ProductFilters() {
   const { filters, setFilters, resetFilters } = useProductStore()
 
-  // Local state for other dropdown options
+  // Local state for options
   const [options, setOptions] = useState({
     memories: [] as string[],
     rams: [] as string[],
     colors: [] as string[],
-    conditions: [] as string[],
-    suppliers: [] as string[],
-    batteries: [] as string[],
   })
 
   useEffect(() => {
-    // Fetch distinct values for other filters
+    // Fetch distinct values for the refined filters
     const fetchOptions = async () => {
       const { data } = await supabase
         .from('produtos')
-        .select('memoria, cor, estado, fornecedor, bateria, ram')
+        .select('memoria, cor, ram')
 
       if (data) {
         const unique = (key: keyof (typeof data)[0]) =>
@@ -52,195 +39,97 @@ export function ProductFilters() {
           memories: unique('memoria'),
           rams: unique('ram'),
           colors: unique('cor'),
-          conditions: unique('estado'),
-          suppliers: unique('fornecedor'),
-          batteries: unique('bateria'),
         })
       }
     }
     fetchOptions()
   }, [])
 
-  const activeFiltersCount = Object.entries(filters).filter(([k, v]) => {
-    if (Array.isArray(v)) return v.length > 0
-    return v !== 'all' && v !== '' && v !== false
-  }).length
-
   const handleReset = () => {
     resetFilters()
   }
 
+  const hasFilters =
+    filters.ram !== 'all' || filters.memory !== 'all' || filters.color !== 'all'
+
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" className="flex gap-2 min-w-[100px]">
-          <SlidersHorizontal className="w-4 h-4" />
-          Filtros
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary" className="h-5 px-1.5 ml-1">
-              {activeFiltersCount}
-            </Badge>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="overflow-y-auto w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>Filtros Avançados</SheetTitle>
-          <SheetDescription>
-            Refine sua busca por características específicas.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="py-6 space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>RAM</Label>
-              <Select
-                value={filters.ram}
-                onValueChange={(val) => setFilters({ ram: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  {options.rams.map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="flex flex-col sm:flex-row gap-2 w-full">
+      <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full">
+        <Select
+          value={filters.ram}
+          onValueChange={(val) => setFilters({ ram: val })}
+        >
+          <SelectTrigger className="w-full sm:w-[120px]">
+            <SelectValue placeholder="RAM" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas RAM</SelectItem>
+            {options.rams.map((r) => (
+              <SelectItem key={r} value={r}>
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-            <div className="space-y-2">
-              <Label>Memória</Label>
-              <Select
-                value={filters.memory}
-                onValueChange={(val) => setFilters({ memory: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  {options.memories.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <Select
+          value={filters.memory}
+          onValueChange={(val) => setFilters({ memory: val })}
+        >
+          <SelectTrigger className="w-full sm:w-[130px]">
+            <SelectValue placeholder="Memória" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toda Memória</SelectItem>
+            {options.memories.map((m) => (
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <div className="space-y-2">
-            <Label>Cor</Label>
-            <Select
-              value={filters.color}
-              onValueChange={(val) => setFilters({ color: val })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {options.colors.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <Select
+          value={filters.color}
+          onValueChange={(val) => setFilters({ color: val })}
+        >
+          <SelectTrigger className="w-full sm:w-[130px] col-span-2 sm:col-span-1">
+            <SelectValue placeholder="Cor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas Cores</SelectItem>
+            {options.colors.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Condição</Label>
-              <Select
-                value={filters.condition}
-                onValueChange={(val) => setFilters({ condition: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  {options.conditions.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Saúde da Bateria</Label>
-              <Select
-                value={filters.battery}
-                onValueChange={(val) => setFilters({ battery: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  {options.batteries.map((b) => (
-                    <SelectItem key={b} value={b}>
-                      {b}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Fornecedor</Label>
-            <Select
-              value={filters.supplier}
-              onValueChange={(val) => setFilters({ supplier: val })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {options.suppliers.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 pt-2">
-            <Checkbox
-              id="inStock"
-              checked={filters.inStockOnly}
-              onCheckedChange={(checked) =>
-                setFilters({ inStockOnly: checked as boolean })
-              }
-            />
-            <Label
-              htmlFor="inStock"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Apenas em estoque
-            </Label>
-          </div>
-
+        {hasFilters && (
           <Button
-            variant="outline"
-            className="w-full mt-4"
+            variant="ghost"
+            size="icon"
             onClick={handleReset}
+            className="shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex"
+            title="Limpar filtros"
           >
-            <FilterX className="w-4 h-4 mr-2" />
-            Limpar Filtros
+            <X className="w-4 h-4" />
           </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+        )}
+      </div>
+
+      {hasFilters && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleReset}
+          className="w-full sm:hidden"
+        >
+          <X className="w-4 h-4 mr-2" />
+          Limpar Filtros
+        </Button>
+      )}
+    </div>
   )
 }

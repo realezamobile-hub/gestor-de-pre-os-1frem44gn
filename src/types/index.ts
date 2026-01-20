@@ -75,11 +75,6 @@ export interface FilterState {
   memory: string
   ram: string
   color: string
-  condition: string
-  supplier: string
-  battery: string
-  inStockOnly: boolean
-  dateRange: 'today' | 'last_2_days' | 'all'
 }
 
 // Evaluation Module Types

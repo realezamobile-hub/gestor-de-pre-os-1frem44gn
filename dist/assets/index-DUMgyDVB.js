@@ -19175,20 +19175,6 @@ var FileText = createLucideIcon("file-text", [
 		key: "z1uh3a"
 	}]
 ]);
-var FunnelX = createLucideIcon("funnel-x", [
-	["path", {
-		d: "M12.531 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14v6a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341l.427-.473",
-		key: "ol2ft2"
-	}],
-	["path", {
-		d: "m16.5 3.5 5 5",
-		key: "15e6fa"
-	}],
-	["path", {
-		d: "m21.5 3.5-5 5",
-		key: "m0lwru"
-	}]
-]);
 var Globe = createLucideIcon("globe", [
 	["circle", {
 		cx: "12",
@@ -19474,44 +19460,6 @@ var ShieldAlert = createLucideIcon("shield-alert", [
 	["path", {
 		d: "M12 16h.01",
 		key: "1drbdi"
-	}]
-]);
-var SlidersHorizontal = createLucideIcon("sliders-horizontal", [
-	["path", {
-		d: "M10 5H3",
-		key: "1qgfaw"
-	}],
-	["path", {
-		d: "M12 19H3",
-		key: "yhmn1j"
-	}],
-	["path", {
-		d: "M14 3v4",
-		key: "1sua03"
-	}],
-	["path", {
-		d: "M16 17v4",
-		key: "1q0r14"
-	}],
-	["path", {
-		d: "M21 12h-9",
-		key: "1o4lsq"
-	}],
-	["path", {
-		d: "M21 19h-5",
-		key: "1rlt1p"
-	}],
-	["path", {
-		d: "M21 5h-7",
-		key: "1oszz2"
-	}],
-	["path", {
-		d: "M8 10v4",
-		key: "tgpxqk"
-	}],
-	["path", {
-		d: "M8 12H3",
-		key: "a7s4jb"
 	}]
 ]);
 var Smartphone = createLucideIcon("smartphone", [["rect", {
@@ -36082,22 +36030,11 @@ function formatDistance$1(laterDate, earlierDate, options$1) {
 function formatDistanceToNow(date, options$1) {
 	return formatDistance$1(date, constructNow(date), options$1);
 }
-function subDays(date, amount, options$1) {
-	return addDays(date, -amount, options$1);
-}
-function startOfToday(options$1) {
-	return startOfDay(Date.now(), options$1);
-}
 var INITIAL_FILTERS = {
 	search: "",
 	memory: "all",
 	ram: "all",
-	color: "all",
-	condition: "all",
-	supplier: "all",
-	battery: "all",
-	inStockOnly: false,
-	dateRange: "all"
+	color: "all"
 };
 var VIEW_PRODUCTS = "v_produtos_visiveis";
 var VIEW_MONITOR = "v_monitor_precos";
@@ -36162,20 +36099,17 @@ const useProductStore = create((set, get$1) => ({
 		set({ isLoading: true });
 		const { filters, page, pageSize } = get$1();
 		try {
-			let minDate = null;
-			if (filters.dateRange === "today") minDate = startOfToday().toISOString();
-			else if (filters.dateRange === "last_2_days") minDate = startOfDay(subDays(/* @__PURE__ */ new Date(), 1)).toISOString();
 			const rpcArgs = {
 				search_query: filters.search.trim() || null,
 				category_filters: null,
 				memory_filter: filters.memory !== "all" ? filters.memory : null,
 				ram_filter: filters.ram !== "all" ? filters.ram : null,
 				color_filter: filters.color !== "all" ? filters.color : null,
-				condition_filter: filters.condition !== "all" ? filters.condition : null,
-				supplier_filter: filters.supplier !== "all" ? filters.supplier : null,
-				battery_filter: filters.battery !== "all" ? filters.battery : null,
-				in_stock_only: filters.inStockOnly || null,
-				min_date: minDate
+				condition_filter: null,
+				supplier_filter: null,
+				battery_filter: null,
+				in_stock_only: false,
+				min_date: null
 			};
 			const { data, error, count: count$3 } = await supabase.rpc("search_products", rpcArgs, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
 			if (!error && data) set({
@@ -38030,164 +37964,90 @@ function ProductFilters() {
 	const [options$1, setOptions] = (0, import_react.useState)({
 		memories: [],
 		rams: [],
-		colors: [],
-		conditions: [],
-		suppliers: [],
-		batteries: []
+		colors: []
 	});
 	(0, import_react.useEffect)(() => {
 		const fetchOptions = async () => {
-			const { data } = await supabase.from("produtos").select("memoria, cor, estado, fornecedor, bateria, ram");
+			const { data } = await supabase.from("produtos").select("memoria, cor, ram");
 			if (data) {
 				const unique = (key) => Array.from(new Set(data.map((item) => item[key]).filter(Boolean))).sort();
 				setOptions({
 					memories: unique("memoria"),
 					rams: unique("ram"),
-					colors: unique("cor"),
-					conditions: unique("estado"),
-					suppliers: unique("fornecedor"),
-					batteries: unique("bateria")
+					colors: unique("cor")
 				});
 			}
 		};
 		fetchOptions();
 	}, []);
-	const activeFiltersCount = Object.entries(filters).filter(([k, v]) => {
-		if (Array.isArray(v)) return v.length > 0;
-		return v !== "all" && v !== "" && v !== false;
-	}).length;
 	const handleReset = () => {
 		resetFilters();
 	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTrigger, {
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-			variant: "outline",
-			className: "flex gap-2 min-w-[100px]",
+	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all";
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col sm:flex-row gap-2 w-full",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlidersHorizontal, { className: "w-4 h-4" }),
-				"Filtros",
-				activeFiltersCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-					variant: "secondary",
-					className: "h-5 px-1.5 ml-1",
-					children: activeFiltersCount
-				})
-			]
-		})
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetContent, {
-		className: "overflow-y-auto w-full sm:max-w-md",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTitle, { children: "Filtros Avançados" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetDescription, { children: "Refine sua busca por características específicas." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "py-6 space-y-6",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "grid grid-cols-2 gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "RAM" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.ram,
-							onValueChange: (val) => setFilters({ ram: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas"
-							}), options$1.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: r$1,
-								children: r$1
-							}, r$1))] })]
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Memória" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.memory,
-							onValueChange: (val) => setFilters({ memory: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas"
-							}), options$1.memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: m,
-								children: m
-							}, m))] })]
-						})]
-					})]
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+					value: filters.ram,
+					onValueChange: (val) => setFilters({ ram: val }),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+						className: "w-full sm:w-[120px]",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "RAM" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: "all",
+						children: "Todas RAM"
+					}), options$1.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: r$1,
+						children: r$1
+					}, r$1))] })]
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-						value: filters.color,
-						onValueChange: (val) => setFilters({ color: val }),
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: "all",
-							children: "Todas"
-						}), options$1.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: c,
-							children: c
-						}, c))] })]
-					})]
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+					value: filters.memory,
+					onValueChange: (val) => setFilters({ memory: val }),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+						className: "w-full sm:w-[130px]",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Memória" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: "all",
+						children: "Toda Memória"
+					}), options$1.memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: m,
+						children: m
+					}, m))] })]
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "grid grid-cols-2 gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Condição" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.condition,
-							onValueChange: (val) => setFilters({ condition: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas"
-							}), options$1.conditions.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: c,
-								children: c
-							}, c))] })]
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Saúde da Bateria" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: filters.battery,
-							onValueChange: (val) => setFilters({ battery: val }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todas" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "all",
-								children: "Todas"
-							}), options$1.batteries.map((b$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: b$1,
-								children: b$1
-							}, b$1))] })]
-						})]
-					})]
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+					value: filters.color,
+					onValueChange: (val) => setFilters({ color: val }),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+						className: "w-full sm:w-[130px] col-span-2 sm:col-span-1",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Cor" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: "all",
+						children: "Todas Cores"
+					}), options$1.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: c,
+						children: c
+					}, c))] })]
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Fornecedor" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-						value: filters.supplier,
-						onValueChange: (val) => setFilters({ supplier: val }),
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todos" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: "all",
-							children: "Todos"
-						}), options$1.suppliers.map((s) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-							value: s,
-							children: s
-						}, s))] })]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center space-x-2 pt-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						id: "inStock",
-						checked: filters.inStockOnly,
-						onCheckedChange: (checked) => setFilters({ inStockOnly: checked })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-						htmlFor: "inStock",
-						className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-						children: "Apenas em estoque"
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "outline",
-					className: "w-full mt-4",
+				hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "icon",
 					onClick: handleReset,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FunnelX, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
+					className: "shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex",
+					title: "Limpar filtros",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
 				})
 			]
+		}), hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+			variant: "secondary",
+			size: "sm",
+			onClick: handleReset,
+			className: "w-full sm:hidden",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
 		})]
-	})] });
+	});
 }
 function useDebounce(value, delay) {
 	const [debouncedValue, setDebouncedValue] = (0, import_react.useState)(value);
@@ -38433,54 +38293,47 @@ function DashboardPage() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-6",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-col gap-4 md:flex-row md:items-center md:justify-between sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b",
+			className: "sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b space-y-4",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex-1 min-w-0",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					className: "text-2xl font-bold tracking-tight",
-					children: "Catálogo"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					className: "text-muted-foreground hidden md:block",
-					children: "Gerencie e visualize os produtos disponíveis."
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col sm:flex-row items-center gap-2 w-full md:max-w-xl",
+				className: "flex flex-col md:flex-row md:items-center md:justify-between gap-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "relative flex-1 w-full",
+					className: "flex-1 min-w-0",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+						className: "text-2xl font-bold tracking-tight",
+						children: "Catálogo"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-muted-foreground hidden md:block",
+						children: "Gerencie e visualize os produtos disponíveis."
+					})]
+				}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+					asChild: true,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "destructive",
+						size: "sm",
+						className: "whitespace-nowrap w-full md:w-auto",
+						title: "Deletar produtos com valor menor ou igual a R$ 0,00",
+						disabled: isDeleting,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Deletar Zerados"]
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+					onClick: handleDeleteZeros,
+					className: "bg-destructive hover:bg-destructive/90",
+					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
+				})] })] })] })]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col lg:flex-row gap-3",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "relative flex-1 w-full lg:max-w-xl",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 						type: "search",
-						placeholder: "Buscar por modelo, RAM, memória...",
-						className: "pl-8 w-full bg-background",
+						placeholder: "Buscar por modelo (ex: iPhone 13)...",
+						className: "pl-8 w-full bg-background h-10",
 						value: searchTerm,
 						onChange: (e) => setSearchTerm(e.target.value)
 					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center gap-2 w-full sm:w-auto",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-						asChild: true,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							variant: "destructive",
-							size: "sm",
-							className: "ml-0 md:ml-2 whitespace-nowrap",
-							title: "Deletar produtos com valor menor ou igual a R$ 0,00",
-							disabled: isDeleting,
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 md:mr-2" }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "hidden md:inline",
-									children: "Deletar Zerados"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "md:hidden",
-									children: "Deletar"
-								})
-							]
-						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleDeleteZeros,
-						className: "bg-destructive hover:bg-destructive/90",
-						children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
-					})] })] })] })]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex-1 lg:flex-none",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
 				})]
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
@@ -43246,4 +43099,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-M3fysHND.js.map
+//# sourceMappingURL=index-DUMgyDVB.js.map

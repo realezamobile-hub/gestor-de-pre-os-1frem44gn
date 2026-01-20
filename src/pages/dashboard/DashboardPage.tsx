@@ -76,68 +76,70 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold tracking-tight">Catálogo</h2>
-          <p className="text-muted-foreground hidden md:block">
-            Gerencie e visualize os produtos disponíveis.
-          </p>
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-bold tracking-tight">Catálogo</h2>
+            <p className="text-muted-foreground hidden md:block">
+              Gerencie e visualize os produtos disponíveis.
+            </p>
+          </div>
+
+          {canDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="whitespace-nowrap w-full md:w-auto"
+                  title="Deletar produtos com valor menor ou igual a R$ 0,00"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Deletar Zerados
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir Produtos Zerados?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação irá remover permanentemente todos os produtos com
+                    valor igual ou inferior a R$ 0,00 (ou sem valor definido) do
+                    catálogo. Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteZeros}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
+                    {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:max-w-xl">
-          <div className="relative flex-1 w-full">
+
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="relative flex-1 w-full lg:max-w-xl">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar por modelo, RAM, memória..."
-              className="pl-8 w-full bg-background"
+              placeholder="Buscar por modelo (ex: iPhone 13)..."
+              className="pl-8 w-full bg-background h-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <ProductFilters />
 
-            {canDelete && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="ml-0 md:ml-2 whitespace-nowrap"
-                    title="Deletar produtos com valor menor ou igual a R$ 0,00"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="w-4 h-4 md:mr-2" />
-                    <span className="hidden md:inline">Deletar Zerados</span>
-                    <span className="md:hidden">Deletar</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Excluir Produtos Zerados?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta ação irá remover permanentemente todos os produtos
-                      com valor igual ou inferior a R$ 0,00 (ou sem valor
-                      definido) do catálogo. Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDeleteZeros}
-                      className="bg-destructive hover:bg-destructive/90"
-                    >
-                      {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+          <div className="flex-1 lg:flex-none">
+            <ProductFilters />
           </div>
         </div>
       </div>
+
       <ProductList products={products} isLoading={isLoading} />
     </div>
   )

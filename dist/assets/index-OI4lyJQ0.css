@@ -3640,6 +3640,9 @@ section[aria-label='Notifications alt+T'] {
   .sm\:max-w-sm{
     max-width: 24rem;
   }
+  .sm\:flex-none{
+    flex: none;
+  }
   .sm\:grid-cols-2{
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3758,20 +3761,11 @@ section[aria-label='Notifications alt+T'] {
   .lg\:col-span-8{
     grid-column: span 8 / span 8;
   }
-  .lg\:max-w-xl{
-    max-width: 36rem;
-  }
-  .lg\:flex-none{
-    flex: none;
-  }
   .lg\:grid-cols-12{
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
   .lg\:grid-cols-2{
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .lg\:flex-row{
-    flex-direction: row;
   }
 }
 @media (min-width: 1280px){

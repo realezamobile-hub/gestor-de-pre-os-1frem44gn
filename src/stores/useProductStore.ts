@@ -6,9 +6,10 @@ import {
   PriceMonitorItem,
   DraftItem,
   GeneratorConfigData,
+  FilterOptions,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
-import { startOfDay, endOfDay } from 'date-fns'
+import { startOfDay, endOfDay, subDays } from 'date-fns'
 import { toast } from 'sonner'
 
 interface ProductStore {
@@ -19,6 +20,10 @@ interface ProductStore {
   isLoading: boolean
   filters: FilterState
   categories: string[]
+
+  // Dynamic options based on search
+  filterOptions: FilterOptions
+  fetchFilterOptions: () => Promise<void>
 
   // Derived state helper
   selectedProductIds: Set<number>
@@ -98,6 +103,13 @@ const INITIAL_FILTERS: FilterState = {
   memory: 'all',
   ram: 'all',
   color: 'all',
+  dateRange: 'all',
+}
+
+const INITIAL_FILTER_OPTIONS: FilterOptions = {
+  memories: [],
+  rams: [],
+  colors: [],
 }
 
 // Helper to cast table name for views since they are not in Database types
@@ -118,6 +130,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   draftItems: [],
   isLoading: false,
   filters: INITIAL_FILTERS,
+  filterOptions: INITIAL_FILTER_OPTIONS,
   selectedProductIds: new Set(),
   categories: [],
   page: 0,
@@ -147,12 +160,21 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       filters: { ...state.filters, ...newFilters },
       page: 0,
     }))
+
+    // Always fetch products
     get().fetchProducts()
+
+    // Only fetch options if search or dateRange changed
+    // This allows the user to select filters without reloading the dropdown options (preventing UI jumps)
+    if (newFilters.search !== undefined || newFilters.dateRange !== undefined) {
+      get().fetchFilterOptions()
+    }
   },
 
   resetFilters: () => {
     set({ filters: INITIAL_FILTERS, page: 0 })
     get().fetchProducts()
+    get().fetchFilterOptions()
   },
 
   setPage: (page) => {
@@ -160,11 +182,46 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     get().fetchProducts()
   },
 
+  fetchFilterOptions: async () => {
+    const { filters } = get()
+
+    let minDate = null
+    const today = startOfDay(new Date())
+
+    if (filters.dateRange === 'today') {
+      minDate = today.toISOString()
+    } else if (filters.dateRange === 'yesterday') {
+      minDate = subDays(today, 1).toISOString()
+    }
+
+    const { data, error } = await supabase.rpc('get_product_filters', {
+      p_search_query: filters.search.trim() || null,
+      p_min_date: minDate,
+    })
+
+    if (!error && data) {
+      set({ filterOptions: data as unknown as FilterOptions })
+    } else {
+      console.error('Error fetching filter options:', error)
+      // On error keep existing options or clear?
+      // Keeping existing is safer for UX
+    }
+  },
+
   fetchProducts: async () => {
     set({ isLoading: true })
     const { filters, page, pageSize } = get()
 
     try {
+      let minDate = null
+      const today = startOfDay(new Date())
+
+      if (filters.dateRange === 'today') {
+        minDate = today.toISOString()
+      } else if (filters.dateRange === 'yesterday') {
+        minDate = subDays(today, 1).toISOString()
+      }
+
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
         category_filters: null,
@@ -175,7 +232,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         supplier_filter: null,
         battery_filter: null,
         in_stock_only: false,
-        min_date: null,
+        min_date: minDate,
       }
 
       const { data, error, count } = await supabase

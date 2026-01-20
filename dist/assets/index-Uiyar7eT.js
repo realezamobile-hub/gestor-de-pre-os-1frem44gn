@@ -24474,7 +24474,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$18({ inst: {
+			cachedValue = useState$17({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24488,7 +24488,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$15(function() {
+			useEffect$14(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24511,7 +24511,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$18 = React$3.useState, useEffect$15 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$17 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24534,7 +24534,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$15 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef(null);
 			if (null === instRef.current) {
@@ -24576,7 +24576,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$15(function() {
+			useEffect$14(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -36030,11 +36030,20 @@ function formatDistance$1(laterDate, earlierDate, options$1) {
 function formatDistanceToNow(date, options$1) {
 	return formatDistance$1(date, constructNow(date), options$1);
 }
+function subDays(date, amount, options$1) {
+	return addDays(date, -amount, options$1);
+}
 var INITIAL_FILTERS = {
 	search: "",
 	memory: "all",
 	ram: "all",
-	color: "all"
+	color: "all",
+	dateRange: "all"
+};
+var INITIAL_FILTER_OPTIONS = {
+	memories: [],
+	rams: [],
+	colors: []
 };
 var VIEW_PRODUCTS = "v_produtos_visiveis";
 var VIEW_MONITOR = "v_monitor_precos";
@@ -36053,6 +36062,7 @@ const useProductStore = create((set, get$1) => ({
 	draftItems: [],
 	isLoading: false,
 	filters: INITIAL_FILTERS,
+	filterOptions: INITIAL_FILTER_OPTIONS,
 	selectedProductIds: /* @__PURE__ */ new Set(),
 	categories: [],
 	page: 0,
@@ -36083,6 +36093,7 @@ const useProductStore = create((set, get$1) => ({
 			page: 0
 		}));
 		get$1().fetchProducts();
+		if (newFilters.search !== void 0 || newFilters.dateRange !== void 0) get$1().fetchFilterOptions();
 	},
 	resetFilters: () => {
 		set({
@@ -36090,15 +36101,33 @@ const useProductStore = create((set, get$1) => ({
 			page: 0
 		});
 		get$1().fetchProducts();
+		get$1().fetchFilterOptions();
 	},
 	setPage: (page) => {
 		set({ page });
 		get$1().fetchProducts();
 	},
+	fetchFilterOptions: async () => {
+		const { filters } = get$1();
+		let minDate = null;
+		const today = startOfDay(/* @__PURE__ */ new Date());
+		if (filters.dateRange === "today") minDate = today.toISOString();
+		else if (filters.dateRange === "yesterday") minDate = subDays(today, 1).toISOString();
+		const { data, error } = await supabase.rpc("get_product_filters", {
+			p_search_query: filters.search.trim() || null,
+			p_min_date: minDate
+		});
+		if (!error && data) set({ filterOptions: data });
+		else console.error("Error fetching filter options:", error);
+	},
 	fetchProducts: async () => {
 		set({ isLoading: true });
 		const { filters, page, pageSize } = get$1();
 		try {
+			let minDate = null;
+			const today = startOfDay(/* @__PURE__ */ new Date());
+			if (filters.dateRange === "today") minDate = today.toISOString();
+			else if (filters.dateRange === "yesterday") minDate = subDays(today, 1).toISOString();
 			const rpcArgs = {
 				search_query: filters.search.trim() || null,
 				category_filters: null,
@@ -36109,7 +36138,7 @@ const useProductStore = create((set, get$1) => ({
 				supplier_filter: null,
 				battery_filter: null,
 				in_stock_only: false,
-				min_date: null
+				min_date: minDate
 			};
 			const { data, error, count: count$3 } = await supabase.rpc("search_products", rpcArgs, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
 			if (!error && data) set({
@@ -37960,92 +37989,101 @@ var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => 
 }));
 SelectSeparator.displayName = Separator.displayName;
 function ProductFilters() {
-	const { filters, setFilters, resetFilters } = useProductStore();
-	const [options$1, setOptions] = (0, import_react.useState)({
-		memories: [],
-		rams: [],
-		colors: []
-	});
-	(0, import_react.useEffect)(() => {
-		const fetchOptions = async () => {
-			const { data } = await supabase.from("produtos").select("memoria, cor, ram");
-			if (data) {
-				const unique = (key) => Array.from(new Set(data.map((item) => item[key]).filter(Boolean))).sort();
-				setOptions({
-					memories: unique("memoria"),
-					rams: unique("ram"),
-					colors: unique("cor")
-				});
-			}
-		};
-		fetchOptions();
-	}, []);
+	const { filters, setFilters, resetFilters, filterOptions } = useProductStore();
 	const handleReset = () => {
 		resetFilters();
 	};
-	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all";
+	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all";
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "flex flex-col sm:flex-row gap-2 w-full",
+		className: "flex flex-col gap-4 w-full",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full",
+			className: "flex gap-2",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-					value: filters.ram,
-					onValueChange: (val) => setFilters({ ram: val }),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-						className: "w-full sm:w-[120px]",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "RAM" })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "all",
-						children: "Todas RAM"
-					}), options$1.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: r$1,
-						children: r$1
-					}, r$1))] })]
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: filters.dateRange === "today" ? "default" : "outline",
+					size: "sm",
+					onClick: () => setFilters({ dateRange: "today" }),
+					className: "flex-1 sm:flex-none",
+					children: "Hoje"
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-					value: filters.memory,
-					onValueChange: (val) => setFilters({ memory: val }),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-						className: "w-full sm:w-[130px]",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Memória" })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "all",
-						children: "Toda Memória"
-					}), options$1.memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: m,
-						children: m
-					}, m))] })]
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: filters.dateRange === "yesterday" ? "default" : "outline",
+					size: "sm",
+					onClick: () => setFilters({ dateRange: "yesterday" }),
+					className: "flex-1 sm:flex-none",
+					children: "Ontem"
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-					value: filters.color,
-					onValueChange: (val) => setFilters({ color: val }),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-						className: "w-full sm:w-[130px] col-span-2 sm:col-span-1",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Cor" })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "all",
-						children: "Todas Cores"
-					}), options$1.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: c,
-						children: c
-					}, c))] })]
-				}),
-				hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: "ghost",
-					size: "icon",
-					onClick: handleReset,
-					className: "shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex",
-					title: "Limpar filtros",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: filters.dateRange === "all" ? "default" : "outline",
+					size: "sm",
+					onClick: () => setFilters({ dateRange: "all" }),
+					className: "flex-1 sm:flex-none",
+					children: "Todo o banco"
 				})
 			]
-		}), hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-			variant: "secondary",
-			size: "sm",
-			onClick: handleReset,
-			className: "w-full sm:hidden",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col sm:flex-row gap-2 w-full",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: filters.ram,
+						onValueChange: (val) => setFilters({ ram: val }),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+							className: "w-full sm:w-[120px]",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "RAM" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: "all",
+							children: "Todas RAM"
+						}), filterOptions.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: r$1,
+							children: r$1
+						}, r$1))] })]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: filters.memory,
+						onValueChange: (val) => setFilters({ memory: val }),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+							className: "w-full sm:w-[130px]",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Memória" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: "all",
+							children: "Toda Memória"
+						}), filterOptions.memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: m,
+							children: m
+						}, m))] })]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: filters.color,
+						onValueChange: (val) => setFilters({ color: val }),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+							className: "w-full sm:w-[130px] col-span-2 sm:col-span-1",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Cor" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: "all",
+							children: "Todas Cores"
+						}), filterOptions.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: c,
+							children: c
+						}, c))] })]
+					}),
+					hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "ghost",
+						size: "icon",
+						onClick: handleReset,
+						className: "shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex",
+						title: "Limpar filtros",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+					})
+				]
+			}), hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+				variant: "secondary",
+				size: "sm",
+				onClick: handleReset,
+				className: "w-full sm:hidden",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
+			})]
 		})]
 	});
 }
@@ -38258,7 +38296,7 @@ var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) =
 AlertDialogCancel.displayName = Cancel.displayName;
 function DashboardPage() {
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, subscribeToProducts, deleteZeroValueProducts, setFilters, filters } = useProductStore();
+	const { products, isLoading, fetchProducts, fetchFilterOptions, subscribeToProducts, deleteZeroValueProducts, setFilters, filters } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
 	(0, import_react.useEffect)(() => {
@@ -38274,6 +38312,7 @@ function DashboardPage() {
 	]);
 	(0, import_react.useEffect)(() => {
 		fetchProducts();
+		fetchFilterOptions();
 		const unsubscribe = subscribeToProducts();
 		return () => unsubscribe();
 	}, []);
@@ -38321,9 +38360,9 @@ function DashboardPage() {
 					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
 				})] })] })] })]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col lg:flex-row gap-3",
+				className: "flex flex-col gap-3",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "relative flex-1 w-full lg:max-w-xl",
+					className: "relative w-full",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 						type: "search",
 						placeholder: "Buscar por modelo (ex: iPhone 13)...",
@@ -38331,10 +38370,7 @@ function DashboardPage() {
 						value: searchTerm,
 						onChange: (e) => setSearchTerm(e.target.value)
 					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "flex-1 lg:flex-none",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
-				})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})]
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
 			products,
@@ -43099,4 +43135,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DUMgyDVB.js.map
+//# sourceMappingURL=index-Uiyar7eT.js.map

@@ -26,6 +26,7 @@ export default function DashboardPage() {
     products,
     isLoading,
     fetchProducts,
+    fetchFilterOptions,
     subscribeToProducts,
     deleteZeroValueProducts,
     setFilters,
@@ -50,6 +51,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchProducts()
+    fetchFilterOptions()
     const unsubscribe = subscribeToProducts()
     return () => unsubscribe()
   }, [])
@@ -122,8 +124,8 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-3">
-          <div className="relative flex-1 w-full lg:max-w-xl">
+        <div className="flex flex-col gap-3">
+          <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -134,9 +136,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="flex-1 lg:flex-none">
-            <ProductFilters />
-          </div>
+          <ProductFilters />
         </div>
       </div>
 

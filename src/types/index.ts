@@ -70,11 +70,20 @@ export interface PriceMonitorItem {
   criado_em: string
 }
 
+export type DateRangeFilter = 'today' | 'yesterday' | 'all'
+
 export interface FilterState {
   search: string
   memory: string
   ram: string
   color: string
+  dateRange: DateRangeFilter
+}
+
+export interface FilterOptions {
+  memories: string[]
+  rams: string[]
+  colors: string[]
 }
 
 // Evaluation Module Types

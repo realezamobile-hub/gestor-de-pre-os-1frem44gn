@@ -19139,6 +19139,26 @@ var DollarSign = createLucideIcon("dollar-sign", [["line", {
 	d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
 	key: "1b0p4s"
 }]]);
+var Ellipsis = createLucideIcon("ellipsis", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "1",
+		key: "41hilf"
+	}],
+	["circle", {
+		cx: "19",
+		cy: "12",
+		r: "1",
+		key: "1wjl8i"
+	}],
+	["circle", {
+		cx: "5",
+		cy: "12",
+		r: "1",
+		key: "1pcz8c"
+	}]
+]);
 var ExternalLink = createLucideIcon("external-link", [
 	["path", {
 		d: "M15 3h6v6",
@@ -36088,7 +36108,7 @@ const useProductStore = create((set, get$1) => ({
 	selectedProductIds: /* @__PURE__ */ new Set(),
 	categories: [],
 	page: 0,
-	pageSize: 50,
+	pageSize: 20,
 	total: 0,
 	selectedProducts: [],
 	getBestPrice: (product) => {
@@ -38149,6 +38169,130 @@ function ProductFilters({ className }) {
 		]
 	});
 }
+var Pagination = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
+	role: "navigation",
+	"aria-label": "pagination",
+	className: cn("mx-auto flex w-full justify-center", className),
+	...props
+});
+Pagination.displayName = "Pagination";
+var PaginationContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+	ref,
+	className: cn("flex flex-row items-center gap-1", className),
+	...props
+}));
+PaginationContent.displayName = "PaginationContent";
+var PaginationItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+	ref,
+	className: cn("", className),
+	...props
+}));
+PaginationItem.displayName = "PaginationItem";
+var PaginationLink = ({ className, isActive, size: size$3 = "icon", ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+	"aria-current": isActive ? "page" : void 0,
+	className: cn(buttonVariants({
+		variant: isActive ? "outline" : "ghost",
+		size: size$3
+	}), className),
+	...props
+});
+PaginationLink.displayName = "PaginationLink";
+var PaginationPrevious = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
+	"aria-label": "Go to previous page",
+	size: "default",
+	className: cn("gap-1 pl-2.5", className),
+	...props,
+	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Previous" })]
+});
+PaginationPrevious.displayName = "PaginationPrevious";
+var PaginationNext = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
+	"aria-label": "Go to next page",
+	size: "default",
+	className: cn("gap-1 pr-2.5", className),
+	...props,
+	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Next" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "h-4 w-4" })]
+});
+PaginationNext.displayName = "PaginationNext";
+var PaginationEllipsis = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+	"aria-hidden": true,
+	className: cn("flex h-9 w-9 items-center justify-center", className),
+	...props,
+	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Ellipsis, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+		className: "sr-only",
+		children: "More pages"
+	})]
+});
+PaginationEllipsis.displayName = "PaginationEllipsis";
+function ProductPagination() {
+	const { page, pageSize, total, setPage, isLoading } = useProductStore();
+	const isMobile = useIsMobile();
+	if (total === 0 && !isLoading) return null;
+	const currentPage = page + 1;
+	const totalPages = Math.ceil(total / pageSize);
+	const startItem = page * pageSize + 1;
+	const endItem = Math.min((page + 1) * pageSize, total);
+	const getPageNumbers = () => {
+		const delta = isMobile ? 1 : 2;
+		const range = [];
+		const rangeWithDots = [];
+		let l;
+		for (let i = 1; i <= totalPages; i++) if (i === 1 || i === totalPages || i >= currentPage - delta && i <= currentPage + delta) range.push(i);
+		for (const i of range) {
+			if (l) {
+				if (i - l === 2) rangeWithDots.push(l + 1);
+				else if (i - l !== 1) rangeWithDots.push("...");
+			}
+			rangeWithDots.push(i);
+			l = i;
+		}
+		return rangeWithDots;
+	};
+	const pages = getPageNumbers();
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col sm:flex-row items-center justify-between gap-4 w-full",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "text-sm text-muted-foreground order-2 sm:order-1",
+			children: [
+				"Mostrando",
+				" ",
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "font-medium",
+					children: total > 0 ? startItem : 0
+				}),
+				"-",
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "font-medium",
+					children: endItem
+				}),
+				" de",
+				" ",
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "font-medium",
+					children: total
+				}),
+				" produtos"
+			]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "order-1 sm:order-2",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pagination, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationContent, { children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationItem, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationPrevious, {
+					onClick: () => setPage(page - 1),
+					className: page === 0 || isLoading ? "pointer-events-none opacity-50" : "cursor-pointer"
+				}) }),
+				pages.map((p, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationItem, { children: p === "..." ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationEllipsis, {}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationLink, {
+					isActive: p === currentPage,
+					onClick: () => setPage(p - 1),
+					className: "cursor-pointer",
+					children: p
+				}) }, i)),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationItem, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationNext, {
+					onClick: () => setPage(page + 1),
+					className: currentPage >= totalPages || isLoading ? "pointer-events-none opacity-50" : "cursor-pointer"
+				}) })
+			] }) })
+		})]
+	});
+}
 function useDebounce(value, delay) {
 	const [debouncedValue, setDebouncedValue] = (0, import_react.useState)(value);
 	(0, import_react.useEffect)(() => {
@@ -38396,72 +38540,79 @@ function DashboardPage() {
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-10",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col md:flex-row md:items-center justify-between gap-3",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center gap-3 flex-1",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-						className: "text-xl font-bold tracking-tight hidden lg:block text-nowrap",
-						children: "Catálogo"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex flex-col md:flex-row gap-2 w-full items-center",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "relative w-full md:w-56 lg:w-64 shrink-0",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								type: "search",
-								placeholder: "Buscar modelo...",
-								className: "pl-8 h-9 text-sm bg-background w-full",
-								value: searchTerm,
-								onChange: (e) => setSearchTerm(e.target.value)
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-10",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col md:flex-row md:items-center justify-between gap-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-3 flex-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+							className: "text-xl font-bold tracking-tight hidden lg:block text-nowrap",
+							children: "Catálogo"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-col md:flex-row gap-2 w-full items-center",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "relative w-full md:w-56 lg:w-64 shrink-0",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									type: "search",
+									placeholder: "Buscar modelo...",
+									className: "pl-8 h-9 text-sm bg-background w-full",
+									value: searchTerm,
+									onChange: (e) => setSearchTerm(e.target.value)
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "w-full md:w-auto flex-1 overflow-x-auto",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
 							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: "w-full md:w-auto flex-1 overflow-x-auto",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
 						})]
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center gap-2 justify-end shrink-0",
-					children: [canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						size: "sm",
-						onClick: () => navigate("/generator"),
-						className: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListChecks, { className: "w-4 h-4 mr-2" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "hidden sm:inline",
-								children: "Gerar Lista"
-							}),
-							draftItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "ml-1.5 bg-white/20 px-1.5 py-0.5 rounded text-xs font-semibold",
-								children: draftItems.length
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-2 justify-end shrink-0",
+						children: [canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							size: "sm",
+							onClick: () => navigate("/generator"),
+							className: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListChecks, { className: "w-4 h-4 mr-2" }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "hidden sm:inline",
+									children: "Gerar Lista"
+								}),
+								draftItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "ml-1.5 bg-white/20 px-1.5 py-0.5 rounded text-xs font-semibold",
+									children: draftItems.length
+								})
+							]
+						}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "destructive",
+								size: "icon",
+								className: "h-9 w-9",
+								title: "Deletar Zerados",
+								disabled: isDeleting,
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
 							})
-						]
-					}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-						asChild: true,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							variant: "destructive",
-							size: "icon",
-							className: "h-9 w-9",
-							title: "Deletar Zerados",
-							disabled: isDeleting,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
-						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleDeleteZeros,
-						className: "bg-destructive hover:bg-destructive/90",
-						children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
-					})] })] })] })]
-				})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+							onClick: handleDeleteZeros,
+							className: "bg-destructive hover:bg-destructive/90",
+							children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
+						})] })] })] })]
+					})]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex-1 min-h-0 overflow-y-auto p-1",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
+					products,
+					isLoading
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "shrink-0 border-t bg-background p-2",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductPagination, {})
 			})
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex-1 min-h-0 overflow-y-auto p-1",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
-				products,
-				isLoading
-			})
-		})]
+		]
 	});
 }
 var ENTRY_FOCUS = "rovingFocusGroup.onEntryFocus";
@@ -43221,4 +43372,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-WoAbGDXu.js.map
+//# sourceMappingURL=index-sohPDxSs.js.map

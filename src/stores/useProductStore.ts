@@ -134,7 +134,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   selectedProductIds: new Set(),
   categories: [],
   page: 0,
-  pageSize: 50,
+  pageSize: 20,
   total: 0,
   selectedProducts: [], // Placeholder, derived actually
 
@@ -203,8 +203,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       set({ filterOptions: data as unknown as FilterOptions })
     } else {
       console.error('Error fetching filter options:', error)
-      // On error keep existing options or clear?
-      // Keeping existing is safer for UX
     }
   },
 

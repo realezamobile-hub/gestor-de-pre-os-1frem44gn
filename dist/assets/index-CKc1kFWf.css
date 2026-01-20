@@ -708,6 +708,12 @@ section[aria-label='Notifications alt+T'] {
 .z-\[1\]{
   z-index: 1;
 }
+.order-1{
+  order: 1;
+}
+.order-2{
+  order: 2;
+}
 .col-span-10{
   grid-column: span 10 / span 10;
 }
@@ -3635,6 +3641,12 @@ section[aria-label='Notifications alt+T'] {
   }
   .sm\:top-auto{
     top: auto;
+  }
+  .sm\:order-1{
+    order: 1;
+  }
+  .sm\:order-2{
+    order: 2;
   }
   .sm\:col-span-1{
     grid-column: span 1 / span 1;

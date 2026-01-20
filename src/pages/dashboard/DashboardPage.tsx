@@ -1,5 +1,6 @@
 import { ProductList } from '@/components/dashboard/ProductList'
 import { ProductFilters } from '@/components/dashboard/ProductFilters'
+import { ProductPagination } from '@/components/dashboard/ProductPagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -169,6 +170,10 @@ export default function DashboardPage() {
 
       <div className="flex-1 min-h-0 overflow-y-auto p-1">
         <ProductList products={products} isLoading={isLoading} />
+      </div>
+
+      <div className="shrink-0 border-t bg-background p-2">
+        <ProductPagination />
       </div>
     </div>
   )

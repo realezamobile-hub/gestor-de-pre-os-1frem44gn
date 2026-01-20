@@ -37,18 +37,20 @@ export function ProductTable({
     <div className="rounded-md border bg-white shadow-sm overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50/50">
+          <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
             {canCreateList && <TableHead className="w-[40px] px-2"></TableHead>}
-            <TableHead>Modelo</TableHead>
-            <TableHead>RAM</TableHead>
-            <TableHead>Memória</TableHead>
-            <TableHead>Cor</TableHead>
-            <TableHead>Condição</TableHead>
-            <TableHead>Bateria</TableHead>
-            <TableHead>Fornecedor</TableHead>
-            <TableHead>Telefone</TableHead>
-            <TableHead className="w-[50px] text-center">Zap</TableHead>
-            <TableHead className="text-right">Valor</TableHead>
+            <TableHead className="h-10 py-2">Modelo</TableHead>
+            <TableHead className="h-10 py-2">RAM</TableHead>
+            <TableHead className="h-10 py-2">Memória</TableHead>
+            <TableHead className="h-10 py-2">Cor</TableHead>
+            <TableHead className="h-10 py-2">Condição</TableHead>
+            <TableHead className="h-10 py-2">Bateria</TableHead>
+            <TableHead className="h-10 py-2">Fornecedor</TableHead>
+            <TableHead className="h-10 py-2">Telefone</TableHead>
+            <TableHead className="h-10 py-2 w-[50px] text-center">
+              Zap
+            </TableHead>
+            <TableHead className="h-10 py-2 text-right">Valor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -71,7 +73,7 @@ export function ProductTable({
                 )}
               >
                 {canCreateList && (
-                  <TableCell className="px-2">
+                  <TableCell className="px-2 py-2">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggleProductSelection(product.id)}
@@ -79,24 +81,28 @@ export function ProductTable({
                     />
                   </TableCell>
                 )}
-                <TableCell className="font-medium">
+                <TableCell className="font-medium py-2">
                   <div className="flex flex-col">
-                    <span>{product.modelo}</span>
+                    <span className="text-sm">{product.modelo}</span>
                     {isLowestPrice && (
-                      <span className="text-[10px] text-emerald-600 font-bold">
+                      <span className="text-[9px] text-emerald-600 font-bold leading-none mt-0.5">
                         ★ Melhor Preço
                       </span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>{product.ram || '-'}</TableCell>
-                <TableCell>{product.memoria}</TableCell>
-                <TableCell>{product.cor}</TableCell>
-                <TableCell>
+                <TableCell className="py-2 text-xs">
+                  {product.ram || '-'}
+                </TableCell>
+                <TableCell className="py-2 text-xs">
+                  {product.memoria}
+                </TableCell>
+                <TableCell className="py-2 text-xs">{product.cor}</TableCell>
+                <TableCell className="py-2">
                   <Badge
                     variant="outline"
                     className={cn(
-                      'text-xs font-normal',
+                      'text-[10px] px-1.5 py-0 font-normal h-5',
                       product.estado === 'Novo'
                         ? 'bg-green-50 text-green-700 border-green-200'
                         : 'bg-amber-50 text-amber-700 border-amber-200',
@@ -105,37 +111,39 @@ export function ProductTable({
                     {product.estado}
                   </Badge>
                 </TableCell>
-                <TableCell>{product.bateria || '-'}</TableCell>
-                <TableCell className="text-gray-600 font-medium">
+                <TableCell className="py-2 text-xs">
+                  {product.bateria || '-'}
+                </TableCell>
+                <TableCell className="text-gray-600 font-medium py-2 text-xs">
                   {product.fornecedor || '-'}
                 </TableCell>
-                <TableCell className="text-gray-600 text-sm whitespace-nowrap">
+                <TableCell className="text-gray-600 text-xs whitespace-nowrap py-2">
                   {product.telefone || '-'}
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="text-center py-2">
                   {product.link_whatsapp || product.telefone ? (
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full"
+                      className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full"
                       onClick={() =>
                         onWhatsAppClick(product.link_whatsapp, product.telefone)
                       }
                       title="Abrir WhatsApp"
                     >
-                      <MessageCircle className="w-4 h-4" />
+                      <MessageCircle className="w-3.5 h-3.5" />
                     </Button>
                   ) : (
                     <span className="text-gray-300">-</span>
                   )}
                 </TableCell>
-                <TableCell className="text-right font-bold text-slate-900">
+                <TableCell className="text-right font-bold text-slate-900 py-2 text-sm">
                   <div
                     className={cn(
                       isLowestPrice &&
-                        'text-emerald-700 scale-110 origin-right transition-transform',
+                        'text-emerald-700 scale-105 origin-right transition-transform',
                       product.valor === null &&
-                        'text-sm font-normal text-muted-foreground',
+                        'text-xs font-normal text-muted-foreground',
                     )}
                   >
                     {formatPrice(product.valor)}

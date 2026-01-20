@@ -19246,6 +19246,28 @@ var Link$1 = createLucideIcon("link", [["path", {
 	d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
 	key: "19qd67"
 }]]);
+var ListChecks = createLucideIcon("list-checks", [
+	["path", {
+		d: "M13 5h8",
+		key: "a7qcls"
+	}],
+	["path", {
+		d: "M13 12h8",
+		key: "h98zly"
+	}],
+	["path", {
+		d: "M13 19h8",
+		key: "c3s6r1"
+	}],
+	["path", {
+		d: "m3 17 2 2 4-4",
+		key: "1jhpwq"
+	}],
+	["path", {
+		d: "m3 7 2 2 4-4",
+		key: "1obspn"
+	}]
+]);
 var LoaderCircle = createLucideIcon("loader-circle", [["path", {
 	d: "M21 12a9 9 0 1 1-6.219-8.56",
 	key: "13zald"
@@ -36719,23 +36741,47 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "rounded-md border bg-white shadow-sm overflow-hidden",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-			className: "bg-gray-50/50",
+			className: "bg-gray-50/50 hover:bg-gray-50/50",
 			children: [
 				canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { className: "w-[40px] px-2" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "RAM" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Memória" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cor" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Condição" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Bateria" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Fornecedor" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Telefone" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-					className: "w-[50px] text-center",
+					className: "h-10 py-2",
+					children: "Modelo"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "RAM"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Memória"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Cor"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Condição"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Bateria"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Fornecedor"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2",
+					children: "Telefone"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "h-10 py-2 w-[50px] text-center",
 					children: "Zap"
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-					className: "text-right",
+					className: "h-10 py-2 text-right",
 					children: "Valor"
 				})
 			]
@@ -36746,7 +36792,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 				className: cn("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
 				children: [
 					canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "px-2",
+						className: "px-2 py-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
 							checked: isSelected,
 							onCheckedChange: () => toggleProductSelection(product.id),
@@ -36754,50 +36800,68 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 						})
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "font-medium",
+						className: "font-medium py-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex flex-col",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: product.modelo }), isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "text-[10px] text-emerald-600 font-bold",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-sm",
+								children: product.modelo
+							}), isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-[9px] text-emerald-600 font-bold leading-none mt-0.5",
 								children: "★ Melhor Preço"
 							})]
 						})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: product.ram || "-" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: product.memoria }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: product.cor }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-						variant: "outline",
-						className: cn("text-xs font-normal", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
-						children: product.estado
-					}) }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: product.bateria || "-" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "text-gray-600 font-medium",
+						className: "py-2 text-xs",
+						children: product.ram || "-"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+						className: "py-2 text-xs",
+						children: product.memoria
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+						className: "py-2 text-xs",
+						children: product.cor
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+						className: "py-2",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+							variant: "outline",
+							className: cn("text-[10px] px-1.5 py-0 font-normal h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
+							children: product.estado
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+						className: "py-2 text-xs",
+						children: product.bateria || "-"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+						className: "text-gray-600 font-medium py-2 text-xs",
 						children: product.fornecedor || "-"
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "text-gray-600 text-sm whitespace-nowrap",
+						className: "text-gray-600 text-xs whitespace-nowrap py-2",
 						children: product.telefone || "-"
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "text-center",
+						className: "text-center py-2",
 						children: product.link_whatsapp || product.telefone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							size: "icon",
 							variant: "ghost",
-							className: "h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full",
+							className: "h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full",
 							onClick: () => onWhatsAppClick(product.link_whatsapp, product.telefone),
 							title: "Abrir WhatsApp",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { className: "w-4 h-4" })
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { className: "w-3.5 h-3.5" })
 						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "text-gray-300",
 							children: "-"
 						})
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "text-right font-bold text-slate-900",
+						className: "text-right font-bold text-slate-900 py-2 text-sm",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: cn(isLowestPrice && "text-emerald-700 scale-110 origin-right transition-transform", product.valor === null && "text-sm font-normal text-muted-foreground"),
+							className: cn(isLowestPrice && "text-emerald-700 scale-105 origin-right transition-transform", product.valor === null && "text-xs font-normal text-muted-foreground"),
 							children: formatPrice(product.valor)
 						})
 					})
@@ -36931,9 +36995,9 @@ function ProductList({ products, isLoading = false }) {
 		className: "rounded-md border bg-white shadow-sm overflow-hidden p-4 space-y-4",
 		children: Array.from({ length: 10 }).map((_$1, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex items-center space-x-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-12 w-12 rounded-full" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-10 w-10 rounded-full" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "space-y-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-4 w-[250px]" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-4 w-[200px]" })]
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-4 w-[250px]" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-3 w-[200px]" })]
 			})]
 		}, i))
 	});
@@ -37988,53 +38052,54 @@ var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => 
 	...props
 }));
 SelectSeparator.displayName = Separator.displayName;
-function ProductFilters() {
+function ProductFilters({ className }) {
 	const { filters, setFilters, resetFilters, filterOptions } = useProductStore();
 	const handleReset = () => {
 		resetFilters();
 	};
 	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all";
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "flex flex-col gap-4 w-full",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex gap-2",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: filters.dateRange === "today" ? "default" : "outline",
-					size: "sm",
-					onClick: () => setFilters({ dateRange: "today" }),
-					className: "flex-1 sm:flex-none",
-					children: "Hoje"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: filters.dateRange === "yesterday" ? "default" : "outline",
-					size: "sm",
-					onClick: () => setFilters({ dateRange: "yesterday" }),
-					className: "flex-1 sm:flex-none",
-					children: "Ontem"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: filters.dateRange === "all" ? "default" : "outline",
-					size: "sm",
-					onClick: () => setFilters({ dateRange: "all" }),
-					className: "flex-1 sm:flex-none",
-					children: "Todo o banco"
-				})
-			]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-col sm:flex-row gap-2 w-full",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full",
+		className: cn("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center bg-muted/50 p-1 rounded-md shrink-0",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: filters.dateRange === "today" ? "default" : "ghost",
+						size: "sm",
+						onClick: () => setFilters({ dateRange: "today" }),
+						className: "h-7 px-3 text-xs",
+						children: "Hoje"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: filters.dateRange === "yesterday" ? "default" : "ghost",
+						size: "sm",
+						onClick: () => setFilters({ dateRange: "yesterday" }),
+						className: "h-7 px-3 text-xs",
+						children: "Ontem"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: filters.dateRange === "all" ? "default" : "ghost",
+						size: "sm",
+						onClick: () => setFilters({ dateRange: "all" }),
+						className: "h-7 px-3 text-xs",
+						children: "Todos"
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-px h-6 bg-border hidden lg:block mx-1" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-3 lg:flex gap-2 w-full lg:w-auto flex-1",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 						value: filters.ram,
 						onValueChange: (val) => setFilters({ ram: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-							className: "w-full sm:w-[120px]",
+							className: "h-9 w-full lg:w-[100px] text-xs",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "RAM" })
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: "all",
-							children: "Todas RAM"
+							children: "Todas"
 						}), filterOptions.rams.map((r$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: r$1,
 							children: r$1
@@ -38044,11 +38109,11 @@ function ProductFilters() {
 						value: filters.memory,
 						onValueChange: (val) => setFilters({ memory: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-							className: "w-full sm:w-[130px]",
+							className: "h-9 w-full lg:w-[110px] text-xs",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Memória" })
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: "all",
-							children: "Toda Memória"
+							children: "Todas"
 						}), filterOptions.memories.map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: m,
 							children: m
@@ -38058,33 +38123,30 @@ function ProductFilters() {
 						value: filters.color,
 						onValueChange: (val) => setFilters({ color: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-							className: "w-full sm:w-[130px] col-span-2 sm:col-span-1",
+							className: "h-9 w-full lg:w-[110px] text-xs",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Cor" })
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: "all",
-							children: "Todas Cores"
+							children: "Todas"
 						}), filterOptions.colors.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 							value: c,
 							children: c
 						}, c))] })]
 					}),
-					hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 						variant: "ghost",
-						size: "icon",
+						size: "sm",
 						onClick: handleReset,
-						className: "shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex",
+						className: "h-9 px-2 text-muted-foreground hover:text-foreground shrink-0",
 						title: "Limpar filtros",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "lg:hidden ml-2",
+							children: "Limpar"
+						})]
 					})
 				]
-			}), hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-				variant: "secondary",
-				size: "sm",
-				onClick: handleReset,
-				className: "w-full sm:hidden",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-2" }), "Limpar Filtros"]
-			})]
-		})]
+			})
+		]
 	});
 }
 function useDebounce(value, delay) {
@@ -38295,8 +38357,9 @@ var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) =
 }));
 AlertDialogCancel.displayName = Cancel.displayName;
 function DashboardPage() {
+	const navigate = useNavigate();
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, fetchFilterOptions, subscribeToProducts, deleteZeroValueProducts, setFilters, filters } = useProductStore();
+	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, deleteZeroValueProducts, setFilters, filters, draftItems } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
 	(0, import_react.useEffect)(() => {
@@ -38313,10 +38376,12 @@ function DashboardPage() {
 	(0, import_react.useEffect)(() => {
 		fetchProducts();
 		fetchFilterOptions();
+		fetchDraftItems();
 		const unsubscribe = subscribeToProducts();
 		return () => unsubscribe();
 	}, []);
 	const canDelete = currentUser?.canDeleteRecords || false;
+	const canCreateList = currentUser?.canCreateList || false;
 	const handleDeleteZeros = async () => {
 		setIsDeleting(true);
 		try {
@@ -38330,51 +38395,72 @@ function DashboardPage() {
 		}
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "space-y-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b space-y-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col md:flex-row md:items-center md:justify-between gap-4",
+		className: "flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-10",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col md:flex-row md:items-center justify-between gap-3",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex-1 min-w-0",
+					className: "flex items-center gap-3 flex-1",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-						className: "text-2xl font-bold tracking-tight",
+						className: "text-xl font-bold tracking-tight hidden lg:block text-nowrap",
 						children: "Catálogo"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						className: "text-muted-foreground hidden md:block",
-						children: "Gerencie e visualize os produtos disponíveis."
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-col md:flex-row gap-2 w-full items-center",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "relative w-full md:w-56 lg:w-64 shrink-0",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								type: "search",
+								placeholder: "Buscar modelo...",
+								className: "pl-8 h-9 text-sm bg-background w-full",
+								value: searchTerm,
+								onChange: (e) => setSearchTerm(e.target.value)
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "w-full md:w-auto flex-1 overflow-x-auto",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
+						})]
 					})]
-				}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-					asChild: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						variant: "destructive",
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2 justify-end shrink-0",
+					children: [canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 						size: "sm",
-						className: "whitespace-nowrap w-full md:w-auto",
-						title: "Deletar produtos com valor menor ou igual a R$ 0,00",
-						disabled: isDeleting,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Deletar Zerados"]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-					onClick: handleDeleteZeros,
-					className: "bg-destructive hover:bg-destructive/90",
-					children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
-				})] })] })] })]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col gap-3",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "relative w-full",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-						type: "search",
-						placeholder: "Buscar por modelo (ex: iPhone 13)...",
-						className: "pl-8 w-full bg-background h-10",
-						value: searchTerm,
-						onChange: (e) => setSearchTerm(e.target.value)
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})]
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
-			products,
-			isLoading
+						onClick: () => navigate("/generator"),
+						className: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListChecks, { className: "w-4 h-4 mr-2" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "hidden sm:inline",
+								children: "Gerar Lista"
+							}),
+							draftItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "ml-1.5 bg-white/20 px-1.5 py-0.5 rounded text-xs font-semibold",
+								children: draftItems.length
+							})
+						]
+					}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "destructive",
+							size: "icon",
+							className: "h-9 w-9",
+							title: "Deletar Zerados",
+							disabled: isDeleting,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						onClick: handleDeleteZeros,
+						className: "bg-destructive hover:bg-destructive/90",
+						children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
+					})] })] })] })]
+				})]
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "flex-1 min-h-0 overflow-y-auto p-1",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
+				products,
+				isLoading
+			})
 		})]
 	});
 }
@@ -43135,4 +43221,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Uiyar7eT.js.map
+//# sourceMappingURL=index-WoAbGDXu.js.map

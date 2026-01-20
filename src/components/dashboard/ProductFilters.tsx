@@ -10,7 +10,11 @@ import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function ProductFilters() {
+interface ProductFiltersProps {
+  className?: string
+}
+
+export function ProductFilters({ className }: ProductFiltersProps) {
   const { filters, setFilters, resetFilters, filterOptions } = useProductStore()
 
   const handleReset = () => {
@@ -24,110 +28,105 @@ export function ProductFilters() {
     filters.dateRange !== 'all'
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      {/* Date Toggle Filters */}
-      <div className="flex gap-2">
+    <div
+      className={cn(
+        'flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center',
+        className,
+      )}
+    >
+      {/* Date Toggle Filters - Grouped for compactness */}
+      <div className="flex items-center bg-muted/50 p-1 rounded-md shrink-0">
         <Button
-          variant={filters.dateRange === 'today' ? 'default' : 'outline'}
+          variant={filters.dateRange === 'today' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setFilters({ dateRange: 'today' })}
-          className="flex-1 sm:flex-none"
+          className="h-7 px-3 text-xs"
         >
           Hoje
         </Button>
         <Button
-          variant={filters.dateRange === 'yesterday' ? 'default' : 'outline'}
+          variant={filters.dateRange === 'yesterday' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setFilters({ dateRange: 'yesterday' })}
-          className="flex-1 sm:flex-none"
+          className="h-7 px-3 text-xs"
         >
           Ontem
         </Button>
         <Button
-          variant={filters.dateRange === 'all' ? 'default' : 'outline'}
+          variant={filters.dateRange === 'all' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setFilters({ dateRange: 'all' })}
-          className="flex-1 sm:flex-none"
+          className="h-7 px-3 text-xs"
         >
-          Todo o banco
+          Todos
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 w-full">
-        <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full">
-          <Select
-            value={filters.ram}
-            onValueChange={(val) => setFilters({ ram: val })}
-          >
-            <SelectTrigger className="w-full sm:w-[120px]">
-              <SelectValue placeholder="RAM" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas RAM</SelectItem>
-              {filterOptions.rams.map((r) => (
-                <SelectItem key={r} value={r}>
-                  {r}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="w-px h-6 bg-border hidden lg:block mx-1" />
 
-          <Select
-            value={filters.memory}
-            onValueChange={(val) => setFilters({ memory: val })}
-          >
-            <SelectTrigger className="w-full sm:w-[130px]">
-              <SelectValue placeholder="Memória" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toda Memória</SelectItem>
-              {filterOptions.memories.map((m) => (
-                <SelectItem key={m} value={m}>
-                  {m}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Selects Row */}
+      <div className="grid grid-cols-3 lg:flex gap-2 w-full lg:w-auto flex-1">
+        <Select
+          value={filters.ram}
+          onValueChange={(val) => setFilters({ ram: val })}
+        >
+          <SelectTrigger className="h-9 w-full lg:w-[100px] text-xs">
+            <SelectValue placeholder="RAM" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas</SelectItem>
+            {filterOptions.rams.map((r) => (
+              <SelectItem key={r} value={r}>
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select
-            value={filters.color}
-            onValueChange={(val) => setFilters({ color: val })}
-          >
-            <SelectTrigger className="w-full sm:w-[130px] col-span-2 sm:col-span-1">
-              <SelectValue placeholder="Cor" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas Cores</SelectItem>
-              {filterOptions.colors.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Select
+          value={filters.memory}
+          onValueChange={(val) => setFilters({ memory: val })}
+        >
+          <SelectTrigger className="h-9 w-full lg:w-[110px] text-xs">
+            <SelectValue placeholder="Memória" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas</SelectItem>
+            {filterOptions.memories.map((m) => (
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          {hasFilters && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReset}
-              className="shrink-0 text-muted-foreground hover:text-foreground hidden sm:flex"
-              title="Limpar filtros"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
+        <Select
+          value={filters.color}
+          onValueChange={(val) => setFilters({ color: val })}
+        >
+          <SelectTrigger className="h-9 w-full lg:w-[110px] text-xs">
+            <SelectValue placeholder="Cor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas</SelectItem>
+            {filterOptions.colors.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {hasFilters && (
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={handleReset}
-            className="w-full sm:hidden"
+            className="h-9 px-2 text-muted-foreground hover:text-foreground shrink-0"
+            title="Limpar filtros"
           >
-            <X className="w-4 h-4 mr-2" />
-            Limpar Filtros
+            <X className="w-4 h-4" />
+            <span className="lg:hidden ml-2">Limpar</span>
           </Button>
         )}
       </div>

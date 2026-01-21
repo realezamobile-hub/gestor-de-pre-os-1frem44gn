@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { DraftItem } from '@/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,6 +10,9 @@ import {
   Building2,
   Phone,
   ExternalLink,
+  Bold,
+  Italic,
+  Smile,
 } from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import {
@@ -17,7 +20,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { Badge } from '@/components/ui/badge'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface DraftItemCardProps {
   item: DraftItem
@@ -40,9 +47,11 @@ export function DraftItemCard({
   const [isSaving, setIsSaving] = useState(false)
   const [isRemoving, setIsRemoving] = useState(false)
 
+  const modelInputRef = useRef<HTMLInputElement>(null)
+  const detailsInputRef = useRef<HTMLInputElement>(null)
+
   // Sync state with props
   useEffect(() => {
-    // Model: Prefer custom_model, fallback to constructed model
     if (item.custom_model) {
       setModel(item.custom_model)
     } else if (item.product) {
@@ -73,7 +82,6 @@ export function DraftItemCard({
     const currentPrice = price ? parseFloat(price) : null
     const originalPrice = item.custom_price ?? item.product?.valor
 
-    // Construct default for comparison
     const defaultModel = item.product
       ? [
           item.product.modelo,
@@ -85,7 +93,6 @@ export function DraftItemCard({
           .join(' ')
       : ''
 
-    // Compare with current props to avoid unnecessary saves
     const hasChanges =
       model !== (item.custom_model || defaultModel) ||
       details !== (item.custom_details || '') ||
@@ -109,6 +116,98 @@ export function DraftItemCard({
     await onRemove(item.id)
     setIsRemoving(false)
   }
+
+  const insertFormat = (
+    ref: React.RefObject<HTMLInputElement>,
+    value: string,
+    setValue: (v: string) => void,
+    char: string,
+  ) => {
+    const el = ref.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+
+    if (start === null || end === null) return
+
+    const selected = value.substring(start, end)
+    const before = value.substring(0, start)
+    const after = value.substring(end)
+
+    const newValue = `${before}${char}${selected}${char}${after}`
+    setValue(newValue)
+
+    // Wait for state update then restore focus/selection
+    setTimeout(() => {
+      el.focus()
+      el.setSelectionRange(start + char.length, end + char.length)
+    }, 0)
+  }
+
+  const FormatToolbar = ({
+    targetRef,
+    value,
+    setValue,
+  }: {
+    targetRef: React.RefObject<HTMLInputElement>
+    value: string
+    setValue: (v: string) => void
+  }) => (
+    <div className="absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 hover:bg-slate-200"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              insertFormat(targetRef, value, setValue, '*')
+            }}
+          >
+            <Bold className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Negrito (*texto*)</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 hover:bg-slate-200"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              insertFormat(targetRef, value, setValue, '_')
+            }}
+          >
+            <Italic className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Itálico (_texto_)</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 hover:bg-slate-200 text-amber-500"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              targetRef.current?.focus()
+              // Try to trigger native emoji picker instructions or basic insert
+            }}
+          >
+            <Smile className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          Use Win+. ou Cmd+Ctrl+Space para Emojis
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  )
 
   const listId = `groups-list-${item.id}`
 
@@ -135,11 +234,19 @@ export function DraftItemCard({
         </div>
 
         {/* Model (Description) - Col 6 */}
-        <div className="col-span-12 sm:col-span-6 space-y-1">
-          <Label className="text-xs text-muted-foreground">
-            Descrição (Modelo + Specs)
-          </Label>
+        <div className="col-span-12 sm:col-span-6 space-y-1 relative group/input">
+          <div className="flex justify-between items-center">
+            <Label className="text-xs text-muted-foreground">
+              Descrição (Modelo + Specs)
+            </Label>
+            <FormatToolbar
+              targetRef={modelInputRef}
+              value={model}
+              setValue={setModel}
+            />
+          </div>
           <Input
+            ref={modelInputRef}
             value={model}
             onChange={(e) => setModel(e.target.value)}
             onBlur={handleBlur}
@@ -202,8 +309,14 @@ export function DraftItemCard({
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="pt-2">
+          <CollapsibleContent className="pt-2 relative group/details">
+            <FormatToolbar
+              targetRef={detailsInputRef}
+              value={details}
+              setValue={setDetails}
+            />
             <Input
+              ref={detailsInputRef}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               onBlur={handleBlur}

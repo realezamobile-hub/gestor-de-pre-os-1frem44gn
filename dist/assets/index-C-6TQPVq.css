@@ -606,6 +606,9 @@ section[aria-label='Notifications alt+T'] {
 .-top-12{
   top: -3rem;
 }
+.-top-6{
+  top: -1.5rem;
+}
 .bottom-0{
   bottom: 0px;
 }
@@ -641,6 +644,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .right-2{
   right: 0.5rem;
+}
+.right-2\.5{
+  right: 0.625rem;
 }
 .right-3{
   right: 0.75rem;
@@ -934,8 +940,8 @@ section[aria-label='Notifications alt+T'] {
 .h-\[600px\]{
   height: 600px;
 }
-.h-\[calc\(100vh-10rem\)\]{
-  height: calc(100vh - 10rem);
+.h-\[calc\(100vh-12rem\)\]{
+  height: calc(100vh - 12rem);
 }
 .h-\[calc\(100vh-3\.5rem\)\]{
   height: calc(100vh - 3.5rem);
@@ -1883,6 +1889,9 @@ section[aria-label='Notifications alt+T'] {
 .bg-white\/80{
   background-color: rgb(255 255 255 / 0.8);
 }
+.bg-white\/90{
+  background-color: rgb(255 255 255 / 0.9);
+}
 .bg-yellow-500{
   --tw-bg-opacity: 1;
   background-color: rgb(234 179 8 / var(--tw-bg-opacity, 1));
@@ -2055,6 +2064,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .pl-8{
   padding-left: 2rem;
+}
+.pl-9{
+  padding-left: 2.25rem;
 }
 .pr-1{
   padding-right: 0.25rem;
@@ -2399,6 +2411,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .opacity-100{
   opacity: 1;
+}
+.opacity-20{
+  opacity: 0.2;
 }
 .opacity-50{
   opacity: 0.5;
@@ -2901,6 +2916,10 @@ section[aria-label='Notifications alt+T'] {
 .hover\:bg-slate-100\/50:hover{
   background-color: rgb(241 245 249 / 0.5);
 }
+.hover\:bg-slate-200:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1));
+}
 .hover\:bg-slate-50:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
@@ -3067,6 +3086,9 @@ section[aria-label='Notifications alt+T'] {
   opacity: 0.5;
 }
 .group\/menu-item:focus-within .group-focus-within\/menu-item\:opacity-100{
+  opacity: 1;
+}
+.group:focus-within .group-focus-within\:opacity-100{
   opacity: 1;
 }
 .group:hover .group-hover\:scale-110{

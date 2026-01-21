@@ -18911,6 +18911,10 @@ var Battery = createLucideIcon("battery", [["path", {
 	rx: "2",
 	key: "13zb55"
 }]]);
+var Bold = createLucideIcon("bold", [["path", {
+	d: "M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8",
+	key: "mg9rjx"
+}]]);
 var Building2 = createLucideIcon("building-2", [
 	["path", {
 		d: "M10 12h4",
@@ -19256,6 +19260,29 @@ var History = createLucideIcon("history", [
 		key: "1fdv2h"
 	}]
 ]);
+var Italic = createLucideIcon("italic", [
+	["line", {
+		x1: "19",
+		x2: "10",
+		y1: "4",
+		y2: "4",
+		key: "15jd3p"
+	}],
+	["line", {
+		x1: "14",
+		x2: "5",
+		y1: "20",
+		y2: "20",
+		key: "bu0au3"
+	}],
+	["line", {
+		x1: "15",
+		x2: "9",
+		y1: "4",
+		y2: "20",
+		key: "uljnxc"
+	}]
+]);
 var LayoutDashboard = createLucideIcon("layout-dashboard", [
 	["rect", {
 		width: "7",
@@ -19565,6 +19592,32 @@ var Smartphone = createLucideIcon("smartphone", [["rect", {
 	d: "M12 18h.01",
 	key: "mhygvu"
 }]]);
+var Smile = createLucideIcon("smile", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M8 14s1.5 2 4 2 4-2 4-2",
+		key: "1y1vjs"
+	}],
+	["line", {
+		x1: "9",
+		x2: "9.01",
+		y1: "9",
+		y2: "9",
+		key: "yxxnd0"
+	}],
+	["line", {
+		x1: "15",
+		x2: "15.01",
+		y1: "9",
+		y2: "9",
+		key: "1p4y9e"
+	}]
+]);
 var StickyNote = createLucideIcon("sticky-note", [["path", {
 	d: "M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z",
 	key: "1dfntj"
@@ -24629,9 +24682,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
-			var instRef = useRef(null);
+			var instRef = useRef$2(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -39055,6 +39108,8 @@ var Textarea = import_react.forwardRef(({ className, ...props }, ref) => {
 });
 Textarea.displayName = "Textarea";
 function GeneratorConfig({ config, onChange, onApplyMarkup }) {
+	const headerRef = (0, import_react.useRef)(null);
+	const footerRef = (0, import_react.useRef)(null);
 	const handleChange = (field, value) => {
 		onChange({
 			...config,
@@ -39065,6 +39120,62 @@ function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 		if (config.markup < 0) return;
 		onApplyMarkup(config.markup);
 	};
+	const insertFormat = (ref, field, char) => {
+		const el = ref.current;
+		if (!el) return;
+		const start = el.selectionStart;
+		const end = el.selectionEnd;
+		const value = el.value;
+		if (start === null || end === null) return;
+		const selected = value.substring(start, end);
+		handleChange(field, `${value.substring(0, start)}${char}${selected}${char}${value.substring(end)}`);
+		setTimeout(() => {
+			el.focus();
+			el.setSelectionRange(start + char.length, end + char.length);
+		}, 0);
+	};
+	const FormatToolbar = ({ targetRef, field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex items-center gap-1 mb-1",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "sm",
+					className: "h-6 w-6 p-0 hover:bg-slate-200",
+					onMouseDown: (e) => {
+						e.preventDefault();
+						insertFormat(targetRef, field, "*");
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Bold, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Negrito" })] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "sm",
+					className: "h-6 w-6 p-0 hover:bg-slate-200",
+					onMouseDown: (e) => {
+						e.preventDefault();
+						insertFormat(targetRef, field, "_");
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Italic, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Itálico" })] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "sm",
+					className: "h-6 w-6 p-0 hover:bg-slate-200 text-amber-500",
+					onMouseDown: (e) => e.preventDefault(),
+					onClick: () => targetRef.current?.focus(),
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Use Win+. para Emojis" })] })
+		]
+	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
 		children: [
@@ -39077,16 +39188,30 @@ function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 				className: "space-y-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cabeçalho" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+					className: "space-y-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex justify-between items-center",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Cabeçalho" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormatToolbar, {
+							targetRef: headerRef,
+							field: "header"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+						ref: headerRef,
 						placeholder: "Ex: 🔥 OFERTAS DO DIA 🔥",
 						value: config.header,
 						onChange: (e) => handleChange("header", e.target.value),
 						className: "min-h-[80px]"
 					})]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Rodapé" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+					className: "space-y-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex justify-between items-center",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Rodapé" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormatToolbar, {
+							targetRef: footerRef,
+							field: "footer"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Textarea, {
+						ref: footerRef,
 						placeholder: "Ex: Preços sujeitos a alteração...",
 						value: config.footer,
 						onChange: (e) => handleChange("footer", e.target.value),
@@ -40239,6 +40364,8 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 	const [showDetails, setShowDetails] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	const [isRemoving, setIsRemoving] = (0, import_react.useState)(false);
+	const modelInputRef = (0, import_react.useRef)(null);
+	const detailsInputRef = (0, import_react.useRef)(null);
 	(0, import_react.useEffect)(() => {
 		if (item.custom_model) setModel(item.custom_model);
 		else if (item.product) setModel([
@@ -40279,6 +40406,72 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 		await onRemove(item.id);
 		setIsRemoving(false);
 	};
+	const insertFormat = (ref, value, setValue, char) => {
+		const el = ref.current;
+		if (!el) return;
+		const start = el.selectionStart;
+		const end = el.selectionEnd;
+		if (start === null || end === null) return;
+		const selected = value.substring(start, end);
+		setValue(`${value.substring(0, start)}${char}${selected}${char}${value.substring(end)}`);
+		setTimeout(() => {
+			el.focus();
+			el.setSelectionRange(start + char.length, end + char.length);
+		}, 0);
+	};
+	const FormatToolbar = ({ targetRef, value, setValue }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "icon",
+					className: "h-5 w-5 hover:bg-slate-200",
+					onMouseDown: (e) => {
+						e.preventDefault();
+						insertFormat(targetRef, value, setValue, "*");
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Bold, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, {
+				side: "top",
+				children: "Negrito (*texto*)"
+			})] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "icon",
+					className: "h-5 w-5 hover:bg-slate-200",
+					onMouseDown: (e) => {
+						e.preventDefault();
+						insertFormat(targetRef, value, setValue, "_");
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Italic, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, {
+				side: "top",
+				children: "Itálico (_texto_)"
+			})] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "icon",
+					className: "h-5 w-5 hover:bg-slate-200 text-amber-500",
+					onMouseDown: (e) => e.preventDefault(),
+					onClick: () => {
+						targetRef.current?.focus();
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-3 h-3" })
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, {
+				side: "top",
+				children: "Use Win+. ou Cmd+Ctrl+Space para Emojis"
+			})] })
+		]
+	});
 	const listId = `groups-list-${item.id}`;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "group relative rounded-lg border bg-card p-3 shadow-sm transition-all hover:shadow-md",
@@ -40308,11 +40501,19 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 						]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "col-span-12 sm:col-span-6 space-y-1",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-							className: "text-xs text-muted-foreground",
-							children: "Descrição (Modelo + Specs)"
+						className: "col-span-12 sm:col-span-6 space-y-1 relative group/input",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex justify-between items-center",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								className: "text-xs text-muted-foreground",
+								children: "Descrição (Modelo + Specs)"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormatToolbar, {
+								targetRef: modelInputRef,
+								value: model,
+								setValue: setModel
+							})]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							ref: modelInputRef,
 							value: model,
 							onChange: (e) => setModel(e.target.value),
 							onBlur: handleBlur,
@@ -40370,15 +40571,20 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Detalhes" : "Adicionar Detalhes"]
 							})
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContent, {
-						className: "pt-2",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CollapsibleContent, {
+						className: "pt-2 relative group/details",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormatToolbar, {
+							targetRef: detailsInputRef,
+							value: details,
+							setValue: setDetails
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							ref: detailsInputRef,
 							value: details,
 							onChange: (e) => setDetails(e.target.value),
 							onBlur: handleBlur,
 							className: "h-8 text-xs text-muted-foreground",
 							placeholder: "Detalhes adicionais (aparecem ao lado do modelo)"
-						})
+						})]
 					})]
 				}), item.product && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground ml-auto bg-slate-50 px-2 py-1 rounded border",
@@ -40971,6 +41177,7 @@ DialogDescription.displayName = Description.displayName;
 function GeneratorHistory() {
 	const { generatedLists, deleteGeneratedList } = useProductStore();
 	const [selectedList, setSelectedList] = (0, import_react.useState)(null);
+	const [searchTerm, setSearchTerm] = (0, import_react.useState)("");
 	const handleCopy = (content) => {
 		navigator.clipboard.writeText(content);
 		toast.success("Conteúdo copiado!");
@@ -40979,6 +41186,12 @@ function GeneratorHistory() {
 		e.stopPropagation();
 		if (confirm("Tem certeza que deseja excluir este item do histórico?")) await deleteGeneratedList(id);
 	};
+	const filteredLists = generatedLists.filter((list) => {
+		const term = searchTerm.toLowerCase();
+		const titleMatch = list.title?.toLowerCase().includes(term);
+		const contentMatch = list.content?.toLowerCase().includes(term);
+		return !term || titleMatch || contentMatch;
+	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTrigger, {
 		asChild: true,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
@@ -40988,13 +41201,33 @@ function GeneratorHistory() {
 		})
 	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetContent, {
 		className: "w-[400px] sm:w-[540px]",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTitle, { children: "Histórico de Listas" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetDescription, { children: "Acesse as listas geradas anteriormente e seus dados originais." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "mt-6 h-[calc(100vh-10rem)]",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetHeader, { children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTitle, { children: "Histórico de Listas" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetDescription, { children: "Acesse as listas geradas anteriormente." }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative mt-2",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						placeholder: "Buscar por título ou conteúdo...",
+						className: "pl-9 pr-8",
+						value: searchTerm,
+						onChange: (e) => setSearchTerm(e.target.value)
+					}),
+					searchTerm && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						onClick: () => setSearchTerm(""),
+						className: "absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+					})
+				]
+			})
+		] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "mt-6 h-[calc(100vh-12rem)]",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
 				className: "h-full",
-				children: generatedLists.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "text-center text-muted-foreground py-10",
-					children: "Nenhuma lista gerada ainda."
+				children: filteredLists.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "text-center text-muted-foreground py-10 flex flex-col items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-8 h-8 opacity-20" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: searchTerm ? "Nenhuma lista encontrada para a busca." : "Nenhuma lista gerada ainda." })]
 				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Tipo" }),
@@ -41002,7 +41235,7 @@ function GeneratorHistory() {
 						className: "text-right",
 						children: "Ações"
 					})
-				] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: generatedLists.map((list) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
+				] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: filteredLists.map((list) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
 					className: "cursor-pointer hover:bg-muted/50",
 					onClick: () => setSelectedList(list),
 					children: [
@@ -43712,4 +43945,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CAp2eEiu.js.map
+//# sourceMappingURL=index-CC9lMBIJ.js.map

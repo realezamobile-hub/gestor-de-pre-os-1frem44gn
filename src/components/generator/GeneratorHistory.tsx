@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -16,13 +17,13 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { History, Trash2, Copy, Eye, Calendar, Package } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { History, Trash2, Copy, Eye, Package, Search, X } from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { GeneratedList } from '@/types'
-import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ import {
 export function GeneratorHistory() {
   const { generatedLists, deleteGeneratedList } = useProductStore()
   const [selectedList, setSelectedList] = useState<GeneratedList | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content)
@@ -45,6 +47,13 @@ export function GeneratorHistory() {
       await deleteGeneratedList(id)
     }
   }
+
+  const filteredLists = generatedLists.filter((list) => {
+    const term = searchTerm.toLowerCase()
+    const titleMatch = list.title?.toLowerCase().includes(term)
+    const contentMatch = list.content?.toLowerCase().includes(term)
+    return !term || titleMatch || contentMatch
+  })
 
   return (
     <>
@@ -59,14 +68,36 @@ export function GeneratorHistory() {
           <SheetHeader>
             <SheetTitle>Histórico de Listas</SheetTitle>
             <SheetDescription>
-              Acesse as listas geradas anteriormente e seus dados originais.
+              Acesse as listas geradas anteriormente.
             </SheetDescription>
+            <div className="relative mt-2">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por título ou conteúdo..."
+                className="pl-9 pr-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </SheetHeader>
-          <div className="mt-6 h-[calc(100vh-10rem)]">
+          <div className="mt-6 h-[calc(100vh-12rem)]">
             <ScrollArea className="h-full">
-              {generatedLists.length === 0 ? (
-                <div className="text-center text-muted-foreground py-10">
-                  Nenhuma lista gerada ainda.
+              {filteredLists.length === 0 ? (
+                <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                  <Search className="w-8 h-8 opacity-20" />
+                  <p>
+                    {searchTerm
+                      ? 'Nenhuma lista encontrada para a busca.'
+                      : 'Nenhuma lista gerada ainda.'}
+                  </p>
                 </div>
               ) : (
                 <Table>
@@ -78,7 +109,7 @@ export function GeneratorHistory() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {generatedLists.map((list) => (
+                    {filteredLists.map((list) => (
                       <TableRow
                         key={list.id}
                         className="cursor-pointer hover:bg-muted/50"

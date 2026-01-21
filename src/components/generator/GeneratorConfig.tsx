@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import {
   Card,
   CardContent,
@@ -15,8 +16,16 @@ import {
   Link as LinkIcon,
   Phone,
   Zap,
+  Bold,
+  Italic,
+  Smile,
 } from 'lucide-react'
 import { GeneratorConfigData } from '@/types'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface GeneratorConfigProps {
   config: GeneratorConfigData
@@ -29,6 +38,9 @@ export function GeneratorConfig({
   onChange,
   onApplyMarkup,
 }: GeneratorConfigProps) {
+  const headerRef = useRef<HTMLTextAreaElement>(null)
+  const footerRef = useRef<HTMLTextAreaElement>(null)
+
   const handleChange = (field: keyof GeneratorConfigData, value: any) => {
     onChange({ ...config, [field]: value })
   }
@@ -37,6 +49,90 @@ export function GeneratorConfig({
     if (config.markup < 0) return
     onApplyMarkup(config.markup)
   }
+
+  const insertFormat = (
+    ref: React.RefObject<HTMLTextAreaElement>,
+    field: keyof GeneratorConfigData,
+    char: string,
+  ) => {
+    const el = ref.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const value = el.value
+
+    if (start === null || end === null) return
+
+    const selected = value.substring(start, end)
+    const before = value.substring(0, start)
+    const after = value.substring(end)
+
+    const newValue = `${before}${char}${selected}${char}${after}`
+    handleChange(field, newValue)
+
+    setTimeout(() => {
+      el.focus()
+      el.setSelectionRange(start + char.length, end + char.length)
+    }, 0)
+  }
+
+  const FormatToolbar = ({
+    targetRef,
+    field,
+  }: {
+    targetRef: React.RefObject<HTMLTextAreaElement>
+    field: keyof GeneratorConfigData
+  }) => (
+    <div className="flex items-center gap-1 mb-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-slate-200"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              insertFormat(targetRef, field, '*')
+            }}
+          >
+            <Bold className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Negrito</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-slate-200"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              insertFormat(targetRef, field, '_')
+            }}
+          >
+            <Italic className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Itálico</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-slate-200 text-amber-500"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => targetRef.current?.focus()}
+          >
+            <Smile className="w-3 h-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Use Win+. para Emojis</TooltipContent>
+      </Tooltip>
+    </div>
+  )
 
   return (
     <div className="grid gap-6">
@@ -51,18 +147,26 @@ export function GeneratorConfig({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Cabeçalho</Label>
+          <div className="space-y-1">
+            <div className="flex justify-between items-center">
+              <Label>Cabeçalho</Label>
+              <FormatToolbar targetRef={headerRef} field="header" />
+            </div>
             <Textarea
+              ref={headerRef}
               placeholder="Ex: 🔥 OFERTAS DO DIA 🔥"
               value={config.header}
               onChange={(e) => handleChange('header', e.target.value)}
               className="min-h-[80px]"
             />
           </div>
-          <div className="space-y-2">
-            <Label>Rodapé</Label>
+          <div className="space-y-1">
+            <div className="flex justify-between items-center">
+              <Label>Rodapé</Label>
+              <FormatToolbar targetRef={footerRef} field="footer" />
+            </div>
             <Textarea
+              ref={footerRef}
               placeholder="Ex: Preços sujeitos a alteração..."
               value={config.footer}
               onChange={(e) => handleChange('footer', e.target.value)}

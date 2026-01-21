@@ -50,6 +50,7 @@ export interface GeneratedList {
   content: string | null
   type: 'supplier' | 'posting' | null
   header_footer_data: GeneratorConfigData | null
+  items_snapshot: DraftItem[] | null
   created_at: string
 }
 

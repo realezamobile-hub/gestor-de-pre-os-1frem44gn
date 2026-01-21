@@ -7,6 +7,7 @@ import {
   DraftItem,
   GeneratorConfigData,
   FilterOptions,
+  GeneratedList,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { startOfDay, endOfDay, subDays } from 'date-fns'
@@ -17,6 +18,7 @@ interface ProductStore {
   monitorItems: PriceMonitorItem[]
   excludedSuppliers: ExcludedSupplier[]
   draftItems: DraftItem[]
+  generatedLists: GeneratedList[]
   isLoading: boolean
   filters: FilterState
   categories: string[]
@@ -46,13 +48,17 @@ interface ProductStore {
   removeFromDraft: (draftId: string) => Promise<void>
   updateDraftItem: (id: string, updates: Partial<DraftItem>) => Promise<void>
   clearDraft: () => Promise<void>
+  applyMarkupToAll: (markup: number) => Promise<void>
 
   // Generated Lists
+  fetchGeneratedLists: () => Promise<void>
+  deleteGeneratedList: (id: string) => Promise<void>
   saveGeneratedList: (
     title: string,
     content: string,
     type: 'supplier' | 'posting',
     config: GeneratorConfigData,
+    itemsSnapshot: DraftItem[],
   ) => Promise<{ success: boolean; error?: any }>
 
   // Legacy/Auto-Generator using Draft
@@ -128,6 +134,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   monitorItems: [],
   excludedSuppliers: [],
   draftItems: [],
+  generatedLists: [],
   isLoading: false,
   filters: INITIAL_FILTERS,
   filterOptions: INITIAL_FILTER_OPTIONS,
@@ -444,7 +451,80 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
   },
 
-  saveGeneratedList: async (title, content, type, config) => {
+  applyMarkupToAll: async (markup) => {
+    const { draftItems } = get()
+    if (draftItems.length === 0) return
+
+    set({ isLoading: true })
+    const updates = draftItems.map((item) => ({
+      id: item.id,
+      user_id: item.user_id,
+      product_id: item.product_id,
+      // Calculate new custom price: Base Price + Markup
+      // Using base price ensures consistency. If user wants cumulative, they can edit individually.
+      custom_price: (item.product?.valor || 0) + markup,
+      // Keep other fields
+      custom_model: item.custom_model,
+      custom_details: item.custom_details,
+      group_name: item.group_name,
+    }))
+
+    // Optimistic
+    const optimisticItems = draftItems.map((item) => ({
+      ...item,
+      custom_price: (item.product?.valor || 0) + markup,
+    }))
+    set({ draftItems: optimisticItems })
+
+    // Bulk update via upsert
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .upsert(updates)
+
+    if (error) {
+      toast.error('Erro ao aplicar aumento global')
+      // Revert needs a fetch
+      await get().fetchDraftItems()
+    } else {
+      toast.success('Aumento aplicado a todos os itens')
+    }
+    set({ isLoading: false })
+  },
+
+  fetchGeneratedLists: async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from('generated_lists')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (!error && data) {
+      set({ generatedLists: data as GeneratedList[] })
+    }
+  },
+
+  deleteGeneratedList: async (id) => {
+    const { error } = await supabase
+      .from('generated_lists')
+      .delete()
+      .eq('id', id)
+
+    if (!error) {
+      set((state) => ({
+        generatedLists: state.generatedLists.filter((l) => l.id !== id),
+      }))
+      toast.success('Lista removida do histórico')
+    } else {
+      toast.error('Erro ao remover lista')
+    }
+  },
+
+  saveGeneratedList: async (title, content, type, config, itemsSnapshot) => {
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -456,11 +536,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       content,
       type,
       header_footer_data: config as any,
+      items_snapshot: itemsSnapshot as any,
     })
 
     if (error) {
       return { success: false, error }
     }
+    await get().fetchGeneratedLists()
     return { success: true }
   },
 

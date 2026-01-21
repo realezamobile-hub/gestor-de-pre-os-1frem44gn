@@ -19173,6 +19173,15 @@ var ExternalLink = createLucideIcon("external-link", [
 		key: "a6xqqp"
 	}]
 ]);
+var Eye = createLucideIcon("eye", [["path", {
+	d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+	key: "1nclc0"
+}], ["circle", {
+	cx: "12",
+	cy: "12",
+	r: "3",
+	key: "1v7zrd"
+}]]);
 var FileText = createLucideIcon("file-text", [
 	["path", {
 		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
@@ -19348,6 +19357,24 @@ var MessageCircle = createLucideIcon("message-circle", [["path", {
 	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
 	key: "1sd12s"
 }]]);
+var Package = createLucideIcon("package", [
+	["path", {
+		d: "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z",
+		key: "1a0edw"
+	}],
+	["path", {
+		d: "M12 22V12",
+		key: "d0xqtd"
+	}],
+	["polyline", {
+		points: "3.29 7 12 12 20.71 7",
+		key: "ousv84"
+	}],
+	["path", {
+		d: "m7.5 4.27 9 5.15",
+		key: "1c824w"
+	}]
+]);
 var Pencil = createLucideIcon("pencil", [["path", {
 	d: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
 	key: "1a8usu"
@@ -19644,6 +19671,10 @@ var X = createLucideIcon("x", [["path", {
 }], ["path", {
 	d: "m6 6 12 12",
 	key: "d8bk6v"
+}]]);
+var Zap = createLucideIcon("zap", [["path", {
+	d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z",
+	key: "1xq2db"
 }]]);
 var CLASS_PART_SEPARATOR = "-";
 var createClassGroupUtils = (config) => {
@@ -24516,7 +24547,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$17({ inst: {
+			cachedValue = useState$18({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24553,7 +24584,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$17 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$18 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -36102,6 +36133,7 @@ const useProductStore = create((set, get$1) => ({
 	monitorItems: [],
 	excludedSuppliers: [],
 	draftItems: [],
+	generatedLists: [],
 	isLoading: false,
 	filters: INITIAL_FILTERS,
 	filterOptions: INITIAL_FILTER_OPTIONS,
@@ -36342,7 +36374,44 @@ const useProductStore = create((set, get$1) => ({
 			toast.success("Lista limpa com sucesso");
 		}
 	},
-	saveGeneratedList: async (title, content, type, config) => {
+	applyMarkupToAll: async (markup) => {
+		const { draftItems } = get$1();
+		if (draftItems.length === 0) return;
+		set({ isLoading: true });
+		const updates = draftItems.map((item) => ({
+			id: item.id,
+			user_id: item.user_id,
+			product_id: item.product_id,
+			custom_price: (item.product?.valor || 0) + markup,
+			custom_model: item.custom_model,
+			custom_details: item.custom_details,
+			group_name: item.group_name
+		}));
+		set({ draftItems: draftItems.map((item) => ({
+			...item,
+			custom_price: (item.product?.valor || 0) + markup
+		})) });
+		const { error } = await supabase.from("whatsapp_draft_items").upsert(updates);
+		if (error) {
+			toast.error("Erro ao aplicar aumento global");
+			await get$1().fetchDraftItems();
+		} else toast.success("Aumento aplicado a todos os itens");
+		set({ isLoading: false });
+	},
+	fetchGeneratedLists: async () => {
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return;
+		const { data, error } = await supabase.from("generated_lists").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+		if (!error && data) set({ generatedLists: data });
+	},
+	deleteGeneratedList: async (id) => {
+		const { error } = await supabase.from("generated_lists").delete().eq("id", id);
+		if (!error) {
+			set((state) => ({ generatedLists: state.generatedLists.filter((l) => l.id !== id) }));
+			toast.success("Lista removida do histórico");
+		} else toast.error("Erro ao remover lista");
+	},
+	saveGeneratedList: async (title, content, type, config, itemsSnapshot) => {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return {
 			success: false,
@@ -36353,12 +36422,14 @@ const useProductStore = create((set, get$1) => ({
 			title,
 			content,
 			type,
-			header_footer_data: config
+			header_footer_data: config,
+			items_snapshot: itemsSnapshot
 		});
 		if (error) return {
 			success: false,
 			error
 		};
+		await get$1().fetchGeneratedLists();
 		return { success: true };
 	},
 	generateListFromFilters: async (date, categories) => {
@@ -38956,12 +39027,16 @@ var Textarea = import_react.forwardRef(({ className, ...props }, ref) => {
 	});
 });
 Textarea.displayName = "Textarea";
-function GeneratorConfig({ config, onChange }) {
+function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 	const handleChange = (field, value) => {
 		onChange({
 			...config,
 			[field]: value
 		});
+	};
+	const handleApply = () => {
+		if (config.markup < 0) return;
+		onApplyMarkup(config.markup);
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
@@ -39035,16 +39110,27 @@ function GeneratorConfig({ config, onChange }) {
 							className: "flex items-center gap-2 text-sm font-semibold",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { className: "w-4 h-4 text-green-600" }), "Aumento Global (R$)"]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							type: "number",
-							min: "0",
-							step: "10",
-							value: config.markup,
-							onChange: (e) => handleChange("markup", Number(e.target.value))
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								type: "number",
+								min: "0",
+								step: "10",
+								value: config.markup,
+								onChange: (e) => handleChange("markup", Number(e.target.value)),
+								className: "flex-1"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "outline",
+								size: "icon",
+								onClick: handleApply,
+								className: "shrink-0",
+								title: "Aplicar este valor a todos os itens",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Zap, { className: "w-4 h-4 text-yellow-600" })
+							})]
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 							className: "text-xs text-muted-foreground",
-							children: "Valor adicionado aos itens que usam preço do sistema (não afeta preços manuais)."
+							children: "Clique no raio para somar este valor ao preço base de todos os itens."
 						})
 					]
 				})
@@ -40318,402 +40404,6 @@ function DraftListGrouped({ items, onRemove, onUpdate }) {
 		})
 	});
 }
-function ListGeneratorPage() {
-	const { draftItems, fetchDraftItems, removeFromDraft, updateDraftItem, clearDraft, fetchCategories, saveGeneratedList } = useProductStore();
-	const { currentUser } = useAuthStore();
-	const [config, setConfig] = (0, import_react.useState)({
-		header: `🔥 *OFERTAS DO DIA - ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}* 🔥\n\n`,
-		footer: "⚠️ _Preços sujeitos a alteração sem aviso prévio._\n📦 _Consulte disponibilidade._",
-		communityLink: "",
-		contactNumber: "",
-		markup: 0
-	});
-	(0, import_react.useEffect)(() => {
-		const savedContact = localStorage.getItem("generator_contactNumber");
-		const savedCommunity = localStorage.getItem("generator_communityLink");
-		const savedMarkup = localStorage.getItem("generator_markup");
-		setConfig((prev) => ({
-			...prev,
-			contactNumber: savedContact || prev.contactNumber,
-			communityLink: savedCommunity || prev.communityLink,
-			markup: savedMarkup ? Number(savedMarkup) : prev.markup
-		}));
-	}, []);
-	(0, import_react.useEffect)(() => {
-		localStorage.setItem("generator_contactNumber", config.contactNumber);
-		localStorage.setItem("generator_communityLink", config.communityLink);
-		localStorage.setItem("generator_markup", config.markup.toString());
-	}, [
-		config.contactNumber,
-		config.communityLink,
-		config.markup
-	]);
-	const [generatedText, setGeneratedText] = (0, import_react.useState)("");
-	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
-	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
-	(0, import_react.useEffect)(() => {
-		fetchCategories();
-		fetchDraftItems();
-	}, []);
-	(0, import_react.useEffect)(() => {
-		if (draftItems.length === 0) setGeneratedText("");
-	}, [draftItems.length]);
-	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "h-full flex flex-col items-center justify-center space-y-4",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-16 h-16 text-gray-300" }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-				className: "text-2xl font-bold text-gray-900",
-				children: "Acesso Negado"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				className: "text-muted-foreground text-center max-w-md",
-				children: "Você não tem permissão para gerar listas de preços."
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-					to: "/",
-					children: "Voltar ao Painel"
-				})
-			})
-		]
-	});
-	const handleGenerate = () => {
-		if (draftItems.length === 0) {
-			setGeneratedText("");
-			return;
-		}
-		const grouped = draftItems.reduce((acc, item) => {
-			const key = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
-			if (!acc[key]) acc[key] = [];
-			acc[key].push(item);
-			return acc;
-		}, {});
-		const sortedKeys = Object.keys(grouped).sort();
-		let text = "";
-		if (isInternal) {
-			text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n`;
-			text += `📅 Data: ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")} \n\n`;
-		} else {
-			text += config.header;
-			if (!config.header.endsWith("\n\n")) text += "\n\n";
-		}
-		sortedKeys.forEach((groupName) => {
-			const items = grouped[groupName];
-			if (items.length === 0) return;
-			text += `*${groupName}*\n`;
-			items.forEach((item) => {
-				let model = item.custom_model;
-				if (!model && item.product) model = [
-					item.product.modelo,
-					item.product.memoria,
-					item.product.ram ? `${item.product.ram} RAM` : null,
-					item.product.cor
-				].filter(Boolean).join(" ");
-				if (!model) model = "Produto sem descrição";
-				if (item.custom_details) model += ` (${item.custom_details})`;
-				let finalPrice = 0;
-				if (isInternal) finalPrice = item.product?.valor ?? item.custom_price ?? 0;
-				else if (item.custom_price !== null && item.custom_price !== void 0) finalPrice = item.custom_price;
-				else finalPrice = (item.product?.valor || 0) + config.markup;
-				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				text += ` - ${model} - ${!isInternal ? "*" : ""}${priceStr}${!isInternal ? "*" : ""}`;
-				if (isInternal && item.product) {
-					text += `\n   ↳ Forn: ${item.product.fornecedor || "N/A"}`;
-					if (item.product.telefone) text += ` | Tel: ${item.product.telefone}`;
-				}
-				text += `\n`;
-			});
-			text += "\n";
-		});
-		if (!isInternal) {
-			if (config.communityLink) text += `\n${config.communityLink}\n`;
-			if (config.contactNumber) {
-				const cleanNumber = config.contactNumber.replace(/\D/g, "");
-				text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`;
-			}
-			text += "\n";
-		}
-		if (!isInternal) {
-			text += config.footer;
-			if (!config.footer.endsWith("\n")) text += "\n";
-		}
-		setGeneratedText(text);
-	};
-	const handleCopy = () => {
-		if (!generatedText) return;
-		navigator.clipboard.writeText(generatedText);
-		toast.success("Lista copiada para a área de transferência!");
-	};
-	const handleSaveList = async () => {
-		if (!generatedText || draftItems.length === 0) return;
-		setIsSaving(true);
-		const result = await saveGeneratedList(isInternal ? "Lista Interna" : "Lista Clientes", generatedText, isInternal ? "supplier" : "posting", config);
-		setIsSaving(false);
-		if (result.success) toast.success("Lista salva no histórico!");
-		else toast.error("Erro ao salvar lista");
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "h-[calc(100vh-8rem)] flex flex-col gap-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-col md:flex-row md:items-center justify-between gap-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex items-center gap-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: "ghost",
-					size: "icon",
-					asChild: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-						to: "/",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-5 h-5" })
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-					className: "text-3xl font-bold tracking-tight text-gray-900",
-					children: "Gerador de Lista WhatsApp"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					className: "text-muted-foreground",
-					children: "Edite seus itens, organize e gere a prévia antes de exportar."
-				})] })]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex gap-2",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "outline",
-					onClick: clearDraft,
-					disabled: draftItems.length === 0,
-					className: "text-destructive hover:bg-destructive/10 hover:text-destructive",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Limpar Lista"]
-				})
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorConfig, {
-						config,
-						onChange: setConfig
-					})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-5 flex flex-col h-full min-h-0",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-						className: "flex-1 flex flex-col min-h-0 border-2 shadow-sm",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
-							className: "bg-gray-50 border-b py-3",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-								className: "text-sm font-medium flex items-center justify-between",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Itens da Lista (Rascunho)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-									className: "text-xs bg-white px-2 py-1 rounded border",
-									children: [draftItems.length, " itens"]
-								})]
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-							className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftListGrouped, {
-								items: draftItems,
-								onRemove: removeFromDraft,
-								onUpdate: updateDraftItem
-							})
-						})]
-					})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-4 h-full",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
-						value: isInternal ? "internal" : "customer",
-						onValueChange: (v) => {
-							setIsInternal(v === "internal");
-							setGeneratedText("");
-						},
-						className: "h-full flex flex-col",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
-							className: "w-full justify-start mb-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-								value: "customer",
-								className: "flex-1",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente"]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-								value: "internal",
-								className: "flex-1",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: "flex-1 relative flex flex-col",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-2",
-										children: [
-											!isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "flex gap-1.5",
-												children: [
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-red-500" }),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-yellow-500" }),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-green-500" })
-												]
-											}),
-											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
-												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
-											})
-										]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-										onClick: handleGenerate,
-										size: "sm",
-										variant: isInternal ? "outline" : "secondary",
-										className: "h-7 text-xs",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévia"]
-									})]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-									className: "p-0 flex-1 overflow-hidden relative group",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-										value: generatedText,
-										readOnly: true,
-										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !generatedText && "opacity-50 italic text-center pt-20"),
-										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévia' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
-									}), generatedText && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "absolute bottom-6 right-6 flex flex-col gap-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-											onClick: handleSaveList,
-											disabled: isSaving,
-											size: "sm",
-											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
-											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar no Histórico"]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-											onClick: handleCopy,
-											size: "sm",
-											variant: "outline",
-											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
-										})]
-									})]
-								})]
-							})
-						})]
-					})
-				})
-			]
-		})]
-	});
-}
-var SWITCH_NAME = "Switch";
-var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
-var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
-var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
-	const [button, setButton] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
-	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
-	const isFormControl = button ? form || !!button.closest("form") : true;
-	const [checked, setChecked] = useControllableState({
-		prop: checkedProp,
-		defaultProp: defaultChecked ?? false,
-		onChange: onCheckedChange,
-		caller: SWITCH_NAME
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
-		scope: __scopeSwitch,
-		checked,
-		disabled,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
-			type: "button",
-			role: "switch",
-			"aria-checked": checked,
-			"aria-required": required,
-			"data-state": getState(checked),
-			"data-disabled": disabled ? "" : void 0,
-			disabled,
-			value,
-			...switchProps,
-			ref: composedRefs,
-			onClick: composeEventHandlers(props.onClick, (event) => {
-				setChecked((prevChecked) => !prevChecked);
-				if (isFormControl) {
-					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
-					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
-				}
-			})
-		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
-			control: button,
-			bubbles: !hasConsumerStoppedPropagationRef.current,
-			name,
-			value,
-			checked,
-			required,
-			disabled,
-			form,
-			style: { transform: "translateX(-100%)" }
-		})]
-	});
-});
-Switch$1.displayName = SWITCH_NAME;
-var THUMB_NAME = "SwitchThumb";
-var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, ...thumbProps } = props;
-	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
-		"data-state": getState(context.checked),
-		"data-disabled": context.disabled ? "" : void 0,
-		...thumbProps,
-		ref: forwardedRef
-	});
-});
-SwitchThumb.displayName = THUMB_NAME;
-var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
-var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(ref, forwardedRef);
-	const prevChecked = usePrevious(checked);
-	const controlSize = useSize(control);
-	import_react.useEffect(() => {
-		const input = ref.current;
-		if (!input) return;
-		const inputProto = window.HTMLInputElement.prototype;
-		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
-		if (prevChecked !== checked && setChecked) {
-			const event = new Event("click", { bubbles });
-			setChecked.call(input, checked);
-			input.dispatchEvent(event);
-		}
-	}, [
-		prevChecked,
-		checked,
-		bubbles
-	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-		type: "checkbox",
-		"aria-hidden": true,
-		defaultChecked: checked,
-		...props,
-		tabIndex: -1,
-		ref: composedRefs,
-		style: {
-			...props.style,
-			...controlSize,
-			position: "absolute",
-			pointerEvents: "none",
-			opacity: 0,
-			margin: 0
-		}
-	});
-});
-SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
-function getState(checked) {
-	return checked ? "checked" : "unchecked";
-}
-var Root = Switch$1;
-var Thumb = SwitchThumb;
-var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
-	...props,
-	ref,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
-}));
-Switch.displayName = Root.displayName;
 var formatDistanceLocale = {
 	lessThanXSeconds: {
 		one: "menos de um segundo",
@@ -41176,6 +40866,597 @@ const ptBR = {
 		firstWeekContainsDate: 1
 	}
 };
+var Dialog = Root$6;
+var DialogPortal = Portal$2;
+var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
+	ref,
+	className: cn("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	...props
+}));
+DialogOverlay.displayName = Overlay.displayName;
+var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
+	ref,
+	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
+	...props,
+	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
+		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			className: "sr-only",
+			children: "Close"
+		})]
+	})]
+})] }));
+DialogContent.displayName = Content$2.displayName;
+var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className),
+	...props
+});
+DialogHeader.displayName = "DialogHeader";
+var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	...props
+});
+DialogFooter.displayName = "DialogFooter";
+var DialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
+	ref,
+	className: cn("text-lg font-semibold leading-none tracking-tight", className),
+	...props
+}));
+DialogTitle.displayName = Title.displayName;
+var DialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
+	ref,
+	className: cn("text-sm text-muted-foreground", className),
+	...props
+}));
+DialogDescription.displayName = Description.displayName;
+function GeneratorHistory() {
+	const { generatedLists, deleteGeneratedList } = useProductStore();
+	const [selectedList, setSelectedList] = (0, import_react.useState)(null);
+	const handleCopy = (content) => {
+		navigator.clipboard.writeText(content);
+		toast.success("Conteúdo copiado!");
+	};
+	const handleDelete = async (id, e) => {
+		e.stopPropagation();
+		if (confirm("Tem certeza que deseja excluir este item do histórico?")) await deleteGeneratedList(id);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTrigger, {
+		asChild: true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+			variant: "outline",
+			className: "gap-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(History, { className: "w-4 h-4" }), "Histórico"]
+		})
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetContent, {
+		className: "w-[400px] sm:w-[540px]",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTitle, { children: "Histórico de Listas" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetDescription, { children: "Acesse as listas geradas anteriormente e seus dados originais." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "mt-6 h-[calc(100vh-10rem)]",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+				className: "h-full",
+				children: generatedLists.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "text-center text-muted-foreground py-10",
+					children: "Nenhuma lista gerada ainda."
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Tipo" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+						className: "text-right",
+						children: "Ações"
+					})
+				] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: generatedLists.map((list) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
+					className: "cursor-pointer hover:bg-muted/50",
+					onClick: () => setSelectedList(list),
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-col",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-medium",
+								children: format(new Date(list.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs text-muted-foreground truncate max-w-[150px]",
+								children: list.title || "Sem título"
+							})]
+						}) }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "capitalize text-xs bg-secondary px-2 py-1 rounded",
+							children: list.type === "supplier" ? "Interna" : "Cliente"
+						}) }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+							className: "text-right",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex justify-end gap-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									variant: "ghost",
+									size: "icon",
+									onClick: (e) => {
+										e.stopPropagation();
+										handleCopy(list.content || "");
+									},
+									title: "Copiar Texto",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-3 h-3" })
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									variant: "ghost",
+									size: "icon",
+									className: "text-destructive hover:text-destructive",
+									onClick: (e) => handleDelete(list.id, e),
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-3 h-3" })
+								})]
+							})
+						})
+					]
+				}, list.id)) })] })
+			})
+		})]
+	})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open: !!selectedList,
+		onOpenChange: (open) => !open && setSelectedList(null),
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "max-w-3xl max-h-[80vh] flex flex-col",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
+				className: "flex items-center justify-between",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Detalhes da Lista" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-sm font-normal text-muted-foreground",
+					children: selectedList && format(new Date(selectedList.created_at), "PPP 'às' HH:mm", { locale: ptBR })
+				})]
+			}) }), selectedList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col gap-2 min-h-0",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2 text-sm font-semibold",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4" }), "Visualização do Texto"]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "border rounded-md p-3 bg-muted/30 flex-1 overflow-auto text-xs font-mono whitespace-pre-wrap",
+							children: selectedList.content
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							onClick: () => handleCopy(selectedList.content || ""),
+							variant: "secondary",
+							size: "sm",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-3 h-3 mr-2" }), "Copiar Texto"]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col gap-2 min-h-0",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-2 text-sm font-semibold",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-4 h-4" }),
+							"Itens Originais (",
+							selectedList.items_snapshot?.length || 0,
+							")"
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "border rounded-md bg-white flex-1 overflow-auto",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+							className: "h-8 text-xs",
+							children: "Produto"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+							className: "h-8 text-xs text-right",
+							children: "Preço"
+						})] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: selectedList.items_snapshot?.map((item, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+							className: "py-2 text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "font-medium",
+								children: item.custom_model || item.product?.modelo
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "text-muted-foreground scale-90 origin-left",
+								children: item.group_name
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+							className: "py-2 text-xs text-right font-mono",
+							children: [
+								"R$",
+								" ",
+								item.custom_price?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+							]
+						})] }, idx)) })] })
+					})]
+				})]
+			})]
+		})
+	})] });
+}
+function ListGeneratorPage() {
+	const { draftItems, fetchDraftItems, removeFromDraft, updateDraftItem, clearDraft, fetchCategories, saveGeneratedList, applyMarkupToAll, fetchGeneratedLists } = useProductStore();
+	const { currentUser } = useAuthStore();
+	const [config, setConfig] = (0, import_react.useState)({
+		header: `🔥 *OFERTAS DO DIA - ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}* 🔥\n\n`,
+		footer: "⚠️ _Preços sujeitos a alteração sem aviso prévio._\n📦 _Consulte disponibilidade._",
+		communityLink: "",
+		contactNumber: "",
+		markup: 0
+	});
+	(0, import_react.useEffect)(() => {
+		const savedContact = localStorage.getItem("generator_contactNumber");
+		const savedCommunity = localStorage.getItem("generator_communityLink");
+		const savedMarkup = localStorage.getItem("generator_markup");
+		setConfig((prev) => ({
+			...prev,
+			contactNumber: savedContact || prev.contactNumber,
+			communityLink: savedCommunity || prev.communityLink,
+			markup: savedMarkup ? Number(savedMarkup) : prev.markup
+		}));
+	}, []);
+	(0, import_react.useEffect)(() => {
+		localStorage.setItem("generator_contactNumber", config.contactNumber);
+		localStorage.setItem("generator_communityLink", config.communityLink);
+		localStorage.setItem("generator_markup", config.markup.toString());
+	}, [
+		config.contactNumber,
+		config.communityLink,
+		config.markup
+	]);
+	const [customerText, setCustomerText] = (0, import_react.useState)("");
+	const [internalText, setInternalText] = (0, import_react.useState)("");
+	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
+	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		fetchCategories();
+		fetchDraftItems();
+		fetchGeneratedLists();
+	}, []);
+	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-full flex flex-col items-center justify-center space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-16 h-16 text-gray-300" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				className: "text-2xl font-bold text-gray-900",
+				children: "Acesso Negado"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground text-center max-w-md",
+				children: "Você não tem permissão para gerar listas de preços."
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+					to: "/",
+					children: "Voltar ao Painel"
+				})
+			})
+		]
+	});
+	const generateContent = (internal) => {
+		const grouped = draftItems.reduce((acc, item) => {
+			const key = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
+			if (!acc[key]) acc[key] = [];
+			acc[key].push(item);
+			return acc;
+		}, {});
+		const sortedKeys = Object.keys(grouped).sort();
+		let text = "";
+		if (internal) {
+			text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n`;
+			text += `📅 Data: ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")} \n\n`;
+		} else {
+			text += config.header;
+			if (!config.header.endsWith("\n\n")) text += "\n\n";
+		}
+		sortedKeys.forEach((groupName) => {
+			const items = grouped[groupName];
+			if (items.length === 0) return;
+			text += `*${groupName}*\n`;
+			items.forEach((item) => {
+				let model = item.custom_model;
+				if (!model && item.product) model = [
+					item.product.modelo,
+					item.product.memoria,
+					item.product.ram ? `${item.product.ram} RAM` : null,
+					item.product.cor
+				].filter(Boolean).join(" ");
+				if (!model) model = "Produto sem descrição";
+				if (item.custom_details) model += ` (${item.custom_details})`;
+				let finalPrice = 0;
+				if (internal) finalPrice = item.product?.valor ?? item.custom_price ?? 0;
+				else if (item.custom_price !== null && item.custom_price !== void 0) finalPrice = item.custom_price;
+				else finalPrice = (item.product?.valor || 0) + config.markup;
+				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
+				text += ` - ${model} - ${!internal ? "*" : ""}${priceStr}${!internal ? "*" : ""}`;
+				if (internal && item.product) {
+					text += `\n   ↳ Forn: ${item.product.fornecedor || "N/A"}`;
+					if (item.product.telefone) text += ` | Tel: ${item.product.telefone}`;
+				}
+				text += `\n`;
+			});
+			text += "\n";
+		});
+		if (!internal) {
+			if (config.communityLink) text += `\n${config.communityLink}\n`;
+			if (config.contactNumber) {
+				const cleanNumber = config.contactNumber.replace(/\D/g, "");
+				text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`;
+			}
+			text += "\n";
+			text += config.footer;
+			if (!config.footer.endsWith("\n")) text += "\n";
+		}
+		return text;
+	};
+	const handleGenerate = () => {
+		if (draftItems.length === 0) {
+			setCustomerText("");
+			setInternalText("");
+			return;
+		}
+		setCustomerText(generateContent(false));
+		setInternalText(generateContent(true));
+	};
+	const handleCopy = () => {
+		const textToCopy = isInternal ? internalText : customerText;
+		if (!textToCopy) return;
+		navigator.clipboard.writeText(textToCopy);
+		toast.success("Lista copiada para a área de transferência!");
+	};
+	const handleSaveList = async () => {
+		const textToSave = isInternal ? internalText : customerText;
+		if (!textToSave || draftItems.length === 0) return;
+		setIsSaving(true);
+		const result = await saveGeneratedList(isInternal ? "Lista Interna" : "Lista Clientes", textToSave, isInternal ? "supplier" : "posting", config, draftItems);
+		setIsSaving(false);
+		if (result.success) toast.success("Lista salva no histórico!");
+		else toast.error("Erro ao salvar lista");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-[calc(100vh-8rem)] flex flex-col gap-6",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col md:flex-row md:items-center justify-between gap-4",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "ghost",
+					size: "icon",
+					asChild: true,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+						to: "/",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-5 h-5" })
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+					className: "text-3xl font-bold tracking-tight text-gray-900",
+					children: "Gerador de Lista WhatsApp"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-muted-foreground",
+					children: "Edite seus itens, organize e gere a prévia antes de exportar."
+				})] })]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorHistory, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "outline",
+					onClick: clearDraft,
+					disabled: draftItems.length === 0,
+					className: "text-destructive hover:bg-destructive/10 hover:text-destructive",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Limpar Lista"]
+				})]
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorConfig, {
+						config,
+						onChange: setConfig,
+						onApplyMarkup: applyMarkupToAll
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "xl:col-span-5 flex flex-col h-full min-h-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+						className: "flex-1 flex flex-col min-h-0 border-2 shadow-sm",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
+							className: "bg-gray-50 border-b py-3",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+								className: "text-sm font-medium flex items-center justify-between",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Itens da Lista (Rascunho)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+									className: "text-xs bg-white px-2 py-1 rounded border",
+									children: [draftItems.length, " itens"]
+								})]
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+							className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftListGrouped, {
+								items: draftItems,
+								onRemove: removeFromDraft,
+								onUpdate: updateDraftItem
+							})
+						})]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "xl:col-span-4 h-full",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
+						value: isInternal ? "internal" : "customer",
+						onValueChange: (v) => setIsInternal(v === "internal"),
+						className: "h-full flex flex-col",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+							className: "w-full justify-start mb-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								value: "customer",
+								className: "flex-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente"]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								value: "internal",
+								className: "flex-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex-1 relative flex flex-col",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2",
+										children: [
+											!isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex gap-1.5",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-red-500" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-yellow-500" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-green-500" })
+												]
+											}),
+											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
+												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
+											})
+										]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+										onClick: handleGenerate,
+										size: "sm",
+										variant: isInternal ? "outline" : "secondary",
+										className: "h-7 text-xs",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévias"]
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+									className: "p-0 flex-1 overflow-hidden relative group",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
+										value: isInternal ? internalText : customerText,
+										onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
+										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
+										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévias' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
+									}), (isInternal ? internalText : customerText) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "absolute bottom-6 right-6 flex flex-col gap-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											onClick: handleSaveList,
+											disabled: isSaving,
+											size: "sm",
+											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
+											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											onClick: handleCopy,
+											size: "sm",
+											variant: "outline",
+											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
+										})]
+									})]
+								})]
+							})
+						})]
+					})
+				})
+			]
+		})]
+	});
+}
+var SWITCH_NAME = "Switch";
+var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
+var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
+var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
+	const [button, setButton] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = button ? form || !!button.closest("form") : true;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: SWITCH_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
+		scope: __scopeSwitch,
+		checked,
+		disabled,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+			type: "button",
+			role: "switch",
+			"aria-checked": checked,
+			"aria-required": required,
+			"data-state": getState(checked),
+			"data-disabled": disabled ? "" : void 0,
+			disabled,
+			value,
+			...switchProps,
+			ref: composedRefs,
+			onClick: composeEventHandlers(props.onClick, (event) => {
+				setChecked((prevChecked) => !prevChecked);
+				if (isFormControl) {
+					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+				}
+			})
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
+			control: button,
+			bubbles: !hasConsumerStoppedPropagationRef.current,
+			name,
+			value,
+			checked,
+			required,
+			disabled,
+			form,
+			style: { transform: "translateX(-100%)" }
+		})]
+	});
+});
+Switch$1.displayName = SWITCH_NAME;
+var THUMB_NAME = "SwitchThumb";
+var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, ...thumbProps } = props;
+	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-state": getState(context.checked),
+		"data-disabled": context.disabled ? "" : void 0,
+		...thumbProps,
+		ref: forwardedRef
+	});
+});
+SwitchThumb.displayName = THUMB_NAME;
+var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
+var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(ref, forwardedRef);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = ref.current;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			setChecked.call(input, checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		prevChecked,
+		checked,
+		bubbles
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: checked,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0
+		}
+	});
+});
+SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function getState(checked) {
+	return checked ? "checked" : "unchecked";
+}
+var Root = Switch$1;
+var Thumb = SwitchThumb;
+var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	...props,
+	ref,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+}));
+Switch.displayName = Root.displayName;
 function UserManagement() {
 	const { users, currentUser, updateUserStatus, toggleUserPermission, updateUserRole } = useAuthStore();
 	const activeUsers = users.filter((u) => u.status !== "pending");
@@ -42219,49 +42500,6 @@ const useEvaluationStore = create((set, get$1) => ({
 		else set({ isLoading: false });
 	}
 }));
-var Dialog = Root$6;
-var DialogPortal = Portal$2;
-var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
-	ref,
-	className: cn("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
-	...props
-}));
-DialogOverlay.displayName = Overlay.displayName;
-var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
-	ref,
-	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
-	...props,
-	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
-		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-			className: "sr-only",
-			children: "Close"
-		})]
-	})]
-})] }));
-DialogContent.displayName = Content$2.displayName;
-var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className),
-	...props
-});
-DialogHeader.displayName = "DialogHeader";
-var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
-	...props
-});
-DialogFooter.displayName = "DialogFooter";
-var DialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
-	ref,
-	className: cn("text-lg font-semibold leading-none tracking-tight", className),
-	...props
-}));
-DialogTitle.displayName = Title.displayName;
-var DialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
-	ref,
-	className: cn("text-sm text-muted-foreground", className),
-	...props
-}));
-DialogDescription.displayName = Description.displayName;
 function BasePriceDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
 	const [model, setModel] = (0, import_react.useState)("");
 	const [price, setPrice] = (0, import_react.useState)("");
@@ -43382,4 +43620,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D8mKaB92.js.map
+//# sourceMappingURL=index-CH7S74LX.js.map

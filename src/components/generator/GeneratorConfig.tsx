@@ -8,17 +8,35 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { DollarSign, FileText, Link as LinkIcon, Phone } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  DollarSign,
+  FileText,
+  Link as LinkIcon,
+  Phone,
+  Zap,
+} from 'lucide-react'
 import { GeneratorConfigData } from '@/types'
+import { toast } from 'sonner'
 
 interface GeneratorConfigProps {
   config: GeneratorConfigData
   onChange: (config: GeneratorConfigData) => void
+  onApplyMarkup: (markup: number) => void
 }
 
-export function GeneratorConfig({ config, onChange }: GeneratorConfigProps) {
+export function GeneratorConfig({
+  config,
+  onChange,
+  onApplyMarkup,
+}: GeneratorConfigProps) {
   const handleChange = (field: keyof GeneratorConfigData, value: any) => {
     onChange({ ...config, [field]: value })
+  }
+
+  const handleApply = () => {
+    if (config.markup < 0) return
+    onApplyMarkup(config.markup)
   }
 
   return (
@@ -95,16 +113,28 @@ export function GeneratorConfig({ config, onChange }: GeneratorConfigProps) {
               <DollarSign className="w-4 h-4 text-green-600" />
               Aumento Global (R$)
             </Label>
-            <Input
-              type="number"
-              min="0"
-              step="10"
-              value={config.markup}
-              onChange={(e) => handleChange('markup', Number(e.target.value))}
-            />
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min="0"
+                step="10"
+                value={config.markup}
+                onChange={(e) => handleChange('markup', Number(e.target.value))}
+                className="flex-1"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleApply}
+                className="shrink-0"
+                title="Aplicar este valor a todos os itens"
+              >
+                <Zap className="w-4 h-4 text-yellow-600" />
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Valor adicionado aos itens que usam preço do sistema (não afeta
-              preços manuais).
+              Clique no raio para somar este valor ao preço base de todos os
+              itens.
             </p>
           </div>
         </CardContent>

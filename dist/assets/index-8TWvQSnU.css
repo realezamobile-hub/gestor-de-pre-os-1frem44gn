@@ -934,6 +934,9 @@ section[aria-label='Notifications alt+T'] {
 .h-\[600px\]{
   height: 600px;
 }
+.h-\[calc\(100vh-10rem\)\]{
+  height: calc(100vh - 10rem);
+}
 .h-\[calc\(100vh-3\.5rem\)\]{
   height: calc(100vh - 3.5rem);
 }
@@ -975,6 +978,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .max-h-\[300px\]{
   max-height: 300px;
+}
+.max-h-\[80vh\]{
+  max-height: 80vh;
 }
 .max-h-\[var\(--radix-dropdown-menu-content-available-height\)\]{
   max-height: var(--radix-dropdown-menu-content-available-height);
@@ -1087,6 +1093,9 @@ section[aria-label='Notifications alt+T'] {
 .w-\[250px\]{
   width: 250px;
 }
+.w-\[400px\]{
+  width: 400px;
+}
 .w-\[40px\]{
   width: 40px;
 }
@@ -1143,11 +1152,17 @@ section[aria-label='Notifications alt+T'] {
 .min-w-\[var\(--radix-select-trigger-width\)\]{
   min-width: var(--radix-select-trigger-width);
 }
+.max-w-3xl{
+  max-width: 48rem;
+}
 .max-w-\[--skeleton-width\]{
   max-width: var(--skeleton-width);
 }
 .max-w-\[120px\]{
   max-width: 120px;
+}
+.max-w-\[150px\]{
+  max-width: 150px;
 }
 .max-w-\[180px\]{
   max-width: 180px;
@@ -1209,6 +1224,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .origin-\[--radix-tooltip-content-transform-origin\]{
   transform-origin: var(--radix-tooltip-content-transform-origin);
+}
+.origin-left{
+  transform-origin: left;
 }
 .origin-right{
   transform-origin: right;
@@ -1463,6 +1481,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .whitespace-nowrap{
   white-space: nowrap;
+}
+.whitespace-pre-wrap{
+  white-space: pre-wrap;
 }
 .text-nowrap{
   text-wrap: nowrap;
@@ -1781,6 +1802,9 @@ section[aria-label='Notifications alt+T'] {
 .bg-muted{
   background-color: hsl(var(--muted));
 }
+.bg-muted\/30{
+  background-color: hsl(var(--muted) / 0.3);
+}
 .bg-muted\/50{
   background-color: hsl(var(--muted) / 0.5);
 }
@@ -1950,6 +1974,10 @@ section[aria-label='Notifications alt+T'] {
 .py-1\.5{
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
+}
+.py-10{
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 }
 .py-12{
   padding-top: 3rem;
@@ -2141,6 +2169,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .uppercase{
   text-transform: uppercase;
+}
+.capitalize{
+  text-transform: capitalize;
 }
 .italic{
   font-style: italic;
@@ -2349,6 +2380,10 @@ section[aria-label='Notifications alt+T'] {
 .text-white{
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+.text-yellow-600{
+  --tw-text-opacity: 1;
+  color: rgb(202 138 4 / var(--tw-text-opacity, 1));
 }
 .underline-offset-4{
   text-underline-offset: 4px;
@@ -3671,6 +3706,9 @@ section[aria-label='Notifications alt+T'] {
   }
   .sm\:flex{
     display: flex;
+  }
+  .sm\:w-\[540px\]{
+    width: 540px;
   }
   .sm\:w-auto{
     width: auto;

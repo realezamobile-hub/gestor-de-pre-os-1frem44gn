@@ -20,6 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DraftItem, GeneratorConfigData } from '@/types'
 import { GeneratorConfig } from '@/components/generator/GeneratorConfig'
 import { DraftListGrouped } from '@/components/generator/DraftListGrouped'
+import { GeneratorHistory } from '@/components/generator/GeneratorHistory'
 
 export default function ListGeneratorPage() {
   const {
@@ -30,6 +31,8 @@ export default function ListGeneratorPage() {
     clearDraft,
     fetchCategories,
     saveGeneratedList,
+    applyMarkupToAll,
+    fetchGeneratedLists,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -65,22 +68,17 @@ export default function ListGeneratorPage() {
     localStorage.setItem('generator_markup', config.markup.toString())
   }, [config.contactNumber, config.communityLink, config.markup])
 
-  // Generator State
-  const [generatedText, setGeneratedText] = useState('')
+  // Preview States (Independent)
+  const [customerText, setCustomerText] = useState('')
+  const [internalText, setInternalText] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     fetchCategories()
     fetchDraftItems()
+    fetchGeneratedLists()
   }, [])
-
-  // Reset/Clear text if draft is empty
-  useEffect(() => {
-    if (draftItems.length === 0) {
-      setGeneratedText('')
-    }
-  }, [draftItems.length])
 
   // Permission check
   if (!currentUser?.canCreateList) {
@@ -98,19 +96,12 @@ export default function ListGeneratorPage() {
     )
   }
 
-  const handleGenerate = () => {
-    if (draftItems.length === 0) {
-      setGeneratedText('')
-      return
-    }
-
+  const generateContent = (internal: boolean) => {
     // Group by Group Name
     const grouped = draftItems.reduce(
       (acc, item) => {
-        // Use custom group name if available, otherwise category, otherwise 'Outros'
         const rawGroup = item.group_name || item.product?.categoria || 'Outros'
         const key = rawGroup.trim() || 'Outros'
-
         if (!acc[key]) acc[key] = []
         acc[key].push(item)
         return acc
@@ -118,13 +109,11 @@ export default function ListGeneratorPage() {
       {} as Record<string, DraftItem[]>,
     )
 
-    // Sort keys
     const sortedKeys = Object.keys(grouped).sort()
-
     let text = ''
 
     // 1. Header
-    if (isInternal) {
+    if (internal) {
       text += `🔐 *LISTA INTERNA - CUSTOS E FORNECEDORES* 🔐\n`
       text += `📅 Data: ${new Date().toLocaleDateString('pt-BR')} \n\n`
     } else {
@@ -140,10 +129,7 @@ export default function ListGeneratorPage() {
       text += `*${groupName}*\n`
 
       items.forEach((item) => {
-        // 1. Details: Custom Model or fallback
         let model = item.custom_model
-
-        // If no custom model, try to construct from product
         if (!model && item.product) {
           model = [
             item.product.modelo,
@@ -154,32 +140,19 @@ export default function ListGeneratorPage() {
             .filter(Boolean)
             .join(' ')
         }
+        if (!model) model = 'Produto sem descrição'
+        if (item.custom_details) model += ` (${item.custom_details})`
 
-        // Final fallback if product is missing and no custom model
-        if (!model) {
-          model = 'Produto sem descrição'
-        }
-
-        // Append details if present
-        if (item.custom_details) {
-          model += ` (${item.custom_details})`
-        }
-
-        // 2. Price Logic
-        // Public List: custom_price overrides everything. Else, base price + markup.
-        // Internal List: base price (cost) always.
         let finalPrice = 0
 
-        if (isInternal) {
-          // Internal List: Prefer product cost (valor)
-          // Fallback to custom_price if product missing, or 0
+        if (internal) {
+          // Internal: Cost price (product.valor)
           finalPrice = item.product?.valor ?? item.custom_price ?? 0
         } else {
-          // Public List
+          // Public: Custom Price > Product Price + Markup
           if (item.custom_price !== null && item.custom_price !== undefined) {
             finalPrice = item.custom_price
           } else {
-            // Fallback to Product Price + Markup
             finalPrice = (item.product?.valor || 0) + config.markup
           }
         }
@@ -188,13 +161,9 @@ export default function ListGeneratorPage() {
           ? `R$ ${finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
           : 'Consulte'
 
-        // 3. Format Line: [Details] - [Price]
-        // Example: - iPhone 11 64GB - R$ 2.000,00
-        // Use '*' for bold price in WhatsApp only if public
-        text += ` - ${model} - ${!isInternal ? '*' : ''}${priceStr}${!isInternal ? '*' : ''}`
+        text += ` - ${model} - ${!internal ? '*' : ''}${priceStr}${!internal ? '*' : ''}`
 
-        // Internal Extras (Supplier Info) - Only if product exists
-        if (isInternal && item.product) {
+        if (internal && item.product) {
           text += `\n   ↳ Forn: ${item.product.fornecedor || 'N/A'}`
           if (item.product.telefone) text += ` | Tel: ${item.product.telefone}`
         }
@@ -204,43 +173,54 @@ export default function ListGeneratorPage() {
       text += '\n'
     })
 
-    // 4. Links (Public only) - BEFORE Footer
-    if (!isInternal) {
-      if (config.communityLink) {
-        text += `\n${config.communityLink}\n`
-      }
-
+    // 4. Links & Footer (Public only)
+    if (!internal) {
+      if (config.communityLink) text += `\n${config.communityLink}\n`
       if (config.contactNumber) {
-        // Simple numeric clean up
         const cleanNumber = config.contactNumber.replace(/\D/g, '')
         text += `\nMe chame pelo WhatsApp: https://wa.me/${cleanNumber}\n`
       }
       text += '\n'
-    }
-
-    // 5. Footer (Public only)
-    if (!isInternal) {
       text += config.footer
       if (!config.footer.endsWith('\n')) text += '\n'
     }
 
-    setGeneratedText(text)
+    return text
+  }
+
+  const handleGenerate = () => {
+    if (draftItems.length === 0) {
+      setCustomerText('')
+      setInternalText('')
+      return
+    }
+    // Generate both
+    setCustomerText(generateContent(false))
+    setInternalText(generateContent(true))
   }
 
   const handleCopy = () => {
-    if (!generatedText) return
-    navigator.clipboard.writeText(generatedText)
+    const textToCopy = isInternal ? internalText : customerText
+    if (!textToCopy) return
+    navigator.clipboard.writeText(textToCopy)
     toast.success('Lista copiada para a área de transferência!')
   }
 
   const handleSaveList = async () => {
-    if (!generatedText || draftItems.length === 0) return
+    const textToSave = isInternal ? internalText : customerText
+    if (!textToSave || draftItems.length === 0) return
 
     setIsSaving(true)
     const title = isInternal ? 'Lista Interna' : 'Lista Clientes'
     const type = isInternal ? 'supplier' : 'posting'
 
-    const result = await saveGeneratedList(title, generatedText, type, config)
+    const result = await saveGeneratedList(
+      title,
+      textToSave,
+      type,
+      config,
+      draftItems,
+    )
 
     setIsSaving(false)
     if (result.success) {
@@ -269,6 +249,7 @@ export default function ListGeneratorPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <GeneratorHistory />
           <Button
             variant="outline"
             onClick={clearDraft}
@@ -284,7 +265,11 @@ export default function ListGeneratorPage() {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0">
         {/* Left Column: Configuration */}
         <div className="xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2">
-          <GeneratorConfig config={config} onChange={setConfig} />
+          <GeneratorConfig
+            config={config}
+            onChange={setConfig}
+            onApplyMarkup={applyMarkupToAll}
+          />
         </div>
 
         {/* Middle Column: Draft Items (Expanded) */}
@@ -312,10 +297,7 @@ export default function ListGeneratorPage() {
         <div className="xl:col-span-4 h-full">
           <Tabs
             value={isInternal ? 'internal' : 'customer'}
-            onValueChange={(v) => {
-              setIsInternal(v === 'internal')
-              setGeneratedText('') // Clear preview on tab switch to force regenerate
-            }}
+            onValueChange={(v) => setIsInternal(v === 'internal')}
             className="h-full flex flex-col"
           >
             <TabsList className="w-full justify-start mb-2">
@@ -373,26 +355,32 @@ export default function ListGeneratorPage() {
                     className="h-7 text-xs"
                   >
                     <RefreshCw className="w-3 h-3 mr-1.5" />
-                    Gerar Prévia
+                    Gerar Prévias
                   </Button>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 overflow-hidden relative group">
                   <textarea
-                    value={generatedText}
-                    readOnly
+                    value={isInternal ? internalText : customerText}
+                    onChange={(e) =>
+                      isInternal
+                        ? setInternalText(e.target.value)
+                        : setCustomerText(e.target.value)
+                    }
                     className={cn(
                       'w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed',
                       isInternal ? 'text-slate-800' : 'text-slate-300',
-                      !generatedText && 'opacity-50 italic text-center pt-20',
+                      !customerText &&
+                        !internalText &&
+                        'opacity-50 italic text-center pt-20',
                     )}
                     placeholder={
                       draftItems.length > 0
-                        ? "Clique em 'Gerar Prévia' para visualizar o resultado..."
+                        ? "Clique em 'Gerar Prévias' para visualizar o resultado..."
                         : 'Adicione produtos para gerar o texto...'
                     }
                   />
 
-                  {generatedText && (
+                  {(isInternal ? internalText : customerText) && (
                     <div className="absolute bottom-6 right-6 flex flex-col gap-2">
                       <Button
                         onClick={handleSaveList}
@@ -410,7 +398,7 @@ export default function ListGeneratorPage() {
                         ) : (
                           <Save className="w-4 h-4 mr-2" />
                         )}
-                        Salvar no Histórico
+                        Salvar
                       </Button>
                       <Button
                         onClick={handleCopy}

@@ -79,6 +79,7 @@ export interface FilterState {
   ram: string
   color: string
   dateRange: DateRangeFilter
+  supplier: string
 }
 
 export interface FilterOptions {

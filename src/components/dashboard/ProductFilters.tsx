@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useProductStore } from '@/stores/useProductStore'
 import {
   Select,
@@ -7,8 +8,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDebounce } from '@/hooks/use-debounce'
 
 interface ProductFiltersProps {
   className?: string
@@ -16,6 +19,21 @@ interface ProductFiltersProps {
 
 export function ProductFilters({ className }: ProductFiltersProps) {
   const { filters, setFilters, resetFilters, filterOptions } = useProductStore()
+  const [supplierTerm, setSupplierTerm] = useState(filters.supplier || '')
+  const debouncedSupplier = useDebounce(supplierTerm, 500)
+
+  // Sync local state when filters are reset externally
+  useEffect(() => {
+    setSupplierTerm(filters.supplier || '')
+  }, [filters.supplier])
+
+  // Sync store when debounced value changes
+  useEffect(() => {
+    // Avoid triggering if it's the same (to prevent loop or double fetch)
+    if (debouncedSupplier !== (filters.supplier || '')) {
+      setFilters({ supplier: debouncedSupplier })
+    }
+  }, [debouncedSupplier, filters.supplier, setFilters])
 
   const handleReset = () => {
     resetFilters()
@@ -25,7 +43,8 @@ export function ProductFilters({ className }: ProductFiltersProps) {
     filters.ram !== 'all' ||
     filters.memory !== 'all' ||
     filters.color !== 'all' ||
-    filters.dateRange !== 'all'
+    filters.dateRange !== 'all' ||
+    !!filters.supplier
 
   return (
     <div
@@ -65,7 +84,7 @@ export function ProductFilters({ className }: ProductFiltersProps) {
       <div className="w-px h-6 bg-border hidden lg:block mx-1" />
 
       {/* Selects Row */}
-      <div className="grid grid-cols-3 lg:flex gap-2 w-full lg:w-auto flex-1">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2 w-full lg:w-auto flex-1 items-center">
         <Select
           value={filters.ram}
           onValueChange={(val) => setFilters({ ram: val })}
@@ -117,12 +136,19 @@ export function ProductFilters({ className }: ProductFiltersProps) {
           </SelectContent>
         </Select>
 
+        <Input
+          placeholder="Pesquisar fornecedor..."
+          value={supplierTerm}
+          onChange={(e) => setSupplierTerm(e.target.value)}
+          className="h-9 w-full lg:w-[150px] text-xs"
+        />
+
         {hasFilters && (
           <Button
             variant="ghost"
             size="sm"
             onClick={handleReset}
-            className="h-9 px-2 text-muted-foreground hover:text-foreground shrink-0"
+            className="h-9 px-2 text-muted-foreground hover:text-foreground shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto"
             title="Limpar filtros"
           >
             <X className="w-4 h-4" />

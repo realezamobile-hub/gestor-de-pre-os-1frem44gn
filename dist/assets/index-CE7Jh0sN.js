@@ -24622,7 +24622,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$18({ inst: {
+			cachedValue = useState$19({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24636,7 +24636,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$14(function() {
+			useEffect$15(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24659,7 +24659,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$18 = React$3.useState, useEffect$14 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$19 = React$3.useState, useEffect$15 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24682,7 +24682,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$14 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$15 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$2(null);
 			if (null === instRef.current) {
@@ -24724,7 +24724,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$14(function() {
+			useEffect$15(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -36186,7 +36186,8 @@ var INITIAL_FILTERS = {
 	memory: "all",
 	ram: "all",
 	color: "all",
-	dateRange: "all"
+	dateRange: "all",
+	supplier: ""
 };
 var INITIAL_FILTER_OPTIONS = {
 	memories: [],
@@ -36283,7 +36284,7 @@ const useProductStore = create((set, get$1) => ({
 				ram_filter: filters.ram !== "all" ? filters.ram : null,
 				color_filter: filters.color !== "all" ? filters.color : null,
 				condition_filter: null,
-				supplier_filter: null,
+				supplier_filter: filters.supplier.trim() || null,
 				battery_filter: null,
 				in_stock_only: false,
 				min_date: minDate
@@ -38223,12 +38224,36 @@ var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => 
 	...props
 }));
 SelectSeparator.displayName = Separator.displayName;
+function useDebounce(value, delay) {
+	const [debouncedValue, setDebouncedValue] = (0, import_react.useState)(value);
+	(0, import_react.useEffect)(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [value, delay]);
+	return debouncedValue;
+}
 function ProductFilters({ className }) {
 	const { filters, setFilters, resetFilters, filterOptions } = useProductStore();
+	const [supplierTerm, setSupplierTerm] = (0, import_react.useState)(filters.supplier || "");
+	const debouncedSupplier = useDebounce(supplierTerm, 500);
+	(0, import_react.useEffect)(() => {
+		setSupplierTerm(filters.supplier || "");
+	}, [filters.supplier]);
+	(0, import_react.useEffect)(() => {
+		if (debouncedSupplier !== (filters.supplier || "")) setFilters({ supplier: debouncedSupplier });
+	}, [
+		debouncedSupplier,
+		filters.supplier,
+		setFilters
+	]);
 	const handleReset = () => {
 		resetFilters();
 	};
-	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all";
+	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all" || !!filters.supplier;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: cn("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
 		children: [
@@ -38260,7 +38285,7 @@ function ProductFilters({ className }) {
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-px h-6 bg-border hidden lg:block mx-1" }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "grid grid-cols-3 lg:flex gap-2 w-full lg:w-auto flex-1",
+				className: "grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2 w-full lg:w-auto flex-1 items-center",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 						value: filters.ram,
@@ -38304,11 +38329,17 @@ function ProductFilters({ className }) {
 							children: c
 						}, c))] })]
 					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						placeholder: "Pesquisar fornecedor...",
+						value: supplierTerm,
+						onChange: (e) => setSupplierTerm(e.target.value),
+						className: "h-9 w-full lg:w-[150px] text-xs"
+					}),
 					hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 						variant: "ghost",
 						size: "sm",
 						onClick: handleReset,
-						className: "h-9 px-2 text-muted-foreground hover:text-foreground shrink-0",
+						className: "h-9 px-2 text-muted-foreground hover:text-foreground shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto",
 						title: "Limpar filtros",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "lg:hidden ml-2",
@@ -38443,18 +38474,6 @@ function ProductPagination() {
 			] }) })
 		})]
 	});
-}
-function useDebounce(value, delay) {
-	const [debouncedValue, setDebouncedValue] = (0, import_react.useState)(value);
-	(0, import_react.useEffect)(() => {
-		const timer = setTimeout(() => {
-			setDebouncedValue(value);
-		}, delay);
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [value, delay]);
-	return debouncedValue;
 }
 var ROOT_NAME = "AlertDialog";
 var [createAlertDialogContext, createAlertDialogScope] = createContextScope(ROOT_NAME, [createDialogScope]);
@@ -43945,4 +43964,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CC9lMBIJ.js.map
+//# sourceMappingURL=index-CE7Jh0sN.js.map

@@ -110,6 +110,7 @@ const INITIAL_FILTERS: FilterState = {
   ram: 'all',
   color: 'all',
   dateRange: 'all',
+  supplier: '',
 }
 
 const INITIAL_FILTER_OPTIONS: FilterOptions = {
@@ -226,7 +227,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,
         condition_filter: null,
-        supplier_filter: null,
+        supplier_filter: filters.supplier.trim() || null,
         battery_filter: null,
         in_stock_only: false,
         min_date: minDate,

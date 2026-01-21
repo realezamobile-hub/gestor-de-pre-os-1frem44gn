@@ -36214,7 +36214,6 @@ const useProductStore = create((set, get$1) => ({
 			p_min_date: minDate
 		});
 		if (!error && data) set({ filterOptions: data });
-		else console.error("Error fetching filter options:", error);
 	},
 	fetchProducts: async () => {
 		set({ isLoading: true });
@@ -36242,16 +36241,12 @@ const useProductStore = create((set, get$1) => ({
 				total: count$3 || 0,
 				isLoading: false
 			});
-			else {
-				console.error("Error fetching products:", error);
-				set({
-					products: [],
-					total: 0,
-					isLoading: false
-				});
-			}
+			else set({
+				products: [],
+				total: 0,
+				isLoading: false
+			});
 		} catch (e) {
-			console.error("Unexpected error fetching products", e);
 			set({
 				products: [],
 				total: 0,
@@ -36403,24 +36398,31 @@ const useProductStore = create((set, get$1) => ({
 			return;
 		}
 		set({ isLoading: true });
-		const updates = draftItems.map((item) => ({
-			id: item.id,
-			user_id: item.user_id,
-			product_id: item.product_id,
-			custom_price: (item.product?.valor || 0) + markup,
-			custom_model: item.custom_model,
-			custom_details: item.custom_details,
-			group_name: item.group_name
-		}));
-		set({ draftItems: draftItems.map((item) => ({
-			...item,
-			custom_price: (item.product?.valor || 0) + markup
-		})) });
+		const updates = draftItems.map((item) => {
+			const newPrice = (item.custom_price ?? item.product?.valor ?? 0) + markup;
+			return {
+				id: item.id,
+				user_id: item.user_id,
+				product_id: item.product_id,
+				custom_price: newPrice,
+				custom_model: item.custom_model,
+				custom_details: item.custom_details,
+				group_name: item.group_name
+			};
+		});
+		set({ draftItems: draftItems.map((item) => {
+			const currentPrice = item.custom_price ?? item.product?.valor ?? 0;
+			return {
+				...item,
+				custom_price: currentPrice + markup
+			};
+		}) });
 		const { error } = await supabase.from("whatsapp_draft_items").upsert(updates);
 		if (error) {
+			console.error("Error applying markup:", error);
 			toast.error("Erro ao aplicar aumento global");
 			await get$1().fetchDraftItems();
-		} else toast.success(`Aumento de R$${markup} aplicado a todos os itens`);
+		} else toast.success(`Adicionado R$${markup} ao preço de todos os itens`);
 		set({ isLoading: false });
 	},
 	fetchGeneratedLists: async () => {
@@ -39153,9 +39155,16 @@ function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Zap, { className: "w-4 h-4 text-yellow-600" })
 							})]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 							className: "text-xs text-muted-foreground",
-							children: "Clique no raio para somar este valor ao preço base de todos os itens."
+							children: [
+								"Clique no raio para ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "somar" }),
+								" este valor ao preço",
+								" ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "atual" }),
+								" de todos os itens da lista."
+							]
 						})
 					]
 				})
@@ -41143,6 +41152,7 @@ function ListGeneratorPage() {
 	const [internalText, setInternalText] = (0, import_react.useState)("");
 	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	const [triggerRefresh, setTriggerRefresh] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		const savedCustomer = localStorage.getItem("generator_customerText");
 		const savedInternal = localStorage.getItem("generator_internalText");
@@ -41158,27 +41168,6 @@ function ListGeneratorPage() {
 		fetchDraftItems();
 		fetchGeneratedLists();
 	}, []);
-	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "h-full flex flex-col items-center justify-center space-y-4",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-16 h-16 text-gray-300" }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-				className: "text-2xl font-bold text-gray-900",
-				children: "Acesso Negado"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				className: "text-muted-foreground text-center max-w-md",
-				children: "Você não tem permissão para gerar listas de preços."
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-					to: "/",
-					children: "Voltar ao Painel"
-				})
-			})
-		]
-	});
 	const generateContent = (internal) => {
 		const grouped = draftItems.reduce((acc, item) => {
 			const key = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
@@ -41235,6 +41224,38 @@ function ListGeneratorPage() {
 		}
 		return text;
 	};
+	(0, import_react.useEffect)(() => {
+		if (triggerRefresh) {
+			setCustomerText(generateContent(false));
+			setInternalText(generateContent(true));
+			setTriggerRefresh(false);
+		}
+	}, [
+		triggerRefresh,
+		draftItems,
+		config
+	]);
+	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-full flex flex-col items-center justify-center space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-16 h-16 text-gray-300" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				className: "text-2xl font-bold text-gray-900",
+				children: "Acesso Negado"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground text-center max-w-md",
+				children: "Você não tem permissão para gerar listas de preços."
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+					to: "/",
+					children: "Voltar ao Painel"
+				})
+			})
+		]
+	});
 	const handleGenerate = () => {
 		if (draftItems.length === 0) {
 			toast.error("Adicione itens à lista para gerar o texto.");
@@ -41243,6 +41264,10 @@ function ListGeneratorPage() {
 		setCustomerText(generateContent(false));
 		setInternalText(generateContent(true));
 		toast.success("Textos gerados com sucesso!");
+	};
+	const handleGlobalIncrease = async (markup) => {
+		await applyMarkupToAll(markup);
+		setTriggerRefresh(true);
 	};
 	const handleClear = async () => {
 		await clearDraft();
@@ -41305,7 +41330,7 @@ function ListGeneratorPage() {
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorConfig, {
 						config,
 						onChange: setConfig,
-						onApplyMarkup: applyMarkupToAll
+						onApplyMarkup: handleGlobalIncrease
 					})
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -43687,4 +43712,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DPi2k-yJ.js.map
+//# sourceMappingURL=index-CAp2eEiu.js.map

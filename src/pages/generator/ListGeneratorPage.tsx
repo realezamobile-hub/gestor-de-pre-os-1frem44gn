@@ -52,9 +52,6 @@ export default function ListGeneratorPage() {
     const savedContact = localStorage.getItem('generator_contactNumber')
     const savedCommunity = localStorage.getItem('generator_communityLink')
     const savedMarkup = localStorage.getItem('generator_markup')
-    // We don't save header/footer by default to keep date dynamic unless we want to,
-    // but usually header has date. Let's keep dynamic date default but allow override if needed.
-    // For now, only persisting contact/community/markup as per previous logic.
 
     setConfig((prev) => ({
       ...prev,
@@ -70,11 +67,14 @@ export default function ListGeneratorPage() {
     localStorage.setItem('generator_markup', config.markup.toString())
   }, [config.contactNumber, config.communityLink, config.markup])
 
-  // Preview States (Independent with Persistence)
+  // Preview States
   const [customerText, setCustomerText] = useState('')
   const [internalText, setInternalText] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Trigger to auto-refresh previews after global operations
+  const [triggerRefresh, setTriggerRefresh] = useState(false)
 
   // Load preview persistence
   useEffect(() => {
@@ -95,22 +95,6 @@ export default function ListGeneratorPage() {
     fetchDraftItems()
     fetchGeneratedLists()
   }, [])
-
-  // Permission check
-  if (!currentUser?.canCreateList) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center space-y-4">
-        <Lock className="w-16 h-16 text-gray-300" />
-        <h2 className="text-2xl font-bold text-gray-900">Acesso Negado</h2>
-        <p className="text-muted-foreground text-center max-w-md">
-          Você não tem permissão para gerar listas de preços.
-        </p>
-        <Button asChild>
-          <Link to="/">Voltar ao Painel</Link>
-        </Button>
-      </div>
-    )
-  }
 
   const generateContent = (internal: boolean) => {
     // Group by Group Name
@@ -166,8 +150,6 @@ export default function ListGeneratorPage() {
           finalPrice = item.product?.valor ?? item.custom_price ?? 0
         } else {
           // Public: Custom Price > Product Price + Markup
-          // Note: If user manually edited custom_price, use it.
-          // If they used "Apply Markup", custom_price is already calculated in DB.
           if (item.custom_price !== null && item.custom_price !== undefined) {
             finalPrice = item.custom_price
           } else {
@@ -206,6 +188,31 @@ export default function ListGeneratorPage() {
     return text
   }
 
+  // Auto-refresh effect
+  useEffect(() => {
+    if (triggerRefresh) {
+      setCustomerText(generateContent(false))
+      setInternalText(generateContent(true))
+      setTriggerRefresh(false)
+    }
+  }, [triggerRefresh, draftItems, config])
+
+  // Permission check
+  if (!currentUser?.canCreateList) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-300" />
+        <h2 className="text-2xl font-bold text-gray-900">Acesso Negado</h2>
+        <p className="text-muted-foreground text-center max-w-md">
+          Você não tem permissão para gerar listas de preços.
+        </p>
+        <Button asChild>
+          <Link to="/">Voltar ao Painel</Link>
+        </Button>
+      </div>
+    )
+  }
+
   const handleGenerate = () => {
     if (draftItems.length === 0) {
       toast.error('Adicione itens à lista para gerar o texto.')
@@ -215,6 +222,11 @@ export default function ListGeneratorPage() {
     setCustomerText(generateContent(false))
     setInternalText(generateContent(true))
     toast.success('Textos gerados com sucesso!')
+  }
+
+  const handleGlobalIncrease = async (markup: number) => {
+    await applyMarkupToAll(markup)
+    setTriggerRefresh(true)
   }
 
   const handleClear = async () => {
@@ -294,7 +306,7 @@ export default function ListGeneratorPage() {
           <GeneratorConfig
             config={config}
             onChange={setConfig}
-            onApplyMarkup={applyMarkupToAll}
+            onApplyMarkup={handleGlobalIncrease}
           />
         </div>
 

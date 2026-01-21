@@ -167,11 +167,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       filters: { ...state.filters, ...newFilters },
       page: 0,
     }))
-
-    // Always fetch products
     get().fetchProducts()
-
-    // Only fetch options if search or dateRange changed
     if (newFilters.search !== undefined || newFilters.dateRange !== undefined) {
       get().fetchFilterOptions()
     }
@@ -190,7 +186,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   fetchFilterOptions: async () => {
     const { filters } = get()
-
     let minDate = null
     const today = startOfDay(new Date())
 
@@ -207,8 +202,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     if (!error && data) {
       set({ filterOptions: data as unknown as FilterOptions })
-    } else {
-      console.error('Error fetching filter options:', error)
     }
   },
 
@@ -246,11 +239,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       if (!error && data) {
         set({ products: data as any, total: count || 0, isLoading: false })
       } else {
-        console.error('Error fetching products:', error)
         set({ products: [], total: 0, isLoading: false })
       }
     } catch (e) {
-      console.error('Unexpected error fetching products', e)
       set({ products: [], total: 0, isLoading: false })
     }
   },
@@ -302,7 +293,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     const prevSelectedIds = new Set(get().selectedProductIds)
 
     if (existing) {
-      // Remove
       const newItems = draftItems.filter((i) => i.product_id !== product.id)
       const newIds = new Set(prevSelectedIds)
       newIds.delete(product.id)
@@ -318,7 +308,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         set({ draftItems: prevDraftItems, selectedProductIds: prevSelectedIds })
       }
     } else {
-      // Add
       const tempId = crypto.randomUUID()
       const fullDescription = formatProductDescription(product)
 
@@ -409,7 +398,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   },
 
   updateDraftItem: async (id, updates) => {
-    // Optimistic Update
     const { draftItems } = get()
     const originalItems = [...draftItems]
 
@@ -430,7 +418,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     if (error) {
       toast.error('Erro ao atualizar item')
-      set({ draftItems: originalItems }) // Revert
+      set({ draftItems: originalItems })
     }
   },
 
@@ -459,24 +447,32 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     }
 
     set({ isLoading: true })
-    const updates = draftItems.map((item) => ({
-      id: item.id,
-      user_id: item.user_id,
-      product_id: item.product_id,
-      // Calculate new custom price: Base Price + Markup
-      // Using base price (item.product.valor) ensures consistency and non-cumulative increases
-      custom_price: (item.product?.valor || 0) + markup,
-      // Keep other fields
-      custom_model: item.custom_model,
-      custom_details: item.custom_details,
-      group_name: item.group_name,
-    }))
+
+    // Use current effective price to allow additive increases
+    // If custom_price is null, we assume current price is product.valor
+    const updates = draftItems.map((item) => {
+      const currentPrice = item.custom_price ?? item.product?.valor ?? 0
+      const newPrice = currentPrice + markup
+
+      return {
+        id: item.id,
+        user_id: item.user_id,
+        product_id: item.product_id,
+        custom_price: newPrice,
+        custom_model: item.custom_model,
+        custom_details: item.custom_details,
+        group_name: item.group_name,
+      }
+    })
 
     // Optimistic Update
-    const optimisticItems = draftItems.map((item) => ({
-      ...item,
-      custom_price: (item.product?.valor || 0) + markup,
-    }))
+    const optimisticItems = draftItems.map((item) => {
+      const currentPrice = item.custom_price ?? item.product?.valor ?? 0
+      return {
+        ...item,
+        custom_price: currentPrice + markup,
+      }
+    })
     set({ draftItems: optimisticItems })
 
     // Bulk update via upsert to apply to all items in DB
@@ -485,11 +481,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .upsert(updates)
 
     if (error) {
+      console.error('Error applying markup:', error)
       toast.error('Erro ao aplicar aumento global')
-      // Revert needs a fetch
-      await get().fetchDraftItems()
+      await get().fetchDraftItems() // Revert
     } else {
-      toast.success(`Aumento de R$${markup} aplicado a todos os itens`)
+      toast.success(`Adicionado R$${markup} ao preço de todos os itens`)
     }
     set({ isLoading: false })
   },
@@ -533,7 +529,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'User not found' }
 
-    // Ensure we are saving a complete snapshot including original product data
     const { error } = await supabase.from('generated_lists').insert({
       user_id: user.id,
       title,
@@ -552,7 +547,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   generateListFromFilters: async (date, categories) => {
     set({ isLoading: true })
-
     try {
       let query = supabase
         .from(VIEW_PRODUCTS)
@@ -570,7 +564,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
 
       const { data, error } = await query
-
       if (error) throw error
 
       if (data) {
@@ -655,9 +648,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   clearAllProducts: async () => {
     const { error } = await supabase.from('produtos').delete().neq('id', 0)
-
     if (error) return { success: false, error }
-
     set({ products: [], total: 0, monitorItems: [] })
     return { success: true }
   },

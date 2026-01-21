@@ -17,7 +17,6 @@ import {
   Zap,
 } from 'lucide-react'
 import { GeneratorConfigData } from '@/types'
-import { toast } from 'sonner'
 
 interface GeneratorConfigProps {
   config: GeneratorConfigData
@@ -133,8 +132,8 @@ export function GeneratorConfig({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Clique no raio para somar este valor ao preço base de todos os
-              itens.
+              Clique no raio para <strong>somar</strong> este valor ao preço{' '}
+              <strong>atual</strong> de todos os itens da lista.
             </p>
           </div>
         </CardContent>

@@ -103,7 +103,8 @@ export function GeneratorConfig({ config, onChange }: GeneratorConfigProps) {
               onChange={(e) => handleChange('markup', Number(e.target.value))}
             />
             <p className="text-xs text-muted-foreground">
-              Valor adicionado a TODOS os itens da lista pública.
+              Valor adicionado aos itens que usam preço do sistema (não afeta
+              preços manuais).
             </p>
           </div>
         </CardContent>

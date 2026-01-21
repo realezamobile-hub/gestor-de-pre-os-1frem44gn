@@ -39044,7 +39044,7 @@ function GeneratorConfig({ config, onChange }) {
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 							className: "text-xs text-muted-foreground",
-							children: "Valor adicionado a TODOS os itens da lista pública."
+							children: "Valor adicionado aos itens que usam preço do sistema (não afeta preços manuais)."
 						})
 					]
 				})
@@ -40331,16 +40331,23 @@ function ListGeneratorPage() {
 	(0, import_react.useEffect)(() => {
 		const savedContact = localStorage.getItem("generator_contactNumber");
 		const savedCommunity = localStorage.getItem("generator_communityLink");
-		if (savedContact || savedCommunity) setConfig((prev) => ({
+		const savedMarkup = localStorage.getItem("generator_markup");
+		setConfig((prev) => ({
 			...prev,
 			contactNumber: savedContact || prev.contactNumber,
-			communityLink: savedCommunity || prev.communityLink
+			communityLink: savedCommunity || prev.communityLink,
+			markup: savedMarkup ? Number(savedMarkup) : prev.markup
 		}));
 	}, []);
 	(0, import_react.useEffect)(() => {
 		localStorage.setItem("generator_contactNumber", config.contactNumber);
 		localStorage.setItem("generator_communityLink", config.communityLink);
-	}, [config.contactNumber, config.communityLink]);
+		localStorage.setItem("generator_markup", config.markup.toString());
+	}, [
+		config.contactNumber,
+		config.communityLink,
+		config.markup
+	]);
 	const [generatedText, setGeneratedText] = (0, import_react.useState)("");
 	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
@@ -40405,10 +40412,12 @@ function ListGeneratorPage() {
 					product.cor
 				].filter(Boolean).join(" ");
 				if (item.custom_details) model += ` (${item.custom_details})`;
-				let finalPrice = item.custom_price ?? product.valor;
-				if (finalPrice !== null && finalPrice !== void 0 && !isInternal) finalPrice += config.markup;
+				let finalPrice = 0;
+				if (isInternal) finalPrice = product.valor || 0;
+				else if (item.custom_price !== null && item.custom_price !== void 0) finalPrice = item.custom_price;
+				else finalPrice = (product.valor || 0) + config.markup;
 				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
-				text += ` - ${model} - ${isInternal ? "" : "*"}${priceStr}${isInternal ? "" : "*"}`;
+				text += ` - ${model} - ${!isInternal ? "*" : ""}${priceStr}${!isInternal ? "*" : ""}`;
 				if (isInternal) {
 					text += `\n   ↳ Forn: ${product.fornecedor || "N/A"}`;
 					if (product.telefone) text += ` | Tel: ${product.telefone}`;
@@ -43372,4 +43381,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-sohPDxSs.js.map
+//# sourceMappingURL=index-BLgjOhNo.js.map

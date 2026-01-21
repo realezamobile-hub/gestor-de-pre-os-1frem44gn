@@ -165,7 +165,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     get().fetchProducts()
 
     // Only fetch options if search or dateRange changed
-    // This allows the user to select filters without reloading the dropdown options (preventing UI jumps)
     if (newFilters.search !== undefined || newFilters.dateRange !== undefined) {
       get().fetchFilterOptions()
     }

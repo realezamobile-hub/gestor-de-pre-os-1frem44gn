@@ -16,7 +16,7 @@ import {
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DraftItem, GeneratorConfigData } from '@/types'
 import { GeneratorConfig } from '@/components/generator/GeneratorConfig'
 import { DraftListGrouped } from '@/components/generator/DraftListGrouped'
@@ -44,24 +44,26 @@ export default function ListGeneratorPage() {
     markup: 0,
   })
 
-  // Load persistence for contact/community
+  // Load persistence for contact/community/markup
   useEffect(() => {
     const savedContact = localStorage.getItem('generator_contactNumber')
     const savedCommunity = localStorage.getItem('generator_communityLink')
-    if (savedContact || savedCommunity) {
-      setConfig((prev) => ({
-        ...prev,
-        contactNumber: savedContact || prev.contactNumber,
-        communityLink: savedCommunity || prev.communityLink,
-      }))
-    }
+    const savedMarkup = localStorage.getItem('generator_markup')
+
+    setConfig((prev) => ({
+      ...prev,
+      contactNumber: savedContact || prev.contactNumber,
+      communityLink: savedCommunity || prev.communityLink,
+      markup: savedMarkup ? Number(savedMarkup) : prev.markup,
+    }))
   }, [])
 
   // Save persistence
   useEffect(() => {
     localStorage.setItem('generator_contactNumber', config.contactNumber)
     localStorage.setItem('generator_communityLink', config.communityLink)
-  }, [config.contactNumber, config.communityLink])
+    localStorage.setItem('generator_markup', config.markup.toString())
+  }, [config.contactNumber, config.communityLink, config.markup])
 
   // Generator State
   const [generatedText, setGeneratedText] = useState('')
@@ -154,12 +156,19 @@ export default function ListGeneratorPage() {
           model += ` (${item.custom_details})`
         }
 
-        // 2. Price (with Global Markup)
-        const basePrice = item.custom_price ?? product.valor
+        // 2. Price Logic
+        // Public List: custom_price overrides everything. Else, base price + markup.
+        // Internal List: base price (cost) always.
+        let finalPrice = 0
 
-        let finalPrice = basePrice
-        if (finalPrice !== null && finalPrice !== undefined && !isInternal) {
-          finalPrice += config.markup
+        if (isInternal) {
+          finalPrice = product.valor || 0
+        } else {
+          if (item.custom_price !== null && item.custom_price !== undefined) {
+            finalPrice = item.custom_price
+          } else {
+            finalPrice = (product.valor || 0) + config.markup
+          }
         }
 
         const priceStr = finalPrice
@@ -168,9 +177,10 @@ export default function ListGeneratorPage() {
 
         // 3. Format Line: [Details] - [Price]
         // Example: - iPhone 11 64GB - R$ 2.000,00
-        text += ` - ${model} - ${isInternal ? '' : '*'}${priceStr}${isInternal ? '' : '*'}`
+        // Use '*' for bold price in WhatsApp only if public
+        text += ` - ${model} - ${!isInternal ? '*' : ''}${priceStr}${!isInternal ? '*' : ''}`
 
-        // Internal Extras
+        // Internal Extras (Supplier Info)
         if (isInternal) {
           text += `\n   ↳ Forn: ${product.fornecedor || 'N/A'}`
           if (product.telefone) text += ` | Tel: ${product.telefone}`

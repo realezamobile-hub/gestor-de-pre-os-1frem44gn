@@ -453,7 +453,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   applyMarkupToAll: async (markup) => {
     const { draftItems } = get()
-    if (draftItems.length === 0) return
+    if (draftItems.length === 0) {
+      toast.warning('A lista está vazia.')
+      return
+    }
 
     set({ isLoading: true })
     const updates = draftItems.map((item) => ({
@@ -461,7 +464,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       user_id: item.user_id,
       product_id: item.product_id,
       // Calculate new custom price: Base Price + Markup
-      // Using base price ensures consistency. If user wants cumulative, they can edit individually.
+      // Using base price (item.product.valor) ensures consistency and non-cumulative increases
       custom_price: (item.product?.valor || 0) + markup,
       // Keep other fields
       custom_model: item.custom_model,
@@ -469,14 +472,14 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       group_name: item.group_name,
     }))
 
-    // Optimistic
+    // Optimistic Update
     const optimisticItems = draftItems.map((item) => ({
       ...item,
       custom_price: (item.product?.valor || 0) + markup,
     }))
     set({ draftItems: optimisticItems })
 
-    // Bulk update via upsert
+    // Bulk update via upsert to apply to all items in DB
     const { error } = await supabase
       .from('whatsapp_draft_items')
       .upsert(updates)
@@ -486,7 +489,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       // Revert needs a fetch
       await get().fetchDraftItems()
     } else {
-      toast.success('Aumento aplicado a todos os itens')
+      toast.success(`Aumento de R$${markup} aplicado a todos os itens`)
     }
     set({ isLoading: false })
   },
@@ -530,6 +533,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'User not found' }
 
+    // Ensure we are saving a complete snapshot including original product data
     const { error } = await supabase.from('generated_lists').insert({
       user_id: user.id,
       title,

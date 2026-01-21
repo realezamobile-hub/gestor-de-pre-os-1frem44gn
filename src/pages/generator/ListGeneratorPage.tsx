@@ -47,11 +47,14 @@ export default function ListGeneratorPage() {
     markup: 0,
   })
 
-  // Load persistence for contact/community/markup
+  // Persistence for config
   useEffect(() => {
     const savedContact = localStorage.getItem('generator_contactNumber')
     const savedCommunity = localStorage.getItem('generator_communityLink')
     const savedMarkup = localStorage.getItem('generator_markup')
+    // We don't save header/footer by default to keep date dynamic unless we want to,
+    // but usually header has date. Let's keep dynamic date default but allow override if needed.
+    // For now, only persisting contact/community/markup as per previous logic.
 
     setConfig((prev) => ({
       ...prev,
@@ -61,18 +64,31 @@ export default function ListGeneratorPage() {
     }))
   }, [])
 
-  // Save persistence
   useEffect(() => {
     localStorage.setItem('generator_contactNumber', config.contactNumber)
     localStorage.setItem('generator_communityLink', config.communityLink)
     localStorage.setItem('generator_markup', config.markup.toString())
   }, [config.contactNumber, config.communityLink, config.markup])
 
-  // Preview States (Independent)
+  // Preview States (Independent with Persistence)
   const [customerText, setCustomerText] = useState('')
   const [internalText, setInternalText] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Load preview persistence
+  useEffect(() => {
+    const savedCustomer = localStorage.getItem('generator_customerText')
+    const savedInternal = localStorage.getItem('generator_internalText')
+    if (savedCustomer) setCustomerText(savedCustomer)
+    if (savedInternal) setInternalText(savedInternal)
+  }, [])
+
+  // Save preview persistence
+  useEffect(() => {
+    localStorage.setItem('generator_customerText', customerText)
+    localStorage.setItem('generator_internalText', internalText)
+  }, [customerText, internalText])
 
   useEffect(() => {
     fetchCategories()
@@ -150,6 +166,8 @@ export default function ListGeneratorPage() {
           finalPrice = item.product?.valor ?? item.custom_price ?? 0
         } else {
           // Public: Custom Price > Product Price + Markup
+          // Note: If user manually edited custom_price, use it.
+          // If they used "Apply Markup", custom_price is already calculated in DB.
           if (item.custom_price !== null && item.custom_price !== undefined) {
             finalPrice = item.custom_price
           } else {
@@ -190,13 +208,21 @@ export default function ListGeneratorPage() {
 
   const handleGenerate = () => {
     if (draftItems.length === 0) {
-      setCustomerText('')
-      setInternalText('')
+      toast.error('Adicione itens à lista para gerar o texto.')
       return
     }
     // Generate both
     setCustomerText(generateContent(false))
     setInternalText(generateContent(true))
+    toast.success('Textos gerados com sucesso!')
+  }
+
+  const handleClear = async () => {
+    await clearDraft()
+    setCustomerText('')
+    setInternalText('')
+    localStorage.removeItem('generator_customerText')
+    localStorage.removeItem('generator_internalText')
   }
 
   const handleCopy = () => {
@@ -252,7 +278,7 @@ export default function ListGeneratorPage() {
           <GeneratorHistory />
           <Button
             variant="outline"
-            onClick={clearDraft}
+            onClick={handleClear}
             disabled={draftItems.length === 0}
             className="text-destructive hover:bg-destructive/10 hover:text-destructive"
           >

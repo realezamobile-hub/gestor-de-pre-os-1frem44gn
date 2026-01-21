@@ -1143,6 +1143,9 @@ section[aria-label='Notifications alt+T'] {
 .min-w-\[12rem\]{
   min-width: 12rem;
 }
+.min-w-\[200px\]{
+  min-width: 200px;
+}
 .min-w-\[800px\]{
   min-width: 800px;
 }
@@ -1157,6 +1160,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .max-w-\[--skeleton-width\]{
   max-width: var(--skeleton-width);
+}
+.max-w-\[100px\]{
+  max-width: 100px;
 }
 .max-w-\[120px\]{
   max-width: 120px;

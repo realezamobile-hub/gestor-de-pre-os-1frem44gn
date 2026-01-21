@@ -3,13 +3,21 @@ import { DraftItem } from '@/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Trash2, Loader2, StickyNote } from 'lucide-react'
+import {
+  Trash2,
+  Loader2,
+  StickyNote,
+  Building2,
+  Phone,
+  ExternalLink,
+} from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { Badge } from '@/components/ui/badge'
 
 interface DraftItemCardProps {
   item: DraftItem
@@ -176,33 +184,66 @@ export function DraftItemCard({
         </div>
       </div>
 
-      <Collapsible
-        open={showDetails}
-        onOpenChange={setShowDetails}
-        className="mt-2"
-      >
-        <div className="flex items-center gap-2">
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-            >
-              <StickyNote className="w-3 h-3 mr-1.5" />
-              {showDetails ? 'Ocultar Detalhes' : 'Adicionar Detalhes'}
-            </Button>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent className="pt-2">
-          <Input
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            onBlur={handleBlur}
-            className="h-8 text-xs text-muted-foreground"
-            placeholder="Detalhes adicionais (aparecem ao lado do modelo)"
-          />
-        </CollapsibleContent>
-      </Collapsible>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <Collapsible
+          open={showDetails}
+          onOpenChange={setShowDetails}
+          className="flex-1 min-w-[200px]"
+        >
+          <div className="flex items-center gap-2">
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <StickyNote className="w-3 h-3 mr-1.5" />
+                {showDetails ? 'Ocultar Detalhes' : 'Adicionar Detalhes'}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="pt-2">
+            <Input
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              onBlur={handleBlur}
+              className="h-8 text-xs text-muted-foreground"
+              placeholder="Detalhes adicionais (aparecem ao lado do modelo)"
+            />
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Supplier Info Badge */}
+        {item.product && (
+          <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground ml-auto bg-slate-50 px-2 py-1 rounded border">
+            {item.product.fornecedor && (
+              <div className="flex items-center gap-1">
+                <Building2 className="w-3 h-3" />
+                <span className="font-medium truncate max-w-[100px]">
+                  {item.product.fornecedor}
+                </span>
+              </div>
+            )}
+            {item.product.telefone && (
+              <div className="flex items-center gap-1 border-l pl-2 ml-1">
+                <Phone className="w-3 h-3" />
+                <span>{item.product.telefone}</span>
+              </div>
+            )}
+            {item.product.link_whatsapp && (
+              <a
+                href={item.product.link_whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 border-l pl-2 ml-1 text-blue-600 hover:underline"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span>Link</span>
+              </a>
+            )}
+          </div>
+        )}
+      </div>
 
       {isSaving && (
         <div className="absolute top-2 right-2">

@@ -18911,6 +18911,28 @@ var Battery = createLucideIcon("battery", [["path", {
 	rx: "2",
 	key: "13zb55"
 }]]);
+var Building2 = createLucideIcon("building-2", [
+	["path", {
+		d: "M10 12h4",
+		key: "a56b0p"
+	}],
+	["path", {
+		d: "M10 8h4",
+		key: "1sr2af"
+	}],
+	["path", {
+		d: "M14 21v-3a2 2 0 0 0-4 0v3",
+		key: "1rgiei"
+	}],
+	["path", {
+		d: "M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2",
+		key: "secmi2"
+	}],
+	["path", {
+		d: "M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16",
+		key: "16ra0t"
+	}]
+]);
 var CalendarClock = createLucideIcon("calendar-clock", [
 	["path", {
 		d: "M16 14v2.2l1.6 1",
@@ -36376,7 +36398,10 @@ const useProductStore = create((set, get$1) => ({
 	},
 	applyMarkupToAll: async (markup) => {
 		const { draftItems } = get$1();
-		if (draftItems.length === 0) return;
+		if (draftItems.length === 0) {
+			toast.warning("A lista está vazia.");
+			return;
+		}
 		set({ isLoading: true });
 		const updates = draftItems.map((item) => ({
 			id: item.id,
@@ -36395,7 +36420,7 @@ const useProductStore = create((set, get$1) => ({
 		if (error) {
 			toast.error("Erro ao aplicar aumento global");
 			await get$1().fetchDraftItems();
-		} else toast.success("Aumento aplicado a todos os itens");
+		} else toast.success(`Aumento de R$${markup} aplicado a todos os itens`);
 		set({ isLoading: false });
 	},
 	fetchGeneratedLists: async () => {
@@ -40319,30 +40344,55 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 					})
 				]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Collapsible, {
-				open: showDetails,
-				onOpenChange: setShowDetails,
-				className: "mt-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "flex items-center gap-2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleTrigger, {
-						asChild: true,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							variant: "ghost",
-							size: "sm",
-							className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Detalhes" : "Adicionar Detalhes"]
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "mt-2 flex flex-wrap items-center gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Collapsible, {
+					open: showDetails,
+					onOpenChange: setShowDetails,
+					className: "flex-1 min-w-[200px]",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "flex items-center gap-2",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "ghost",
+								size: "sm",
+								className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(StickyNote, { className: "w-3 h-3 mr-1.5" }), showDetails ? "Ocultar Detalhes" : "Adicionar Detalhes"]
+							})
 						})
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContent, {
-					className: "pt-2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-						value: details,
-						onChange: (e) => setDetails(e.target.value),
-						onBlur: handleBlur,
-						className: "h-8 text-xs text-muted-foreground",
-						placeholder: "Detalhes adicionais (aparecem ao lado do modelo)"
-					})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContent, {
+						className: "pt-2",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							value: details,
+							onChange: (e) => setDetails(e.target.value),
+							onBlur: handleBlur,
+							className: "h-8 text-xs text-muted-foreground",
+							placeholder: "Detalhes adicionais (aparecem ao lado do modelo)"
+						})
+					})]
+				}), item.product && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground ml-auto bg-slate-50 px-2 py-1 rounded border",
+					children: [
+						item.product.fornecedor && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Building2, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-medium truncate max-w-[100px]",
+								children: item.product.fornecedor
+							})]
+						}),
+						item.product.telefone && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-1 border-l pl-2 ml-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.product.telefone })]
+						}),
+						item.product.link_whatsapp && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+							href: item.product.link_whatsapp,
+							target: "_blank",
+							rel: "noreferrer",
+							className: "flex items-center gap-1 border-l pl-2 ml-1 text-blue-600 hover:underline",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Link" })]
+						})
+					]
 				})]
 			}),
 			isSaving && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -41094,6 +41144,16 @@ function ListGeneratorPage() {
 	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
+		const savedCustomer = localStorage.getItem("generator_customerText");
+		const savedInternal = localStorage.getItem("generator_internalText");
+		if (savedCustomer) setCustomerText(savedCustomer);
+		if (savedInternal) setInternalText(savedInternal);
+	}, []);
+	(0, import_react.useEffect)(() => {
+		localStorage.setItem("generator_customerText", customerText);
+		localStorage.setItem("generator_internalText", internalText);
+	}, [customerText, internalText]);
+	(0, import_react.useEffect)(() => {
 		fetchCategories();
 		fetchDraftItems();
 		fetchGeneratedLists();
@@ -41177,12 +41237,19 @@ function ListGeneratorPage() {
 	};
 	const handleGenerate = () => {
 		if (draftItems.length === 0) {
-			setCustomerText("");
-			setInternalText("");
+			toast.error("Adicione itens à lista para gerar o texto.");
 			return;
 		}
 		setCustomerText(generateContent(false));
 		setInternalText(generateContent(true));
+		toast.success("Textos gerados com sucesso!");
+	};
+	const handleClear = async () => {
+		await clearDraft();
+		setCustomerText("");
+		setInternalText("");
+		localStorage.removeItem("generator_customerText");
+		localStorage.removeItem("generator_internalText");
 	};
 	const handleCopy = () => {
 		const textToCopy = isInternal ? internalText : customerText;
@@ -41224,7 +41291,7 @@ function ListGeneratorPage() {
 				className: "flex gap-2",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorHistory, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 					variant: "outline",
-					onClick: clearDraft,
+					onClick: handleClear,
 					disabled: draftItems.length === 0,
 					className: "text-destructive hover:bg-destructive/10 hover:text-destructive",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Limpar Lista"]
@@ -43620,4 +43687,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CH7S74LX.js.map
+//# sourceMappingURL=index-DPi2k-yJ.js.map

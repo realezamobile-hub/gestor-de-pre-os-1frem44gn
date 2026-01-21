@@ -38239,7 +38239,7 @@ function useDebounce(value, delay) {
 function ProductFilters({ className }) {
 	const { filters, setFilters, resetFilters, filterOptions } = useProductStore();
 	const [supplierTerm, setSupplierTerm] = (0, import_react.useState)(filters.supplier || "");
-	const debouncedSupplier = useDebounce(supplierTerm, 500);
+	const debouncedSupplier = useDebounce(supplierTerm, 300);
 	(0, import_react.useEffect)(() => {
 		setSupplierTerm(filters.supplier || "");
 	}, [filters.supplier]);
@@ -43964,4 +43964,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CE7Jh0sN.js.map
+//# sourceMappingURL=index-BLI_eOVL.js.map

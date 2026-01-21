@@ -20,7 +20,9 @@ interface ProductFiltersProps {
 export function ProductFilters({ className }: ProductFiltersProps) {
   const { filters, setFilters, resetFilters, filterOptions } = useProductStore()
   const [supplierTerm, setSupplierTerm] = useState(filters.supplier || '')
-  const debouncedSupplier = useDebounce(supplierTerm, 500)
+
+  // Reduced debounce time for better responsiveness
+  const debouncedSupplier = useDebounce(supplierTerm, 300)
 
   // Sync local state when filters are reset externally
   useEffect(() => {

@@ -169,6 +169,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       page: 0,
     }))
     get().fetchProducts()
+    // Fetch options only if search or date changes, as these affect the global result set context more significantly
     if (newFilters.search !== undefined || newFilters.dateRange !== undefined) {
       get().fetchFilterOptions()
     }
@@ -193,6 +194,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     if (filters.dateRange === 'today') {
       minDate = today.toISOString()
     } else if (filters.dateRange === 'yesterday') {
+      // "Yesterday" filter means items starting from yesterday (usually includes today in this context)
       minDate = subDays(today, 1).toISOString()
     }
 
@@ -217,9 +219,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       if (filters.dateRange === 'today') {
         minDate = today.toISOString()
       } else if (filters.dateRange === 'yesterday') {
+        // "Yesterday" implies items created since start of yesterday
         minDate = subDays(today, 1).toISOString()
       }
 
+      // Prepare arguments for the RPC call
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
         category_filters: null,
@@ -227,7 +231,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,
         condition_filter: null,
-        supplier_filter: filters.supplier.trim() || null,
+        supplier_filter: filters.supplier.trim() || null, // Handles partial match via updated RPC
         battery_filter: null,
         in_stock_only: false,
         min_date: minDate,

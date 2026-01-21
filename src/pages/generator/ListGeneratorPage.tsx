@@ -107,13 +107,17 @@ export default function ListGeneratorPage() {
     // Group by Group Name
     const grouped = draftItems.reduce(
       (acc, item) => {
-        const key = item.group_name || item.product?.categoria || 'Outros'
+        // Use custom group name if available, otherwise category, otherwise 'Outros'
+        const rawGroup = item.group_name || item.product?.categoria || 'Outros'
+        const key = rawGroup.trim() || 'Outros'
+
         if (!acc[key]) acc[key] = []
         acc[key].push(item)
         return acc
       },
       {} as Record<string, DraftItem[]>,
     )
+
     // Sort keys
     const sortedKeys = Object.keys(grouped).sort()
 
@@ -130,25 +134,30 @@ export default function ListGeneratorPage() {
 
     // 2. Groups and Items
     sortedKeys.forEach((groupName) => {
-      text += `*${groupName}*\n`
       const items = grouped[groupName]
+      if (items.length === 0) return
+
+      text += `*${groupName}*\n`
 
       items.forEach((item) => {
-        const product = item.product
-        if (!product) return
-
         // 1. Details: Custom Model or fallback
-        let model = item.custom_model || product.modelo || ''
-        // If empty custom_model (legacy), construct it
-        if (!item.custom_model) {
+        let model = item.custom_model
+
+        // If no custom model, try to construct from product
+        if (!model && item.product) {
           model = [
-            product.modelo,
-            product.memoria,
-            product.ram ? `${product.ram} RAM` : null,
-            product.cor,
+            item.product.modelo,
+            item.product.memoria,
+            item.product.ram ? `${item.product.ram} RAM` : null,
+            item.product.cor,
           ]
             .filter(Boolean)
             .join(' ')
+        }
+
+        // Final fallback if product is missing and no custom model
+        if (!model) {
+          model = 'Produto sem descrição'
         }
 
         // Append details if present
@@ -162,12 +171,16 @@ export default function ListGeneratorPage() {
         let finalPrice = 0
 
         if (isInternal) {
-          finalPrice = product.valor || 0
+          // Internal List: Prefer product cost (valor)
+          // Fallback to custom_price if product missing, or 0
+          finalPrice = item.product?.valor ?? item.custom_price ?? 0
         } else {
+          // Public List
           if (item.custom_price !== null && item.custom_price !== undefined) {
             finalPrice = item.custom_price
           } else {
-            finalPrice = (product.valor || 0) + config.markup
+            // Fallback to Product Price + Markup
+            finalPrice = (item.product?.valor || 0) + config.markup
           }
         }
 
@@ -180,10 +193,10 @@ export default function ListGeneratorPage() {
         // Use '*' for bold price in WhatsApp only if public
         text += ` - ${model} - ${!isInternal ? '*' : ''}${priceStr}${!isInternal ? '*' : ''}`
 
-        // Internal Extras (Supplier Info)
-        if (isInternal) {
-          text += `\n   ↳ Forn: ${product.fornecedor || 'N/A'}`
-          if (product.telefone) text += ` | Tel: ${product.telefone}`
+        // Internal Extras (Supplier Info) - Only if product exists
+        if (isInternal && item.product) {
+          text += `\n   ↳ Forn: ${item.product.fornecedor || 'N/A'}`
+          if (item.product.telefone) text += ` | Tel: ${item.product.telefone}`
         }
 
         text += `\n`

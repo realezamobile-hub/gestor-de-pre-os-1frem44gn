@@ -40268,7 +40268,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 }
 function DraftListGrouped({ items, onRemove, onUpdate }) {
 	const grouped = items.reduce((acc, item) => {
-		const groupName = item.group_name || item.product?.categoria || "Outros";
+		const groupName = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
 		if (!acc[groupName]) acc[groupName] = [];
 		acc[groupName].push(item);
 		return acc;
@@ -40385,7 +40385,7 @@ function ListGeneratorPage() {
 			return;
 		}
 		const grouped = draftItems.reduce((acc, item) => {
-			const key = item.group_name || item.product?.categoria || "Outros";
+			const key = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
 			if (!acc[key]) acc[key] = [];
 			acc[key].push(item);
 			return acc;
@@ -40400,27 +40400,28 @@ function ListGeneratorPage() {
 			if (!config.header.endsWith("\n\n")) text += "\n\n";
 		}
 		sortedKeys.forEach((groupName) => {
+			const items = grouped[groupName];
+			if (items.length === 0) return;
 			text += `*${groupName}*\n`;
-			grouped[groupName].forEach((item) => {
-				const product = item.product;
-				if (!product) return;
-				let model = item.custom_model || product.modelo || "";
-				if (!item.custom_model) model = [
-					product.modelo,
-					product.memoria,
-					product.ram ? `${product.ram} RAM` : null,
-					product.cor
+			items.forEach((item) => {
+				let model = item.custom_model;
+				if (!model && item.product) model = [
+					item.product.modelo,
+					item.product.memoria,
+					item.product.ram ? `${item.product.ram} RAM` : null,
+					item.product.cor
 				].filter(Boolean).join(" ");
+				if (!model) model = "Produto sem descrição";
 				if (item.custom_details) model += ` (${item.custom_details})`;
 				let finalPrice = 0;
-				if (isInternal) finalPrice = product.valor || 0;
+				if (isInternal) finalPrice = item.product?.valor ?? item.custom_price ?? 0;
 				else if (item.custom_price !== null && item.custom_price !== void 0) finalPrice = item.custom_price;
-				else finalPrice = (product.valor || 0) + config.markup;
+				else finalPrice = (item.product?.valor || 0) + config.markup;
 				const priceStr = finalPrice ? `R$ ${finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Consulte";
 				text += ` - ${model} - ${!isInternal ? "*" : ""}${priceStr}${!isInternal ? "*" : ""}`;
-				if (isInternal) {
-					text += `\n   ↳ Forn: ${product.fornecedor || "N/A"}`;
-					if (product.telefone) text += ` | Tel: ${product.telefone}`;
+				if (isInternal && item.product) {
+					text += `\n   ↳ Forn: ${item.product.fornecedor || "N/A"}`;
+					if (item.product.telefone) text += ` | Tel: ${item.product.telefone}`;
 				}
 				text += `\n`;
 			});
@@ -43381,4 +43382,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BLgjOhNo.js.map
+//# sourceMappingURL=index-D8mKaB92.js.map

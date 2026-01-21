@@ -23,7 +23,11 @@ export function DraftListGrouped({
   // Group items by group_name
   const grouped = items.reduce(
     (acc, item) => {
-      const groupName = item.group_name || item.product?.categoria || 'Outros'
+      // Robust grouping logic: Prefer custom group, then category, then 'Outros'
+      // Trim to avoid duplicate groups with different spacing
+      const rawGroup = item.group_name || item.product?.categoria || 'Outros'
+      const groupName = rawGroup.trim() || 'Outros'
+
       if (!acc[groupName]) acc[groupName] = []
       acc[groupName].push(item)
       return acc

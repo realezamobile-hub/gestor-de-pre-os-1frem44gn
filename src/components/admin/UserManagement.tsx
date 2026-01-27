@@ -13,9 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { Lock, Unlock, Building } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { Lock, Unlock } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -35,14 +33,16 @@ import { Role } from '@/types'
 import { Label } from '@/components/ui/label'
 
 export function UserManagement() {
-  const {
-    users,
-    currentUser,
-    updateUserStatus,
-    toggleUserPermission,
-    updateUserRole,
-    updateUserCompany,
-  } = useAuthStore()
+  // Use precise selectors to avoid broad re-renders
+  const users = useAuthStore((state) => state.users)
+  const currentUser = useAuthStore((state) => state.currentUser)
+  const updateUserStatus = useAuthStore((state) => state.updateUserStatus)
+  const toggleUserPermission = useAuthStore(
+    (state) => state.toggleUserPermission,
+  )
+  const updateUserRole = useAuthStore((state) => state.updateUserRole)
+  const updateUserCompany = useAuthStore((state) => state.updateUserCompany)
+
   const { companies, fetchCompanies } = useCompanyStore()
 
   useEffect(() => {

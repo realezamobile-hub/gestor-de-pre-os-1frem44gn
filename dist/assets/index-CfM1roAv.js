@@ -32715,7 +32715,7 @@ var mapProfileToUser = (profile) => {
 		role,
 		status: profile.status || "pending",
 		phone: profile.phone || "",
-		lastActive: profile.last_active || (/* @__PURE__ */ new Date()).toISOString(),
+		lastActive: profile.last_active || profile.created_at || (/* @__PURE__ */ new Date(0)).toISOString(),
 		createdAt: profile.created_at || (/* @__PURE__ */ new Date()).toISOString(),
 		companyId: profile.company_id,
 		isSuperAdmin: profile.is_super_admin || false,
@@ -32731,74 +32731,80 @@ const useAuthStore = create((set, get$1) => ({
 	isLoading: true,
 	initialized: false,
 	users: [],
-	initialize: async () => {
-		if (get$1().initialized) return;
-		set({ initialized: true });
-		const syncUser = async (session) => {
-			if (session?.user) try {
-				const { data: profile, error } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-				if (profile && !error) {
-					const user = mapProfileToUser({
-						...profile,
-						email: session.user.email
-					});
-					let company = null;
-					if (user.companyId) {
-						const { data: companyData } = await supabase.from("empresas").select("*").eq("id", user.companyId).single();
-						company = companyData;
-					}
-					set({
-						currentUser: user,
-						currentCompany: company,
-						isLoading: false
-					});
-					await supabase.from("profiles").update({ last_active: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", profile.id);
-				} else {
-					console.error("Error fetching profile:", error);
-					set({
-						currentUser: null,
-						currentCompany: null,
-						isLoading: false
-					});
+	syncUser: async (session) => {
+		if (session?.user) try {
+			const { data: profile, error } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+			if (profile && !error) {
+				const user = mapProfileToUser({
+					...profile,
+					email: session.user.email
+				});
+				let company = null;
+				if (user.companyId) {
+					const { data: companyData } = await supabase.from("empresas").select("*").eq("id", user.companyId).single();
+					company = companyData;
 				}
-			} catch (e) {
-				console.error("Exception fetching profile", e);
+				set({
+					currentUser: user,
+					currentCompany: company,
+					session,
+					isLoading: false
+				});
+				await supabase.from("profiles").update({ last_active: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", profile.id);
+			} else {
+				console.error("Error fetching profile:", error);
 				set({
 					currentUser: null,
 					currentCompany: null,
+					session: null,
 					isLoading: false
 				});
 			}
-			else set({
+		} catch (e) {
+			console.error("Exception fetching profile", e);
+			set({
 				currentUser: null,
 				currentCompany: null,
+				session: null,
 				isLoading: false
 			});
-		};
-		supabase.auth.onAuthStateChange((event, session) => {
-			if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-				set({
-					session,
-					isLoading: true
-				});
-				syncUser(session);
+		}
+		else set({
+			currentUser: null,
+			currentCompany: null,
+			session: null,
+			isLoading: false
+		});
+	},
+	initialize: async () => {
+		if (get$1().initialized) return;
+		set({
+			initialized: true,
+			isLoading: true
+		});
+		const { syncUser } = get$1();
+		try {
+			const { data: { session } } = await supabase.auth.getSession();
+			if (session) await syncUser(session);
+			else set({ isLoading: false });
+		} catch (error) {
+			console.error("Auth initialization error:", error);
+			set({ isLoading: false });
+		}
+		supabase.auth.onAuthStateChange(async (event, session) => {
+			if (event === "SIGNED_IN") {
+				if (get$1().currentUser?.id !== session?.user.id) {
+					set({ isLoading: true });
+					await syncUser(session);
+				}
 			} else if (event === "SIGNED_OUT") set({
 				session: null,
 				currentUser: null,
 				currentCompany: null,
 				isLoading: false
 			});
-			else set({ session });
+			else if (event === "TOKEN_REFRESHED") set({ session });
 		});
-		try {
-			const { data: { session } } = await supabase.auth.getSession();
-			set({ session });
-			if (session) syncUser(session);
-			else set({ isLoading: false });
-		} catch (error) {
-			console.error("Auth initialization error:", error);
-			set({ isLoading: false });
-		}
 	},
 	login: async (email, password) => {
 		const { error } = await supabase.auth.signInWithPassword({
@@ -34621,13 +34627,14 @@ function LoginPage() {
 	const { login, currentUser, isLoading, logout } = useAuthStore();
 	(0, import_react.useEffect)(() => {
 		if (!isLoading && currentUser) {
-			if (currentUser.isSuperAdmin) navigate("/admin");
-			else if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate("/");
-			else if (currentUser.status === "pending") navigate("/pending");
-			else if (currentUser.status === "blocked") {
+			if (currentUser.status === "blocked") {
 				logout();
 				toast.error("Sua conta está bloqueada. Entre em contato com o suporte.");
+				return;
 			}
+			if (currentUser.isSuperAdmin) navigate("/admin", { replace: true });
+			else if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate("/", { replace: true });
+			else if (currentUser.status === "pending") navigate("/pending", { replace: true });
 		}
 	}, [
 		currentUser,
@@ -41840,7 +41847,12 @@ var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PUR
 }));
 Switch.displayName = Root.displayName;
 function UserManagement() {
-	const { users, currentUser, updateUserStatus, toggleUserPermission, updateUserRole, updateUserCompany } = useAuthStore();
+	const users = useAuthStore((state) => state.users);
+	const currentUser = useAuthStore((state) => state.currentUser);
+	const updateUserStatus = useAuthStore((state) => state.updateUserStatus);
+	const toggleUserPermission = useAuthStore((state) => state.toggleUserPermission);
+	const updateUserRole = useAuthStore((state) => state.updateUserRole);
+	const updateUserCompany = useAuthStore((state) => state.updateUserCompany);
 	const { companies, fetchCompanies } = useCompanyStore();
 	(0, import_react.useEffect)(() => {
 		fetchCompanies();
@@ -42950,7 +42962,9 @@ function CompanyManagement() {
 	});
 }
 function AdminPage() {
-	const { users, fetchUsers, currentUser } = useAuthStore();
+	const currentUser = useAuthStore((state) => state.currentUser);
+	const users = useAuthStore((state) => state.users);
+	const fetchUsers = useAuthStore((state) => state.fetchUsers);
 	(0, import_react.useEffect)(() => {
 		fetchUsers();
 	}, []);
@@ -44335,4 +44349,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-B7k3JSB-.js.map
+//# sourceMappingURL=index-CfM1roAv.js.map

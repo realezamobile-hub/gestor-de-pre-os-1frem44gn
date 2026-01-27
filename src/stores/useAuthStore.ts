@@ -11,6 +11,7 @@ interface AuthState {
   initialized: boolean
 
   initialize: () => Promise<void>
+  syncUser: (session: Session | null) => Promise<void>
   login: (
     email: string,
     password: string,
@@ -51,7 +52,9 @@ const mapProfileToUser = (profile: any): User => {
     role: role,
     status: (profile.status as UserStatus) || 'pending',
     phone: profile.phone || '',
-    lastActive: profile.last_active || new Date().toISOString(),
+    // Use a fixed fallback date to avoid object identity changes on every mapping
+    lastActive:
+      profile.last_active || profile.created_at || new Date(0).toISOString(),
     createdAt: profile.created_at || new Date().toISOString(),
     companyId: profile.company_id,
     isSuperAdmin: profile.is_super_admin || false,
@@ -69,88 +72,84 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialized: false,
   users: [],
 
-  initialize: async () => {
-    if (get().initialized) return
-    set({ initialized: true })
+  syncUser: async (session: Session | null) => {
+    if (session?.user) {
+      try {
+        // Fetch Profile
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
 
-    const syncUser = async (session: Session | null) => {
-      if (session?.user) {
-        try {
-          // Fetch Profile
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
+        if (profile && !error) {
+          const profileWithEmail = { ...profile, email: session.user.email }
+          const user = mapProfileToUser(profileWithEmail)
 
-          if (profile && !error) {
-            const profileWithEmail = { ...profile, email: session.user.email }
-            const user = mapProfileToUser(profileWithEmail)
-
-            // Fetch Company
-            let company = null
-            if (user.companyId) {
-              const { data: companyData } = await supabase
-                .from('empresas')
-                .select('*')
-                .eq('id', user.companyId)
-                .single()
-              company = companyData
-            }
-
-            set({
-              currentUser: user,
-              currentCompany: company,
-              isLoading: false,
-            })
-
-            // Update last active silently
-            await supabase
-              .from('profiles')
-              .update({ last_active: new Date().toISOString() })
-              .eq('id', profile.id)
-          } else {
-            console.error('Error fetching profile:', error)
-            set({ currentUser: null, currentCompany: null, isLoading: false })
+          // Fetch Company
+          let company = null
+          if (user.companyId) {
+            const { data: companyData } = await supabase
+              .from('empresas')
+              .select('*')
+              .eq('id', user.companyId)
+              .single()
+            company = companyData
           }
-        } catch (e) {
-          console.error('Exception fetching profile', e)
-          set({ currentUser: null, currentCompany: null, isLoading: false })
-        }
-      } else {
-        set({ currentUser: null, currentCompany: null, isLoading: false })
-      }
-    }
 
-    // Set up auth state listener FIRST
-    supabase.auth.onAuthStateChange((event, session) => {
-      // Only set loading if we are actually changing session context significantly
-      // or if it's the first load
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        set({ session, isLoading: true })
-        syncUser(session)
-      } else if (event === 'SIGNED_OUT') {
+          set({
+            currentUser: user,
+            currentCompany: company,
+            session,
+            isLoading: false,
+          })
+
+          // Update last active silently without triggering store updates
+          await supabase
+            .from('profiles')
+            .update({ last_active: new Date().toISOString() })
+            .eq('id', profile.id)
+        } else {
+          console.error('Error fetching profile:', error)
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+        }
+      } catch (e) {
+        console.error('Exception fetching profile', e)
         set({
-          session: null,
           currentUser: null,
           currentCompany: null,
+          session: null,
           isLoading: false,
         })
-      } else {
-        // For token refreshes etc, just update session but don't trigger full reload UI
-        set({ session })
       }
-    })
+    } else {
+      set({
+        currentUser: null,
+        currentCompany: null,
+        session: null,
+        isLoading: false,
+      })
+    }
+  },
 
-    // THEN check for existing session
+  initialize: async () => {
+    if (get().initialized) return
+    set({ initialized: true, isLoading: true })
+
+    const { syncUser } = get()
+
+    // Check for existing session first to avoid flicker
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession()
-      set({ session })
-      // If session exists, syncUser will handle loading state
       if (session) {
-        syncUser(session)
+        await syncUser(session)
       } else {
         set({ isLoading: false })
       }
@@ -158,6 +157,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Auth initialization error:', error)
       set({ isLoading: false })
     }
+
+    // Set up auth state listener
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      // Avoid re-syncing if we just did it via getSession (though handling SIGNED_IN is safe)
+      if (event === 'SIGNED_IN') {
+        // Only set loading if not already loaded or if user changed
+        const currentId = get().currentUser?.id
+        if (currentId !== session?.user.id) {
+          set({ isLoading: true })
+          await syncUser(session)
+        }
+      } else if (event === 'SIGNED_OUT') {
+        set({
+          session: null,
+          currentUser: null,
+          currentCompany: null,
+          isLoading: false,
+        })
+      } else if (event === 'TOKEN_REFRESHED') {
+        set({ session })
+      }
+    })
   },
 
   login: async (email, password) => {

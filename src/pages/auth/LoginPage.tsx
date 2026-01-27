@@ -22,22 +22,25 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { login, currentUser, isLoading, logout } = useAuthStore()
 
-  // Redirect if already logged in
+  // Redirect if already logged in, ensuring stability
   useEffect(() => {
+    // Only redirect if NOT loading and user exists
     if (!isLoading && currentUser) {
+      if (currentUser.status === 'blocked') {
+        logout()
+        toast.error('Sua conta está bloqueada. Entre em contato com o suporte.')
+        return
+      }
+
       if (currentUser.isSuperAdmin) {
-        navigate('/admin')
+        navigate('/admin', { replace: true })
       } else if (
         currentUser.status === 'active' ||
         currentUser.role === 'ADMIN'
       ) {
-        navigate('/')
+        navigate('/', { replace: true })
       } else if (currentUser.status === 'pending') {
-        navigate('/pending')
-      } else if (currentUser.status === 'blocked') {
-        // If user is blocked but has a session, logout force them out
-        logout()
-        toast.error('Sua conta está bloqueada. Entre em contato com o suporte.')
+        navigate('/pending', { replace: true })
       }
     }
   }, [currentUser, isLoading, navigate, logout])
@@ -50,7 +53,7 @@ export default function LoginPage() {
       const result = await login(email, password)
       if (result.success) {
         toast.success('Login realizado com sucesso!')
-        // Navigation handled by useEffect when currentUser updates
+        // Navigation handled by useEffect
       } else {
         toast.error(result.error?.message || 'Erro ao realizar login')
       }

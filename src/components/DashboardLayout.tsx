@@ -15,6 +15,7 @@ export default function DashboardLayout() {
     )
   }
 
+  // Strictly check for currentUser after loading is done
   if (!currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
@@ -26,10 +27,6 @@ export default function DashboardLayout() {
   if (currentUser.status === 'blocked') {
     return <Navigate to="/login" replace />
   }
-
-  // Basic check: if user has no company assigned, redirect to pending or a specific state
-  // Assuming default migration handles this, but for new users without company (if possible):
-  // (Logic to handle 'no company' state if needed, but 'pending' usually covers it)
 
   return (
     <div className="flex h-screen bg-gray-50/50">

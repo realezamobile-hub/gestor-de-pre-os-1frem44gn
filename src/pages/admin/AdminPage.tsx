@@ -24,12 +24,16 @@ import { PriceMonitor } from '@/components/admin/PriceMonitor'
 import { CompanyManagement } from '@/components/admin/CompanyManagement'
 
 export default function AdminPage() {
-  const { users, fetchUsers, currentUser } = useAuthStore()
+  // Use selectors to prevent unnecessary re-renders of the main page
+  const currentUser = useAuthStore((state) => state.currentUser)
+  const users = useAuthStore((state) => state.users)
+  const fetchUsers = useAuthStore((state) => state.fetchUsers)
 
   useEffect(() => {
     fetchUsers()
   }, [])
 
+  // Guard clause
   if (currentUser?.role !== 'ADMIN' && !currentUser?.isSuperAdmin) {
     return <Navigate to="/" replace />
   }

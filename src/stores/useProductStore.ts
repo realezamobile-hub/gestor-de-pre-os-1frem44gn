@@ -90,6 +90,9 @@ interface ProductStore {
   cleanupByDate: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
+  performDailyCleanup: (
+    date: string,
+  ) => Promise<{ success: boolean; data?: any; error?: any }>
   deleteSoldItems: () => Promise<{
     success: boolean
     count?: number
@@ -688,6 +691,20 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       return { success: true, data }
     } catch (error) {
       console.error('Cleanup by date error:', error)
+      return { success: false, error }
+    }
+  },
+
+  performDailyCleanup: async (date) => {
+    try {
+      const { data, error } = await supabase.rpc('perform_daily_cleanup', {
+        target_date: date,
+      })
+      if (error) throw error
+      get().fetchProducts()
+      return { success: true, data }
+    } catch (error) {
+      console.error('Daily cleanup error:', error)
       return { success: false, error }
     }
   },

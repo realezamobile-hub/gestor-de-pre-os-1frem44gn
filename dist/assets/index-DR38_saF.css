@@ -1637,6 +1637,10 @@ section[aria-label='Notifications alt+T'] {
 .border-primary{
   border-color: hsl(var(--primary));
 }
+.border-purple-100{
+  --tw-border-opacity: 1;
+  border-color: rgb(243 232 255 / var(--tw-border-opacity, 1));
+}
 .border-red-100{
   --tw-border-opacity: 1;
   border-color: rgb(254 226 226 / var(--tw-border-opacity, 1));
@@ -1825,6 +1829,13 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-primary\/10{
   background-color: hsl(var(--primary) / 0.1);
+}
+.bg-purple-50\/10{
+  background-color: rgb(250 245 255 / 0.1);
+}
+.bg-purple-600{
+  --tw-bg-opacity: 1;
+  background-color: rgb(147 51 234 / var(--tw-bg-opacity, 1));
 }
 .bg-red-100{
   --tw-bg-opacity: 1;
@@ -2326,6 +2337,14 @@ section[aria-label='Notifications alt+T'] {
 }
 .text-primary-foreground{
   color: hsl(var(--primary-foreground));
+}
+.text-purple-600{
+  --tw-text-opacity: 1;
+  color: rgb(147 51 234 / var(--tw-text-opacity, 1));
+}
+.text-purple-900{
+  --tw-text-opacity: 1;
+  color: rgb(88 28 135 / var(--tw-text-opacity, 1));
 }
 .text-red-400{
   --tw-text-opacity: 1;
@@ -2888,6 +2907,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .hover\:bg-primary\/90:hover{
   background-color: hsl(var(--primary) / 0.9);
+}
+.hover\:bg-purple-700:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(126 34 206 / var(--tw-bg-opacity, 1));
 }
 .hover\:bg-red-50:hover{
   --tw-bg-opacity: 1;

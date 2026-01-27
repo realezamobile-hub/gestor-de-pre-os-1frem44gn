@@ -9,7 +9,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AlertTriangle, Trash2, ShieldAlert, CalendarClock } from 'lucide-react'
+import {
+  AlertTriangle,
+  Trash2,
+  ShieldAlert,
+  CalendarClock,
+  CalendarRange,
+} from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useProductStore } from '@/stores/useProductStore'
 import { toast } from 'sonner'
@@ -30,9 +36,15 @@ import { useAuthStore } from '@/stores/useAuthStore'
 export function BulkCleanup() {
   const [date, setDate] = useState<string>('')
   const [dailyDate, setDailyDate] = useState<string>('')
+  const [cleanupDate, setCleanupDate] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const { clearAllProducts, fetchProducts, cleanupByDate, deleteSoldItems } =
-    useProductStore()
+  const {
+    clearAllProducts,
+    fetchProducts,
+    cleanupByDate,
+    performDailyCleanup,
+    deleteSoldItems,
+  } = useProductStore()
   const { currentUser } = useAuthStore()
 
   const canDelete = currentUser?.canDeleteRecords || false
@@ -90,6 +102,28 @@ export function BulkCleanup() {
     }
   }
 
+  const handleCleanupUpToDate = async () => {
+    if (!cleanupDate) return
+
+    setLoading(true)
+    try {
+      const result = await performDailyCleanup(cleanupDate)
+      if (result.success && result.data) {
+        toast.success(
+          `Limpeza concluída. ${result.data.products_deleted} produtos vendidos e ${result.data.messages_deleted} mensagens removidos com sucesso.`,
+        )
+      } else {
+        throw result.error
+      }
+      setCleanupDate('')
+    } catch (error) {
+      console.error('Cleanup up to date error:', error)
+      toast.error('Erro ao realizar limpeza de histórico.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleDeleteSold = async () => {
     setLoading(true)
     try {
@@ -141,15 +175,88 @@ export function BulkCleanup() {
   return (
     <div className="grid gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Full Cleanup Up to Date (New Feature) */}
+        <Card className="border-purple-100 bg-purple-50/10 md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-purple-900">
+              <CalendarRange className="w-5 h-5 text-purple-600" />
+              Limpeza Diária (Mensagens e Vendidos)
+            </CardTitle>
+            <CardDescription>
+              Remove mensagens processadas (data de recebimento) e produtos
+              vendidos (data de venda) <strong>até a data selecionada</strong>{' '}
+              (inclusive).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 items-end gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cleanup-upto-date">Limpar dados até:</Label>
+                <Input
+                  id="cleanup-upto-date"
+                  type="date"
+                  value={cleanupDate}
+                  onChange={(e) => setCleanupDate(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    disabled={!cleanupDate || loading}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {loading ? 'Processando...' : 'Executar Limpeza Diária'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmação de Limpeza</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Você está prestes a excluir registros antigos do banco de
+                      dados.
+                      <br />
+                      <br />
+                      <strong>Ação:</strong> Excluir mensagens recebidas e
+                      produtos vendidos até o dia{' '}
+                      <strong>
+                        {cleanupDate &&
+                          new Date(
+                            cleanupDate + 'T00:00:00',
+                          ).toLocaleDateString('pt-BR')}
+                      </strong>{' '}
+                      (inclusive).
+                      <br />
+                      <br />
+                      Esta ação é irreversível e ajuda a manter o sistema limpo.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCleanupUpToDate}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      Confirmar Limpeza
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Daily Cleanup Card */}
         <Card className="border-amber-100 bg-amber-50/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-900">
               <CalendarClock className="w-5 h-5 text-amber-600" />
-              Limpeza Diária (Data Específica)
+              Limpeza por Data (Criação)
             </CardTitle>
             <CardDescription>
-              Remove registros de produtos e mensagens criados em uma data.
+              Remove registros criados exatamente na data selecionada.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -180,7 +287,7 @@ export function BulkCleanup() {
                   <AlertDialogTitle>Confirmação de Limpeza</AlertDialogTitle>
                   <AlertDialogDescription>
                     Você está prestes a excluir todos os produtos e mensagens
-                    processadas do dia{' '}
+                    criados no dia{' '}
                     <strong>
                       {dailyDate &&
                         new Date(dailyDate + 'T00:00:00').toLocaleDateString(
@@ -213,7 +320,7 @@ export function BulkCleanup() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-900">
               <AlertTriangle className="w-5 h-5 text-red-600" />
-              Limpeza por Data de Venda
+              Limpeza por Data de Venda (Legado)
             </CardTitle>
             <CardDescription>
               Remove produtos vendidos até uma data específica.
@@ -321,7 +428,7 @@ export function BulkCleanup() {
           </CardContent>
         </Card>
 
-        <Card className="border-destructive/30 bg-destructive/5">
+        <Card className="border-destructive/30 bg-destructive/5 md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <ShieldAlert className="w-5 h-5" />

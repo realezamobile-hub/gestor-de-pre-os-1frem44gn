@@ -21,11 +21,18 @@ import { useState } from 'react'
 
 export function Sidebar() {
   const location = useLocation()
-  const { currentUser, currentCompany, logout } = useAuthStore()
+
+  // Use specific selectors to prevent unnecessary re-renders when other parts of the store (like users list) change
+  const currentUser = useAuthStore((state) => state.currentUser)
+  const currentCompany = useAuthStore((state) => state.currentCompany)
+  const logout = useAuthStore((state) => state.logout)
+
   const [open, setOpen] = useState(false)
 
   // Check module availability from company config
   const modules = currentCompany?.modulos_ativos || []
+
+  // Robust check: User has module if company has it OR if user is Super Admin (explicit bypass)
   const hasModule = (module: string) =>
     modules.includes(module) || currentUser?.isSuperAdmin
 
@@ -61,6 +68,7 @@ export function Sidebar() {
       label: 'Avaliação',
       icon: ClipboardCheck,
       // Visible if module active AND user has permission (Admin, Tecnico)
+      // Super Admin bypass ensures this is true if hasModule('evaluation') returns true (which it does for super admin)
       isVisible:
         hasModule('evaluation') &&
         (isAdmin || isTecnico || currentUser?.canAccessEvaluation),

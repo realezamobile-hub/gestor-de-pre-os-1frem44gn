@@ -33,7 +33,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, []) // fetchUsers is stable from store
 
   // Guard clause
   if (currentUser?.role !== 'ADMIN' && !currentUser?.isSuperAdmin) {

@@ -32715,6 +32715,7 @@ var mapProfileToUser = (profile) => {
 	else if (rawRole === "TECNICO") role = "TECNICO";
 	else if (rawRole === "ADMINISTRATIVO") role = "ADMINISTRATIVO";
 	else if (rawRole === "USER") role = "VENDEDOR";
+	const isSuperAdmin = profile.is_super_admin || profile.email === "realezamobile@gmail.com";
 	return {
 		id: profile.id,
 		name: profile.name || "",
@@ -32725,7 +32726,7 @@ var mapProfileToUser = (profile) => {
 		lastActive: profile.last_active || profile.created_at || (/* @__PURE__ */ new Date(0)).toISOString(),
 		createdAt: profile.created_at || (/* @__PURE__ */ new Date()).toISOString(),
 		companyId: profile.company_id,
-		isSuperAdmin: profile.is_super_admin || false,
+		isSuperAdmin,
 		canCreateList: profile.can_create_list || false,
 		canAccessEvaluation: profile.can_access_evaluation || false,
 		canDeleteRecords: profile.can_delete_records || false
@@ -34098,7 +34099,9 @@ var SheetDescription = import_react.forwardRef(({ className, ...props }, ref) =>
 SheetDescription.displayName = Description.displayName;
 function Sidebar() {
 	const location = useLocation();
-	const { currentUser, currentCompany, logout } = useAuthStore();
+	const currentUser = useAuthStore((state) => state.currentUser);
+	const currentCompany = useAuthStore((state) => state.currentCompany);
+	const logout = useAuthStore((state) => state.logout);
 	const [open, setOpen] = (0, import_react.useState)(false);
 	const modules = currentCompany?.modulos_ativos || [];
 	const hasModule = (module$1) => modules.includes(module$1) || currentUser?.isSuperAdmin;
@@ -44384,4 +44387,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CaxRBXag.js.map
+//# sourceMappingURL=index-Dq9wJi-H.js.map

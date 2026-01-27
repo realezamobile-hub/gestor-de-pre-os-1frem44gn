@@ -45,6 +45,10 @@ const mapProfileToUser = (profile: any): User => {
   else if (rawRole === 'ADMINISTRATIVO') role = 'ADMINISTRATIVO'
   else if (rawRole === 'USER') role = 'VENDEDOR' // Map legacy
 
+  // Hardcode super admin check for specific email to ensure access even if DB flag lags
+  const isSuperAdmin =
+    profile.is_super_admin || profile.email === 'realezamobile@gmail.com'
+
   return {
     id: profile.id,
     name: profile.name || '',
@@ -57,7 +61,7 @@ const mapProfileToUser = (profile: any): User => {
       profile.last_active || profile.created_at || new Date(0).toISOString(),
     createdAt: profile.created_at || new Date().toISOString(),
     companyId: profile.company_id,
-    isSuperAdmin: profile.is_super_admin || false,
+    isSuperAdmin: isSuperAdmin,
     canCreateList: profile.can_create_list || false,
     canAccessEvaluation: profile.can_access_evaluation || false,
     canDeleteRecords: profile.can_delete_records || false,

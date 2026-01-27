@@ -11,7 +11,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.1'
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -48,11 +48,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'avaliacoes_iphone_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "avaliacoes_iphone_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -383,42 +383,23 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'whatsapp_draft_items_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "whatsapp_draft_items_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'produtos'
-            referencedColumns: ['id']
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'whatsapp_draft_items_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "whatsapp_draft_items_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'v_monitor_precos'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'whatsapp_draft_items_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'v_produtos_visiveis'
-            referencedColumns: ['id']
+            referencedRelation: "v_produtos_visiveis"
+            referencedColumns: ["id"]
           },
         ]
       }
     }
     Views: {
-      v_monitor_precos: {
-        Row: {
-          categoria: string | null
-          criado_em: string | null
-          fornecedor: string | null
-          id: number | null
-          modelo: string | null
-          telefone: string | null
-          valor: number | null
-        }
-        Relationships: []
-      }
       v_produtos_menor_preco: {
         Row: {
           categoria: string | null
@@ -472,6 +453,44 @@ export type Database = {
           telefone: string | null
           valor: number | null
         }
+        Insert: {
+          bateria?: string | null
+          categoria?: string | null
+          cor?: string | null
+          criado_em?: string | null
+          data_venda?: string | null
+          em_estoque?: boolean | null
+          estado?: string | null
+          fornecedor?: string | null
+          id?: number | null
+          link_whatsapp?: string | null
+          memoria?: string | null
+          modelo?: string | null
+          modo?: string | null
+          obs?: string | null
+          ram?: string | null
+          telefone?: string | null
+          valor?: number | null
+        }
+        Update: {
+          bateria?: string | null
+          categoria?: string | null
+          cor?: string | null
+          criado_em?: string | null
+          data_venda?: string | null
+          em_estoque?: boolean | null
+          estado?: string | null
+          fornecedor?: string | null
+          id?: number | null
+          link_whatsapp?: string | null
+          memoria?: string | null
+          modelo?: string | null
+          modo?: string | null
+          obs?: string | null
+          ram?: string | null
+          telefone?: string | null
+          valor?: number | null
+        }
         Relationships: []
       }
     }
@@ -479,89 +498,59 @@ export type Database = {
       cleanup_by_date: { Args: { target_date: string }; Returns: Json }
       delete_sold_items: { Args: never; Returns: number }
       delete_zero_value_products: { Args: never; Returns: number }
-      get_product_filters: {
-        Args: { p_min_date: string; p_search_query: string }
-        Returns: Json
-      }
+      get_product_filters:
+        | {
+            Args: { p_min_date: string; p_search_query: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_min_date: string
+              p_search_query: string
+              p_supplier_filter?: string
+            }
+            Returns: Json
+          }
       limpar_produtos_sem_valor: { Args: never; Returns: undefined }
-      search_products:
-        | {
-            Args: {
-              battery_filter: string
-              category_filters: string[]
-              color_filter: string
-              condition_filter: string
-              in_stock_only: boolean
-              memory_filter: string
-              min_date: string
-              search_query: string
-              supplier_filter: string
-            }
-            Returns: {
-              bateria: string | null
-              categoria: string | null
-              cor: string | null
-              criado_em: string | null
-              data_venda: string | null
-              em_estoque: boolean | null
-              estado: string | null
-              fornecedor: string | null
-              id: number | null
-              link_whatsapp: string | null
-              memoria: string | null
-              modelo: string | null
-              modo: string | null
-              obs: string | null
-              ram: string | null
-              telefone: string | null
-              valor: number | null
-            }[]
-            SetofOptions: {
-              from: '*'
-              to: 'v_produtos_visiveis'
-              isOneToOne: false
-              isSetofReturn: true
-            }
-          }
-        | {
-            Args: {
-              battery_filter: string
-              category_filters: string[]
-              color_filter: string
-              condition_filter: string
-              in_stock_only: boolean
-              memory_filter: string
-              min_date: string
-              ram_filter?: string
-              search_query: string
-              supplier_filter: string
-            }
-            Returns: {
-              bateria: string | null
-              categoria: string | null
-              cor: string | null
-              criado_em: string | null
-              data_venda: string | null
-              em_estoque: boolean | null
-              estado: string | null
-              fornecedor: string | null
-              id: number | null
-              link_whatsapp: string | null
-              memoria: string | null
-              modelo: string | null
-              modo: string | null
-              obs: string | null
-              ram: string | null
-              telefone: string | null
-              valor: number | null
-            }[]
-            SetofOptions: {
-              from: '*'
-              to: 'v_produtos_visiveis'
-              isOneToOne: false
-              isSetofReturn: true
-            }
-          }
+      search_products: {
+        Args: {
+          battery_filter: string
+          category_filters: string[]
+          color_filter: string
+          condition_filter: string
+          in_stock_only: boolean
+          memory_filter: string
+          min_date: string
+          ram_filter?: string
+          search_query: string
+          supplier_filter: string
+        }
+        Returns: {
+          bateria: string | null
+          categoria: string | null
+          cor: string | null
+          criado_em: string | null
+          data_venda: string | null
+          em_estoque: boolean | null
+          estado: string | null
+          fornecedor: string | null
+          id: number | null
+          link_whatsapp: string | null
+          memoria: string | null
+          modelo: string | null
+          modo: string | null
+          obs: string | null
+          ram: string | null
+          telefone: string | null
+          valor: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "v_produtos_visiveis"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
@@ -572,33 +561,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -607,23 +596,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -632,23 +621,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -657,36 +646,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -694,3 +683,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

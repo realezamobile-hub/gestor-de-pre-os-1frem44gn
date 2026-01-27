@@ -105,6 +105,7 @@ export interface FilterOptions {
   memories: string[]
   rams: string[]
   colors: string[]
+  categories: string[]
 }
 
 // Evaluation Module Types

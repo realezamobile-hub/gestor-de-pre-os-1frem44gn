@@ -121,6 +121,7 @@ const INITIAL_FILTER_OPTIONS: FilterOptions = {
   memories: [],
   rams: [],
   colors: [],
+  categories: [],
 }
 
 // Helper to cast table name for views since they are not in Database types

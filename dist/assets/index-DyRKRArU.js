@@ -36207,7 +36207,8 @@ var INITIAL_FILTERS = {
 var INITIAL_FILTER_OPTIONS = {
 	memories: [],
 	rams: [],
-	colors: []
+	colors: [],
+	categories: []
 };
 var VIEW_PRODUCTS = "v_produtos_visiveis";
 var VIEW_MONITOR = "v_monitor_precos";
@@ -39149,7 +39150,7 @@ function useDebounce(value, delay) {
 	return debouncedValue;
 }
 function ProductFilters({ className }) {
-	const { filters, setFilters, resetFilters, filterOptions, categories, fetchCategories } = useProductStore();
+	const { filters, setFilters, resetFilters, filterOptions } = useProductStore();
 	const [supplierTerm, setSupplierTerm] = (0, import_react.useState)(filters.supplier || "");
 	const debouncedSupplier = useDebounce(supplierTerm, 300);
 	(0, import_react.useEffect)(() => {
@@ -39162,9 +39163,6 @@ function ProductFilters({ className }) {
 		filters.supplier,
 		setFilters
 	]);
-	(0, import_react.useEffect)(() => {
-		if (categories.length === 0) fetchCategories();
-	}, [categories.length, fetchCategories]);
 	const handleReset = () => {
 		resetFilters();
 	};
@@ -39247,7 +39245,7 @@ function ProductFilters({ className }) {
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "w-full lg:w-[150px]",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MultiSelect, {
-							options: categories,
+							options: filterOptions.categories,
 							selected: filters.categories,
 							onChange: (val) => setFilters({ categories: val }),
 							placeholder: "Categorias",
@@ -45260,4 +45258,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BOIYBQYC.js.map
+//# sourceMappingURL=index-DyRKRArU.js.map

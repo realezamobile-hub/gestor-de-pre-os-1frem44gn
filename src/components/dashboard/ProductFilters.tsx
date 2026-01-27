@@ -19,14 +19,7 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ className }: ProductFiltersProps) {
-  const {
-    filters,
-    setFilters,
-    resetFilters,
-    filterOptions,
-    categories,
-    fetchCategories,
-  } = useProductStore()
+  const { filters, setFilters, resetFilters, filterOptions } = useProductStore()
   const [supplierTerm, setSupplierTerm] = useState(filters.supplier || '')
 
   // Reduced debounce time for better responsiveness
@@ -44,13 +37,6 @@ export function ProductFilters({ className }: ProductFiltersProps) {
       setFilters({ supplier: debouncedSupplier })
     }
   }, [debouncedSupplier, filters.supplier, setFilters])
-
-  // Fetch categories on mount if not available
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories()
-    }
-  }, [categories.length, fetchCategories])
 
   const handleReset = () => {
     resetFilters()
@@ -158,7 +144,7 @@ export function ProductFilters({ className }: ProductFiltersProps) {
 
         <div className="w-full lg:w-[150px]">
           <MultiSelect
-            options={categories}
+            options={filterOptions.categories}
             selected={filters.categories}
             onChange={(val) => setFilters({ categories: val })}
             placeholder="Categorias"

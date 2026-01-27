@@ -1,4 +1,9 @@
 -- Migration to audit and fix search, view and filtering logic
+
+-- Drop view and cascade to functions to allow column reordering
+-- This is necessary because CREATE OR REPLACE VIEW cannot change column types or names of existing columns
+DROP VIEW IF EXISTS public.v_produtos_visiveis CASCADE;
+
 -- 1. Redefine v_produtos_visiveis to ensure no implicit filtering of valid products
 CREATE OR REPLACE VIEW public.v_produtos_visiveis AS
 SELECT

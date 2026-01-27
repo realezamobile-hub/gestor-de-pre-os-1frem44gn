@@ -169,8 +169,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       page: 0,
     }))
     get().fetchProducts()
-    // Fetch options only if search or date changes, as these affect the global result set context more significantly
-    if (newFilters.search !== undefined || newFilters.dateRange !== undefined) {
+    // Fetch options only if search context changes (search, date or supplier)
+    // This ensures that dropdown options (RAM, Memory, Color) are relevant to the current search/supplier results
+    if (
+      newFilters.search !== undefined ||
+      newFilters.dateRange !== undefined ||
+      newFilters.supplier !== undefined
+    ) {
       get().fetchFilterOptions()
     }
   },
@@ -197,10 +202,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       // "Yesterday" filter means items starting from yesterday (usually includes today in this context)
       minDate = subDays(today, 1).toISOString()
     }
+    // If 'all', minDate remains null, which is correctly handled by RPC as "no date filter"
 
     const { data, error } = await supabase.rpc('get_product_filters', {
       p_search_query: filters.search.trim() || null,
       p_min_date: minDate,
+      p_supplier_filter: filters.supplier.trim() || null,
     })
 
     if (!error && data) {
@@ -222,6 +229,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         // "Yesterday" implies items created since start of yesterday
         minDate = subDays(today, 1).toISOString()
       }
+      // If 'all', minDate remains null
 
       // Prepare arguments for the RPC call
       const rpcArgs: any = {
@@ -233,7 +241,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         condition_filter: null,
         supplier_filter: filters.supplier.trim() || null, // Handles partial match via updated RPC
         battery_filter: null,
-        in_stock_only: false,
+        in_stock_only: false, // We want to see all products matching criteria
         min_date: minDate,
       }
 

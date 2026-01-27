@@ -36243,7 +36243,7 @@ const useProductStore = create((set, get$1) => ({
 			page: 0
 		}));
 		get$1().fetchProducts();
-		if (newFilters.search !== void 0 || newFilters.dateRange !== void 0) get$1().fetchFilterOptions();
+		if (newFilters.search !== void 0 || newFilters.dateRange !== void 0 || newFilters.supplier !== void 0) get$1().fetchFilterOptions();
 	},
 	resetFilters: () => {
 		set({
@@ -36265,7 +36265,8 @@ const useProductStore = create((set, get$1) => ({
 		else if (filters.dateRange === "yesterday") minDate = subDays(today, 1).toISOString();
 		const { data, error } = await supabase.rpc("get_product_filters", {
 			p_search_query: filters.search.trim() || null,
-			p_min_date: minDate
+			p_min_date: minDate,
+			p_supplier_filter: filters.supplier.trim() || null
 		});
 		if (!error && data) set({ filterOptions: data });
 	},
@@ -43964,4 +43965,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BLI_eOVL.js.map
+//# sourceMappingURL=index-C3rbz-9W.js.map

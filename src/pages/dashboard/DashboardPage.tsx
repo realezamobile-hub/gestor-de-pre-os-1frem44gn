@@ -40,19 +40,27 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(filters.search)
 
-  // Sync internal state with store state if it changes externally
+  // Sync internal state with store state if it changes externally (e.g. Clear Filters)
   useEffect(() => {
     setSearchTerm(filters.search)
   }, [filters.search])
 
   const debouncedSearch = useDebounce(searchTerm, 300)
 
+  // Sync store when debounced value changes
   useEffect(() => {
     // Only update if value is different to avoid loops/unnecessary fetches
     if (debouncedSearch !== filters.search) {
       setFilters({ search: debouncedSearch })
     }
-  }, [debouncedSearch, setFilters, filters.search])
+    // We strictly want to trigger this ONLY when the user input (debounced) changes.
+    // We intentionally exclude 'filters.search' from dependencies to avoid a race condition:
+    // When filters are reset externally (filters.search becomes ""), this effect would fire
+    // with the STALE debouncedSearch value (e.g. "iphone"), immediately re-applying the filter we just cleared.
+    // By excluding it, we allow the sync effect above to clear the input, which then updates debouncedSearch,
+    // which then triggers this effect with the correct empty value (matching the store).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, setFilters])
 
   useEffect(() => {
     fetchProducts()

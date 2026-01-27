@@ -39158,11 +39158,7 @@ function ProductFilters({ className }) {
 	}, [filters.supplier]);
 	(0, import_react.useEffect)(() => {
 		if (debouncedSupplier !== (filters.supplier || "")) setFilters({ supplier: debouncedSupplier });
-	}, [
-		debouncedSupplier,
-		filters.supplier,
-		setFilters
-	]);
+	}, [debouncedSupplier, setFilters]);
 	const handleReset = () => {
 		resetFilters();
 	};
@@ -39602,11 +39598,7 @@ function DashboardPage() {
 	const debouncedSearch = useDebounce(searchTerm, 300);
 	(0, import_react.useEffect)(() => {
 		if (debouncedSearch !== filters.search) setFilters({ search: debouncedSearch });
-	}, [
-		debouncedSearch,
-		setFilters,
-		filters.search
-	]);
+	}, [debouncedSearch, setFilters]);
 	(0, import_react.useEffect)(() => {
 		fetchProducts();
 		fetchFilterOptions();
@@ -45258,4 +45250,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DyRKRArU.js.map
+//# sourceMappingURL=index-Qj76XpyQ.js.map

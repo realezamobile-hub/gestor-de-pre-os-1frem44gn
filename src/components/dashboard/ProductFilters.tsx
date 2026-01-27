@@ -36,7 +36,9 @@ export function ProductFilters({ className }: ProductFiltersProps) {
     if (debouncedSupplier !== (filters.supplier || '')) {
       setFilters({ supplier: debouncedSupplier })
     }
-  }, [debouncedSupplier, filters.supplier, setFilters])
+    // We intentionally exclude 'filters.supplier' from dependencies to avoid race condition during reset
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSupplier, setFilters])
 
   const handleReset = () => {
     resetFilters()

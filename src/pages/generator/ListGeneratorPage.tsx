@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import {
   Copy,
   Loader2,
   RefreshCw,
+  Smile,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -21,6 +22,12 @@ import { DraftItem, GeneratorConfigData } from '@/types'
 import { GeneratorConfig } from '@/components/generator/GeneratorConfig'
 import { DraftListGrouped } from '@/components/generator/DraftListGrouped'
 import { GeneratorHistory } from '@/components/generator/GeneratorHistory'
+import { EmojiPicker } from '@/components/common/EmojiPicker'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export default function ListGeneratorPage() {
   const {
@@ -72,6 +79,7 @@ export default function ListGeneratorPage() {
   const [internalText, setInternalText] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const previewTextareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Trigger to auto-refresh previews after global operations
   const [triggerRefresh, setTriggerRefresh] = useState(false)
@@ -268,6 +276,32 @@ export default function ListGeneratorPage() {
     }
   }
 
+  const insertEmojiInPreview = (emoji: string) => {
+    const el = previewTextareaRef.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const currentValue = isInternal ? internalText : customerText
+
+    if (start === null || end === null) return
+
+    const before = currentValue.substring(0, start)
+    const after = currentValue.substring(end)
+    const newValue = `${before}${emoji}${after}`
+
+    if (isInternal) {
+      setInternalText(newValue)
+    } else {
+      setCustomerText(newValue)
+    }
+
+    setTimeout(() => {
+      el.focus()
+      el.setSelectionRange(start + emoji.length, start + emoji.length)
+    }, 0)
+  }
+
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -386,18 +420,47 @@ export default function ListGeneratorPage() {
                         : 'whatsapp_preview.txt'}
                     </span>
                   </div>
-                  <Button
-                    onClick={handleGenerate}
-                    size="sm"
-                    variant={isInternal ? 'outline' : 'secondary'}
-                    className="h-7 text-xs"
-                  >
-                    <RefreshCw className="w-3 h-3 mr-1.5" />
-                    Gerar Prévias
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <EmojiPicker
+                            onEmojiSelect={insertEmojiInPreview}
+                            trigger={
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className={cn(
+                                  'h-7 px-2',
+                                  isInternal
+                                    ? 'text-slate-600 hover:bg-slate-200'
+                                    : 'text-slate-400 hover:bg-slate-800',
+                                )}
+                              >
+                                <Smile className="w-4 h-4" />
+                              </Button>
+                            }
+                            side="left"
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>Inserir Emoji</TooltipContent>
+                    </Tooltip>
+
+                    <Button
+                      onClick={handleGenerate}
+                      size="sm"
+                      variant={isInternal ? 'outline' : 'secondary'}
+                      className="h-7 text-xs"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1.5" />
+                      Gerar Prévias
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 overflow-hidden relative group">
                   <textarea
+                    ref={previewTextareaRef}
                     value={isInternal ? internalText : customerText}
                     onChange={(e) =>
                       isInternal

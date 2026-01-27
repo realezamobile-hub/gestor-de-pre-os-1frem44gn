@@ -18,7 +18,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
-import { History, Trash2, Copy, Eye, Package, Search, X } from 'lucide-react'
+import {
+  History,
+  Trash2,
+  Copy,
+  Eye,
+  Package,
+  Search,
+  X,
+  Lock,
+} from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -30,11 +39,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 export function GeneratorHistory() {
   const { generatedLists, deleteGeneratedList } = useProductStore()
   const [selectedList, setSelectedList] = useState<GeneratedList | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showInternalDetails, setShowInternalDetails] = useState(false)
 
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content)
@@ -169,9 +181,14 @@ export function GeneratorHistory() {
 
       <Dialog
         open={!!selectedList}
-        onOpenChange={(open) => !open && setSelectedList(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedList(null)
+            setShowInternalDetails(false)
+          }
+        }}
       >
-        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Detalhes da Lista</span>
@@ -205,42 +222,108 @@ export function GeneratorHistory() {
               </div>
 
               <div className="flex flex-col gap-2 min-h-0">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Package className="w-4 h-4" />
-                  Itens Originais ({selectedList.items_snapshot?.length || 0})
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Package className="w-4 h-4" />
+                    Itens ({selectedList.items_snapshot?.length || 0})
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="internal-mode"
+                      checked={showInternalDetails}
+                      onCheckedChange={setShowInternalDetails}
+                    />
+                    <Label htmlFor="internal-mode" className="text-xs">
+                      {showInternalDetails
+                        ? 'Ver Detalhes Públicos'
+                        : 'Ver Dados Internos'}
+                    </Label>
+                  </div>
                 </div>
+
                 <div className="border rounded-md bg-white flex-1 overflow-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="h-8 text-xs">Produto</TableHead>
-                        <TableHead className="h-8 text-xs text-right">
-                          Preço
-                        </TableHead>
+                        {showInternalDetails ? (
+                          <>
+                            <TableHead className="h-8 text-xs">
+                              Fornecedor
+                            </TableHead>
+                            <TableHead className="h-8 text-xs text-right">
+                              Custo Orig.
+                            </TableHead>
+                          </>
+                        ) : (
+                          <TableHead className="h-8 text-xs text-right">
+                            Preço Lista
+                          </TableHead>
+                        )}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedList.items_snapshot?.map((item, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell className="py-2 text-xs">
-                            <div className="font-medium">
-                              {item.custom_model || item.product?.modelo}
-                            </div>
-                            <div className="text-muted-foreground scale-90 origin-left">
-                              {item.group_name}
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-2 text-xs text-right font-mono">
-                            R${' '}
-                            {item.custom_price?.toLocaleString('pt-BR', {
-                              minimumFractionDigits: 2,
-                            })}
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {selectedList.items_snapshot?.map((item, idx) => {
+                        const originalPrice = item.product?.valor
+                        const hasProduct = !!item.product
+                        return (
+                          <TableRow key={idx}>
+                            <TableCell className="py-2 text-xs">
+                              <div className="font-medium">
+                                {item.custom_model || item.product?.modelo}
+                              </div>
+                              <div className="text-muted-foreground scale-90 origin-left">
+                                {item.group_name}
+                              </div>
+                            </TableCell>
+
+                            {showInternalDetails ? (
+                              <>
+                                <TableCell className="py-2 text-xs">
+                                  {hasProduct ? (
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">
+                                        {item.product?.fornecedor || '-'}
+                                      </span>
+                                      <span className="text-[10px] text-muted-foreground">
+                                        {item.product?.telefone || '-'}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground italic">
+                                      Manual
+                                    </span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="py-2 text-xs text-right font-mono text-red-600">
+                                  {originalPrice
+                                    ? `R$ ${originalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                                    : '-'}
+                                </TableCell>
+                              </>
+                            ) : (
+                              <TableCell className="py-2 text-xs text-right font-mono text-emerald-600">
+                                R${' '}
+                                {item.custom_price?.toLocaleString('pt-BR', {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </div>
+                {showInternalDetails && (
+                  <div className="p-2 bg-yellow-50 border border-yellow-100 rounded text-[10px] text-yellow-800 flex items-start gap-2">
+                    <Lock className="w-3 h-3 mt-0.5 shrink-0" />
+                    <p>
+                      Estes dados são internos (custo e fornecedor original) e
+                      foram salvos no momento da geração da lista.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}

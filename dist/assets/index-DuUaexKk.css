@@ -991,8 +991,8 @@ section[aria-label='Notifications alt+T'] {
 .max-h-\[300px\]{
   max-height: 300px;
 }
-.max-h-\[80vh\]{
-  max-height: 80vh;
+.max-h-\[90vh\]{
+  max-height: 90vh;
 }
 .max-h-\[var\(--radix-dropdown-menu-content-available-height\)\]{
   max-height: var(--radix-dropdown-menu-content-available-height);
@@ -1173,8 +1173,8 @@ section[aria-label='Notifications alt+T'] {
 .min-w-\[var\(--radix-select-trigger-width\)\]{
   min-width: var(--radix-select-trigger-width);
 }
-.max-w-3xl{
-  max-width: 48rem;
+.max-w-4xl{
+  max-width: 56rem;
 }
 .max-w-\[--skeleton-width\]{
   max-width: var(--skeleton-width);
@@ -1679,6 +1679,10 @@ section[aria-label='Notifications alt+T'] {
 .border-transparent{
   border-color: transparent;
 }
+.border-yellow-100{
+  --tw-border-opacity: 1;
+  border-color: rgb(254 249 195 / var(--tw-border-opacity, 1));
+}
 .border-l-emerald-500{
   --tw-border-opacity: 1;
   border-left-color: rgb(16 185 129 / var(--tw-border-opacity, 1));
@@ -1915,6 +1919,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-white\/90{
   background-color: rgb(255 255 255 / 0.9);
+}
+.bg-yellow-50{
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1));
 }
 .bg-yellow-500{
   --tw-bg-opacity: 1;
@@ -2438,6 +2446,10 @@ section[aria-label='Notifications alt+T'] {
 .text-yellow-600{
   --tw-text-opacity: 1;
   color: rgb(202 138 4 / var(--tw-text-opacity, 1));
+}
+.text-yellow-800{
+  --tw-text-opacity: 1;
+  color: rgb(133 77 14 / var(--tw-text-opacity, 1));
 }
 .underline-offset-4{
   text-underline-offset: 4px;

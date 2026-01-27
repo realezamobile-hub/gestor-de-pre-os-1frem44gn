@@ -24744,9 +24744,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$3 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
-			var instRef = useRef$2(null);
+			var instRef = useRef$3(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -40258,6 +40258,34 @@ const emojiCategories = [
 					"tomada",
 					"carregador"
 				]
+			},
+			{
+				emoji: "💣",
+				name: "Bomba",
+				keywords: [
+					"bomb",
+					"explosão",
+					"preço baixo"
+				]
+			},
+			{
+				emoji: "🎉",
+				name: "Festa",
+				keywords: [
+					"party",
+					"comemoração",
+					"novidade"
+				]
+			},
+			{
+				emoji: "✨",
+				name: "Brilho",
+				keywords: [
+					"sparkles",
+					"brilho",
+					"novo",
+					"especial"
+				]
 			}
 		]
 	},
@@ -40518,11 +40546,34 @@ const emojiCategories = [
 					"por favor",
 					"obrigado"
 				]
+			},
+			{
+				emoji: "🫡",
+				name: "Saudação",
+				keywords: [
+					"salute",
+					"respeito",
+					"sim senhor"
+				]
+			},
+			{
+				emoji: "🫣",
+				name: "Espiando",
+				keywords: [
+					"peek",
+					"espiando",
+					"medo"
+				]
+			},
+			{
+				emoji: "🫠",
+				name: "Derretendo",
+				keywords: ["melting", "calor"]
 			}
 		]
 	},
 	{
-		id: "objects",
+		id: "objects_tech",
 		name: "Objetos e Tecnologia",
 		emojis: [
 			{
@@ -40552,6 +40603,11 @@ const emojiCategories = [
 				emoji: "🖱️",
 				name: "Mouse",
 				keywords: ["mouse"]
+			},
+			{
+				emoji: "⌨️",
+				name: "Teclado",
+				keywords: ["keyboard", "teclado"]
 			},
 			{
 				emoji: "📷",
@@ -40630,12 +40686,44 @@ const emojiCategories = [
 					"present",
 					"presente"
 				]
+			},
+			{
+				emoji: "⌚",
+				name: "Smartwatch",
+				keywords: [
+					"watch",
+					"relógio",
+					"smart"
+				]
+			},
+			{
+				emoji: "🎮",
+				name: "Video Game",
+				keywords: [
+					"game",
+					"jogo",
+					"console"
+				]
+			},
+			{
+				emoji: "🕹️",
+				name: "Joystick",
+				keywords: [
+					"joystick",
+					"game",
+					"jogo"
+				]
+			},
+			{
+				emoji: "📱",
+				name: "Smartphone",
+				keywords: ["mobile", "celular"]
 			}
 		]
 	},
 	{
 		id: "symbols",
-		name: "Símbolos",
+		name: "Símbolos e Setas",
 		emojis: [
 			{
 				emoji: "❤️",
@@ -40794,6 +40882,199 @@ const emojiCategories = [
 					"arrow",
 					"down",
 					"baixo"
+				]
+			},
+			{
+				emoji: "🆗",
+				name: "OK",
+				keywords: [
+					"ok",
+					"button",
+					"botão",
+					"certo"
+				]
+			},
+			{
+				emoji: "🔝",
+				name: "Top",
+				keywords: [
+					"top",
+					"acima",
+					"melhor"
+				]
+			},
+			{
+				emoji: "🔞",
+				name: "Proibido Menores",
+				keywords: ["18", "proibido"]
+			},
+			{
+				emoji: "📶",
+				name: "Sinal",
+				keywords: [
+					"signal",
+					"sinal",
+					"rede"
+				]
+			}
+		]
+	},
+	{
+		id: "nature",
+		name: "Natureza e Animais",
+		emojis: [
+			{
+				emoji: "🐶",
+				name: "Cachorro",
+				keywords: [
+					"dog",
+					"cão",
+					"pet"
+				]
+			},
+			{
+				emoji: "🐱",
+				name: "Gato",
+				keywords: [
+					"cat",
+					"gato",
+					"pet"
+				]
+			},
+			{
+				emoji: "🐭",
+				name: "Rato",
+				keywords: ["mouse", "rato"]
+			},
+			{
+				emoji: "🦁",
+				name: "Leão",
+				keywords: [
+					"lion",
+					"leão",
+					"rei"
+				]
+			},
+			{
+				emoji: "🐯",
+				name: "Tigre",
+				keywords: ["tiger", "tigre"]
+			},
+			{
+				emoji: "🐻",
+				name: "Urso",
+				keywords: ["bear", "urso"]
+			},
+			{
+				emoji: "🐼",
+				name: "Panda",
+				keywords: ["panda"]
+			},
+			{
+				emoji: "🐸",
+				name: "Sapo",
+				keywords: ["frog", "sapo"]
+			},
+			{
+				emoji: "🐔",
+				name: "Galinha",
+				keywords: [
+					"chicken",
+					"galinha",
+					"ave"
+				]
+			},
+			{
+				emoji: "🦄",
+				name: "Unicórnio",
+				keywords: ["unicorn", "unicórnio"]
+			},
+			{
+				emoji: "🐝",
+				name: "Abelha",
+				keywords: [
+					"bee",
+					"abelha",
+					"mel"
+				]
+			},
+			{
+				emoji: "🦋",
+				name: "Borboleta",
+				keywords: ["butterfly", "borboleta"]
+			},
+			{
+				emoji: "💐",
+				name: "Buquê",
+				keywords: [
+					"bouquet",
+					"flowers",
+					"flores"
+				]
+			},
+			{
+				emoji: "🌸",
+				name: "Flor de Cerejeira",
+				keywords: ["flower", "flor"]
+			},
+			{
+				emoji: "🌹",
+				name: "Rosa",
+				keywords: [
+					"rose",
+					"rosa",
+					"flor"
+				]
+			},
+			{
+				emoji: "🌻",
+				name: "Girassol",
+				keywords: ["sunflower", "flor"]
+			},
+			{
+				emoji: "🌴",
+				name: "Palmeira",
+				keywords: [
+					"palm",
+					"tree",
+					"árvore"
+				]
+			},
+			{
+				emoji: "🌵",
+				name: "Cacto",
+				keywords: ["cactus", "cacto"]
+			},
+			{
+				emoji: "⭐",
+				name: "Estrela",
+				keywords: [
+					"star",
+					"estrela",
+					"brilho"
+				]
+			},
+			{
+				emoji: "🌟",
+				name: "Estrela Brilhante",
+				keywords: ["star", "brilho"]
+			},
+			{
+				emoji: "☀️",
+				name: "Sol",
+				keywords: [
+					"sun",
+					"sol",
+					"dia"
+				]
+			},
+			{
+				emoji: "🌙",
+				name: "Lua",
+				keywords: [
+					"moon",
+					"lua",
+					"noite"
 				]
 			}
 		]
@@ -42913,10 +43194,125 @@ const ptBR = {
 		firstWeekContainsDate: 1
 	}
 };
+var SWITCH_NAME = "Switch";
+var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
+var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
+var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
+	const [button, setButton] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = button ? form || !!button.closest("form") : true;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: SWITCH_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
+		scope: __scopeSwitch,
+		checked,
+		disabled,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+			type: "button",
+			role: "switch",
+			"aria-checked": checked,
+			"aria-required": required,
+			"data-state": getState(checked),
+			"data-disabled": disabled ? "" : void 0,
+			disabled,
+			value,
+			...switchProps,
+			ref: composedRefs,
+			onClick: composeEventHandlers(props.onClick, (event) => {
+				setChecked((prevChecked) => !prevChecked);
+				if (isFormControl) {
+					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+				}
+			})
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
+			control: button,
+			bubbles: !hasConsumerStoppedPropagationRef.current,
+			name,
+			value,
+			checked,
+			required,
+			disabled,
+			form,
+			style: { transform: "translateX(-100%)" }
+		})]
+	});
+});
+Switch$1.displayName = SWITCH_NAME;
+var THUMB_NAME = "SwitchThumb";
+var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSwitch, ...thumbProps } = props;
+	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-state": getState(context.checked),
+		"data-disabled": context.disabled ? "" : void 0,
+		...thumbProps,
+		ref: forwardedRef
+	});
+});
+SwitchThumb.displayName = THUMB_NAME;
+var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
+var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(ref, forwardedRef);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = ref.current;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			setChecked.call(input, checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		prevChecked,
+		checked,
+		bubbles
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: checked,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0
+		}
+	});
+});
+SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function getState(checked) {
+	return checked ? "checked" : "unchecked";
+}
+var Root = Switch$1;
+var Thumb = SwitchThumb;
+var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	...props,
+	ref,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+}));
+Switch.displayName = Root.displayName;
 function GeneratorHistory() {
 	const { generatedLists, deleteGeneratedList } = useProductStore();
 	const [selectedList, setSelectedList] = (0, import_react.useState)(null);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)("");
+	const [showInternalDetails, setShowInternalDetails] = (0, import_react.useState)(false);
 	const handleCopy = (content) => {
 		navigator.clipboard.writeText(content);
 		toast.success("Conteúdo copiado!");
@@ -43020,9 +43416,14 @@ function GeneratorHistory() {
 		})]
 	})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
 		open: !!selectedList,
-		onOpenChange: (open) => !open && setSelectedList(null),
+		onOpenChange: (open) => {
+			if (!open) {
+				setSelectedList(null);
+				setShowInternalDetails(false);
+			}
+		},
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
-			className: "max-w-3xl max-h-[80vh] flex flex-col",
+			className: "max-w-4xl max-h-[90vh] flex flex-col",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
 				className: "flex items-center justify-between",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Detalhes da Lista" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -43051,40 +43452,89 @@ function GeneratorHistory() {
 					]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex flex-col gap-2 min-h-0",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-2 text-sm font-semibold",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-4 h-4" }),
-							"Itens Originais (",
-							selectedList.items_snapshot?.length || 0,
-							")"
-						]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						className: "border rounded-md bg-white flex-1 overflow-auto",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "h-8 text-xs",
-							children: "Produto"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "h-8 text-xs text-right",
-							children: "Preço"
-						})] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: selectedList.items_snapshot?.map((item, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-							className: "py-2 text-xs",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "font-medium",
-								children: item.custom_model || item.product?.modelo
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "text-muted-foreground scale-90 origin-left",
-								children: item.group_name
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2 text-sm font-semibold",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package, { className: "w-4 h-4" }),
+									"Itens (",
+									selectedList.items_snapshot?.length || 0,
+									")"
+								]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center space-x-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+									id: "internal-mode",
+									checked: showInternalDetails,
+									onCheckedChange: setShowInternalDetails
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									htmlFor: "internal-mode",
+									className: "text-xs",
+									children: showInternalDetails ? "Ver Detalhes Públicos" : "Ver Dados Internos"
+								})]
 							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-							className: "py-2 text-xs text-right font-mono",
-							children: [
-								"R$",
-								" ",
-								item.custom_price?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-							]
-						})] }, idx)) })] })
-					})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "border rounded-md bg-white flex-1 overflow-auto",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+								className: "h-8 text-xs",
+								children: "Produto"
+							}), showInternalDetails ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+								className: "h-8 text-xs",
+								children: "Fornecedor"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+								className: "h-8 text-xs text-right",
+								children: "Custo Orig."
+							})] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+								className: "h-8 text-xs text-right",
+								children: "Preço Lista"
+							})] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: selectedList.items_snapshot?.map((item, idx) => {
+								const originalPrice = item.product?.valor;
+								const hasProduct = !!item.product;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+									className: "py-2 text-xs",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "font-medium",
+										children: item.custom_model || item.product?.modelo
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "text-muted-foreground scale-90 origin-left",
+										children: item.group_name
+									})]
+								}), showInternalDetails ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+									className: "py-2 text-xs",
+									children: hasProduct ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex flex-col",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "font-medium",
+											children: item.product?.fornecedor || "-"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "text-[10px] text-muted-foreground",
+											children: item.product?.telefone || "-"
+										})]
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground italic",
+										children: "Manual"
+									})
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+									className: "py-2 text-xs text-right font-mono text-red-600",
+									children: originalPrice ? `R$ ${originalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "-"
+								})] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+									className: "py-2 text-xs text-right font-mono text-emerald-600",
+									children: [
+										"R$",
+										" ",
+										item.custom_price?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+									]
+								})] }, idx);
+							}) })] })
+						}),
+						showInternalDetails && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "p-2 bg-yellow-50 border border-yellow-100 rounded text-[10px] text-yellow-800 flex items-start gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-3 h-3 mt-0.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Estes dados são internos (custo e fornecedor original) e foram salvos no momento da geração da lista." })]
+						})
+					]
 				})]
 			})]
 		})
@@ -43124,6 +43574,7 @@ function ListGeneratorPage() {
 	const [internalText, setInternalText] = (0, import_react.useState)("");
 	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	const previewTextareaRef = (0, import_react.useRef)(null);
 	const [triggerRefresh, setTriggerRefresh] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		const savedCustomer = localStorage.getItem("generator_customerText");
@@ -43263,6 +43714,21 @@ function ListGeneratorPage() {
 		if (result.success) toast.success("Lista salva no histórico!");
 		else toast.error("Erro ao salvar lista");
 	};
+	const insertEmojiInPreview = (emoji) => {
+		const el = previewTextareaRef.current;
+		if (!el) return;
+		const start = el.selectionStart;
+		const end = el.selectionEnd;
+		const currentValue = isInternal ? internalText : customerText;
+		if (start === null || end === null) return;
+		const newValue = `${currentValue.substring(0, start)}${emoji}${currentValue.substring(end)}`;
+		if (isInternal) setInternalText(newValue);
+		else setCustomerText(newValue);
+		setTimeout(() => {
+			el.focus();
+			el.setSelectionRange(start + emoji.length, start + emoji.length);
+		}, 0);
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-[calc(100vh-8rem)] flex flex-col gap-6",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -43368,16 +43834,32 @@ function ListGeneratorPage() {
 												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
 											})
 										]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-										onClick: handleGenerate,
-										size: "sm",
-										variant: isInternal ? "outline" : "secondary",
-										className: "h-7 text-xs",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévias"]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+											asChild: true,
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmojiPicker, {
+												onEmojiSelect: insertEmojiInPreview,
+												trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+													size: "sm",
+													variant: "ghost",
+													className: cn("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-4 h-4" })
+												}),
+												side: "left"
+											}) })
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Inserir Emoji" })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											onClick: handleGenerate,
+											size: "sm",
+											variant: isInternal ? "outline" : "secondary",
+											className: "h-7 text-xs",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévias"]
+										})]
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 									className: "p-0 flex-1 overflow-hidden relative group",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
+										ref: previewTextareaRef,
 										value: isInternal ? internalText : customerText,
 										onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
 										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
@@ -43447,120 +43929,6 @@ const useCompanyStore = create((set, get$1) => ({
 		return { success: true };
 	}
 }));
-var SWITCH_NAME = "Switch";
-var [createSwitchContext, createSwitchScope] = createContextScope(SWITCH_NAME);
-var [SwitchProvider, useSwitchContext] = createSwitchContext(SWITCH_NAME);
-var Switch$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, name, checked: checkedProp, defaultChecked, required, disabled, value = "on", onCheckedChange, form, ...switchProps } = props;
-	const [button, setButton] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node) => setButton(node));
-	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
-	const isFormControl = button ? form || !!button.closest("form") : true;
-	const [checked, setChecked] = useControllableState({
-		prop: checkedProp,
-		defaultProp: defaultChecked ?? false,
-		onChange: onCheckedChange,
-		caller: SWITCH_NAME
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SwitchProvider, {
-		scope: __scopeSwitch,
-		checked,
-		disabled,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
-			type: "button",
-			role: "switch",
-			"aria-checked": checked,
-			"aria-required": required,
-			"data-state": getState(checked),
-			"data-disabled": disabled ? "" : void 0,
-			disabled,
-			value,
-			...switchProps,
-			ref: composedRefs,
-			onClick: composeEventHandlers(props.onClick, (event) => {
-				setChecked((prevChecked) => !prevChecked);
-				if (isFormControl) {
-					hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
-					if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
-				}
-			})
-		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SwitchBubbleInput, {
-			control: button,
-			bubbles: !hasConsumerStoppedPropagationRef.current,
-			name,
-			value,
-			checked,
-			required,
-			disabled,
-			form,
-			style: { transform: "translateX(-100%)" }
-		})]
-	});
-});
-Switch$1.displayName = SWITCH_NAME;
-var THUMB_NAME = "SwitchThumb";
-var SwitchThumb = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeSwitch, ...thumbProps } = props;
-	const context = useSwitchContext(THUMB_NAME, __scopeSwitch);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
-		"data-state": getState(context.checked),
-		"data-disabled": context.disabled ? "" : void 0,
-		...thumbProps,
-		ref: forwardedRef
-	});
-});
-SwitchThumb.displayName = THUMB_NAME;
-var BUBBLE_INPUT_NAME = "SwitchBubbleInput";
-var SwitchBubbleInput = import_react.forwardRef(({ __scopeSwitch, control, checked, bubbles = true, ...props }, forwardedRef) => {
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(ref, forwardedRef);
-	const prevChecked = usePrevious(checked);
-	const controlSize = useSize(control);
-	import_react.useEffect(() => {
-		const input = ref.current;
-		if (!input) return;
-		const inputProto = window.HTMLInputElement.prototype;
-		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
-		if (prevChecked !== checked && setChecked) {
-			const event = new Event("click", { bubbles });
-			setChecked.call(input, checked);
-			input.dispatchEvent(event);
-		}
-	}, [
-		prevChecked,
-		checked,
-		bubbles
-	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-		type: "checkbox",
-		"aria-hidden": true,
-		defaultChecked: checked,
-		...props,
-		tabIndex: -1,
-		ref: composedRefs,
-		style: {
-			...props.style,
-			...controlSize,
-			position: "absolute",
-			pointerEvents: "none",
-			opacity: 0,
-			margin: 0
-		}
-	});
-});
-SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
-function getState(checked) {
-	return checked ? "checked" : "unchecked";
-}
-var Root = Switch$1;
-var Thumb = SwitchThumb;
-var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
-	...props,
-	ref,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
-}));
-Switch.displayName = Root.displayName;
 function UserManagement() {
 	const users = useAuthStore((state) => state.users);
 	const currentUser = useAuthStore((state) => state.currentUser);
@@ -46101,4 +46469,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DCjYamBM.js.map
+//# sourceMappingURL=index-DUz57KjB.js.map

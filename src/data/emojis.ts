@@ -117,6 +117,21 @@ export const emojiCategories: EmojiCategory[] = [
         name: 'Tomada',
         keywords: ['plug', 'tomada', 'carregador'],
       },
+      {
+        emoji: '💣',
+        name: 'Bomba',
+        keywords: ['bomb', 'explosão', 'preço baixo'],
+      },
+      {
+        emoji: '🎉',
+        name: 'Festa',
+        keywords: ['party', 'comemoração', 'novidade'],
+      },
+      {
+        emoji: '✨',
+        name: 'Brilho',
+        keywords: ['sparkles', 'brilho', 'novo', 'especial'],
+      },
     ],
   },
   {
@@ -234,10 +249,17 @@ export const emojiCategories: EmojiCategory[] = [
         name: 'Rezar',
         keywords: ['pray', 'please', 'por favor', 'obrigado'],
       },
+      {
+        emoji: '🫡',
+        name: 'Saudação',
+        keywords: ['salute', 'respeito', 'sim senhor'],
+      },
+      { emoji: '🫣', name: 'Espiando', keywords: ['peek', 'espiando', 'medo'] },
+      { emoji: '🫠', name: 'Derretendo', keywords: ['melting', 'calor'] },
     ],
   },
   {
-    id: 'objects',
+    id: 'objects_tech',
     name: 'Objetos e Tecnologia',
     emojis: [
       {
@@ -252,6 +274,7 @@ export const emojiCategories: EmojiCategory[] = [
       },
       { emoji: '🖨️', name: 'Impressora', keywords: ['printer', 'impressora'] },
       { emoji: '🖱️', name: 'Mouse', keywords: ['mouse'] },
+      { emoji: '⌨️', name: 'Teclado', keywords: ['keyboard', 'teclado'] },
       { emoji: '📷', name: 'Câmera', keywords: ['camera', 'foto'] },
       {
         emoji: '📸',
@@ -282,11 +305,27 @@ export const emojiCategories: EmojiCategory[] = [
         name: 'Presente',
         keywords: ['gift', 'present', 'presente'],
       },
+      {
+        emoji: '⌚',
+        name: 'Smartwatch',
+        keywords: ['watch', 'relógio', 'smart'],
+      },
+      {
+        emoji: '🎮',
+        name: 'Video Game',
+        keywords: ['game', 'jogo', 'console'],
+      },
+      {
+        emoji: '🕹️',
+        name: 'Joystick',
+        keywords: ['joystick', 'game', 'jogo'],
+      },
+      { emoji: '📱', name: 'Smartphone', keywords: ['mobile', 'celular'] },
     ],
   },
   {
     id: 'symbols',
-    name: 'Símbolos',
+    name: 'Símbolos e Setas',
     emojis: [
       {
         emoji: '❤️',
@@ -331,6 +370,54 @@ export const emojiCategories: EmojiCategory[] = [
       },
       { emoji: '⬆️', name: 'Seta Cima', keywords: ['arrow', 'up', 'cima'] },
       { emoji: '⬇️', name: 'Seta Baixo', keywords: ['arrow', 'down', 'baixo'] },
+      {
+        emoji: '🆗',
+        name: 'OK',
+        keywords: ['ok', 'button', 'botão', 'certo'],
+      },
+      { emoji: '🔝', name: 'Top', keywords: ['top', 'acima', 'melhor'] },
+      { emoji: '🔞', name: 'Proibido Menores', keywords: ['18', 'proibido'] },
+      { emoji: '📶', name: 'Sinal', keywords: ['signal', 'sinal', 'rede'] },
+    ],
+  },
+  {
+    id: 'nature',
+    name: 'Natureza e Animais',
+    emojis: [
+      { emoji: '🐶', name: 'Cachorro', keywords: ['dog', 'cão', 'pet'] },
+      { emoji: '🐱', name: 'Gato', keywords: ['cat', 'gato', 'pet'] },
+      { emoji: '🐭', name: 'Rato', keywords: ['mouse', 'rato'] },
+      { emoji: '🦁', name: 'Leão', keywords: ['lion', 'leão', 'rei'] },
+      { emoji: '🐯', name: 'Tigre', keywords: ['tiger', 'tigre'] },
+      { emoji: '🐻', name: 'Urso', keywords: ['bear', 'urso'] },
+      { emoji: '🐼', name: 'Panda', keywords: ['panda'] },
+      { emoji: '🐸', name: 'Sapo', keywords: ['frog', 'sapo'] },
+      {
+        emoji: '🐔',
+        name: 'Galinha',
+        keywords: ['chicken', 'galinha', 'ave'],
+      },
+      { emoji: '🦄', name: 'Unicórnio', keywords: ['unicorn', 'unicórnio'] },
+      { emoji: '🐝', name: 'Abelha', keywords: ['bee', 'abelha', 'mel'] },
+      { emoji: '🦋', name: 'Borboleta', keywords: ['butterfly', 'borboleta'] },
+      {
+        emoji: '💐',
+        name: 'Buquê',
+        keywords: ['bouquet', 'flowers', 'flores'],
+      },
+      { emoji: '🌸', name: 'Flor de Cerejeira', keywords: ['flower', 'flor'] },
+      { emoji: '🌹', name: 'Rosa', keywords: ['rose', 'rosa', 'flor'] },
+      { emoji: '🌻', name: 'Girassol', keywords: ['sunflower', 'flor'] },
+      { emoji: '🌴', name: 'Palmeira', keywords: ['palm', 'tree', 'árvore'] },
+      { emoji: '🌵', name: 'Cacto', keywords: ['cactus', 'cacto'] },
+      {
+        emoji: '⭐',
+        name: 'Estrela',
+        keywords: ['star', 'estrela', 'brilho'],
+      },
+      { emoji: '🌟', name: 'Estrela Brilhante', keywords: ['star', 'brilho'] },
+      { emoji: '☀️', name: 'Sol', keywords: ['sun', 'sol', 'dia'] },
+      { emoji: '🌙', name: 'Lua', keywords: ['moon', 'lua', 'noite'] },
     ],
   },
 ]

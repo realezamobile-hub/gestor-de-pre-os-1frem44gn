@@ -25,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { EmojiPicker } from '@/components/common/EmojiPicker'
 
 interface DraftItemCardProps {
   item: DraftItem
@@ -145,6 +146,32 @@ export function DraftItemCard({
     }, 0)
   }
 
+  const insertEmoji = (
+    ref: React.RefObject<HTMLInputElement>,
+    value: string,
+    setValue: (v: string) => void,
+    emoji: string,
+  ) => {
+    const el = ref.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+
+    if (start === null || end === null) return
+
+    const before = value.substring(0, start)
+    const after = value.substring(end)
+
+    const newValue = `${before}${emoji}${after}`
+    setValue(newValue)
+
+    setTimeout(() => {
+      el.focus()
+      el.setSelectionRange(start + emoji.length, start + emoji.length)
+    }, 0)
+  }
+
   const FormatToolbar = ({
     targetRef,
     value,
@@ -154,7 +181,7 @@ export function DraftItemCard({
     value: string
     setValue: (v: string) => void
   }) => (
-    <div className="absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm">
+    <div className="absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm z-20">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
@@ -187,25 +214,22 @@ export function DraftItemCard({
         </TooltipTrigger>
         <TooltipContent side="top">Itálico (_texto_)</TooltipContent>
       </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
+
+      <EmojiPicker
+        onEmojiSelect={(emoji) =>
+          insertEmoji(targetRef, value, setValue, emoji)
+        }
+        trigger={
           <Button
             variant="ghost"
             size="icon"
             className="h-5 w-5 hover:bg-slate-200 text-amber-500"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              targetRef.current?.focus()
-              // Try to trigger native emoji picker instructions or basic insert
-            }}
           >
             <Smile className="w-3 h-3" />
           </Button>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          Use Win+. ou Cmd+Ctrl+Space para Emojis
-        </TooltipContent>
-      </Tooltip>
+        }
+        side="top"
+      />
     </div>
   )
 

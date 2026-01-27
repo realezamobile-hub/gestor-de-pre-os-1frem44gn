@@ -24684,7 +24684,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$20({ inst: {
+			cachedValue = useState$21({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24698,7 +24698,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$17(function() {
+			useEffect$18(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24721,7 +24721,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$20 = React$3.useState, useEffect$17 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$21 = React$3.useState, useEffect$18 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24744,7 +24744,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$17 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$2 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$2(null);
 			if (null === instRef.current) {
@@ -24786,7 +24786,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$17(function() {
+			useEffect$18(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -40038,6 +40038,840 @@ var Textarea = import_react.forwardRef(({ className, ...props }, ref) => {
 	});
 });
 Textarea.displayName = "Textarea";
+const emojiCategories = [
+	{
+		id: "suggested",
+		name: "Sugestões para Vendas",
+		emojis: [
+			{
+				emoji: "🔥",
+				name: "Fogo",
+				keywords: [
+					"fire",
+					"hot",
+					"quente",
+					"oferta",
+					"promoção"
+				]
+			},
+			{
+				emoji: "📱",
+				name: "Celular",
+				keywords: [
+					"phone",
+					"mobile",
+					"celular",
+					"smartphone"
+				]
+			},
+			{
+				emoji: "💸",
+				name: "Dinheiro voando",
+				keywords: [
+					"money",
+					"cash",
+					"dinheiro",
+					"desconto"
+				]
+			},
+			{
+				emoji: "💳",
+				name: "Cartão de Crédito",
+				keywords: [
+					"credit",
+					"card",
+					"cartão",
+					"pagamento"
+				]
+			},
+			{
+				emoji: "📦",
+				name: "Pacote",
+				keywords: [
+					"package",
+					"box",
+					"pacote",
+					"entrega"
+				]
+			},
+			{
+				emoji: "🚚",
+				name: "Caminhão",
+				keywords: [
+					"truck",
+					"delivery",
+					"caminhão",
+					"entrega"
+				]
+			},
+			{
+				emoji: "✅",
+				name: "Check",
+				keywords: [
+					"check",
+					"done",
+					"feito",
+					"aprovado",
+					"disponível"
+				]
+			},
+			{
+				emoji: "⚠️",
+				name: "Aviso",
+				keywords: [
+					"warning",
+					"alert",
+					"atenção",
+					"aviso"
+				]
+			},
+			{
+				emoji: "🆕",
+				name: "Novo",
+				keywords: [
+					"new",
+					"novo",
+					"lançamento"
+				]
+			},
+			{
+				emoji: "⚡",
+				name: "Raio",
+				keywords: [
+					"zap",
+					"flash",
+					"rápido",
+					"oferta relâmpago"
+				]
+			},
+			{
+				emoji: "💎",
+				name: "Diamante",
+				keywords: [
+					"gem",
+					"diamond",
+					"jóia",
+					"premium",
+					"luxo"
+				]
+			},
+			{
+				emoji: "🛡️",
+				name: "Escudo",
+				keywords: [
+					"shield",
+					"protect",
+					"segurança",
+					"garantia"
+				]
+			},
+			{
+				emoji: "💰",
+				name: "Saco de Dinheiro",
+				keywords: [
+					"money",
+					"bag",
+					"saco",
+					"dinheiro"
+				]
+			},
+			{
+				emoji: "🏷️",
+				name: "Etiqueta",
+				keywords: [
+					"tag",
+					"label",
+					"preço",
+					"oferta"
+				]
+			},
+			{
+				emoji: "📢",
+				name: "Megafone",
+				keywords: [
+					"loudspeaker",
+					"anúncio",
+					"promoção"
+				]
+			},
+			{
+				emoji: "📍",
+				name: "Pin",
+				keywords: [
+					"pin",
+					"location",
+					"localização"
+				]
+			},
+			{
+				emoji: "📆",
+				name: "Calendário",
+				keywords: [
+					"calendar",
+					"date",
+					"data",
+					"agendamento"
+				]
+			},
+			{
+				emoji: "🚀",
+				name: "Foguete",
+				keywords: [
+					"rocket",
+					"foguete",
+					"rápido",
+					"lançamento"
+				]
+			},
+			{
+				emoji: "⌚",
+				name: "Relógio",
+				keywords: [
+					"watch",
+					"relógio",
+					"tempo"
+				]
+			},
+			{
+				emoji: "🎧",
+				name: "Fones",
+				keywords: [
+					"headphones",
+					"fones",
+					"áudio"
+				]
+			},
+			{
+				emoji: "🔋",
+				name: "Bateria",
+				keywords: [
+					"battery",
+					"bateria",
+					"energia"
+				]
+			},
+			{
+				emoji: "🔌",
+				name: "Tomada",
+				keywords: [
+					"plug",
+					"tomada",
+					"carregador"
+				]
+			}
+		]
+	},
+	{
+		id: "smileys",
+		name: "Carinhas e Emoções",
+		emojis: [
+			{
+				emoji: "😀",
+				name: "Sorrindo",
+				keywords: [
+					"smile",
+					"happy",
+					"feliz"
+				]
+			},
+			{
+				emoji: "😃",
+				name: "Sorrindo muito",
+				keywords: [
+					"smile",
+					"happy",
+					"feliz"
+				]
+			},
+			{
+				emoji: "😄",
+				name: "Sorrindo com olhos fechados",
+				keywords: [
+					"smile",
+					"happy",
+					"feliz"
+				]
+			},
+			{
+				emoji: "😁",
+				name: "Sorrindo mostrando dentes",
+				keywords: [
+					"smile",
+					"happy",
+					"feliz"
+				]
+			},
+			{
+				emoji: "😆",
+				name: "Sorrindo muito com olhos fechados",
+				keywords: [
+					"smile",
+					"happy",
+					"laugh",
+					"risada"
+				]
+			},
+			{
+				emoji: "😅",
+				name: "Suor frio",
+				keywords: [
+					"sweat",
+					"smile",
+					"alívio"
+				]
+			},
+			{
+				emoji: "🤣",
+				name: "Rindo muito",
+				keywords: [
+					"laugh",
+					"rolling",
+					"risada"
+				]
+			},
+			{
+				emoji: "😂",
+				name: "Chorando de rir",
+				keywords: [
+					"joy",
+					"laugh",
+					"risada"
+				]
+			},
+			{
+				emoji: "🙂",
+				name: "Sorriso leve",
+				keywords: ["smile", "leve"]
+			},
+			{
+				emoji: "🙃",
+				name: "De cabeça para baixo",
+				keywords: ["upside", "down"]
+			},
+			{
+				emoji: "😉",
+				name: "Piscando",
+				keywords: ["wink", "piscar"]
+			},
+			{
+				emoji: "😊",
+				name: "Sorriso tímido",
+				keywords: [
+					"blush",
+					"smile",
+					"tímido"
+				]
+			},
+			{
+				emoji: "😇",
+				name: "Anjo",
+				keywords: [
+					"angel",
+					"anjo",
+					"inocente"
+				]
+			},
+			{
+				emoji: "🥰",
+				name: "Apaixonado",
+				keywords: [
+					"love",
+					"amor",
+					"coração"
+				]
+			},
+			{
+				emoji: "😍",
+				name: "Olhos de coração",
+				keywords: [
+					"love",
+					"amor",
+					"coração"
+				]
+			},
+			{
+				emoji: "🤩",
+				name: "Estrelas nos olhos",
+				keywords: [
+					"star",
+					"eyes",
+					"fã"
+				]
+			},
+			{
+				emoji: "😘",
+				name: "Beijo",
+				keywords: ["kiss", "beijo"]
+			},
+			{
+				emoji: "😗",
+				name: "Beijo simples",
+				keywords: ["kiss", "beijo"]
+			},
+			{
+				emoji: "🤑",
+				name: "Dinheiro",
+				keywords: [
+					"money",
+					"rich",
+					"rico"
+				]
+			},
+			{
+				emoji: "🤗",
+				name: "Abraço",
+				keywords: ["hug", "abraço"]
+			},
+			{
+				emoji: "🤔",
+				name: "Pensando",
+				keywords: ["think", "pensando"]
+			},
+			{
+				emoji: "🤐",
+				name: "Boca fechada",
+				keywords: [
+					"zipper",
+					"mouth",
+					"segredo"
+				]
+			},
+			{
+				emoji: "😎",
+				name: "Óculos escuros",
+				keywords: [
+					"cool",
+					"sunglasses",
+					"legal"
+				]
+			},
+			{
+				emoji: "🤯",
+				name: "Cabeça explodindo",
+				keywords: [
+					"mind",
+					"blown",
+					"explodindo"
+				]
+			},
+			{
+				emoji: "😱",
+				name: "Grito",
+				keywords: [
+					"scream",
+					"medo",
+					"susto"
+				]
+			},
+			{
+				emoji: "👍",
+				name: "Jóia",
+				keywords: [
+					"thumbs",
+					"up",
+					"like",
+					"curtir"
+				]
+			},
+			{
+				emoji: "👎",
+				name: "Descurtir",
+				keywords: [
+					"thumbs",
+					"down",
+					"dislike"
+				]
+			},
+			{
+				emoji: "👏",
+				name: "Palmas",
+				keywords: [
+					"clap",
+					"applause",
+					"palmas"
+				]
+			},
+			{
+				emoji: "🙌",
+				name: "Mãos levantadas",
+				keywords: [
+					"hands",
+					"up",
+					"comemorar"
+				]
+			},
+			{
+				emoji: "🤝",
+				name: "Aperto de mão",
+				keywords: [
+					"handshake",
+					"deal",
+					"acordo"
+				]
+			},
+			{
+				emoji: "🙏",
+				name: "Rezar",
+				keywords: [
+					"pray",
+					"please",
+					"por favor",
+					"obrigado"
+				]
+			}
+		]
+	},
+	{
+		id: "objects",
+		name: "Objetos e Tecnologia",
+		emojis: [
+			{
+				emoji: "💻",
+				name: "Laptop",
+				keywords: [
+					"laptop",
+					"computer",
+					"computador"
+				]
+			},
+			{
+				emoji: "🖥️",
+				name: "Desktop",
+				keywords: [
+					"desktop",
+					"computer",
+					"computador"
+				]
+			},
+			{
+				emoji: "🖨️",
+				name: "Impressora",
+				keywords: ["printer", "impressora"]
+			},
+			{
+				emoji: "🖱️",
+				name: "Mouse",
+				keywords: ["mouse"]
+			},
+			{
+				emoji: "📷",
+				name: "Câmera",
+				keywords: ["camera", "foto"]
+			},
+			{
+				emoji: "📸",
+				name: "Câmera com flash",
+				keywords: [
+					"camera",
+					"flash",
+					"foto"
+				]
+			},
+			{
+				emoji: "📹",
+				name: "Filmadora",
+				keywords: [
+					"video",
+					"camera",
+					"vídeo"
+				]
+			},
+			{
+				emoji: "📺",
+				name: "TV",
+				keywords: [
+					"tv",
+					"television",
+					"televisão"
+				]
+			},
+			{
+				emoji: "🔊",
+				name: "Som alto",
+				keywords: [
+					"speaker",
+					"loud",
+					"som"
+				]
+			},
+			{
+				emoji: "🔔",
+				name: "Sino",
+				keywords: [
+					"bell",
+					"notification",
+					"notificação"
+				]
+			},
+			{
+				emoji: "🔍",
+				name: "Lupa",
+				keywords: ["search", "busca"]
+			},
+			{
+				emoji: "🔑",
+				name: "Chave",
+				keywords: ["key", "chave"]
+			},
+			{
+				emoji: "🛒",
+				name: "Carrinho",
+				keywords: [
+					"cart",
+					"shopping",
+					"compras"
+				]
+			},
+			{
+				emoji: "🎁",
+				name: "Presente",
+				keywords: [
+					"gift",
+					"present",
+					"presente"
+				]
+			}
+		]
+	},
+	{
+		id: "symbols",
+		name: "Símbolos",
+		emojis: [
+			{
+				emoji: "❤️",
+				name: "Coração Vermelho",
+				keywords: [
+					"heart",
+					"red",
+					"amor"
+				]
+			},
+			{
+				emoji: "🧡",
+				name: "Coração Laranja",
+				keywords: ["heart", "orange"]
+			},
+			{
+				emoji: "💛",
+				name: "Coração Amarelo",
+				keywords: ["heart", "yellow"]
+			},
+			{
+				emoji: "💚",
+				name: "Coração Verde",
+				keywords: ["heart", "green"]
+			},
+			{
+				emoji: "💙",
+				name: "Coração Azul",
+				keywords: ["heart", "blue"]
+			},
+			{
+				emoji: "💜",
+				name: "Coração Roxo",
+				keywords: ["heart", "purple"]
+			},
+			{
+				emoji: "🖤",
+				name: "Coração Preto",
+				keywords: ["heart", "black"]
+			},
+			{
+				emoji: "🤍",
+				name: "Coração Branco",
+				keywords: ["heart", "white"]
+			},
+			{
+				emoji: "💯",
+				name: "100",
+				keywords: [
+					"100",
+					"score",
+					"cem"
+				]
+			},
+			{
+				emoji: "💢",
+				name: "Raiva",
+				keywords: ["anger", "raiva"]
+			},
+			{
+				emoji: "💥",
+				name: "Colisão",
+				keywords: [
+					"collision",
+					"boom",
+					"explosão"
+				]
+			},
+			{
+				emoji: "💦",
+				name: "Suor",
+				keywords: ["sweat", "suor"]
+			},
+			{
+				emoji: "💨",
+				name: "Vento",
+				keywords: [
+					"dash",
+					"run",
+					"correr"
+				]
+			},
+			{
+				emoji: "💫",
+				name: "Tontura",
+				keywords: [
+					"dizzy",
+					"star",
+					"estrela"
+				]
+			},
+			{
+				emoji: "💬",
+				name: "Balão de fala",
+				keywords: [
+					"speech",
+					"bubble",
+					"fala"
+				]
+			},
+			{
+				emoji: "❌",
+				name: "X",
+				keywords: [
+					"x",
+					"cross",
+					"erro"
+				]
+			},
+			{
+				emoji: "⭕",
+				name: "Círculo",
+				keywords: ["circle", "círculo"]
+			},
+			{
+				emoji: "❗",
+				name: "Exclamação",
+				keywords: ["exclamation", "atenção"]
+			},
+			{
+				emoji: "❓",
+				name: "Interrogação",
+				keywords: ["question", "dúvida"]
+			},
+			{
+				emoji: "➡️",
+				name: "Seta Direita",
+				keywords: [
+					"arrow",
+					"right",
+					"direita"
+				]
+			},
+			{
+				emoji: "⬅️",
+				name: "Seta Esquerda",
+				keywords: [
+					"arrow",
+					"left",
+					"esquerda"
+				]
+			},
+			{
+				emoji: "⬆️",
+				name: "Seta Cima",
+				keywords: [
+					"arrow",
+					"up",
+					"cima"
+				]
+			},
+			{
+				emoji: "⬇️",
+				name: "Seta Baixo",
+				keywords: [
+					"arrow",
+					"down",
+					"baixo"
+				]
+			}
+		]
+	}
+];
+const allEmojis = emojiCategories.flatMap((cat) => cat.emojis);
+function EmojiPicker({ onEmojiSelect, trigger, side = "bottom" }) {
+	const [open, setOpen] = (0, import_react.useState)(false);
+	const [frequentEmojis, setFrequentEmojis] = (0, import_react.useState)([]);
+	(0, import_react.useEffect)(() => {
+		const stored = localStorage.getItem("frequent_emojis");
+		if (stored) try {
+			setFrequentEmojis(JSON.parse(stored).map((e) => allEmojis.find((item) => item.emoji === e)).filter(Boolean).slice(0, 10));
+		} catch (e) {
+			console.error("Failed to parse frequent emojis", e);
+		}
+	}, [open]);
+	const handleSelect = (emoji) => {
+		onEmojiSelect(emoji.emoji);
+		setOpen(false);
+		const currentStored = localStorage.getItem("frequent_emojis");
+		let newFrequent = currentStored ? JSON.parse(currentStored) : [];
+		newFrequent = newFrequent.filter((e) => e !== emoji.emoji);
+		newFrequent.unshift(emoji.emoji);
+		newFrequent = newFrequent.slice(0, 20);
+		localStorage.setItem("frequent_emojis", JSON.stringify(newFrequent));
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, {
+		open,
+		onOpenChange: setOpen,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverTrigger, {
+			asChild: true,
+			children: trigger || /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				variant: "ghost",
+				size: "icon",
+				className: "h-8 w-8 text-muted-foreground hover:text-foreground",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-5 h-5" })
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverContent, {
+			className: "w-80 p-0",
+			side,
+			align: "start",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Command, {
+				className: "w-full h-[350px]",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandInput, { placeholder: "Pesquisar emoji..." }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CommandList, {
+					className: "h-full max-h-[300px]",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandEmpty, { children: "Nenhum emoji encontrado." }),
+						frequentEmojis.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandGroup, {
+							heading: "Usados Frequentemente",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "flex flex-wrap gap-1 p-1",
+								children: frequentEmojis.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandItem, {
+									value: item.name + " " + item.keywords.join(" "),
+									onSelect: () => handleSelect(item),
+									className: "flex items-center justify-center w-8 h-8 p-0 cursor-pointer text-lg hover:bg-accent rounded-md aria-selected:bg-accent",
+									children: item.emoji
+								}, item.emoji))
+							})
+						}),
+						emojiCategories.map((category) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandGroup, {
+							heading: category.name,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "flex flex-wrap gap-1 p-1",
+								children: category.emojis.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CommandItem, {
+									value: item.name + " " + item.keywords.join(" "),
+									onSelect: () => handleSelect(item),
+									className: "flex items-center justify-center w-8 h-8 p-0 cursor-pointer text-lg hover:bg-accent rounded-md aria-selected:bg-accent",
+									children: item.emoji
+								}, item.emoji))
+							})
+						}, category.id))
+					]
+				})]
+			})
+		})]
+	});
+}
 function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 	const headerRef = (0, import_react.useRef)(null);
 	const footerRef = (0, import_react.useRef)(null);
@@ -40063,6 +40897,19 @@ function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 		setTimeout(() => {
 			el.focus();
 			el.setSelectionRange(start + char.length, end + char.length);
+		}, 0);
+	};
+	const insertEmoji = (ref, field, emoji) => {
+		const el = ref.current;
+		if (!el) return;
+		const start = el.selectionStart;
+		const end = el.selectionEnd;
+		const value = el.value;
+		if (start === null || end === null) return;
+		handleChange(field, `${value.substring(0, start)}${emoji}${value.substring(end)}`);
+		setTimeout(() => {
+			el.focus();
+			el.setSelectionRange(start + emoji.length, start + emoji.length);
 		}, 0);
 	};
 	const FormatToolbar = ({ targetRef, field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40094,17 +40941,15 @@ function GeneratorConfig({ config, onChange, onApplyMarkup }) {
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Italic, { className: "w-3 h-3" })
 				})
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Itálico" })] }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmojiPicker, {
+				onEmojiSelect: (emoji) => insertEmoji(targetRef, field, emoji),
+				trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 					variant: "ghost",
 					size: "sm",
 					className: "h-6 w-6 p-0 hover:bg-slate-200 text-amber-500",
-					onMouseDown: (e) => e.preventDefault(),
-					onClick: () => targetRef.current?.focus(),
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-3 h-3" })
 				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Use Win+. para Emojis" })] })
+			})
 		]
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -41350,8 +42195,20 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 			el.setSelectionRange(start + char.length, end + char.length);
 		}, 0);
 	};
+	const insertEmoji = (ref, value, setValue, emoji) => {
+		const el = ref.current;
+		if (!el) return;
+		const start = el.selectionStart;
+		const end = el.selectionEnd;
+		if (start === null || end === null) return;
+		setValue(`${value.substring(0, start)}${emoji}${value.substring(end)}`);
+		setTimeout(() => {
+			el.focus();
+			el.setSelectionRange(start + emoji.length, start + emoji.length);
+		}, 0);
+	};
 	const FormatToolbar = ({ targetRef, value, setValue }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm",
+		className: "absolute right-0 -top-6 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 transition-opacity bg-white/90 px-1 rounded border shadow-sm z-20",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
 				asChild: true,
@@ -41385,22 +42242,16 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 				side: "top",
 				children: "Itálico (_texto_)"
 			})] }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmojiPicker, {
+				onEmojiSelect: (emoji) => insertEmoji(targetRef, value, setValue, emoji),
+				trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 					variant: "ghost",
 					size: "icon",
 					className: "h-5 w-5 hover:bg-slate-200 text-amber-500",
-					onMouseDown: (e) => e.preventDefault(),
-					onClick: () => {
-						targetRef.current?.focus();
-					},
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-3 h-3" })
-				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, {
-				side: "top",
-				children: "Use Win+. ou Cmd+Ctrl+Space para Emojis"
-			})] })
+				}),
+				side: "top"
+			})
 		]
 	});
 	const listId = `groups-list-${item.id}`;
@@ -45250,4 +46101,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Qj76XpyQ.js.map
+//# sourceMappingURL=index-DCjYamBM.js.map

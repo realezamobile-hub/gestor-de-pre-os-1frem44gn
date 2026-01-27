@@ -940,6 +940,9 @@ section[aria-label='Notifications alt+T'] {
 .h-\[1px\]{
   height: 1px;
 }
+.h-\[350px\]{
+  height: 350px;
+}
 .h-\[600px\]{
   height: 600px;
 }
@@ -1077,6 +1080,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .w-8{
   width: 2rem;
+}
+.w-80{
+  width: 20rem;
 }
 .w-9{
   width: 2.25rem;
@@ -3215,6 +3221,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .aria-disabled\:opacity-50[aria-disabled="true"]{
   opacity: 0.5;
+}
+.aria-selected\:bg-accent[aria-selected="true"]{
+  background-color: hsl(var(--accent));
 }
 .aria-selected\:text-muted-foreground[aria-selected="true"]{
   color: hsl(var(--muted-foreground));

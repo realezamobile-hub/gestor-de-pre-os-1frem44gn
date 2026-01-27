@@ -26,6 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { EmojiPicker } from '@/components/common/EmojiPicker'
 
 interface GeneratorConfigProps {
   config: GeneratorConfigData
@@ -77,6 +78,32 @@ export function GeneratorConfig({
     }, 0)
   }
 
+  const insertEmoji = (
+    ref: React.RefObject<HTMLTextAreaElement>,
+    field: keyof GeneratorConfigData,
+    emoji: string,
+  ) => {
+    const el = ref.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const value = el.value
+
+    if (start === null || end === null) return
+
+    const before = value.substring(0, start)
+    const after = value.substring(end)
+
+    const newValue = `${before}${emoji}${after}`
+    handleChange(field, newValue)
+
+    setTimeout(() => {
+      el.focus()
+      el.setSelectionRange(start + emoji.length, start + emoji.length)
+    }, 0)
+  }
+
   const FormatToolbar = ({
     targetRef,
     field,
@@ -117,20 +144,19 @@ export function GeneratorConfig({
         </TooltipTrigger>
         <TooltipContent>Itálico</TooltipContent>
       </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
+
+      <EmojiPicker
+        onEmojiSelect={(emoji) => insertEmoji(targetRef, field, emoji)}
+        trigger={
           <Button
             variant="ghost"
             size="sm"
             className="h-6 w-6 p-0 hover:bg-slate-200 text-amber-500"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => targetRef.current?.focus()}
           >
             <Smile className="w-3 h-3" />
           </Button>
-        </TooltipTrigger>
-        <TooltipContent>Use Win+. para Emojis</TooltipContent>
-      </Tooltip>
+        }
+      />
     </div>
   )
 

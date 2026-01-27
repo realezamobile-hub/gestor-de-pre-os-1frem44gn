@@ -110,10 +110,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               .update({ last_active: new Date().toISOString() })
               .eq('id', profile.id)
           } else {
+            console.error('Error fetching profile:', error)
             set({ currentUser: null, currentCompany: null, isLoading: false })
           }
         } catch (e) {
-          console.error('Error fetching profile', e)
+          console.error('Exception fetching profile', e)
           set({ currentUser: null, currentCompany: null, isLoading: false })
         }
       } else {
@@ -123,8 +124,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Set up auth state listener FIRST
     supabase.auth.onAuthStateChange((event, session) => {
-      set({ session, isLoading: true })
-      syncUser(session)
+      // Only set loading if we are actually changing session context significantly
+      // or if it's the first load
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        set({ session, isLoading: true })
+        syncUser(session)
+      } else if (event === 'SIGNED_OUT') {
+        set({
+          session: null,
+          currentUser: null,
+          currentCompany: null,
+          isLoading: false,
+        })
+      } else {
+        // For token refreshes etc, just update session but don't trigger full reload UI
+        set({ session })
+      }
     })
 
     // THEN check for existing session
@@ -133,7 +148,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         data: { session },
       } = await supabase.auth.getSession()
       set({ session })
-      await syncUser(session)
+      // If session exists, syncUser will handle loading state
+      if (session) {
+        syncUser(session)
+      } else {
+        set({ isLoading: false })
+      }
     } catch (error) {
       console.error('Auth initialization error:', error)
       set({ isLoading: false })

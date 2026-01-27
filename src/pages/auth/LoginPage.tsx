@@ -25,7 +25,12 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!isLoading && currentUser) {
-      if (currentUser.status === 'active' || currentUser.role === 'ADMIN') {
+      if (currentUser.isSuperAdmin) {
+        navigate('/admin')
+      } else if (
+        currentUser.status === 'active' ||
+        currentUser.role === 'ADMIN'
+      ) {
         navigate('/')
       } else if (currentUser.status === 'pending') {
         navigate('/pending')
@@ -45,7 +50,7 @@ export default function LoginPage() {
       const result = await login(email, password)
       if (result.success) {
         toast.success('Login realizado com sucesso!')
-        // Navigation handled by useEffect
+        // Navigation handled by useEffect when currentUser updates
       } else {
         toast.error(result.error?.message || 'Erro ao realizar login')
       }

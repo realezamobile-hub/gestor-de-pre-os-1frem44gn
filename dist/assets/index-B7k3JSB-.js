@@ -32753,13 +32753,16 @@ const useAuthStore = create((set, get$1) => ({
 						isLoading: false
 					});
 					await supabase.from("profiles").update({ last_active: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", profile.id);
-				} else set({
-					currentUser: null,
-					currentCompany: null,
-					isLoading: false
-				});
+				} else {
+					console.error("Error fetching profile:", error);
+					set({
+						currentUser: null,
+						currentCompany: null,
+						isLoading: false
+					});
+				}
 			} catch (e) {
-				console.error("Error fetching profile", e);
+				console.error("Exception fetching profile", e);
 				set({
 					currentUser: null,
 					currentCompany: null,
@@ -32773,16 +32776,25 @@ const useAuthStore = create((set, get$1) => ({
 			});
 		};
 		supabase.auth.onAuthStateChange((event, session) => {
-			set({
-				session,
-				isLoading: true
+			if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+				set({
+					session,
+					isLoading: true
+				});
+				syncUser(session);
+			} else if (event === "SIGNED_OUT") set({
+				session: null,
+				currentUser: null,
+				currentCompany: null,
+				isLoading: false
 			});
-			syncUser(session);
+			else set({ session });
 		});
 		try {
 			const { data: { session } } = await supabase.auth.getSession();
 			set({ session });
-			await syncUser(session);
+			if (session) syncUser(session);
+			else set({ isLoading: false });
 		} catch (error) {
 			console.error("Auth initialization error:", error);
 			set({ isLoading: false });
@@ -34609,7 +34621,8 @@ function LoginPage() {
 	const { login, currentUser, isLoading, logout } = useAuthStore();
 	(0, import_react.useEffect)(() => {
 		if (!isLoading && currentUser) {
-			if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate("/");
+			if (currentUser.isSuperAdmin) navigate("/admin");
+			else if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate("/");
 			else if (currentUser.status === "pending") navigate("/pending");
 			else if (currentUser.status === "blocked") {
 				logout();
@@ -44322,4 +44335,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-9QUYulMw.js.map
+//# sourceMappingURL=index-B7k3JSB-.js.map

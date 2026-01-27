@@ -18972,44 +18972,6 @@ var CalendarClock = createLucideIcon("calendar-clock", [
 		key: "qoo3c4"
 	}]
 ]);
-var CalendarRange = createLucideIcon("calendar-range", [
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "4",
-		rx: "2",
-		key: "1hopcy"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}],
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}],
-	["path", {
-		d: "M17 14h-6",
-		key: "bkmgh3"
-	}],
-	["path", {
-		d: "M13 18H7",
-		key: "bb0bb7"
-	}],
-	["path", {
-		d: "M7 14h.01",
-		key: "1qa3f1"
-	}],
-	["path", {
-		d: "M17 18h.01",
-		key: "1bdyru"
-	}]
-]);
 var Check = createLucideIcon("check", [["path", {
 	d: "M20 6 9 17l-5-5",
 	key: "1gmf2c"
@@ -36611,23 +36573,9 @@ const useProductStore = create((set, get$1) => ({
 		});
 		return { success: true };
 	},
-	deleteZeroValueProducts: async () => {
+	cleanupOldRecords: async (date) => {
 		try {
-			const { error } = await supabase.rpc("limpar_produtos_sem_valor");
-			if (error) throw error;
-			get$1().fetchProducts();
-			return { success: true };
-		} catch (error) {
-			console.error("Delete zero value error:", error);
-			return {
-				success: false,
-				error
-			};
-		}
-	},
-	cleanupByDate: async (date) => {
-		try {
-			const { data, error } = await supabase.rpc("cleanup_by_date", { target_date: date });
+			const { data, error } = await supabase.rpc("cleanup_old_records", { p_target_date: date });
 			if (error) throw error;
 			get$1().fetchProducts();
 			return {
@@ -36635,41 +36583,7 @@ const useProductStore = create((set, get$1) => ({
 				data
 			};
 		} catch (error) {
-			console.error("Cleanup by date error:", error);
-			return {
-				success: false,
-				error
-			};
-		}
-	},
-	performDailyCleanup: async (date) => {
-		try {
-			const { data, error } = await supabase.rpc("perform_daily_cleanup", { target_date: date });
-			if (error) throw error;
-			get$1().fetchProducts();
-			return {
-				success: true,
-				data
-			};
-		} catch (error) {
-			console.error("Daily cleanup error:", error);
-			return {
-				success: false,
-				error
-			};
-		}
-	},
-	deleteSoldItems: async () => {
-		try {
-			const { data, error } = await supabase.rpc("delete_sold_items");
-			if (error) throw error;
-			get$1().fetchProducts();
-			return {
-				success: true,
-				count: data
-			};
-		} catch (error) {
-			console.error("Delete sold items error:", error);
+			console.error("Cleanup old records error:", error);
 			return {
 				success: false,
 				error
@@ -44300,81 +44214,22 @@ function DomainSettings() {
 }
 function BulkCleanup() {
 	const [date, setDate] = (0, import_react.useState)("");
-	const [dailyDate, setDailyDate] = (0, import_react.useState)("");
-	const [cleanupDate, setCleanupDate] = (0, import_react.useState)("");
 	const [loading, setLoading] = (0, import_react.useState)(false);
-	const { clearAllProducts, fetchProducts, cleanupByDate, performDailyCleanup, deleteSoldItems } = useProductStore();
+	const { cleanupOldRecords } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const canDelete = currentUser?.canDeleteRecords || false;
 	const handleCleanup = async () => {
 		if (!date) return;
 		setLoading(true);
 		try {
-			const cutoffDate = format(addDays(/* @__PURE__ */ new Date(date + "T00:00:00"), 1), "yyyy-MM-dd");
-			const { error, count: count$3 } = await supabase.from("produtos").delete({ count: "exact" }).lt("data_venda", cutoffDate);
-			if (error) throw error;
-			toast.success(`${count$3 ?? 0} produtos vendidos foram removidos com sucesso.`);
-			fetchProducts();
-			setDate("");
+			const result = await cleanupOldRecords(endOfDay(/* @__PURE__ */ new Date(date + "T00:00:00")).toISOString());
+			if (result.success) {
+				toast.success(`Limpeza concluída com sucesso.`, { description: `${result.data.products_deleted} produtos e ${result.data.messages_deleted} mensagens removidos.` });
+				setDate("");
+			} else throw result.error;
 		} catch (error) {
 			console.error("Cleanup error:", error);
-			toast.error("Erro ao realizar a limpeza de dados.");
-		} finally {
-			setLoading(false);
-		}
-	};
-	const handleDailyCleanup = async () => {
-		if (!dailyDate) return;
-		setLoading(true);
-		try {
-			const result = await cleanupByDate(dailyDate);
-			if (result.success && result.data) toast.success(`Limpeza concluída. ${result.data.products_deleted} produtos e ${result.data.messages_deleted} mensagens removidos.`);
-			else throw result.error;
-			setDailyDate("");
-		} catch (error) {
-			console.error("Daily cleanup error:", error);
-			toast.error("Erro ao realizar limpeza por data.");
-		} finally {
-			setLoading(false);
-		}
-	};
-	const handleCleanupUpToDate = async () => {
-		if (!cleanupDate) return;
-		setLoading(true);
-		try {
-			const result = await performDailyCleanup(cleanupDate);
-			if (result.success && result.data) toast.success(`Limpeza concluída. ${result.data.products_deleted} produtos vendidos e ${result.data.messages_deleted} mensagens removidos com sucesso.`);
-			else throw result.error;
-			setCleanupDate("");
-		} catch (error) {
-			console.error("Cleanup up to date error:", error);
-			toast.error("Erro ao realizar limpeza de histórico.");
-		} finally {
-			setLoading(false);
-		}
-	};
-	const handleDeleteSold = async () => {
-		setLoading(true);
-		try {
-			const result = await deleteSoldItems();
-			if (result.success) toast.success(`${result.count} produtos vendidos/sem estoque foram removidos.`);
-			else throw result.error;
-		} catch (error) {
-			console.error("Delete sold error:", error);
-			toast.error("Erro ao excluir produtos vendidos.");
-		} finally {
-			setLoading(false);
-		}
-	};
-	const handleClearAll = async () => {
-		setLoading(true);
-		try {
-			const result = await clearAllProducts();
-			if (result.success) toast.success("Todos os produtos foram removidos com sucesso.");
-			else throw result.error;
-		} catch (error) {
-			console.error("Clear all error:", error);
-			toast.error("Erro ao limpar banco de dados.");
+			toast.error("Erro ao realizar limpeza de registros.");
 		} finally {
 			setLoading(false);
 		}
@@ -44395,201 +44250,84 @@ function BulkCleanup() {
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "grid gap-6",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "grid grid-cols-1 md:grid-cols-2 gap-6",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					className: "border-purple-100 bg-purple-50/10 md:col-span-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex items-center gap-2 text-purple-900",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarRange, { className: "w-5 h-5 text-purple-600" }), "Limpeza Diária (Mensagens e Vendidos)"]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: [
-						"Remove mensagens processadas (data de recebimento) e produtos vendidos (data de venda) ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "até a data selecionada" }),
-						" ",
-						"(inclusive)."
-					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-						className: "space-y-4",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid w-full grid-cols-1 md:grid-cols-2 items-end gap-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-									htmlFor: "cleanup-upto-date",
-									children: "Limpar dados até:"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									id: "cleanup-upto-date",
-									type: "date",
-									value: cleanupDate,
-									onChange: (e) => setCleanupDate(e.target.value),
-									className: "bg-white"
-								})]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-								asChild: true,
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									className: "w-full bg-purple-600 hover:bg-purple-700 text-white",
-									disabled: !cleanupDate || loading,
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Executar Limpeza Diária"]
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "border-red-100 bg-red-50/10",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+				className: "flex items-center gap-2 text-red-900",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarClock, { className: "w-5 h-5 text-red-600" }), "Limpeza de Histórico Antigo"]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ferramenta para remover registros antigos do banco de dados para liberar espaço e manter a performance." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+				className: "space-y-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "rounded-lg border border-amber-200 bg-amber-50 p-4",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-start gap-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, { className: "h-5 w-5 text-amber-600 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "text-sm text-amber-800",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									className: "font-medium mb-1",
+									children: "Atenção: Ação Irreversível"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Esta ação excluirá permanentemente:" }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+									className: "list-disc pl-5 mt-1 space-y-1",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+										"Todos os ",
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "produtos" }),
+										" criados até a data selecionada (inclusive)."
+									] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+										"Todas as ",
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "mensagens processadas" }),
+										" recebidas até a data selecionada (inclusive)."
+									] })]
 								})
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmação de Limpeza" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-								"Você está prestes a excluir registros antigos do banco de dados.",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Ação:" }),
-								" Excluir mensagens recebidas e produtos vendidos até o dia",
-								" ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: cleanupDate && (/* @__PURE__ */ new Date(cleanupDate + "T00:00:00")).toLocaleDateString("pt-BR") }),
-								" ",
-								"(inclusive).",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								"Esta ação é irreversível e ajuda a manter o sistema limpo."
-							] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-								onClick: handleCleanupUpToDate,
-								className: "bg-purple-600 hover:bg-purple-700",
-								children: "Confirmar Limpeza"
-							})] })] })] })]
-						})
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					className: "border-amber-100 bg-amber-50/10",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex items-center gap-2 text-amber-900",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarClock, { className: "w-5 h-5 text-amber-600" }), "Limpeza por Data (Criação)"]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remove registros criados exatamente na data selecionada." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-						className: "space-y-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid w-full items-center gap-1.5",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "daily-date",
-								children: "Data dos registros:"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "daily-date",
-								type: "date",
-								value: dailyDate,
-								onChange: (e) => setDailyDate(e.target.value),
-								className: "bg-white"
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-								variant: "outline",
-								className: "w-full border-amber-200 text-amber-800 hover:bg-amber-50",
-								disabled: !dailyDate || loading,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Limpar Registros do Dia"]
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmação de Limpeza" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-							"Você está prestes a excluir todos os produtos e mensagens criados no dia",
-							" ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: dailyDate && (/* @__PURE__ */ new Date(dailyDate + "T00:00:00")).toLocaleDateString("pt-BR") }),
-							".",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-							"Esta ação é útil para remover dados que perderam relevância após 48h. A ação é irreversível."
-						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-							onClick: handleDailyCleanup,
-							className: "bg-amber-600 hover:bg-amber-700",
-							children: "Confirmar Limpeza"
-						})] })] })] })]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					className: "border-red-100 bg-red-50/10",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex items-center gap-2 text-red-900",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, { className: "w-5 h-5 text-red-600" }), "Limpeza por Data de Venda (Legado)"]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remove produtos vendidos até uma data específica." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-						className: "space-y-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid w-full items-center gap-1.5",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							]
+						})]
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid w-full items-end gap-4 md:grid-cols-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
 								htmlFor: "cleanup-date",
-								children: "Vendidos em ou antes de:"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								children: "Selecionar Data Limite"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 								id: "cleanup-date",
 								type: "date",
 								value: date,
 								onChange: (e) => setDate(e.target.value),
 								className: "bg-white"
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-								variant: "outline",
-								className: "w-full border-red-200 text-red-700 hover:bg-red-50",
-								disabled: !date || loading,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Vendidos (Data)"]
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Você tem certeza absoluta?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-							"Esta ação excluirá permanentemente todos os produtos com data de venda em ou antes de",
-							" ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "font-bold",
-								children: date && (/* @__PURE__ */ new Date(date + "T00:00:00")).toLocaleDateString("pt-BR")
 							}),
-							"."
-						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-							onClick: handleCleanup,
-							className: "bg-red-600 hover:bg-red-700",
-							children: "Sim, excluir"
-						})] })] })] })]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					className: "border-blue-100 bg-blue-50/10 md:col-span-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex items-center gap-2 text-blue-900",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-5 h-5 text-blue-600" }), "Excluir Todos os Vendidos / Sem Estoque"]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remove imediatamente todos os produtos marcados como sem estoque ou com data de venda." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-						asChild: true,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							className: "w-full bg-blue-600 hover:bg-blue-700",
-							disabled: loading,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Limpar Todos os Vendidos e Sem Estoque"]
-						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Limpar Catálogo?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Isso removerá ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "todos" }),
-						" os produtos que não estão em estoque ou que já foram vendidos, independentemente da data."
-					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleDeleteSold,
-						className: "bg-blue-600 hover:bg-blue-700",
-						children: "Confirmar Limpeza"
-					})] })] })] }) })]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					className: "border-destructive/30 bg-destructive/5 md:col-span-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex items-center gap-2 text-destructive",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-5 h-5" }), "Resetar Banco de Dados"]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ação crítica. Remove TODOS os produtos do sistema." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-muted-foreground",
+								children: "Registros desta data e anteriores serão apagados."
+							})
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
 						asChild: true,
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							variant: "destructive",
-							className: "w-full sm:w-auto",
-							disabled: loading,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Limpando..." : "LIMPAR TUDO (TODOS OS PRODUTOS)"]
+							className: "w-full",
+							disabled: !date || loading,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Registros Antigos"]
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, {
-						className: "text-destructive",
-						children: "PERIGO: Limpar Tudo?"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Você está prestes a excluir ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "TODOS" }),
-						" os produtos do banco de dados.",
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Exclusão em Massa" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+						"Você está prestes a excluir permanentemente dados do sistema até o dia",
+						" ",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [" ", date && format(/* @__PURE__ */ new Date(date + "T00:00:00"), "dd/MM/yyyy")] }),
+						".",
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						"Isso geralmente é feito para reiniciar o sistema ou limpar dados de teste. Esta ação é ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "irreversível" }),
-						"."
+						"Esta ação não pode ser desfeita. Tem certeza que deseja continuar?"
 					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleClearAll,
-						className: "bg-destructive hover:bg-destructive/90",
-						children: "Confirmar Exclusão Total"
-					})] })] })] }) })]
-				})
-			]
+						onClick: handleCleanup,
+						className: "bg-red-600 hover:bg-red-700",
+						children: "Sim, excluir tudo"
+					})] })] })] })]
+				})]
+			})]
 		})
 	});
 }
@@ -46469,4 +46207,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DUz57KjB.js.map
+//# sourceMappingURL=index-Dw6i5OZi.js.map

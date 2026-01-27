@@ -81,23 +81,10 @@ interface ProductStore {
   fetchPriceMonitor: () => Promise<void>
   clearAllProducts: () => Promise<{ success: boolean; error?: any }>
 
-  // New Maintenance Features
-  deleteZeroValueProducts: () => Promise<{
-    success: boolean
-    count?: number
-    error?: any
-  }>
-  cleanupByDate: (
+  // Maintenance Features (Simplified)
+  cleanupOldRecords: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
-  performDailyCleanup: (
-    date: string,
-  ) => Promise<{ success: boolean; data?: any; error?: any }>
-  deleteSoldItems: () => Promise<{
-    success: boolean
-    count?: number
-    error?: any
-  }>
 
   // Helper
   getBestPrice: (
@@ -672,54 +659,16 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     return { success: true }
   },
 
-  deleteZeroValueProducts: async () => {
+  cleanupOldRecords: async (date) => {
     try {
-      const { error } = await supabase.rpc('limpar_produtos_sem_valor')
-      if (error) throw error
-      get().fetchProducts()
-      return { success: true }
-    } catch (error) {
-      console.error('Delete zero value error:', error)
-      return { success: false, error }
-    }
-  },
-
-  cleanupByDate: async (date) => {
-    try {
-      const { data, error } = await supabase.rpc('cleanup_by_date', {
-        target_date: date,
+      const { data, error } = await supabase.rpc('cleanup_old_records', {
+        p_target_date: date,
       })
       if (error) throw error
       get().fetchProducts()
       return { success: true, data }
     } catch (error) {
-      console.error('Cleanup by date error:', error)
-      return { success: false, error }
-    }
-  },
-
-  performDailyCleanup: async (date) => {
-    try {
-      const { data, error } = await supabase.rpc('perform_daily_cleanup', {
-        target_date: date,
-      })
-      if (error) throw error
-      get().fetchProducts()
-      return { success: true, data }
-    } catch (error) {
-      console.error('Daily cleanup error:', error)
-      return { success: false, error }
-    }
-  },
-
-  deleteSoldItems: async () => {
-    try {
-      const { data, error } = await supabase.rpc('delete_sold_items')
-      if (error) throw error
-      get().fetchProducts()
-      return { success: true, count: data }
-    } catch (error) {
-      console.error('Delete sold items error:', error)
+      console.error('Cleanup old records error:', error)
       return { success: false, error }
     }
   },

@@ -1344,6 +1344,9 @@ section[aria-label='Notifications alt+T'] {
 .resize-none{
   resize: none;
 }
+.list-disc{
+  list-style-type: disc;
+}
 .list-none{
   list-style-type: none;
 }
@@ -1600,10 +1603,6 @@ section[aria-label='Notifications alt+T'] {
 .border-\[--color-border\]{
   border-color: var(--color-border);
 }
-.border-amber-100{
-  --tw-border-opacity: 1;
-  border-color: rgb(254 243 199 / var(--tw-border-opacity, 1));
-}
 .border-amber-200{
   --tw-border-opacity: 1;
   border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
@@ -1620,9 +1619,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .border-destructive\/20{
   border-color: hsl(var(--destructive) / 0.2);
-}
-.border-destructive\/30{
-  border-color: hsl(var(--destructive) / 0.3);
 }
 .border-destructive\/50{
   border-color: hsl(var(--destructive) / 0.5);
@@ -1648,10 +1644,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .border-primary{
   border-color: hsl(var(--primary));
-}
-.border-purple-100{
-  --tw-border-opacity: 1;
-  border-color: rgb(243 232 255 / var(--tw-border-opacity, 1));
 }
 .border-red-100{
   --tw-border-opacity: 1;
@@ -1707,18 +1699,11 @@ section[aria-label='Notifications alt+T'] {
   --tw-bg-opacity: 1;
   background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
 }
-.bg-amber-50\/10{
-  background-color: rgb(255 251 235 / 0.1);
-}
 .bg-amber-50\/30{
   background-color: rgb(255 251 235 / 0.3);
 }
 .bg-amber-500\/90{
   background-color: rgb(245 158 11 / 0.9);
-}
-.bg-amber-600{
-  --tw-bg-opacity: 1;
-  background-color: rgb(217 119 6 / var(--tw-bg-opacity, 1));
 }
 .bg-background{
   background-color: hsl(var(--background));
@@ -1739,9 +1724,6 @@ section[aria-label='Notifications alt+T'] {
 .bg-blue-50{
   --tw-bg-opacity: 1;
   background-color: rgb(239 246 255 / var(--tw-bg-opacity, 1));
-}
-.bg-blue-50\/10{
-  background-color: rgb(239 246 255 / 0.1);
 }
 .bg-blue-50\/20{
   background-color: rgb(239 246 255 / 0.2);
@@ -1765,9 +1747,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-destructive{
   background-color: hsl(var(--destructive));
-}
-.bg-destructive\/5{
-  background-color: hsl(var(--destructive) / 0.05);
 }
 .bg-emerald-100\/50{
   background-color: rgb(209 250 229 / 0.5);
@@ -1849,13 +1828,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-primary\/10{
   background-color: hsl(var(--primary) / 0.1);
-}
-.bg-purple-50\/10{
-  background-color: rgb(250 245 255 / 0.1);
-}
-.bg-purple-600{
-  --tw-bg-opacity: 1;
-  background-color: rgb(147 51 234 / var(--tw-bg-opacity, 1));
 }
 .bg-red-100{
   --tw-bg-opacity: 1;
@@ -2088,6 +2060,9 @@ section[aria-label='Notifications alt+T'] {
 .pl-4{
   padding-left: 1rem;
 }
+.pl-5{
+  padding-left: 1.25rem;
+}
 .pl-6{
   padding-left: 1.5rem;
 }
@@ -2280,10 +2255,6 @@ section[aria-label='Notifications alt+T'] {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
 }
-.text-blue-900{
-  --tw-text-opacity: 1;
-  color: rgb(30 58 138 / var(--tw-text-opacity, 1));
-}
 .text-card-foreground{
   color: hsl(var(--card-foreground));
 }
@@ -2365,14 +2336,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .text-primary-foreground{
   color: hsl(var(--primary-foreground));
-}
-.text-purple-600{
-  --tw-text-opacity: 1;
-  color: rgb(147 51 234 / var(--tw-text-opacity, 1));
-}
-.text-purple-900{
-  --tw-text-opacity: 1;
-  color: rgb(88 28 135 / var(--tw-text-opacity, 1));
 }
 .text-red-400{
   --tw-text-opacity: 1;
@@ -2877,10 +2840,6 @@ section[aria-label='Notifications alt+T'] {
   --tw-bg-opacity: 1;
   background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
 }
-.hover\:bg-amber-700:hover{
-  --tw-bg-opacity: 1;
-  background-color: rgb(180 83 9 / var(--tw-bg-opacity, 1));
-}
 .hover\:bg-blue-50\/60:hover{
   background-color: rgb(239 246 255 / 0.6);
 }
@@ -2939,10 +2898,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .hover\:bg-primary\/90:hover{
   background-color: hsl(var(--primary) / 0.9);
-}
-.hover\:bg-purple-700:hover{
-  --tw-bg-opacity: 1;
-  background-color: rgb(126 34 206 / var(--tw-bg-opacity, 1));
 }
 .hover\:bg-red-50:hover{
   --tw-bg-opacity: 1;
@@ -3793,9 +3748,6 @@ section[aria-label='Notifications alt+T'] {
   .sm\:w-\[540px\]{
     width: 540px;
   }
-  .sm\:w-auto{
-    width: auto;
-  }
   .sm\:max-w-\[425px\]{
     max-width: 425px;
   }
@@ -3841,9 +3793,6 @@ section[aria-label='Notifications alt+T'] {
 @media (min-width: 768px){
   .md\:absolute{
     position: absolute;
-  }
-  .md\:col-span-2{
-    grid-column: span 2 / span 2;
   }
   .md\:col-span-4{
     grid-column: span 4 / span 4;

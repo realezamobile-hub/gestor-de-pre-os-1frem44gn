@@ -40,6 +40,7 @@ export function ProductTable({
           <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
             {canCreateList && <TableHead className="w-[40px] px-2"></TableHead>}
             <TableHead className="h-10 py-2">Modelo</TableHead>
+            <TableHead className="h-10 py-2">Categoria</TableHead>
             <TableHead className="h-10 py-2">RAM</TableHead>
             <TableHead className="h-10 py-2">Memória</TableHead>
             <TableHead className="h-10 py-2">Cor</TableHead>
@@ -90,6 +91,9 @@ export function ProductTable({
                       </span>
                     )}
                   </div>
+                </TableCell>
+                <TableCell className="py-2 text-xs">
+                  {product.categoria || '-'}
                 </TableCell>
                 <TableCell className="py-2 text-xs">
                   {product.ram || '-'}

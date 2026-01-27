@@ -114,6 +114,7 @@ const INITIAL_FILTERS: FilterState = {
   color: 'all',
   dateRange: 'all',
   supplier: '',
+  categories: [],
 }
 
 const INITIAL_FILTER_OPTIONS: FilterOptions = {
@@ -237,7 +238,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       // Prepare arguments for the RPC call
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
-        category_filters: null,
+        category_filters:
+          filters.categories.length > 0 ? filters.categories : null,
         memory_filter: filters.memory !== 'all' ? filters.memory : null,
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,

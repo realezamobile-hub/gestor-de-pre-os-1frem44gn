@@ -98,6 +98,7 @@ export interface FilterState {
   color: string
   dateRange: DateRangeFilter
   supplier: string
+  categories: string[]
 }
 
 export interface FilterOptions {

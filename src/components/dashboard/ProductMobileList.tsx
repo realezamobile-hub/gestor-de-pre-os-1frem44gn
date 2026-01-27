@@ -9,6 +9,7 @@ import {
   Smartphone,
   Truck,
   Phone,
+  Tag,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useProductStore } from '@/stores/useProductStore'
@@ -77,6 +78,12 @@ export function ProductMobileList({
                 </div>
 
                 <div className="flex flex-wrap gap-2 my-2 text-xs text-muted-foreground">
+                  {product.categoria && (
+                    <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full text-blue-700 font-medium">
+                      <Tag className="w-3 h-3" />
+                      {product.categoria}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">
                     <Cpu className="w-3 h-3" />
                     {product.ram || '-'}

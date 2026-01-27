@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { MultiSelect } from '@/components/MultiSelect'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -18,7 +19,14 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ className }: ProductFiltersProps) {
-  const { filters, setFilters, resetFilters, filterOptions } = useProductStore()
+  const {
+    filters,
+    setFilters,
+    resetFilters,
+    filterOptions,
+    categories,
+    fetchCategories,
+  } = useProductStore()
   const [supplierTerm, setSupplierTerm] = useState(filters.supplier || '')
 
   // Reduced debounce time for better responsiveness
@@ -37,6 +45,13 @@ export function ProductFilters({ className }: ProductFiltersProps) {
     }
   }, [debouncedSupplier, filters.supplier, setFilters])
 
+  // Fetch categories on mount if not available
+  useEffect(() => {
+    if (categories.length === 0) {
+      fetchCategories()
+    }
+  }, [categories.length, fetchCategories])
+
   const handleReset = () => {
     resetFilters()
   }
@@ -46,6 +61,7 @@ export function ProductFilters({ className }: ProductFiltersProps) {
     filters.memory !== 'all' ||
     filters.color !== 'all' ||
     filters.dateRange !== 'all' ||
+    filters.categories.length > 0 ||
     !!filters.supplier
 
   return (
@@ -137,6 +153,16 @@ export function ProductFilters({ className }: ProductFiltersProps) {
             ))}
           </SelectContent>
         </Select>
+
+        <div className="w-full lg:w-[150px]">
+          <MultiSelect
+            options={categories}
+            selected={filters.categories}
+            onChange={(val) => setFilters({ categories: val })}
+            placeholder="Categorias"
+            className="h-9 text-xs"
+          />
+        </div>
 
         <Input
           placeholder="Pesquisar fornecedor..."

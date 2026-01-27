@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Role } from '@/types'
+import { Role, User } from '@/types'
 import { Label } from '@/components/ui/label'
 
 export function UserManagement() {
@@ -80,6 +80,19 @@ export function UserManagement() {
     toast.success('Empresa do usuário atualizada')
   }
 
+  // Helper to determine edit permissions
+  const canEditUser = (targetUser: User) => {
+    // Super Admins have unrestricted control (can edit everyone including themselves)
+    if (isSuperAdmin) return true
+
+    // Normal Admins cannot edit themselves (to prevent lockout) or Super Admins
+    if (targetUser.id === currentUser?.id) return false
+    if (targetUser.isSuperAdmin) return false
+
+    // Normal Admins can edit other users
+    return true
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -101,171 +114,176 @@ export function UserManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {activeUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9 border">
-                    <AvatarImage
-                      src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
-                    />
-                    <AvatarFallback>{user.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {user.email}
+            {activeUsers.map((user) => {
+              const canEdit = canEditUser(user)
+              return (
+                <TableRow key={user.id}>
+                  <TableCell className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9 border">
+                      <AvatarImage
+                        src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
+                      />
+                      <AvatarFallback>{user.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{user.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {user.email}
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
-                {isSuperAdmin && (
+                  {isSuperAdmin && (
+                    <TableCell>
+                      <Select
+                        value={user.companyId || ''}
+                        onValueChange={(val) =>
+                          handleCompanyChange(user.id, val)
+                        }
+                        disabled={!canEdit}
+                      >
+                        <SelectTrigger className="w-[140px] h-8">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {companies.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.nome_fantasia}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                  )}
+
                   <TableCell>
                     <Select
-                      value={user.companyId || ''}
-                      onValueChange={(val) => handleCompanyChange(user.id, val)}
-                      disabled={user.isSuperAdmin}
+                      value={user.role}
+                      onValueChange={(val: Role) =>
+                        handleRoleChange(user.id, val)
+                      }
+                      disabled={!canEdit}
                     >
                       <SelectTrigger className="w-[140px] h-8">
-                        <SelectValue placeholder="Selecione..." />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {companies.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.nome_fantasia}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="ADMIN">Admin (Gestor)</SelectItem>
+                        <SelectItem value="VENDEDOR">Vendedor</SelectItem>
+                        <SelectItem value="TECNICO">Técnico</SelectItem>
+                        <SelectItem value="ADMINISTRATIVO">
+                          Administrativo
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
-                )}
-
-                <TableCell>
-                  <Select
-                    value={user.role}
-                    onValueChange={(val: Role) =>
-                      handleRoleChange(user.id, val)
-                    }
-                    disabled={user.id === currentUser?.id || user.isSuperAdmin}
-                  >
-                    <SelectTrigger className="w-[140px] h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ADMIN">Admin (Gestor)</SelectItem>
-                      <SelectItem value="VENDEDOR">Vendedor</SelectItem>
-                      <SelectItem value="TECNICO">Técnico</SelectItem>
-                      <SelectItem value="ADMINISTRATIVO">
-                        Administrativo
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={
-                      user.status === 'active'
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-red-50 text-red-700 border-red-200'
-                    }
-                  >
-                    {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex flex-col items-start gap-2 max-w-[180px] mx-auto">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={user.canCreateList}
-                        onCheckedChange={() =>
-                          handleTogglePermission(user.id, 'canCreateList')
-                        }
-                        disabled={
-                          user.id === currentUser?.id || user.isSuperAdmin
-                        }
-                        id={`list-${user.id}`}
-                      />
-                      <Label
-                        htmlFor={`list-${user.id}`}
-                        className="text-xs font-normal cursor-pointer"
-                      >
-                        Criar Lista
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={user.canAccessEvaluation}
-                        onCheckedChange={() =>
-                          handleTogglePermission(user.id, 'canAccessEvaluation')
-                        }
-                        disabled={
-                          user.id === currentUser?.id || user.isSuperAdmin
-                        }
-                        id={`eval-${user.id}`}
-                      />
-                      <Label
-                        htmlFor={`eval-${user.id}`}
-                        className="text-xs font-normal cursor-pointer"
-                      >
-                        Avaliação
-                      </Label>
-                    </div>
-                    {isSuperAdmin && (
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={
+                        user.status === 'active'
+                          ? 'bg-green-50 text-green-700 border-green-200'
+                          : 'bg-red-50 text-red-700 border-red-200'
+                      }
+                    >
+                      {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-start gap-2 max-w-[180px] mx-auto">
                       <div className="flex items-center gap-2">
                         <Switch
-                          checked={user.canDeleteRecords}
+                          checked={user.canCreateList}
                           onCheckedChange={() =>
-                            handleTogglePermission(user.id, 'canDeleteRecords')
+                            handleTogglePermission(user.id, 'canCreateList')
                           }
-                          disabled={
-                            user.id === currentUser?.id || user.isSuperAdmin
-                          }
-                          id={`del-${user.id}`}
-                          className="data-[state=checked]:bg-red-500"
+                          disabled={!canEdit}
+                          id={`list-${user.id}`}
                         />
                         <Label
-                          htmlFor={`del-${user.id}`}
-                          className="text-xs font-normal cursor-pointer text-red-700"
+                          htmlFor={`list-${user.id}`}
+                          className="text-xs font-normal cursor-pointer"
                         >
-                          Deletar Dados
+                          Criar Lista
                         </Label>
                       </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    {user.id !== currentUser?.id && !user.isSuperAdmin && (
-                      <>
-                        {user.status === 'active' ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReject(user.id)}
-                            className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                            title="Bloquear Acesso"
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={user.canAccessEvaluation}
+                          onCheckedChange={() =>
+                            handleTogglePermission(
+                              user.id,
+                              'canAccessEvaluation',
+                            )
+                          }
+                          disabled={!canEdit}
+                          id={`eval-${user.id}`}
+                        />
+                        <Label
+                          htmlFor={`eval-${user.id}`}
+                          className="text-xs font-normal cursor-pointer"
+                        >
+                          Avaliação
+                        </Label>
+                      </div>
+                      {isSuperAdmin && (
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={user.canDeleteRecords}
+                            onCheckedChange={() =>
+                              handleTogglePermission(
+                                user.id,
+                                'canDeleteRecords',
+                              )
+                            }
+                            disabled={!canEdit}
+                            id={`del-${user.id}`}
+                            className="data-[state=checked]:bg-red-500"
+                          />
+                          <Label
+                            htmlFor={`del-${user.id}`}
+                            className="text-xs font-normal cursor-pointer text-red-700"
                           >
-                            <Lock className="w-4 h-4 mr-1" />
-                            Bloquear
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleApprove(user.id)}
-                            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                            title="Restaurar Acesso"
-                          >
-                            <Unlock className="w-4 h-4 mr-1" />
-                            Ativar
-                          </Button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                            Deletar Dados
+                          </Label>
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      {canEdit && (
+                        <>
+                          {user.status === 'active' ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleReject(user.id)}
+                              className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                              title="Bloquear Acesso"
+                            >
+                              <Lock className="w-4 h-4 mr-1" />
+                              Bloquear
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleApprove(user.id)}
+                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                              title="Restaurar Acesso"
+                            >
+                              <Unlock className="w-4 h-4 mr-1" />
+                              Ativar
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </CardContent>

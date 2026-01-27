@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { useCompanyStore } from '@/stores/useCompanyStore'
 import {
   Table,
   TableBody,
@@ -11,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { Lock, Unlock } from 'lucide-react'
+import { Lock, Unlock, Building } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
@@ -39,9 +41,16 @@ export function UserManagement() {
     updateUserStatus,
     toggleUserPermission,
     updateUserRole,
+    updateUserCompany,
   } = useAuthStore()
+  const { companies, fetchCompanies } = useCompanyStore()
+
+  useEffect(() => {
+    fetchCompanies()
+  }, [])
 
   const activeUsers = users.filter((u) => u.status !== 'pending')
+  const isSuperAdmin = currentUser?.isSuperAdmin
 
   const handleApprove = async (id: string) => {
     await updateUserStatus(id, 'active')
@@ -63,9 +72,12 @@ export function UserManagement() {
 
   const handleRoleChange = async (id: string, newRole: Role) => {
     await updateUserRole(id, newRole)
-    toast.success(
-      `Usuário promovido para ${newRole === 'admin' ? 'Administrador' : 'Usuário Padrão'}`,
-    )
+    toast.success(`Função atualizada para ${newRole}`)
+  }
+
+  const handleCompanyChange = async (id: string, companyId: string) => {
+    await updateUserCompany(id, companyId)
+    toast.success('Empresa do usuário atualizada')
   }
 
   return (
@@ -73,7 +85,7 @@ export function UserManagement() {
       <CardHeader>
         <CardTitle>Base de Usuários</CardTitle>
         <CardDescription>
-          Gerencie funções, permissões e acesso.
+          Gerencie funções, empresas e permissões.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,10 +93,10 @@ export function UserManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Usuário</TableHead>
-              <TableHead>Função</TableHead>
+              {isSuperAdmin && <TableHead>Empresa</TableHead>}
+              <TableHead>Função (Cargo)</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-center">Permissões</TableHead>
-              <TableHead className="text-center">Último Acesso</TableHead>
+              <TableHead className="text-center">Permissões Extras</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -105,20 +117,46 @@ export function UserManagement() {
                     </div>
                   </div>
                 </TableCell>
+
+                {isSuperAdmin && (
+                  <TableCell>
+                    <Select
+                      value={user.companyId || ''}
+                      onValueChange={(val) => handleCompanyChange(user.id, val)}
+                      disabled={user.isSuperAdmin}
+                    >
+                      <SelectTrigger className="w-[140px] h-8">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {companies.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.nome_fantasia}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                )}
+
                 <TableCell>
                   <Select
                     value={user.role}
                     onValueChange={(val: Role) =>
                       handleRoleChange(user.id, val)
                     }
-                    disabled={user.id === currentUser?.id}
+                    disabled={user.id === currentUser?.id || user.isSuperAdmin}
                   >
-                    <SelectTrigger className="w-[130px] h-8">
+                    <SelectTrigger className="w-[140px] h-8">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="user">Usuário</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
+                      <SelectItem value="ADMIN">Admin (Gestor)</SelectItem>
+                      <SelectItem value="VENDEDOR">Vendedor</SelectItem>
+                      <SelectItem value="TECNICO">Técnico</SelectItem>
+                      <SelectItem value="ADMINISTRATIVO">
+                        Administrativo
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -142,7 +180,9 @@ export function UserManagement() {
                         onCheckedChange={() =>
                           handleTogglePermission(user.id, 'canCreateList')
                         }
-                        disabled={user.id === currentUser?.id}
+                        disabled={
+                          user.id === currentUser?.id || user.isSuperAdmin
+                        }
                         id={`list-${user.id}`}
                       />
                       <Label
@@ -158,7 +198,9 @@ export function UserManagement() {
                         onCheckedChange={() =>
                           handleTogglePermission(user.id, 'canAccessEvaluation')
                         }
-                        disabled={user.id === currentUser?.id}
+                        disabled={
+                          user.id === currentUser?.id || user.isSuperAdmin
+                        }
                         id={`eval-${user.id}`}
                       />
                       <Label
@@ -168,36 +210,32 @@ export function UserManagement() {
                         Avaliação
                       </Label>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={user.canDeleteRecords}
-                        onCheckedChange={() =>
-                          handleTogglePermission(user.id, 'canDeleteRecords')
-                        }
-                        disabled={user.id === currentUser?.id}
-                        id={`del-${user.id}`}
-                        className="data-[state=checked]:bg-red-500"
-                      />
-                      <Label
-                        htmlFor={`del-${user.id}`}
-                        className="text-xs font-normal cursor-pointer text-red-700"
-                      >
-                        Pode Deletar Registros
-                      </Label>
-                    </div>
+                    {isSuperAdmin && (
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={user.canDeleteRecords}
+                          onCheckedChange={() =>
+                            handleTogglePermission(user.id, 'canDeleteRecords')
+                          }
+                          disabled={
+                            user.id === currentUser?.id || user.isSuperAdmin
+                          }
+                          id={`del-${user.id}`}
+                          className="data-[state=checked]:bg-red-500"
+                        />
+                        <Label
+                          htmlFor={`del-${user.id}`}
+                          className="text-xs font-normal cursor-pointer text-red-700"
+                        >
+                          Deletar Dados
+                        </Label>
+                      </div>
+                    )}
                   </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(user.lastActive), {
-                      addSuffix: true,
-                      locale: ptBR,
-                    })}
-                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    {user.id !== currentUser?.id && (
+                    {user.id !== currentUser?.id && !user.isSuperAdmin && (
                       <>
                         {user.status === 'active' ? (
                           <Button

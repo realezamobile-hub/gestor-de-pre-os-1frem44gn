@@ -12,6 +12,7 @@ import {
   Database,
   Ban,
   TrendingDown,
+  Building2,
 } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 import { UserManagement } from '@/components/admin/UserManagement'
@@ -20,6 +21,7 @@ import { DomainSettings } from '@/components/admin/DomainSettings'
 import { BulkCleanup } from '@/components/admin/BulkCleanup'
 import { SupplierBlacklist } from '@/components/admin/SupplierBlacklist'
 import { PriceMonitor } from '@/components/admin/PriceMonitor'
+import { CompanyManagement } from '@/components/admin/CompanyManagement'
 
 export default function AdminPage() {
   const { users, fetchUsers, currentUser } = useAuthStore()
@@ -28,11 +30,12 @@ export default function AdminPage() {
     fetchUsers()
   }, [])
 
-  if (currentUser?.role !== 'admin') {
+  if (currentUser?.role !== 'ADMIN' && !currentUser?.isSuperAdmin) {
     return <Navigate to="/" replace />
   }
 
   const pendingUsers = users.filter((u) => u.status === 'pending')
+  const isSuperAdmin = currentUser?.isSuperAdmin
 
   return (
     <div className="space-y-8 pb-12">
@@ -40,7 +43,8 @@ export default function AdminPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
           <p className="text-muted-foreground mt-1">
-            Painel de controle de usuários, dados e monitoramento.
+            Painel de controle de usuários, dados e configurações
+            {isSuperAdmin ? ' globais' : ''}.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
@@ -98,9 +102,22 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="monitor" className="w-full">
+      <Tabs defaultValue="active" className="w-full">
         <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="grid w-full min-w-[800px] grid-cols-6 md:w-auto">
+          <TabsList className="grid w-full min-w-[800px] grid-cols-7 md:w-auto">
+            <TabsTrigger value="active">Usuários</TabsTrigger>
+            {isSuperAdmin && (
+              <TabsTrigger value="companies" className="flex gap-2">
+                <Building2 className="w-4 h-4" />
+                Cadastros
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="pending" className="relative">
+              Solicitações
+              {pendingUsers.length > 0 && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+              )}
+            </TabsTrigger>
             <TabsTrigger value="monitor" className="flex gap-2">
               <TrendingDown className="w-4 h-4" />
               Monitor
@@ -108,13 +125,6 @@ export default function AdminPage() {
             <TabsTrigger value="blacklist" className="flex gap-2">
               <Ban className="w-4 h-4" />
               Blacklist
-            </TabsTrigger>
-            <TabsTrigger value="active">Usuários</TabsTrigger>
-            <TabsTrigger value="pending" className="relative">
-              Solicitações
-              {pendingUsers.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-              )}
             </TabsTrigger>
             <TabsTrigger value="domain" className="flex gap-2">
               <Globe className="w-4 h-4" />
@@ -130,20 +140,26 @@ export default function AdminPage() {
           </TabsList>
         </div>
 
+        <TabsContent value="active" className="mt-6 animate-fade-in">
+          <UserManagement />
+        </TabsContent>
+
+        {isSuperAdmin && (
+          <TabsContent value="companies" className="mt-6 animate-fade-in">
+            <CompanyManagement />
+          </TabsContent>
+        )}
+
+        <TabsContent value="pending" className="mt-6 animate-fade-in">
+          <PendingRequests />
+        </TabsContent>
+
         <TabsContent value="monitor" className="mt-6 animate-fade-in">
           <PriceMonitor />
         </TabsContent>
 
         <TabsContent value="blacklist" className="mt-6 animate-fade-in">
           <SupplierBlacklist />
-        </TabsContent>
-
-        <TabsContent value="active" className="mt-6 animate-fade-in">
-          <UserManagement />
-        </TabsContent>
-
-        <TabsContent value="pending" className="mt-6 animate-fade-in">
-          <PendingRequests />
         </TabsContent>
 
         <TabsContent value="domain" className="mt-6 animate-fade-in">

@@ -21,8 +21,20 @@ import { useState } from 'react'
 
 export function Sidebar() {
   const location = useLocation()
-  const { currentUser, logout } = useAuthStore()
+  const { currentUser, currentCompany, logout } = useAuthStore()
   const [open, setOpen] = useState(false)
+
+  // Check module availability from company config
+  const modules = currentCompany?.modulos_ativos || []
+  const hasModule = (module: string) =>
+    modules.includes(module) || currentUser?.isSuperAdmin
+
+  // Check Role Access
+  const isSuperAdmin = currentUser?.isSuperAdmin
+  const isAdmin = currentUser?.role === 'ADMIN' || isSuperAdmin
+  const isVendedor = currentUser?.role === 'VENDEDOR'
+  const isTecnico = currentUser?.role === 'TECNICO'
+  const isAdministrativo = currentUser?.role === 'ADMINISTRATIVO'
 
   // Define visibility logic for each link
   const links = [
@@ -30,26 +42,35 @@ export function Sidebar() {
       href: '/',
       label: 'Painel',
       icon: LayoutDashboard,
-      isVisible: true,
+      isVisible: true, // Everyone sees Dashboard
     },
     {
       href: '/generator',
       label: 'Gerador',
       icon: FileText,
-      isVisible: currentUser?.canCreateList || currentUser?.role === 'admin',
+      // Visible if module active AND user has permission (Admin, Vendedor, Administrativo)
+      isVisible:
+        hasModule('generator') &&
+        (isAdmin ||
+          isVendedor ||
+          isAdministrativo ||
+          currentUser?.canCreateList),
     },
     {
       href: '/evaluation',
       label: 'Avaliação',
       icon: ClipboardCheck,
+      // Visible if module active AND user has permission (Admin, Tecnico)
       isVisible:
-        currentUser?.canAccessEvaluation || currentUser?.role === 'admin',
+        hasModule('evaluation') &&
+        (isAdmin || isTecnico || currentUser?.canAccessEvaluation),
     },
     {
       href: '/admin',
       label: 'Admin',
       icon: Settings,
-      isVisible: currentUser?.role === 'admin',
+      // Visible if user is Admin or SuperAdmin
+      isVisible: isAdmin,
     },
   ]
 
@@ -69,10 +90,16 @@ export function Sidebar() {
             fullWidth ? 'text-xl' : 'text-xs scale-90',
           )}
         >
-          {fullWidth ? 'PriceApp' : 'PA'}
+          {fullWidth ? (
+            currentCompany?.nome_fantasia || 'PriceApp'
+          ) : (
+            <span title={currentCompany?.nome_fantasia || 'PriceApp'}>PA</span>
+          )}
         </h1>
         {fullWidth && (
-          <p className="text-xs text-muted-foreground mt-1">Gestão</p>
+          <p className="text-xs text-muted-foreground mt-1 truncate">
+            {currentCompany?.razao_social || 'Gestão'}
+          </p>
         )}
       </div>
 
@@ -134,10 +161,14 @@ export function Sidebar() {
           <div className="flex flex-col h-full py-4">
             <div className="px-5 mb-8 flex items-center gap-3 whitespace-nowrap">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="font-bold text-primary">P</span>
+                <span className="font-bold text-primary">
+                  {currentCompany?.nome_fantasia?.charAt(0) || 'P'}
+                </span>
               </div>
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
-                <h1 className="font-bold text-lg">PriceApp</h1>
+                <h1 className="font-bold text-lg truncate w-32">
+                  {currentCompany?.nome_fantasia || 'PriceApp'}
+                </h1>
               </div>
             </div>
 

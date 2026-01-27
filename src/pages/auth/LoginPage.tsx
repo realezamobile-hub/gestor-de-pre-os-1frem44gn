@@ -25,7 +25,7 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!isLoading && currentUser) {
-      if (currentUser.status === 'active' || currentUser.role === 'admin') {
+      if (currentUser.status === 'active' || currentUser.role === 'ADMIN') {
         navigate('/')
       } else if (currentUser.status === 'pending') {
         navigate('/pending')
@@ -45,7 +45,7 @@ export default function LoginPage() {
       const result = await login(email, password)
       if (result.success) {
         toast.success('Login realizado com sucesso!')
-        navigate('/')
+        // Navigation handled by useEffect
       } else {
         toast.error(result.error?.message || 'Erro ao realizar login')
       }

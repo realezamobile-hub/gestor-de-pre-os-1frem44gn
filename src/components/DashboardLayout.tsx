@@ -27,6 +27,10 @@ export default function DashboardLayout() {
     return <Navigate to="/login" replace />
   }
 
+  // Basic check: if user has no company assigned, redirect to pending or a specific state
+  // Assuming default migration handles this, but for new users without company (if possible):
+  // (Logic to handle 'no company' state if needed, but 'pending' usually covers it)
+
   return (
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />

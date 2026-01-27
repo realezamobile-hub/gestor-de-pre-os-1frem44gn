@@ -29,7 +29,7 @@ export default function RegisterPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!isLoading && currentUser) {
-      if (currentUser.status === 'active' || currentUser.role === 'admin') {
+      if (currentUser.status === 'active' || currentUser.role === 'ADMIN') {
         navigate('/')
       } else if (currentUser.status === 'pending') {
         navigate('/pending')

@@ -18891,6 +18891,13 @@ var ArrowLeft = createLucideIcon("arrow-left", [["path", {
 	d: "M19 12H5",
 	key: "x3x0zl"
 }]]);
+var ArrowRight = createLucideIcon("arrow-right", [["path", {
+	d: "M5 12h14",
+	key: "1ays0h"
+}], ["path", {
+	d: "m12 5 7 7-7 7",
+	key: "xquz4c"
+}]]);
 var Ban = createLucideIcon("ban", [["path", {
 	d: "M4.929 4.929 19.07 19.071",
 	key: "196cmz"
@@ -42989,11 +42996,26 @@ function AdminPage() {
 						isSuperAdmin ? " globais" : "",
 						"."
 					]
-				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "outline",
-					size: "sm",
-					onClick: () => fetchUsers(),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCcw, { className: "w-4 h-4 mr-2" }), "Atualizar Dados"]
+				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex gap-2",
+					children: [isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "secondary",
+						size: "sm",
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+							to: "/evaluation",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ClipboardCheck, { className: "w-4 h-4 mr-2" }),
+								"Módulo de Avaliação",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "w-3 h-3 ml-2 opacity-50" })
+							]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "outline",
+						size: "sm",
+						onClick: () => fetchUsers(),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCcw, { className: "w-4 h-4 mr-2" }), "Atualizar Dados"]
+					})]
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -43221,12 +43243,15 @@ const useEvaluationStore = create((set, get$1) => ({
 	},
 	fetchEvaluations: async () => {
 		set({ isLoading: true });
-		const { data, error } = await supabase.from("avaliacoes_iphone").select("*").order("created_at", { ascending: false }).limit(100);
+		const { data, error } = await supabase.from("avaliacoes_iphone").select("*, empresas(nome_fantasia)").order("created_at", { ascending: false }).limit(100);
 		if (!error && data) set({
 			evaluations: data,
 			isLoading: false
 		});
-		else set({ isLoading: false });
+		else {
+			console.error("Error fetching evaluations:", error);
+			set({ isLoading: false });
+		}
 	}
 }));
 function BasePriceDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
@@ -44103,6 +44128,7 @@ function EvaluationChecklist() {
 }
 function EvaluationHistory() {
 	const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore();
+	const { currentUser } = useAuthStore();
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)("");
 	(0, import_react.useEffect)(() => {
 		fetchEvaluations();
@@ -44111,6 +44137,7 @@ function EvaluationHistory() {
 		const search = searchTerm.toLowerCase();
 		return item.modelo.toLowerCase().includes(search) || item.serial_number && item.serial_number.toLowerCase().includes(search);
 	});
+	const showCompany = currentUser?.isSuperAdmin;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-4",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -44130,6 +44157,7 @@ function EvaluationHistory() {
 				className: "bg-gray-50/50",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
+					showCompany && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Empresa" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Serial" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Estado" }),
@@ -44139,14 +44167,14 @@ function EvaluationHistory() {
 					})
 				]
 			}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				colSpan: 5,
+				colSpan: showCompany ? 6 : 5,
 				className: "h-24 text-center",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex justify-center",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "animate-spin rounded-full h-6 w-6 border-b-2 border-primary" })
 				})
 			}) }) : filteredEvaluations.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				colSpan: 5,
+				colSpan: showCompany ? 6 : 5,
 				className: "h-24 text-center text-muted-foreground",
 				children: "Nenhuma avaliação encontrada."
 			}) }) : filteredEvaluations.map((evalItem) => {
@@ -44155,9 +44183,16 @@ function EvaluationHistory() {
 					className: "hover:bg-gray-50",
 					children: [
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-							className: "text-muted-foreground",
+							className: "text-muted-foreground whitespace-nowrap",
 							children: format(new Date(evalItem.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 						}),
+						showCompany && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-1.5 text-muted-foreground",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Building2, { className: "w-3.5 h-3.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs font-medium",
+								children: evalItem.empresas?.nome_fantasia || "N/A"
+							})]
+						}) }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 							className: "font-medium",
 							children: evalItem.modelo
@@ -44191,7 +44226,7 @@ function EvaluationPage() {
 	(0, import_react.useEffect)(() => {
 		fetchConfigs();
 	}, []);
-	if (!currentUser?.canAccessEvaluation && currentUser?.role !== "admin") return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+	if (!(currentUser?.isSuperAdmin || currentUser?.role === "ADMIN" || currentUser?.role === "TECNICO" || currentUser?.canAccessEvaluation)) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-full flex flex-col items-center justify-center space-y-4",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-16 h-16 text-gray-300" }),
@@ -44216,7 +44251,7 @@ function EvaluationPage() {
 			})
 		]
 	});
-	const isAdmin = currentUser?.role === "admin";
+	const isAdmin = currentUser?.role === "ADMIN" || currentUser?.isSuperAdmin;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-[calc(100vh-6rem)] flex flex-col space-y-6",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
@@ -44349,4 +44384,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CfM1roAv.js.map
+//# sourceMappingURL=index-CaxRBXag.js.map

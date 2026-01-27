@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import {
   Table,
   TableBody,
@@ -12,10 +13,11 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Search } from 'lucide-react'
+import { Search, Building2 } from 'lucide-react'
 
 export function EvaluationHistory() {
   const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore()
+  const { currentUser } = useAuthStore()
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
@@ -29,6 +31,9 @@ export function EvaluationHistory() {
       (item.serial_number && item.serial_number.toLowerCase().includes(search))
     )
   })
+
+  // Show company column if user is Super Admin
+  const showCompany = currentUser?.isSuperAdmin
 
   return (
     <div className="space-y-4">
@@ -49,6 +54,7 @@ export function EvaluationHistory() {
           <TableHeader>
             <TableRow className="bg-gray-50/50">
               <TableHead>Data</TableHead>
+              {showCompany && <TableHead>Empresa</TableHead>}
               <TableHead>Modelo</TableHead>
               <TableHead>Serial</TableHead>
               <TableHead>Estado</TableHead>
@@ -58,7 +64,10 @@ export function EvaluationHistory() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell
+                  colSpan={showCompany ? 6 : 5}
+                  className="h-24 text-center"
+                >
                   <div className="flex justify-center">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
@@ -67,7 +76,7 @@ export function EvaluationHistory() {
             ) : filteredEvaluations.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={showCompany ? 6 : 5}
                   className="h-24 text-center text-muted-foreground"
                 >
                   Nenhuma avaliação encontrada.
@@ -80,7 +89,7 @@ export function EvaluationHistory() {
                   evalItem.descontos_aplicados.length > 0
                 return (
                   <TableRow key={evalItem.id} className="hover:bg-gray-50">
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
                       {format(
                         new Date(evalItem.created_at),
                         'dd/MM/yyyy HH:mm',
@@ -89,6 +98,16 @@ export function EvaluationHistory() {
                         },
                       )}
                     </TableCell>
+                    {showCompany && (
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Building2 className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">
+                            {evalItem.empresas?.nome_fantasia || 'N/A'}
+                          </span>
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell className="font-medium">
                       {evalItem.modelo}
                     </TableCell>

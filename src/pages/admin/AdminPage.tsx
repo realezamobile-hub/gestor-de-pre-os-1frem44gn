@@ -13,8 +13,10 @@ import {
   Ban,
   TrendingDown,
   Building2,
+  ClipboardCheck,
+  ArrowRight,
 } from 'lucide-react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { UserManagement } from '@/components/admin/UserManagement'
 import { PendingRequests } from '@/components/admin/PendingRequests'
 import { DomainSettings } from '@/components/admin/DomainSettings'
@@ -51,10 +53,21 @@ export default function AdminPage() {
             {isSuperAdmin ? ' globais' : ''}.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
-          <RefreshCcw className="w-4 h-4 mr-2" />
-          Atualizar Dados
-        </Button>
+        <div className="flex gap-2">
+          {isSuperAdmin && (
+            <Button variant="secondary" size="sm" asChild>
+              <Link to="/evaluation">
+                <ClipboardCheck className="w-4 h-4 mr-2" />
+                Módulo de Avaliação
+                <ArrowRight className="w-3 h-3 ml-2 opacity-50" />
+              </Link>
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
+            <RefreshCcw className="w-4 h-4 mr-2" />
+            Atualizar Dados
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

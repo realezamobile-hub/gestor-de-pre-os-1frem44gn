@@ -133,4 +133,7 @@ export interface Evaluation {
   descontos_aplicados: PeripheralDiscountConfig[]
   created_at: string
   company_id?: string
+  empresas?: {
+    nome_fantasia: string
+  } | null
 }

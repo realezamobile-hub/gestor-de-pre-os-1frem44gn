@@ -149,15 +149,17 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
   fetchEvaluations: async () => {
     set({ isLoading: true })
+    // We select company name to display for Super Admins
     const { data, error } = await supabase
       .from('avaliacoes_iphone')
-      .select('*')
+      .select('*, empresas(nome_fantasia)')
       .order('created_at', { ascending: false })
       .limit(100)
 
     if (!error && data) {
       set({ evaluations: data as any, isLoading: false })
     } else {
+      console.error('Error fetching evaluations:', error)
       set({ isLoading: false })
     }
   },

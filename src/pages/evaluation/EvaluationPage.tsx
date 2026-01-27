@@ -17,7 +17,17 @@ export default function EvaluationPage() {
     fetchConfigs()
   }, [])
 
-  if (!currentUser?.canAccessEvaluation && currentUser?.role !== 'admin') {
+  // Robust check for access:
+  // 1. Super Admin (Always allowed)
+  // 2. Role is ADMIN or TECNICO
+  // 3. User has explicit permission flag
+  const canAccess =
+    currentUser?.isSuperAdmin ||
+    currentUser?.role === 'ADMIN' ||
+    currentUser?.role === 'TECNICO' ||
+    currentUser?.canAccessEvaluation
+
+  if (!canAccess) {
     return (
       <div className="h-full flex flex-col items-center justify-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-gray-300" />
@@ -34,7 +44,7 @@ export default function EvaluationPage() {
     )
   }
 
-  const isAdmin = currentUser?.role === 'admin'
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin
 
   return (
     <div className="h-[calc(100vh-6rem)] flex flex-col space-y-6">

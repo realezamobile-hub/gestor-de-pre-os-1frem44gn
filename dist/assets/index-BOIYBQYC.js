@@ -39168,7 +39168,7 @@ function ProductFilters({ className }) {
 	const handleReset = () => {
 		resetFilters();
 	};
-	const hasFilters = filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all" || filters.categories.length > 0 || !!filters.supplier;
+	const hasFilters = filters.search && filters.search.trim() !== "" || filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all" || filters.categories.length > 0 || !!filters.supplier;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: cn("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
 		children: [
@@ -39261,15 +39261,12 @@ function ProductFilters({ className }) {
 						className: "h-9 w-full lg:w-[150px] text-xs"
 					}),
 					hasFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						variant: "ghost",
+						variant: "secondary",
 						size: "sm",
 						onClick: handleReset,
-						className: "h-9 px-2 text-muted-foreground hover:text-foreground shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto",
-						title: "Limpar filtros",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "lg:hidden ml-2",
-							children: "Limpar"
-						})]
+						className: "h-9 px-3 text-secondary-foreground hover:bg-secondary/80 shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto font-normal",
+						title: "Limpar todos os filtros",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-1.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Limpar Filtros" })]
 					})
 				]
 			})
@@ -45263,4 +45260,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-COvSCm2Y.js.map
+//# sourceMappingURL=index-BOIYBQYC.js.map

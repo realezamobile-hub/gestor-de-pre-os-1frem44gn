@@ -56,7 +56,9 @@ export function ProductFilters({ className }: ProductFiltersProps) {
     resetFilters()
   }
 
+  // Check if any filter is active, including search text
   const hasFilters =
+    (filters.search && filters.search.trim() !== '') ||
     filters.ram !== 'all' ||
     filters.memory !== 'all' ||
     filters.color !== 'all' ||
@@ -173,14 +175,14 @@ export function ProductFilters({ className }: ProductFiltersProps) {
 
         {hasFilters && (
           <Button
-            variant="ghost"
+            variant="secondary"
             size="sm"
             onClick={handleReset}
-            className="h-9 px-2 text-muted-foreground hover:text-foreground shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto"
-            title="Limpar filtros"
+            className="h-9 px-3 text-secondary-foreground hover:bg-secondary/80 shrink-0 col-span-2 sm:col-span-1 lg:col-span-auto font-normal"
+            title="Limpar todos os filtros"
           >
-            <X className="w-4 h-4" />
-            <span className="lg:hidden ml-2">Limpar</span>
+            <X className="w-4 h-4 mr-1.5" />
+            <span>Limpar Filtros</span>
           </Button>
         )}
       </div>

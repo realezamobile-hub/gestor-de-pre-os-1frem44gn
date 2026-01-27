@@ -3914,9 +3914,6 @@ section[aria-label='Notifications alt+T'] {
   .lg\:flex{
     display: flex;
   }
-  .lg\:hidden{
-    display: none;
-  }
   .lg\:w-64{
     width: 16rem;
   }

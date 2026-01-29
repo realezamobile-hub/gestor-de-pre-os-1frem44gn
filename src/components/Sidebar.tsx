@@ -77,8 +77,8 @@ export function Sidebar() {
       href: '/admin',
       label: 'Admin',
       icon: Settings,
-      // Visible if user is Admin or SuperAdmin
-      isVisible: isAdmin,
+      // Visible for everyone to access settings/maintenance
+      isVisible: true,
     },
   ]
 

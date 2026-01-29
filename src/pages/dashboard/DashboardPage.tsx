@@ -53,12 +53,6 @@ export default function DashboardPage() {
     if (debouncedSearch !== filters.search) {
       setFilters({ search: debouncedSearch })
     }
-    // We strictly want to trigger this ONLY when the user input (debounced) changes.
-    // We intentionally exclude 'filters.search' from dependencies to avoid a race condition:
-    // When filters are reset externally (filters.search becomes ""), this effect would fire
-    // with the STALE debouncedSearch value (e.g. "iphone"), immediately re-applying the filter we just cleared.
-    // By excluding it, we allow the sync effect above to clear the input, which then updates debouncedSearch,
-    // which then triggers this effect with the correct empty value (matching the store).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, setFilters])
 
@@ -70,7 +64,6 @@ export default function DashboardPage() {
     return () => unsubscribe()
   }, [])
 
-  const canDelete = currentUser?.canDeleteRecords || false
   const canCreateList = currentUser?.canCreateList || false
 
   const handleDeleteZeros = async () => {
@@ -78,14 +71,12 @@ export default function DashboardPage() {
     try {
       const result = await deleteZeroValueProducts()
       if (result.success) {
-        toast.success('Limpeza concluída com sucesso!')
+        toast.success('Registros deletados com sucesso!')
       } else {
-        toast.error(
-          `Erro ao limpar: ${result.error?.message || result.error || 'Erro desconhecido'}`,
-        )
+        toast.error('Erro ao deletar registros. Tente novamente.')
       }
     } catch (e) {
-      toast.error('Erro ao limpar: Erro inesperado ao tentar remover produtos.')
+      toast.error('Erro ao deletar registros. Tente novamente.')
     } finally {
       setIsDeleting(false)
     }
@@ -136,42 +127,38 @@ export default function DashboardPage() {
               </Button>
             )}
 
-            {canDelete && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="h-9 w-9"
-                    title="Deletar Zerados"
-                    disabled={isDeleting}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-9 w-9"
+                  title="Deletar registros com valor <= 0,00"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir Produtos Zerados?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja excluir permanentemente todos os
+                    produtos com valor zero ou nulo? Esta ação não pode ser
+                    desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteZeros}
+                    className="bg-destructive hover:bg-destructive/90"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Excluir Produtos Zerados?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta ação irá remover permanentemente todos os produtos
-                      com valor igual ou inferior a R$ 0,00 (ou sem valor
-                      definido) do catálogo. Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDeleteZeros}
-                      className="bg-destructive hover:bg-destructive/90"
-                    >
-                      {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+                    {isDeleting ? 'Excluindo...' : 'Confirmar Limpeza'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>

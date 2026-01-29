@@ -80,140 +80,124 @@ export function BulkCleanup() {
       const result = await deleteZeroValueProducts(currentUser.companyId)
 
       if (result.success) {
-        toast.success('Limpeza concluída com sucesso!', {
-          description: `${result.count} produtos removidos (valor zerado ou nulo).`,
-        })
+        toast.success('Registros deletados com sucesso!')
       } else {
         throw result.error
       }
     } catch (error: any) {
       console.error('Zero value cleanup error:', error)
-
-      let errorMessage = 'Erro ao remover produtos sem valor.'
-
-      // Handle specific timeout error (Postgres code 57014) or generic timeout messages
-      if (
-        error?.code === '57014' ||
-        error?.message?.toLowerCase().includes('timeout')
-      ) {
-        errorMessage =
-          'A operação excedeu o tempo limite. Tente novamente mais tarde ou contate o suporte.'
-      } else if (error?.message) {
-        errorMessage = `Erro: ${error.message}`
-      }
-
-      toast.error(errorMessage)
+      toast.error('Erro ao deletar registros. Tente novamente.')
     } finally {
       setZeroValueLoading(false)
     }
   }
 
-  if (!canDelete) {
-    return (
-      <Card className="border-red-200 bg-red-50">
-        <CardContent className="pt-6 text-center text-red-800">
-          <ShieldAlert className="w-12 h-12 mx-auto mb-2 text-red-500" />
-          <h3 className="text-lg font-semibold">Acesso Restrito</h3>
-          <p>Você não tem permissão para executar ferramentas de limpeza.</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <div className="grid gap-6">
-      <Card className="border-red-100 bg-red-50/10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-900">
-            <CalendarClock className="w-5 h-5 text-red-600" />
-            Limpeza de Histórico Antigo
-          </CardTitle>
-          <CardDescription>
-            Ferramenta para remover registros antigos do banco de dados para
-            liberar espaço e manter a performance.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div className="text-sm text-amber-800">
-                <p className="font-medium mb-1">Atenção: Ação Irreversível</p>
-                <p>Esta ação excluirá permanentemente:</p>
-                <ul className="list-disc pl-5 mt-1 space-y-1">
-                  <li>
-                    Todos os <strong>produtos</strong> criados até a data
-                    selecionada (inclusive).
-                  </li>
-                  <li>
-                    Todas as <strong>mensagens processadas</strong> recebidas
-                    até a data selecionada (inclusive).
-                  </li>
-                </ul>
+      {canDelete ? (
+        <Card className="border-red-100 bg-red-50/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-900">
+              <CalendarClock className="w-5 h-5 text-red-600" />
+              Limpeza de Histórico Antigo
+            </CardTitle>
+            <CardDescription>
+              Ferramenta para remover registros antigos do banco de dados para
+              liberar espaço e manter a performance.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="text-sm text-amber-800">
+                  <p className="font-medium mb-1">Atenção: Ação Irreversível</p>
+                  <p>Esta ação excluirá permanentemente:</p>
+                  <ul className="list-disc pl-5 mt-1 space-y-1">
+                    <li>
+                      Todos os <strong>produtos</strong> criados até a data
+                      selecionada (inclusive).
+                    </li>
+                    <li>
+                      Todas as <strong>mensagens processadas</strong> recebidas
+                      até a data selecionada (inclusive).
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="grid w-full items-end gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="cleanup-date">Selecionar Data Limite</Label>
-              <Input
-                id="cleanup-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="bg-white"
-              />
-              <p className="text-xs text-muted-foreground">
-                Registros desta data e anteriores serão apagados.
-              </p>
-            </div>
+            <div className="grid w-full items-end gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="cleanup-date">Selecionar Data Limite</Label>
+                <Input
+                  id="cleanup-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="bg-white"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Registros desta data e anteriores serão apagados.
+                </p>
+              </div>
 
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  disabled={!date || loading}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {loading ? 'Processando...' : 'Excluir Registros Antigos'}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Confirmar Exclusão em Massa
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Você está prestes a excluir permanentemente dados do sistema
-                    até o dia{' '}
-                    <strong>
-                      {' '}
-                      {date &&
-                        format(new Date(date + 'T00:00:00'), 'dd/MM/yyyy')}
-                    </strong>
-                    .
-                    <br />
-                    <br />
-                    Esta ação não pode ser desfeita. Tem certeza que deseja
-                    continuar?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleCleanup}
-                    className="bg-red-600 hover:bg-red-700"
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    disabled={!date || loading}
                   >
-                    Sim, excluir tudo
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
-      </Card>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {loading ? 'Processando...' : 'Excluir Registros Antigos'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Confirmar Exclusão em Massa
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Você está prestes a excluir permanentemente dados do
+                      sistema até o dia{' '}
+                      <strong>
+                        {' '}
+                        {date &&
+                          format(new Date(date + 'T00:00:00'), 'dd/MM/yyyy')}
+                      </strong>
+                      .
+                      <br />
+                      <br />
+                      Esta ação não pode ser desfeita. Tem certeza que deseja
+                      continuar?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCleanup}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Sim, excluir tudo
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-red-200 bg-red-50 opacity-60">
+          <CardContent className="pt-6 text-center text-red-800">
+            <ShieldAlert className="w-12 h-12 mx-auto mb-2 text-red-500" />
+            <h3 className="text-lg font-semibold">
+              Limpeza de Histórico Restrita
+            </h3>
+            <p>Você não tem permissão para remover registros antigos.</p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-orange-100 bg-orange-50/10">
         <CardHeader>
@@ -255,11 +239,9 @@ export function BulkCleanup() {
                     Confirmar Limpeza de Produtos
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Você está prestes a excluir todos os produtos com valor
-                    igual ou inferior a zero, bem como produtos com valor nulo.
-                    <br />
-                    <br />
-                    Esta ação não pode ser desfeita. Deseja continuar?
+                    Tem certeza que deseja excluir permanentemente todos os
+                    produtos com valor zero ou nulo? Esta ação não pode ser
+                    desfeita.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

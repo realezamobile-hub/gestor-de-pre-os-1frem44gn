@@ -1164,9 +1164,6 @@ section[aria-label='Notifications alt+T'] {
 .min-w-\[200px\]{
   min-width: 200px;
 }
-.min-w-\[800px\]{
-  min-width: 800px;
-}
 .min-w-\[8rem\]{
   min-width: 8rem;
 }
@@ -1358,9 +1355,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .grid-cols-2{
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.grid-cols-7{
-  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 .flex-row{
   flex-direction: row;
@@ -3877,6 +3871,9 @@ section[aria-label='Notifications alt+T'] {
   }
   .md\:items-center{
     align-items: center;
+  }
+  .md\:justify-center{
+    justify-content: center;
   }
   .md\:p-8{
     padding: 2rem;

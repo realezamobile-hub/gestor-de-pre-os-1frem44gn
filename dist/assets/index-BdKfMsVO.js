@@ -34134,7 +34134,7 @@ function Sidebar() {
 			href: "/admin",
 			label: "Admin",
 			icon: Settings,
-			isVisible: isAdmin
+			isVisible: true
 		}
 	].filter((link) => link.isVisible);
 	const NavContent = ({ fullWidth = true }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -39565,16 +39565,14 @@ function DashboardPage() {
 		const unsubscribe = subscribeToProducts();
 		return () => unsubscribe();
 	}, []);
-	const canDelete = currentUser?.canDeleteRecords || false;
 	const canCreateList = currentUser?.canCreateList || false;
 	const handleDeleteZeros = async () => {
 		setIsDeleting(true);
 		try {
-			const result = await deleteZeroValueProducts();
-			if (result.success) toast.success("Limpeza concluída com sucesso!");
-			else toast.error(`Erro ao limpar: ${result.error?.message || result.error || "Erro desconhecido"}`);
+			if ((await deleteZeroValueProducts()).success) toast.success("Registros deletados com sucesso!");
+			else toast.error("Erro ao deletar registros. Tente novamente.");
 		} catch (e) {
-			toast.error("Erro ao limpar: Erro inesperado ao tentar remover produtos.");
+			toast.error("Erro ao deletar registros. Tente novamente.");
 		} finally {
 			setIsDeleting(false);
 		}
@@ -39624,20 +39622,20 @@ function DashboardPage() {
 									children: draftItems.length
 								})
 							]
-						}), canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
 							asChild: true,
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 								variant: "destructive",
 								size: "icon",
 								className: "h-9 w-9",
-								title: "Deletar Zerados",
+								title: "Deletar registros com valor <= 0,00",
 								disabled: isDeleting,
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Esta ação irá remover permanentemente todos os produtos com valor igual ou inferior a R$ 0,00 (ou sem valor definido) do catálogo. Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo? Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
 							onClick: handleDeleteZeros,
 							className: "bg-destructive hover:bg-destructive/90",
-							children: isDeleting ? "Excluindo..." : "Confirmar Exclusão"
+							children: isDeleting ? "Excluindo..." : "Confirmar Limpeza"
 						})] })] })] })]
 					})]
 				})
@@ -44318,35 +44316,18 @@ function BulkCleanup() {
 		setZeroValueLoading(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Limpeza concluída com sucesso!", { description: `${result.count} produtos removidos (valor zerado ou nulo).` });
+			if (result.success) toast.success("Registros deletados com sucesso!");
 			else throw result.error;
 		} catch (error) {
 			console.error("Zero value cleanup error:", error);
-			let errorMessage = "Erro ao remover produtos sem valor.";
-			if (error?.code === "57014" || error?.message?.toLowerCase().includes("timeout")) errorMessage = "A operação excedeu o tempo limite. Tente novamente mais tarde ou contate o suporte.";
-			else if (error?.message) errorMessage = `Erro: ${error.message}`;
-			toast.error(errorMessage);
+			toast.error("Erro ao deletar registros. Tente novamente.");
 		} finally {
 			setZeroValueLoading(false);
 		}
 	};
-	if (!canDelete) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
-		className: "border-red-200 bg-red-50",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-			className: "pt-6 text-center text-red-800",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-12 h-12 mx-auto mb-2 text-red-500" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-					className: "text-lg font-semibold",
-					children: "Acesso Restrito"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Você não tem permissão para executar ferramentas de limpeza." })
-			]
-		})
-	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		children: [canDelete ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 			className: "border-red-100 bg-red-50/10",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 				className: "flex items-center gap-2 text-red-900",
@@ -44424,6 +44405,19 @@ function BulkCleanup() {
 					})] })] })] })]
 				})]
 			})]
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+			className: "border-red-200 bg-red-50 opacity-60",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+				className: "pt-6 text-center text-red-800",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-12 h-12 mx-auto mb-2 text-red-500" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+						className: "text-lg font-semibold",
+						children: "Limpeza de Histórico Restrita"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Você não tem permissão para remover registros antigos." })
+				]
+			})
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 			className: "border-orange-100 bg-orange-50/10",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
@@ -44452,12 +44446,7 @@ function BulkCleanup() {
 							disabled: zeroValueLoading,
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Você está prestes a excluir todos os produtos com valor igual ou inferior a zero, bem como produtos com valor nulo.",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						"Esta ação não pode ser desfeita. Deseja continuar?"
-					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo? Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
 						onClick: handleZeroValueCleanup,
 						className: "bg-orange-600 hover:bg-orange-700",
 						children: "Confirmar Limpeza"
@@ -44931,15 +44920,13 @@ function AdminPage() {
 	const currentUser = useAuthStore((state) => state.currentUser);
 	const users = useAuthStore((state) => state.users);
 	const fetchUsers = useAuthStore((state) => state.fetchUsers);
-	(0, import_react.useEffect)(() => {
-		fetchUsers();
-	}, []);
-	if (currentUser?.role !== "ADMIN" && !currentUser?.isSuperAdmin) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Navigate, {
-		to: "/",
-		replace: true
-	});
-	const pendingUsers = users.filter((u$1) => u$1.status === "pending");
 	const isSuperAdmin = currentUser?.isSuperAdmin;
+	const isAdmin = currentUser?.role === "ADMIN" || isSuperAdmin;
+	(0, import_react.useEffect)(() => {
+		if (isAdmin) fetchUsers();
+	}, [isAdmin]);
+	const pendingUsers = users.filter((u$1) => u$1.status === "pending");
+	const activeRecentUsers = users.filter((u$1) => (/* @__PURE__ */ new Date()).getTime() - new Date(u$1.lastActive).getTime() < 1440 * 60 * 1e3);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-8 pb-12",
 		children: [
@@ -44969,7 +44956,7 @@ function AdminPage() {
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "w-3 h-3 ml-2 opacity-50" })
 							]
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					}), isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 						variant: "outline",
 						size: "sm",
 						onClick: () => fetchUsers(),
@@ -44977,7 +44964,7 @@ function AdminPage() {
 					})]
 				})]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "grid grid-cols-1 md:grid-cols-3 gap-6",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
@@ -45016,7 +45003,7 @@ function AdminPage() {
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Activity, { className: "h-4 w-4 text-emerald-500" })]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 							className: "text-2xl font-bold text-emerald-900",
-							children: users.filter((u$1) => (/* @__PURE__ */ new Date()).getTime() - new Date(u$1.lastActive).getTime() < 1440 * 60 * 1e3).length
+							children: activeRecentUsers.length
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 							className: "text-xs text-emerald-700 mt-1",
 							children: "Ativos nas últimas 24h"
@@ -45025,15 +45012,15 @@ function AdminPage() {
 				]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
-				defaultValue: "active",
+				defaultValue: isAdmin ? "active" : "maintenance",
 				className: "w-full",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "w-full overflow-x-auto pb-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
-							className: "grid w-full min-w-[800px] grid-cols-7 md:w-auto",
+							className: "flex w-full md:w-auto justify-start md:justify-center overflow-x-auto gap-1",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+								isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
 									value: "active",
 									children: "Usuários"
 								}),
@@ -45042,22 +45029,22 @@ function AdminPage() {
 									className: "flex gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Building2, { className: "w-4 h-4" }), "Cadastros"]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
 									value: "pending",
 									className: "relative",
 									children: ["Solicitações", pendingUsers.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" })]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
 									value: "monitor",
 									className: "flex gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TrendingDown, { className: "w-4 h-4" }), "Monitor"]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
 									value: "blacklist",
 									className: "flex gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Ban, { className: "w-4 h-4" }), "Blacklist"]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+								isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
 									value: "domain",
 									className: "flex gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Globe, { className: "w-4 h-4" }), "Domínio"]
@@ -45070,7 +45057,7 @@ function AdminPage() {
 							]
 						})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "active",
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserManagement, {})
@@ -45080,22 +45067,22 @@ function AdminPage() {
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CompanyManagement, {})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "pending",
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PendingRequests, {})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "monitor",
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PriceMonitor, {})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "blacklist",
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SupplierBlacklist, {})
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					isAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 						value: "domain",
 						className: "mt-6 animate-fade-in",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DomainSettings, {})
@@ -46343,4 +46330,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DMQQO16W.js.map
+//# sourceMappingURL=index-BdKfMsVO.js.map

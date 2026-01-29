@@ -494,11 +494,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return
 
-    const { data, error } = await supabase
+    // Get user profile first to check permissions and company
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('can_view_all_lists, company_id')
+      .eq('id', user.id)
+      .single()
+
+    let query = supabase
       .from('generated_lists')
-      .select('*')
-      .eq('user_id', user.id)
+      .select('*, profiles(name)')
       .order('created_at', { ascending: false })
+
+    // Apply filtering logic
+    if (profile?.can_view_all_lists && profile.company_id) {
+      query = query.eq('company_id', profile.company_id)
+    } else {
+      query = query.eq('user_id', user.id)
+    }
+
+    const { data, error } = await query
 
     if (!error && data) {
       set({ generatedLists: data as GeneratedList[] })
@@ -527,6 +542,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'User not found' }
 
+    // Fetch company_id for the user
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('company_id')
+      .eq('id', user.id)
+      .single()
+
     const { error } = await supabase.from('generated_lists').insert({
       user_id: user.id,
       title,
@@ -534,6 +556,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       type,
       header_footer_data: config as any,
       items_snapshot: itemsSnapshot as any,
+      company_id: profile?.company_id,
     })
 
     if (error) {

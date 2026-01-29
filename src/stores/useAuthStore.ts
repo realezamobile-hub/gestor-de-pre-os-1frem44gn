@@ -65,6 +65,7 @@ const mapProfileToUser = (profile: any): User => {
     canCreateList: profile.can_create_list || false,
     canAccessEvaluation: profile.can_access_evaluation || false,
     canDeleteRecords: profile.can_delete_records || false,
+    canViewAllLists: profile.can_view_all_lists || false,
   }
 }
 
@@ -276,6 +277,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (permission === 'canCreateList') dbColumn = 'can_create_list'
     if (permission === 'canAccessEvaluation') dbColumn = 'can_access_evaluation'
     if (permission === 'canDeleteRecords') dbColumn = 'can_delete_records'
+    if (permission === 'canViewAllLists') dbColumn = 'can_view_all_lists'
 
     if (!dbColumn) return
 

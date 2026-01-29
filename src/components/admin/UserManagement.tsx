@@ -64,7 +64,11 @@ export function UserManagement() {
 
   const handleTogglePermission = async (
     id: string,
-    permission: 'canCreateList' | 'canAccessEvaluation' | 'canDeleteRecords',
+    permission:
+      | 'canCreateList'
+      | 'canAccessEvaluation'
+      | 'canDeleteRecords'
+      | 'canViewAllLists',
   ) => {
     await toggleUserPermission(id, permission)
     toast.success('Permissão atualizada')
@@ -190,7 +194,7 @@ export function UserManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex flex-col items-start gap-2 max-w-[180px] mx-auto">
+                    <div className="flex flex-col items-start gap-2 max-w-[220px] mx-auto">
                       <div className="flex items-center gap-2">
                         <Switch
                           checked={user.canCreateList}
@@ -224,6 +228,23 @@ export function UserManagement() {
                           className="text-xs font-normal cursor-pointer"
                         >
                           Avaliação
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={user.canViewAllLists}
+                          onCheckedChange={() =>
+                            handleTogglePermission(user.id, 'canViewAllLists')
+                          }
+                          disabled={!canEdit}
+                          id={`view-all-${user.id}`}
+                          className="data-[state=checked]:bg-blue-600"
+                        />
+                        <Label
+                          htmlFor={`view-all-${user.id}`}
+                          className="text-xs font-normal cursor-pointer text-blue-700"
+                        >
+                          Ver Histórico Completo
                         </Label>
                       </div>
                       {isSuperAdmin && (

@@ -30,6 +30,7 @@ export interface User {
   canCreateList: boolean
   canAccessEvaluation: boolean
   canDeleteRecords: boolean
+  canViewAllLists: boolean
 }
 
 // Map directly to Supabase table row and extend with new columns
@@ -69,6 +70,7 @@ export interface GeneratedList {
   items_snapshot: DraftItem[] | null
   created_at: string
   company_id?: string
+  profiles?: { name: string | null } | null
 }
 
 export interface ExcludedSupplier {

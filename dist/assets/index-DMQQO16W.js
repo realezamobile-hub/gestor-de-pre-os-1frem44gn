@@ -32728,7 +32728,8 @@ var mapProfileToUser = (profile) => {
 		isSuperAdmin,
 		canCreateList: profile.can_create_list || false,
 		canAccessEvaluation: profile.can_access_evaluation || false,
-		canDeleteRecords: profile.can_delete_records || false
+		canDeleteRecords: profile.can_delete_records || false,
+		canViewAllLists: profile.can_view_all_lists || false
 	};
 };
 const useAuthStore = create((set, get$1) => ({
@@ -32883,6 +32884,7 @@ const useAuthStore = create((set, get$1) => ({
 		if (permission === "canCreateList") dbColumn = "can_create_list";
 		if (permission === "canAccessEvaluation") dbColumn = "can_access_evaluation";
 		if (permission === "canDeleteRecords") dbColumn = "can_delete_records";
+		if (permission === "canViewAllLists") dbColumn = "can_view_all_lists";
 		if (!dbColumn) return;
 		const { error } = await supabase.from("profiles").update({ [dbColumn]: newValue }).eq("id", userId);
 		if (!error) set((state) => ({ users: state.users.map((u$1) => u$1.id === userId ? {
@@ -36481,7 +36483,11 @@ const useProductStore = create((set, get$1) => ({
 	fetchGeneratedLists: async () => {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
-		const { data, error } = await supabase.from("generated_lists").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+		const { data: profile } = await supabase.from("profiles").select("can_view_all_lists, company_id").eq("id", user.id).single();
+		let query = supabase.from("generated_lists").select("*, profiles(name)").order("created_at", { ascending: false });
+		if (profile?.can_view_all_lists && profile.company_id) query = query.eq("company_id", profile.company_id);
+		else query = query.eq("user_id", user.id);
+		const { data, error } = await query;
 		if (!error && data) set({ generatedLists: data });
 	},
 	deleteGeneratedList: async (id) => {
@@ -36497,13 +36503,15 @@ const useProductStore = create((set, get$1) => ({
 			success: false,
 			error: "User not found"
 		};
+		const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).single();
 		const { error } = await supabase.from("generated_lists").insert({
 			user_id: user.id,
 			title,
 			content,
 			type,
 			header_footer_data: config,
-			items_snapshot: itemsSnapshot
+			items_snapshot: itemsSnapshot,
+			company_id: profile?.company_id
 		});
 		if (error) return {
 			success: false,
@@ -43261,6 +43269,7 @@ var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PUR
 Switch.displayName = Root.displayName;
 function GeneratorHistory() {
 	const { generatedLists, deleteGeneratedList } = useProductStore();
+	const { currentUser } = useAuthStore();
 	const [selectedList, setSelectedList] = (0, import_react.useState)(null);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)("");
 	const [showInternalDetails, setShowInternalDetails] = (0, import_react.useState)(false);
@@ -43276,8 +43285,10 @@ function GeneratorHistory() {
 		const term = searchTerm.toLowerCase();
 		const titleMatch = list.title?.toLowerCase().includes(term);
 		const contentMatch = list.content?.toLowerCase().includes(term);
-		return !term || titleMatch || contentMatch;
+		const creatorMatch = list.profiles?.name?.toLowerCase().includes(term);
+		return !term || titleMatch || contentMatch || creatorMatch;
 	});
+	const canViewAll = currentUser?.canViewAllLists || false;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetTrigger, {
 		asChild: true,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
@@ -43295,7 +43306,7 @@ function GeneratorHistory() {
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-						placeholder: "Buscar por título ou conteúdo...",
+						placeholder: "Buscar por título, conteúdo ou autor...",
 						className: "pl-9 pr-8",
 						value: searchTerm,
 						onChange: (e) => setSearchTerm(e.target.value)
@@ -43315,7 +43326,7 @@ function GeneratorHistory() {
 					className: "text-center text-muted-foreground py-10 flex flex-col items-center gap-2",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-8 h-8 opacity-20" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: searchTerm ? "Nenhuma lista encontrada para a busca." : "Nenhuma lista gerada ainda." })]
 				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Lista" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Tipo" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 						className: "text-right",
@@ -43327,13 +43338,20 @@ function GeneratorHistory() {
 					children: [
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex flex-col",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "font-medium",
-								children: format(new Date(list.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "text-xs text-muted-foreground truncate max-w-[150px]",
-								children: list.title || "Sem título"
-							})]
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-medium",
+									children: format(new Date(list.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs text-muted-foreground truncate max-w-[150px]",
+									children: list.title || "Sem título"
+								}),
+								canViewAll && list.profiles?.name && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+									className: "text-[10px] text-blue-600 mt-1 font-medium",
+									children: ["Por: ", list.profiles.name]
+								})
+							]
 						}) }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "capitalize text-xs bg-secondary px-2 py-1 rounded",
@@ -43352,7 +43370,7 @@ function GeneratorHistory() {
 									},
 									title: "Copiar Texto",
 									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-3 h-3" })
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								}), (currentUser?.id === list.user_id || currentUser?.canDeleteRecords) && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 									variant: "ghost",
 									size: "icon",
 									className: "text-destructive hover:text-destructive",
@@ -43377,7 +43395,13 @@ function GeneratorHistory() {
 			className: "max-w-4xl max-h-[90vh] flex flex-col",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
 				className: "flex items-center justify-between",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Detalhes da Lista" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col gap-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Detalhes da Lista" }), selectedList?.profiles?.name && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "text-xs font-normal text-muted-foreground",
+						children: ["Criado por ", selectedList.profiles.name]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "text-sm font-normal text-muted-foreground",
 					children: selectedList && format(new Date(selectedList.created_at), "PPP 'às' HH:mm", { locale: ptBR })
 				})]
@@ -43994,7 +44018,7 @@ function UserManagement() {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 				className: "text-center",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-col items-start gap-2 max-w-[180px] mx-auto",
+					className: "flex flex-col items-start gap-2 max-w-[220px] mx-auto",
 					children: [
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex items-center gap-2",
@@ -44020,6 +44044,20 @@ function UserManagement() {
 								htmlFor: `eval-${user.id}`,
 								className: "text-xs font-normal cursor-pointer",
 								children: "Avaliação"
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+								checked: user.canViewAllLists,
+								onCheckedChange: () => handleTogglePermission(user.id, "canViewAllLists"),
+								disabled: !canEdit,
+								id: `view-all-${user.id}`,
+								className: "data-[state=checked]:bg-blue-600"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								htmlFor: `view-all-${user.id}`,
+								className: "text-xs font-normal cursor-pointer text-blue-700",
+								children: "Ver Histórico Completo"
 							})]
 						}),
 						isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -46305,4 +46343,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DqWJak7W.js.map
+//# sourceMappingURL=index-DMQQO16W.js.map

@@ -29,6 +29,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
@@ -44,6 +45,7 @@ import { Label } from '@/components/ui/label'
 
 export function GeneratorHistory() {
   const { generatedLists, deleteGeneratedList } = useProductStore()
+  const { currentUser } = useAuthStore()
   const [selectedList, setSelectedList] = useState<GeneratedList | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [showInternalDetails, setShowInternalDetails] = useState(false)
@@ -64,8 +66,12 @@ export function GeneratorHistory() {
     const term = searchTerm.toLowerCase()
     const titleMatch = list.title?.toLowerCase().includes(term)
     const contentMatch = list.content?.toLowerCase().includes(term)
-    return !term || titleMatch || contentMatch
+    const creatorMatch = list.profiles?.name?.toLowerCase().includes(term)
+    return !term || titleMatch || contentMatch || creatorMatch
   })
+
+  // Check if current user can view others' lists to decide if we show the creator column
+  const canViewAll = currentUser?.canViewAllLists || false
 
   return (
     <>
@@ -85,7 +91,7 @@ export function GeneratorHistory() {
             <div className="relative mt-2">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por título ou conteúdo..."
+                placeholder="Buscar por título, conteúdo ou autor..."
                 className="pl-9 pr-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -115,7 +121,7 @@ export function GeneratorHistory() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data</TableHead>
+                      <TableHead>Lista</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
@@ -139,6 +145,11 @@ export function GeneratorHistory() {
                             <span className="text-xs text-muted-foreground truncate max-w-[150px]">
                               {list.title || 'Sem título'}
                             </span>
+                            {canViewAll && list.profiles?.name && (
+                              <span className="text-[10px] text-blue-600 mt-1 font-medium">
+                                Por: {list.profiles.name}
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -159,14 +170,17 @@ export function GeneratorHistory() {
                             >
                               <Copy className="w-3 h-3" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive"
-                              onClick={(e) => handleDelete(list.id, e)}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                            {(currentUser?.id === list.user_id ||
+                              currentUser?.canDeleteRecords) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={(e) => handleDelete(list.id, e)}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -191,7 +205,14 @@ export function GeneratorHistory() {
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span>Detalhes da Lista</span>
+              <div className="flex flex-col gap-1">
+                <span>Detalhes da Lista</span>
+                {selectedList?.profiles?.name && (
+                  <span className="text-xs font-normal text-muted-foreground">
+                    Criado por {selectedList.profiles.name}
+                  </span>
+                )}
+              </div>
               <span className="text-sm font-normal text-muted-foreground">
                 {selectedList &&
                   format(new Date(selectedList.created_at), "PPP 'às' HH:mm", {

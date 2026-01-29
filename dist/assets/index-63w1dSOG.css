@@ -1188,8 +1188,8 @@ section[aria-label='Notifications alt+T'] {
 .max-w-\[150px\]{
   max-width: 150px;
 }
-.max-w-\[180px\]{
-  max-width: 180px;
+.max-w-\[220px\]{
+  max-width: 220px;
 }
 .max-w-lg{
   max-width: 32rem;
@@ -3317,6 +3317,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .data-\[state\=active\]\:bg-background[data-state="active"]{
   background-color: hsl(var(--background));
+}
+.data-\[state\=checked\]\:bg-blue-600[data-state="checked"]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1));
 }
 .data-\[state\=checked\]\:bg-primary[data-state="checked"]{
   background-color: hsl(var(--primary));

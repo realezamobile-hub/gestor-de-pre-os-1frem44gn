@@ -85,6 +85,9 @@ interface ProductStore {
   cleanupOldRecords: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
+  deleteZeroValueProducts: (
+    companyId: string,
+  ) => Promise<{ success: boolean; count?: number; error?: any }>
 
   // Helper
   getBestPrice: (
@@ -669,6 +672,22 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       return { success: true, data }
     } catch (error) {
       console.error('Cleanup old records error:', error)
+      return { success: false, error }
+    }
+  },
+
+  deleteZeroValueProducts: async (companyId) => {
+    try {
+      // Cast to any to bypass strict type checking against outdated Database types
+      const { data, error } = await supabase.rpc('delete_zero_value_products', {
+        p_company_id: companyId,
+      } as any)
+
+      if (error) throw error
+      get().fetchProducts()
+      return { success: true, count: data as number }
+    } catch (error) {
+      console.error('Error deleting zero value products:', error)
       return { success: false, error }
     }
   },

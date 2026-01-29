@@ -18907,6 +18907,26 @@ var Ban = createLucideIcon("ban", [["path", {
 	r: "10",
 	key: "1mglay"
 }]]);
+var Banknote = createLucideIcon("banknote", [
+	["rect", {
+		width: "20",
+		height: "12",
+		x: "2",
+		y: "6",
+		rx: "2",
+		key: "9lu3g6"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "2",
+		key: "1c9p78"
+	}],
+	["path", {
+		d: "M6 12h.01M18 12h.01",
+		key: "113zkx"
+	}]
+]);
 var Battery = createLucideIcon("battery", [["path", {
 	d: "M 22 14 L 22 10",
 	key: "nqc4tb"
@@ -36589,6 +36609,23 @@ const useProductStore = create((set, get$1) => ({
 				error
 			};
 		}
+	},
+	deleteZeroValueProducts: async (companyId) => {
+		try {
+			const { data, error } = await supabase.rpc("delete_zero_value_products", { p_company_id: companyId });
+			if (error) throw error;
+			get$1().fetchProducts();
+			return {
+				success: true,
+				count: data
+			};
+		} catch (error) {
+			console.error("Error deleting zero value products:", error);
+			return {
+				success: false,
+				error
+			};
+		}
 	}
 }));
 function Skeleton({ className, ...props }) {
@@ -44215,7 +44252,8 @@ function DomainSettings() {
 function BulkCleanup() {
 	const [date, setDate] = (0, import_react.useState)("");
 	const [loading, setLoading] = (0, import_react.useState)(false);
-	const { cleanupOldRecords } = useProductStore();
+	const [zeroValueLoading, setZeroValueLoading] = (0, import_react.useState)(false);
+	const { cleanupOldRecords, deleteZeroValueProducts } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const canDelete = currentUser?.canDeleteRecords || false;
 	const handleCleanup = async () => {
@@ -44234,6 +44272,23 @@ function BulkCleanup() {
 			setLoading(false);
 		}
 	};
+	const handleZeroValueCleanup = async () => {
+		if (!currentUser?.companyId) {
+			toast.error("Empresa não identificada.");
+			return;
+		}
+		setZeroValueLoading(true);
+		try {
+			const result = await deleteZeroValueProducts(currentUser.companyId);
+			if (result.success) toast.success("Registros deletados com sucesso!", { description: `${result.count} produtos sem valor foram removidos.` });
+			else throw result.error;
+		} catch (error) {
+			console.error("Zero value cleanup error:", error);
+			toast.error("Erro ao remover produtos sem valor.");
+		} finally {
+			setZeroValueLoading(false);
+		}
+	};
 	if (!canDelete) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
 		className: "border-red-200 bg-red-50",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
@@ -44248,9 +44303,9 @@ function BulkCleanup() {
 			]
 		})
 	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 			className: "border-red-100 bg-red-50/10",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 				className: "flex items-center gap-2 text-red-900",
@@ -44328,7 +44383,47 @@ function BulkCleanup() {
 					})] })] })] })]
 				})]
 			})]
-		})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "border-orange-100 bg-orange-50/10",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+				className: "flex items-center gap-2 text-orange-900",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-5 h-5 text-orange-600" }), "Limpeza de Produtos Inválidos"]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo)." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+				className: "space-y-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "rounded-lg border border-orange-200 bg-orange-50 p-4",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+						className: "text-sm text-orange-800",
+						children: [
+							"Isso removerá todos os produtos com ",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor R$ 0,00" }),
+							" ",
+							"ou sem preço cadastrado. Útil para limpar importações incorretas ou produtos incompletos."
+						]
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex justify-end",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							variant: "destructive",
+							className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
+							disabled: zeroValueLoading,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+						"Você está prestes a excluir todos os produtos com valor igual ou inferior a zero.",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+						"Esta ação não pode ser desfeita. Deseja continuar?"
+					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						onClick: handleZeroValueCleanup,
+						className: "bg-orange-600 hover:bg-orange-700",
+						children: "Confirmar Limpeza"
+					})] })] })] })
+				})]
+			})]
+		})]
 	});
 }
 var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
@@ -46207,4 +46302,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Dw6i5OZi.js.map
+//# sourceMappingURL=index-BZ96Ngzr.js.map

@@ -9,7 +9,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Trash2, CalendarClock, ShieldAlert, AlertTriangle } from 'lucide-react'
+import {
+  Trash2,
+  CalendarClock,
+  ShieldAlert,
+  AlertTriangle,
+  Banknote,
+} from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import { toast } from 'sonner'
 import {
@@ -29,7 +35,8 @@ import { useAuthStore } from '@/stores/useAuthStore'
 export function BulkCleanup() {
   const [date, setDate] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const { cleanupOldRecords } = useProductStore()
+  const [zeroValueLoading, setZeroValueLoading] = useState(false)
+  const { cleanupOldRecords, deleteZeroValueProducts } = useProductStore()
   const { currentUser } = useAuthStore()
 
   const canDelete = currentUser?.canDeleteRecords || false
@@ -59,6 +66,31 @@ export function BulkCleanup() {
       toast.error('Erro ao realizar limpeza de registros.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleZeroValueCleanup = async () => {
+    if (!currentUser?.companyId) {
+      toast.error('Empresa não identificada.')
+      return
+    }
+
+    setZeroValueLoading(true)
+    try {
+      const result = await deleteZeroValueProducts(currentUser.companyId)
+
+      if (result.success) {
+        toast.success('Registros deletados com sucesso!', {
+          description: `${result.count} produtos sem valor foram removidos.`,
+        })
+      } else {
+        throw result.error
+      }
+    } catch (error) {
+      console.error('Zero value cleanup error:', error)
+      toast.error('Erro ao remover produtos sem valor.')
+    } finally {
+      setZeroValueLoading(false)
     }
   }
 
@@ -161,6 +193,68 @@ export function BulkCleanup() {
                     className="bg-red-600 hover:bg-red-700"
                   >
                     Sim, excluir tudo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-orange-100 bg-orange-50/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-orange-900">
+            <Banknote className="w-5 h-5 text-orange-600" />
+            Limpeza de Produtos Inválidos
+          </CardTitle>
+          <CardDescription>
+            Remover produtos que não possuem valor definido (zero, negativo ou
+            nulo).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+            <p className="text-sm text-orange-800">
+              Isso removerá todos os produtos com <strong>valor R$ 0,00</strong>{' '}
+              ou sem preço cadastrado. Útil para limpar importações incorretas
+              ou produtos incompletos.
+            </p>
+          </div>
+
+          <div className="flex justify-end">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+                  disabled={zeroValueLoading}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {zeroValueLoading
+                    ? 'Processando...'
+                    : 'Deletar registros com valor <= 0,00'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Confirmar Limpeza de Produtos
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Você está prestes a excluir todos os produtos com valor
+                    igual ou inferior a zero.
+                    <br />
+                    <br />
+                    Esta ação não pode ser desfeita. Deseja continuar?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleZeroValueCleanup}
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    Confirmar Limpeza
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

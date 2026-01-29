@@ -164,8 +164,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       page: 0,
     }))
     get().fetchProducts()
-    // Fetch options only if search context changes (search, date or supplier)
-    // This ensures that dropdown options (RAM, Memory, Color) are relevant to the current search/supplier results
     if (
       newFilters.search !== undefined ||
       newFilters.dateRange !== undefined ||
@@ -194,10 +192,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     if (filters.dateRange === 'today') {
       minDate = today.toISOString()
     } else if (filters.dateRange === 'yesterday') {
-      // "Yesterday" filter means items starting from yesterday (usually includes today in this context)
       minDate = subDays(today, 1).toISOString()
     }
-    // If 'all', minDate remains null, which is correctly handled by RPC as "no date filter"
 
     const { data, error } = await supabase.rpc('get_product_filters', {
       p_search_query: filters.search.trim() || null,
@@ -221,12 +217,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       if (filters.dateRange === 'today') {
         minDate = today.toISOString()
       } else if (filters.dateRange === 'yesterday') {
-        // "Yesterday" implies items created since start of yesterday
         minDate = subDays(today, 1).toISOString()
       }
-      // If 'all', minDate remains null
 
-      // Prepare arguments for the RPC call
       const rpcArgs: any = {
         search_query: filters.search.trim() || null,
         category_filters:
@@ -235,9 +228,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         ram_filter: filters.ram !== 'all' ? filters.ram : null,
         color_filter: filters.color !== 'all' ? filters.color : null,
         condition_filter: null,
-        supplier_filter: filters.supplier.trim() || null, // Handles partial match via updated RPC
+        supplier_filter: filters.supplier.trim() || null,
         battery_filter: null,
-        in_stock_only: false, // We want to see all products matching criteria
+        in_stock_only: false,
         min_date: minDate,
       }
 
@@ -457,8 +450,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     set({ isLoading: true })
 
-    // Use current effective price to allow additive increases
-    // If custom_price is null, we assume current price is product.valor
     const updates = draftItems.map((item) => {
       const currentPrice = item.custom_price ?? item.product?.valor ?? 0
       const newPrice = currentPrice + markup
@@ -474,7 +465,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     })
 
-    // Optimistic Update
     const optimisticItems = draftItems.map((item) => {
       const currentPrice = item.custom_price ?? item.product?.valor ?? 0
       return {
@@ -484,7 +474,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     })
     set({ draftItems: optimisticItems })
 
-    // Bulk update via upsert to apply to all items in DB
     const { error } = await supabase
       .from('whatsapp_draft_items')
       .upsert(updates)
@@ -492,7 +481,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     if (error) {
       console.error('Error applying markup:', error)
       toast.error('Erro ao aplicar aumento global')
-      await get().fetchDraftItems() // Revert
+      await get().fetchDraftItems()
     } else {
       toast.success(`Adicionado R$${markup} ao preço de todos os itens`)
     }
@@ -678,7 +667,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   deleteZeroValueProducts: async (companyId) => {
     try {
-      // Cast to any to bypass strict type checking against outdated Database types
       const { data, error } = await supabase.rpc('delete_zero_value_products', {
         p_company_id: companyId,
       } as any)

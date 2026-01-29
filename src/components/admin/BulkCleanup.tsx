@@ -80,15 +80,29 @@ export function BulkCleanup() {
       const result = await deleteZeroValueProducts(currentUser.companyId)
 
       if (result.success) {
-        toast.success('Registros deletados com sucesso!', {
-          description: `${result.count} produtos sem valor foram removidos.`,
+        toast.success('Limpeza concluída com sucesso!', {
+          description: `${result.count} produtos removidos (valor zerado ou nulo).`,
         })
       } else {
         throw result.error
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Zero value cleanup error:', error)
-      toast.error('Erro ao remover produtos sem valor.')
+
+      let errorMessage = 'Erro ao remover produtos sem valor.'
+
+      // Handle specific timeout error (Postgres code 57014) or generic timeout messages
+      if (
+        error?.code === '57014' ||
+        error?.message?.toLowerCase().includes('timeout')
+      ) {
+        errorMessage =
+          'A operação excedeu o tempo limite. Tente novamente mais tarde ou contate o suporte.'
+      } else if (error?.message) {
+        errorMessage = `Erro: ${error.message}`
+      }
+
+      toast.error(errorMessage)
     } finally {
       setZeroValueLoading(false)
     }
@@ -216,8 +230,8 @@ export function BulkCleanup() {
           <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
             <p className="text-sm text-orange-800">
               Isso removerá todos os produtos com <strong>valor R$ 0,00</strong>{' '}
-              ou sem preço cadastrado. Útil para limpar importações incorretas
-              ou produtos incompletos.
+              ou sem preço cadastrado (nulo). Útil para limpar importações
+              incorretas ou produtos incompletos.
             </p>
           </div>
 
@@ -242,7 +256,7 @@ export function BulkCleanup() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     Você está prestes a excluir todos os produtos com valor
-                    igual ou inferior a zero.
+                    igual ou inferior a zero, bem como produtos com valor nulo.
                     <br />
                     <br />
                     Esta ação não pode ser desfeita. Deseja continuar?

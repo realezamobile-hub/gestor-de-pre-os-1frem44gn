@@ -44280,11 +44280,14 @@ function BulkCleanup() {
 		setZeroValueLoading(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Registros deletados com sucesso!", { description: `${result.count} produtos sem valor foram removidos.` });
+			if (result.success) toast.success("Limpeza concluída com sucesso!", { description: `${result.count} produtos removidos (valor zerado ou nulo).` });
 			else throw result.error;
 		} catch (error) {
 			console.error("Zero value cleanup error:", error);
-			toast.error("Erro ao remover produtos sem valor.");
+			let errorMessage = "Erro ao remover produtos sem valor.";
+			if (error?.code === "57014" || error?.message?.toLowerCase().includes("timeout")) errorMessage = "A operação excedeu o tempo limite. Tente novamente mais tarde ou contate o suporte.";
+			else if (error?.message) errorMessage = `Erro: ${error.message}`;
+			toast.error(errorMessage);
 		} finally {
 			setZeroValueLoading(false);
 		}
@@ -44398,7 +44401,7 @@ function BulkCleanup() {
 							"Isso removerá todos os produtos com ",
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor R$ 0,00" }),
 							" ",
-							"ou sem preço cadastrado. Útil para limpar importações incorretas ou produtos incompletos."
+							"ou sem preço cadastrado (nulo). Útil para limpar importações incorretas ou produtos incompletos."
 						]
 					})
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -44412,7 +44415,7 @@ function BulkCleanup() {
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Você está prestes a excluir todos os produtos com valor igual ou inferior a zero.",
+						"Você está prestes a excluir todos os produtos com valor igual ou inferior a zero, bem como produtos com valor nulo.",
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
 						"Esta ação não pode ser desfeita. Deseja continuar?"
@@ -46302,4 +46305,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BZ96Ngzr.js.map
+//# sourceMappingURL=index-DqWJak7W.js.map

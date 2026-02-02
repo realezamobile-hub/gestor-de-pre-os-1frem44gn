@@ -25,7 +25,14 @@ export function AvatarUpload() {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Por favor selecione um arquivo de imagem válido')
+      toast.error(
+        'Por favor selecione um arquivo de imagem válido (JPG, PNG, WebP)',
+      )
+      return
+    }
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Formato não suportado. Use JPG, PNG ou WebP.')
       return
     }
 
@@ -41,9 +48,11 @@ export function AvatarUpload() {
       if (result.success) {
         toast.success('Foto de perfil atualizada!')
       } else {
-        toast.error('Erro ao atualizar foto')
+        console.error('Upload result error:', result.error)
+        toast.error('Erro ao atualizar foto. Tente novamente.')
       }
     } catch (error) {
+      console.error('Upload exception:', error)
       toast.error('Erro inesperado no upload')
     } finally {
       setIsUploading(false)
@@ -92,7 +101,7 @@ export function AvatarUpload() {
         type="file"
         ref={fileInputRef}
         onChange={handleFileSelect}
-        accept="image/*"
+        accept="image/png, image/jpeg, image/webp"
         className="hidden"
       />
 
@@ -102,8 +111,11 @@ export function AvatarUpload() {
         onClick={triggerClick}
         disabled={isUploading}
       >
-        Alterar Foto
+        {isUploading ? 'Enviando...' : 'Alterar Foto'}
       </Button>
+      <p className="text-xs text-muted-foreground text-center">
+        Suporta JPG, PNG e WebP até 5MB.
+      </p>
     </div>
   )
 }

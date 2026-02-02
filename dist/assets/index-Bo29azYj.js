@@ -32765,10 +32765,10 @@ var mapProfileToUser = (profile) => {
 		createdAt: profile.created_at || (/* @__PURE__ */ new Date()).toISOString(),
 		companyId: profile.company_id,
 		isSuperAdmin,
-		canCreateList: profile.can_create_list || false,
-		canAccessEvaluation: profile.can_access_evaluation || false,
-		canDeleteRecords: profile.can_delete_records || false,
-		canViewAllLists: profile.can_view_all_lists || false
+		canCreateList: profile.can_create_list || isSuperAdmin || false,
+		canAccessEvaluation: profile.can_access_evaluation || isSuperAdmin || false,
+		canDeleteRecords: profile.can_delete_records || isSuperAdmin || false,
+		canViewAllLists: profile.can_view_all_lists || isSuperAdmin || false
 	};
 };
 const useAuthStore = create((set, get$1) => ({
@@ -32929,7 +32929,7 @@ const useAuthStore = create((set, get$1) => ({
 		try {
 			const fileExt = file.name.split(".").pop();
 			const filePath = `${`${currentUser.id}/${Date.now()}.${fileExt}`}`;
-			const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
+			const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
 			if (uploadError) throw uploadError;
 			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
 			const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", currentUser.id);
@@ -32940,6 +32940,7 @@ const useAuthStore = create((set, get$1) => ({
 				url: publicUrl
 			};
 		} catch (error) {
+			console.error("Avatar upload error:", error);
 			return {
 				success: false,
 				error
@@ -44803,7 +44804,7 @@ function BulkCleanup() {
 	const [zeroValueLoading, setZeroValueLoading] = (0, import_react.useState)(false);
 	const { cleanupOldRecords, deleteZeroValueProducts } = useProductStore();
 	const { currentUser } = useAuthStore();
-	const canDelete = currentUser?.canDeleteRecords || false;
+	const canDeleteHistory = currentUser?.canDeleteRecords || false;
 	const handleCleanup = async () => {
 		if (!date) return;
 		setLoading(true);
@@ -44828,8 +44829,11 @@ function BulkCleanup() {
 		setZeroValueLoading(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Registros deletados com sucesso!");
-			else throw result.error;
+			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo foram removidos.` });
+			else {
+				console.error("Zero cleanup error:", result.error);
+				toast.error("Erro ao deletar registros. Tente novamente.");
+			}
 		} catch (error) {
 			console.error("Zero value cleanup error:", error);
 			toast.error("Erro ao deletar registros. Tente novamente.");
@@ -44839,7 +44843,7 @@ function BulkCleanup() {
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
-		children: [canDelete ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		children: [canDeleteHistory ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 			className: "border-red-100 bg-red-50/10",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 				className: "flex items-center gap-2 text-red-900",
@@ -44935,7 +44939,7 @@ function BulkCleanup() {
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 				className: "flex items-center gap-2 text-orange-900",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-5 h-5 text-orange-600" }), "Limpeza de Produtos Inválidos"]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo)." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo) da sua empresa." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 				className: "space-y-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "rounded-lg border border-orange-200 bg-orange-50 p-4",
@@ -44955,10 +44959,14 @@ function BulkCleanup() {
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							variant: "destructive",
 							className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
-							disabled: zeroValueLoading,
+							disabled: zeroValueLoading || !currentUser?.companyId,
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo? Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+						"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+						"Esta ação não pode ser desfeita."
+					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
 						onClick: handleZeroValueCleanup,
 						className: "bg-orange-600 hover:bg-orange-700",
 						children: "Confirmar Limpeza"
@@ -46771,7 +46779,15 @@ function AvatarUpload() {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		if (!file.type.startsWith("image/")) {
-			toast.error("Por favor selecione um arquivo de imagem válido");
+			toast.error("Por favor selecione um arquivo de imagem válido (JPG, PNG, WebP)");
+			return;
+		}
+		if (![
+			"image/jpeg",
+			"image/png",
+			"image/webp"
+		].includes(file.type)) {
+			toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
 			return;
 		}
 		if (file.size > 5 * 1024 * 1024) {
@@ -46780,9 +46796,14 @@ function AvatarUpload() {
 		}
 		setIsUploading(true);
 		try {
-			if ((await uploadAvatar(file)).success) toast.success("Foto de perfil atualizada!");
-			else toast.error("Erro ao atualizar foto");
+			const result = await uploadAvatar(file);
+			if (result.success) toast.success("Foto de perfil atualizada!");
+			else {
+				console.error("Upload result error:", result.error);
+				toast.error("Erro ao atualizar foto. Tente novamente.");
+			}
 		} catch (error) {
+			console.error("Upload exception:", error);
 			toast.error("Erro inesperado no upload");
 		} finally {
 			setIsUploading(false);
@@ -46816,7 +46837,7 @@ function AvatarUpload() {
 				type: "file",
 				ref: fileInputRef,
 				onChange: handleFileSelect,
-				accept: "image/*",
+				accept: "image/png, image/jpeg, image/webp",
 				className: "hidden"
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
@@ -46824,7 +46845,11 @@ function AvatarUpload() {
 				size: "sm",
 				onClick: triggerClick,
 				disabled: isUploading,
-				children: "Alterar Foto"
+				children: isUploading ? "Enviando..." : "Alterar Foto"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-xs text-muted-foreground text-center",
+				children: "Suporta JPG, PNG e WebP até 5MB."
 			})
 		]
 	});
@@ -47037,4 +47062,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BU32-cfh.js.map
+//# sourceMappingURL=index-Bo29azYj.js.map

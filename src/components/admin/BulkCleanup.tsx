@@ -39,7 +39,8 @@ export function BulkCleanup() {
   const { cleanupOldRecords, deleteZeroValueProducts } = useProductStore()
   const { currentUser } = useAuthStore()
 
-  const canDelete = currentUser?.canDeleteRecords || false
+  // This permission only applies to history cleanup, not zero value cleanup
+  const canDeleteHistory = currentUser?.canDeleteRecords || false
 
   const handleCleanup = async () => {
     if (!date) return
@@ -80,9 +81,12 @@ export function BulkCleanup() {
       const result = await deleteZeroValueProducts(currentUser.companyId)
 
       if (result.success) {
-        toast.success('Registros deletados com sucesso!')
+        toast.success('Limpeza realizada com sucesso!', {
+          description: `${result.count} produtos com valor zero ou nulo foram removidos.`,
+        })
       } else {
-        throw result.error
+        console.error('Zero cleanup error:', result.error)
+        toast.error('Erro ao deletar registros. Tente novamente.')
       }
     } catch (error: any) {
       console.error('Zero value cleanup error:', error)
@@ -94,7 +98,7 @@ export function BulkCleanup() {
 
   return (
     <div className="grid gap-6">
-      {canDelete ? (
+      {canDeleteHistory ? (
         <Card className="border-red-100 bg-red-50/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-900">
@@ -199,6 +203,7 @@ export function BulkCleanup() {
         </Card>
       )}
 
+      {/* Zero Value Cleanup - Available to everyone with a company */}
       <Card className="border-orange-100 bg-orange-50/10">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-orange-900">
@@ -207,7 +212,7 @@ export function BulkCleanup() {
           </CardTitle>
           <CardDescription>
             Remover produtos que não possuem valor definido (zero, negativo ou
-            nulo).
+            nulo) da sua empresa.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -225,7 +230,7 @@ export function BulkCleanup() {
                 <Button
                   variant="destructive"
                   className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-                  disabled={zeroValueLoading}
+                  disabled={zeroValueLoading || !currentUser?.companyId}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   {zeroValueLoading
@@ -240,8 +245,9 @@ export function BulkCleanup() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     Tem certeza que deseja excluir permanentemente todos os
-                    produtos com valor zero ou nulo? Esta ação não pode ser
-                    desfeita.
+                    produtos com valor zero ou nulo da sua empresa?
+                    <br />
+                    Esta ação não pode ser desfeita.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

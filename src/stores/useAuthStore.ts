@@ -84,10 +84,11 @@ const mapProfileToUser = (profile: any): User => {
     createdAt: profile.created_at || new Date().toISOString(),
     companyId: profile.company_id,
     isSuperAdmin: isSuperAdmin,
-    canCreateList: profile.can_create_list || false,
-    canAccessEvaluation: profile.can_access_evaluation || false,
-    canDeleteRecords: profile.can_delete_records || false,
-    canViewAllLists: profile.can_view_all_lists || false,
+    // Apply Super Admin Override for all permissions
+    canCreateList: profile.can_create_list || isSuperAdmin || false,
+    canAccessEvaluation: profile.can_access_evaluation || isSuperAdmin || false,
+    canDeleteRecords: profile.can_delete_records || isSuperAdmin || false,
+    canViewAllLists: profile.can_view_all_lists || isSuperAdmin || false,
   }
 }
 
@@ -278,7 +279,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Upload file
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file)
+        .upload(filePath, file, {
+          upsert: true,
+        })
 
       if (uploadError) throw uploadError
 
@@ -298,6 +301,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await syncUser(session)
       return { success: true, url: publicUrl }
     } catch (error) {
+      console.error('Avatar upload error:', error)
       return { success: false, error }
     }
   },

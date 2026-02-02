@@ -33,12 +33,9 @@ export function TopHeader() {
             {currentUser.email}
           </p>
         </div>
-        <Avatar className="h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all">
+        <Avatar className="h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all bg-white">
           <AvatarImage
-            src={
-              currentUser.avatarUrl ||
-              `https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}`
-            }
+            src={currentUser.avatarUrl || undefined}
             className="object-cover"
           />
           <AvatarFallback>{initials}</AvatarFallback>

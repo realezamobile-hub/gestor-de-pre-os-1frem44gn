@@ -1,6 +1,5 @@
 import { Database } from '@/lib/supabase/types'
 
-// Updated Roles based on User Story
 export type Role = 'ADMIN' | 'VENDEDOR' | 'TECNICO' | 'ADMINISTRATIVO'
 
 export type UserStatus = 'pending' | 'active' | 'blocked'
@@ -24,16 +23,20 @@ export interface User {
   companyId: string
   isSuperAdmin: boolean
   phone?: string
+  address?: string | null
+  rg?: string | null
+  cpf?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  avatarUrl?: string | null
   lastActive: string
   createdAt: string
-  // Legacy permissions (can be mapped to Roles later, but keeping for backward compat in UI logic)
   canCreateList: boolean
   canAccessEvaluation: boolean
   canDeleteRecords: boolean
   canViewAllLists: boolean
 }
 
-// Map directly to Supabase table row and extend with new columns
 export type Product = Database['public']['Tables']['produtos']['Row'] & {
   ram?: string | null
   company_id?: string
@@ -48,7 +51,7 @@ export interface DraftItem {
   custom_price?: number | null
   group_name?: string | null
   created_at: string
-  product?: Product // Joined product data
+  product?: Product
   company_id?: string
 }
 
@@ -110,7 +113,6 @@ export interface FilterOptions {
   categories: string[]
 }
 
-// Evaluation Module Types
 export interface BasePriceConfig {
   id: string
   modelo: string

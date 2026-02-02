@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Lock, Unlock, Settings2, Pencil } from 'lucide-react'
+import { Lock, Unlock, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -39,15 +39,9 @@ export function UserManagement() {
 
   const isSuperAdmin = currentUser?.isSuperAdmin
 
-  // Filter users based on company for regular admins
   const filteredUsers = users.filter((u) => {
-    // If pending, it might be in PendingRequests component, but keeping consistency here
     if (u.status === 'pending') return false
-
-    // Super admin sees all
     if (isSuperAdmin) return true
-
-    // Regular admin sees only their company
     return u.companyId === currentUser?.companyId
   })
 
@@ -66,16 +60,10 @@ export function UserManagement() {
     setIsEditDialogOpen(true)
   }
 
-  // Helper to determine edit permissions
   const canEditUser = (targetUser: User) => {
-    // Super Admins have unrestricted control
     if (isSuperAdmin) return true
-
-    // Normal Admins cannot edit themselves (to prevent lockout) or Super Admins
     if (targetUser.id === currentUser?.id) return false
     if (targetUser.isSuperAdmin) return false
-
-    // Normal Admins can edit other users
     return true
   }
 
@@ -119,9 +107,10 @@ export function UserManagement() {
                   return (
                     <TableRow key={user.id}>
                       <TableCell className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 border">
+                        <Avatar className="h-9 w-9 border bg-white">
                           <AvatarImage
-                            src={`https://img.usecurling.com/ppl/thumbnail?seed=${user.id}`}
+                            src={user.avatarUrl || undefined}
+                            className="object-cover"
                           />
                           <AvatarFallback>{user.name[0]}</AvatarFallback>
                         </Avatar>

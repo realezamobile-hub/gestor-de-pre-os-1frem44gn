@@ -17742,7 +17742,7 @@ function getElementRef$2(element) {
 }
 function createCollection(name) {
 	const PROVIDER_NAME$2 = name + "CollectionProvider";
-	const [createCollectionContext, createCollectionScope$4] = createContextScope(PROVIDER_NAME$2);
+	const [createCollectionContext, createCollectionScope$5] = createContextScope(PROVIDER_NAME$2);
 	const [CollectionProviderImpl, useCollectionContext] = createCollectionContext(PROVIDER_NAME$2, {
 		collectionRef: { current: null },
 		itemMap: /* @__PURE__ */ new Map()
@@ -17791,7 +17791,7 @@ function createCollection(name) {
 		});
 	});
 	CollectionItemSlot.displayName = ITEM_SLOT_NAME;
-	function useCollection$4(scope) {
+	function useCollection$5(scope) {
 		const context = useCollectionContext(name + "CollectionConsumer", scope);
 		return import_react.useCallback(() => {
 			const collectionNode = context.collectionRef.current;
@@ -17806,8 +17806,8 @@ function createCollection(name) {
 			Slot: CollectionSlot,
 			ItemSlot: CollectionItemSlot
 		},
-		useCollection$4,
-		createCollectionScope$4
+		useCollection$5,
+		createCollectionScope$5
 	];
 }
 var Primitive = [
@@ -18037,7 +18037,7 @@ function handleAndDispatchCustomEvent$1(name, handler, detail, { discrete }) {
 	if (discrete) dispatchDiscreteCustomEvent(target, event);
 	else target.dispatchEvent(event);
 }
-var Root$9 = DismissableLayer;
+var Root$10 = DismissableLayer;
 var Branch = DismissableLayerBranch;
 var useLayoutEffect2 = globalThis?.document ? import_react.useLayoutEffect : () => {};
 var import_react_dom$5 = /* @__PURE__ */ __toESM(require_react_dom(), 1);
@@ -18228,11 +18228,11 @@ var VisuallyHidden = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 VisuallyHidden.displayName = NAME$2;
-var Root$8 = VisuallyHidden;
+var Root$9 = VisuallyHidden;
 var import_react_dom$4 = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var PROVIDER_NAME$1 = "ToastProvider";
-var [Collection$3, useCollection$3, createCollectionScope$3] = createCollection("Toast");
-var [createToastContext, createToastScope] = createContextScope("Toast", [createCollectionScope$3]);
+var [Collection$4, useCollection$4, createCollectionScope$4] = createCollection("Toast");
+var [createToastContext, createToastScope] = createContextScope("Toast", [createCollectionScope$4]);
 var [ToastProviderProvider, useToastProviderContext] = createToastContext(PROVIDER_NAME$1);
 var ToastProvider$1 = (props) => {
 	const { __scopeToast, label = "Notification", duration = 5e3, swipeDirection = "right", swipeThreshold = 50, children } = props;
@@ -18241,7 +18241,7 @@ var ToastProvider$1 = (props) => {
 	const isFocusedToastEscapeKeyDownRef = import_react.useRef(false);
 	const isClosePausedRef = import_react.useRef(false);
 	if (!label.trim()) console.error(`Invalid prop \`label\` supplied to \`${PROVIDER_NAME$1}\`. Expected non-empty \`string\`.`);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.Provider, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$4.Provider, {
 		scope: __scopeToast,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastProviderProvider, {
 			scope: __scopeToast,
@@ -18268,7 +18268,7 @@ var VIEWPORT_RESUME = "toast.viewportResume";
 var ToastViewport$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeToast, hotkey = VIEWPORT_DEFAULT_HOTKEY, label = "Notifications ({hotkey})", ...viewportProps } = props;
 	const context = useToastProviderContext(VIEWPORT_NAME$2, __scopeToast);
-	const getItems = useCollection$3(__scopeToast);
+	const getItems = useCollection$4(__scopeToast);
 	const wrapperRef = import_react.useRef(null);
 	const headFocusProxyRef = import_react.useRef(null);
 	const tailFocusProxyRef = import_react.useRef(null);
@@ -18366,7 +18366,7 @@ var ToastViewport$1 = import_react.forwardRef((props, forwardedRef) => {
 					focusFirst$2(getSortedTabbableCandidates({ tabbingDirection: "forwards" }));
 				}
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.Slot, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$4.Slot, {
 				scope: __scopeToast,
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.ol, {
 					tabIndex: -1,
@@ -18525,9 +18525,9 @@ var ToastImpl = import_react.forwardRef((props, forwardedRef) => {
 	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastInteractiveProvider, {
 		scope: __scopeToast,
 		onClose: handleClose,
-		children: import_react_dom$4.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.ItemSlot, {
+		children: import_react_dom$4.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$4.ItemSlot, {
 			scope: __scopeToast,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$9, {
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$10, {
 				asChild: true,
 				onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
 					if (!context.isFocusedToastEscapeKeyDownRef.current) handleClose();
@@ -19321,6 +19321,27 @@ var History = createLucideIcon("history", [
 		key: "1fdv2h"
 	}]
 ]);
+var Image$1 = createLucideIcon("image", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		ry: "2",
+		key: "1m3agn"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "9",
+		r: "2",
+		key: "af1f0g"
+	}],
+	["path", {
+		d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",
+		key: "1xmnt7"
+	}]
+]);
 var Italic = createLucideIcon("italic", [
 	["line", {
 		x1: "19",
@@ -19847,6 +19868,57 @@ var Zap = createLucideIcon("zap", [["path", {
 	d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z",
 	key: "1xq2db"
 }]]);
+var ZoomIn = createLucideIcon("zoom-in", [
+	["circle", {
+		cx: "11",
+		cy: "11",
+		r: "8",
+		key: "4ej97u"
+	}],
+	["line", {
+		x1: "21",
+		x2: "16.65",
+		y1: "21",
+		y2: "16.65",
+		key: "13gj7c"
+	}],
+	["line", {
+		x1: "11",
+		x2: "11",
+		y1: "8",
+		y2: "14",
+		key: "1vmskp"
+	}],
+	["line", {
+		x1: "8",
+		x2: "14",
+		y1: "11",
+		y2: "11",
+		key: "durymu"
+	}]
+]);
+var ZoomOut = createLucideIcon("zoom-out", [
+	["circle", {
+		cx: "11",
+		cy: "11",
+		r: "8",
+		key: "4ej97u"
+	}],
+	["line", {
+		x1: "21",
+		x2: "16.65",
+		y1: "21",
+		y2: "16.65",
+		key: "13gj7c"
+	}],
+	["line", {
+		x1: "8",
+		x2: "14",
+		y1: "11",
+		y2: "11",
+		key: "durymu"
+	}]
+]);
 var CLASS_PART_SEPARATOR = "-";
 var createClassGroupUtils = (config) => {
 	const classMap = createClassMap(config);
@@ -21232,13 +21304,13 @@ var getDefaultConfig = () => {
 	};
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
-function cn(...inputs) {
+function cn$1(...inputs) {
 	return twMerge(clsx(inputs));
 }
 var ToastProvider = Provider$1;
 var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$2, {
 	ref,
-	className: cn("fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]", className),
+	className: cn$1("fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]", className),
 	...props
 }));
 ToastViewport.displayName = Viewport$2.displayName;
@@ -21252,20 +21324,20 @@ var toastVariants = cva("group pointer-events-auto relative flex w-full items-ce
 var Toast$1 = import_react.forwardRef(({ className, variant, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2$6, {
 		ref,
-		className: cn(toastVariants({ variant }), className),
+		className: cn$1(toastVariants({ variant }), className),
 		...props
 	});
 });
 Toast$1.displayName = Root2$6.displayName;
 var ToastAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action$1, {
 	ref,
-	className: cn("inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive", className),
+	className: cn$1("inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive", className),
 	...props
 }));
 ToastAction.displayName = Action$1.displayName;
 var ToastClose = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close$1, {
 	ref,
-	className: cn("absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600", className),
+	className: cn$1("absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600", className),
 	"toast-close": "",
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" })
@@ -21273,13 +21345,13 @@ var ToastClose = import_react.forwardRef(({ className, ...props }, ref) => /* @_
 ToastClose.displayName = Close$1.displayName;
 var ToastTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title$1, {
 	ref,
-	className: cn("text-sm font-semibold", className),
+	className: cn$1("text-sm font-semibold", className),
 	...props
 }));
 ToastTitle.displayName = Title$1.displayName;
 var ToastDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$1, {
 	ref,
-	className: cn("text-sm opacity-90", className),
+	className: cn$1("text-sm opacity-90", className),
 	...props
 }));
 ToastDescription.displayName = Description$1.displayName;
@@ -21636,10 +21708,10 @@ var Observer = class {
 			if (typeof id !== "string" && typeof id !== "number") return { unwrap };
 			else return Object.assign(id, { unwrap });
 		};
-		this.custom = (jsx$29, data) => {
+		this.custom = (jsx$30, data) => {
 			const id = (data == null ? void 0 : data.id) || toastsCounter++;
 			this.create({
-				jsx: jsx$29(id),
+				jsx: jsx$30(id),
 				id,
 				...data
 			});
@@ -21695,7 +21767,7 @@ var TOAST_WIDTH = 356;
 var GAP = 14;
 var SWIPE_THRESHOLD = 45;
 var TIME_BEFORE_UNMOUNT = 200;
-function cn$1(...classes) {
+function cn$2(...classes) {
 	return classes.filter(Boolean).join(" ");
 }
 function getDefaultSwipeDirections(position) {
@@ -21848,12 +21920,12 @@ var Toast = (props) => {
 		if (icons == null ? void 0 : icons.loading) {
 			var _toast_classNames1$1;
 			return /* @__PURE__ */ import_react.createElement("div", {
-				className: cn$1(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames1$1 = toast$2.classNames) == null ? void 0 : _toast_classNames1$1.loader, "sonner-loader"),
+				className: cn$2(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames1$1 = toast$2.classNames) == null ? void 0 : _toast_classNames1$1.loader, "sonner-loader"),
 				"data-visible": toastType === "loading"
 			}, icons.loading);
 		}
 		return /* @__PURE__ */ import_react.createElement(Loader, {
-			className: cn$1(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames$1 = toast$2.classNames) == null ? void 0 : _toast_classNames$1.loader),
+			className: cn$2(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames$1 = toast$2.classNames) == null ? void 0 : _toast_classNames$1.loader),
 			visible: toastType === "loading"
 		});
 	}
@@ -21862,7 +21934,7 @@ var Toast = (props) => {
 	return /* @__PURE__ */ import_react.createElement("li", {
 		tabIndex: 0,
 		ref: toastRef,
-		className: cn$1(className, toastClassname, classNames == null ? void 0 : classNames.toast, toast$2 == null ? void 0 : (_toast_classNames = toast$2.classNames) == null ? void 0 : _toast_classNames.toast, classNames == null ? void 0 : classNames.default, classNames == null ? void 0 : classNames[toastType], toast$2 == null ? void 0 : (_toast_classNames1 = toast$2.classNames) == null ? void 0 : _toast_classNames1[toastType]),
+		className: cn$2(className, toastClassname, classNames == null ? void 0 : classNames.toast, toast$2 == null ? void 0 : (_toast_classNames = toast$2.classNames) == null ? void 0 : _toast_classNames.toast, classNames == null ? void 0 : classNames.default, classNames == null ? void 0 : classNames[toastType], toast$2 == null ? void 0 : (_toast_classNames1 = toast$2.classNames) == null ? void 0 : _toast_classNames1[toastType]),
 		"data-sonner-toast": "",
 		"data-rich-colors": (_toast_richColors = toast$2.richColors) != null ? _toast_richColors : defaultRichColors,
 		"data-styled": !Boolean(toast$2.jsx || toast$2.unstyled || unstyled),
@@ -21977,19 +22049,19 @@ var Toast = (props) => {
 			deleteToast();
 			toast$2.onDismiss == null || toast$2.onDismiss.call(toast$2, toast$2);
 		},
-		className: cn$1(classNames == null ? void 0 : classNames.closeButton, toast$2 == null ? void 0 : (_toast_classNames2 = toast$2.classNames) == null ? void 0 : _toast_classNames2.closeButton)
+		className: cn$2(classNames == null ? void 0 : classNames.closeButton, toast$2 == null ? void 0 : (_toast_classNames2 = toast$2.classNames) == null ? void 0 : _toast_classNames2.closeButton)
 	}, (_icons_close = icons == null ? void 0 : icons.close) != null ? _icons_close : CloseIcon) : null, (toastType || toast$2.icon || toast$2.promise) && toast$2.icon !== null && ((icons == null ? void 0 : icons[toastType]) !== null || toast$2.icon) ? /* @__PURE__ */ import_react.createElement("div", {
 		"data-icon": "",
-		className: cn$1(classNames == null ? void 0 : classNames.icon, toast$2 == null ? void 0 : (_toast_classNames3 = toast$2.classNames) == null ? void 0 : _toast_classNames3.icon)
+		className: cn$2(classNames == null ? void 0 : classNames.icon, toast$2 == null ? void 0 : (_toast_classNames3 = toast$2.classNames) == null ? void 0 : _toast_classNames3.icon)
 	}, toast$2.promise || toast$2.type === "loading" && !toast$2.icon ? toast$2.icon || getLoadingIcon() : null, toast$2.type !== "loading" ? icon : null) : null, /* @__PURE__ */ import_react.createElement("div", {
 		"data-content": "",
-		className: cn$1(classNames == null ? void 0 : classNames.content, toast$2 == null ? void 0 : (_toast_classNames4 = toast$2.classNames) == null ? void 0 : _toast_classNames4.content)
+		className: cn$2(classNames == null ? void 0 : classNames.content, toast$2 == null ? void 0 : (_toast_classNames4 = toast$2.classNames) == null ? void 0 : _toast_classNames4.content)
 	}, /* @__PURE__ */ import_react.createElement("div", {
 		"data-title": "",
-		className: cn$1(classNames == null ? void 0 : classNames.title, toast$2 == null ? void 0 : (_toast_classNames5 = toast$2.classNames) == null ? void 0 : _toast_classNames5.title)
+		className: cn$2(classNames == null ? void 0 : classNames.title, toast$2 == null ? void 0 : (_toast_classNames5 = toast$2.classNames) == null ? void 0 : _toast_classNames5.title)
 	}, toast$2.jsx ? toast$2.jsx : typeof toast$2.title === "function" ? toast$2.title() : toast$2.title), toast$2.description ? /* @__PURE__ */ import_react.createElement("div", {
 		"data-description": "",
-		className: cn$1(descriptionClassName, toastDescriptionClassname, classNames == null ? void 0 : classNames.description, toast$2 == null ? void 0 : (_toast_classNames6 = toast$2.classNames) == null ? void 0 : _toast_classNames6.description)
+		className: cn$2(descriptionClassName, toastDescriptionClassname, classNames == null ? void 0 : classNames.description, toast$2 == null ? void 0 : (_toast_classNames6 = toast$2.classNames) == null ? void 0 : _toast_classNames6.description)
 	}, typeof toast$2.description === "function" ? toast$2.description() : toast$2.description) : null), /* @__PURE__ */ import_react.isValidElement(toast$2.cancel) ? toast$2.cancel : toast$2.cancel && isAction(toast$2.cancel) ? /* @__PURE__ */ import_react.createElement("button", {
 		"data-button": true,
 		"data-cancel": true,
@@ -22000,7 +22072,7 @@ var Toast = (props) => {
 			toast$2.cancel.onClick == null || toast$2.cancel.onClick.call(toast$2.cancel, event);
 			deleteToast();
 		},
-		className: cn$1(classNames == null ? void 0 : classNames.cancelButton, toast$2 == null ? void 0 : (_toast_classNames7 = toast$2.classNames) == null ? void 0 : _toast_classNames7.cancelButton)
+		className: cn$2(classNames == null ? void 0 : classNames.cancelButton, toast$2 == null ? void 0 : (_toast_classNames7 = toast$2.classNames) == null ? void 0 : _toast_classNames7.cancelButton)
 	}, toast$2.cancel.label) : null, /* @__PURE__ */ import_react.isValidElement(toast$2.action) ? toast$2.action : toast$2.action && isAction(toast$2.action) ? /* @__PURE__ */ import_react.createElement("button", {
 		"data-button": true,
 		"data-action": true,
@@ -22011,7 +22083,7 @@ var Toast = (props) => {
 			if (event.defaultPrevented) return;
 			deleteToast();
 		},
-		className: cn$1(classNames == null ? void 0 : classNames.actionButton, toast$2 == null ? void 0 : (_toast_classNames8 = toast$2.classNames) == null ? void 0 : _toast_classNames8.actionButton)
+		className: cn$2(classNames == null ? void 0 : classNames.actionButton, toast$2 == null ? void 0 : (_toast_classNames8 = toast$2.classNames) == null ? void 0 : _toast_classNames8.actionButton)
 	}, toast$2.action.label) : null);
 };
 function getDocumentDirection() {
@@ -23775,7 +23847,7 @@ var Arrow$1 = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 Arrow$1.displayName = NAME$1;
-var Root$7 = Arrow$1;
+var Root$8 = Arrow$1;
 function useSize(element) {
 	const [size$3, setSize] = import_react.useState(void 0);
 	useLayoutEffect2(() => {
@@ -23992,7 +24064,7 @@ var PopperArrow = import_react.forwardRef(function PopperArrow2(props, forwarded
 			}[contentContext.placedSide],
 			visibility: contentContext.shouldHideArrow ? "hidden" : void 0
 		},
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$7, {
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$8, {
 			...arrowProps,
 			ref: forwardedRef,
 			style: {
@@ -24374,7 +24446,7 @@ var TooltipContentImpl = import_react.forwardRef((props, forwardedRef) => {
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slottable$1, { children }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHiddenContentContextProvider, {
 				scope: __scopeTooltip,
 				isInside: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$8, {
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$9, {
 					id: context.contentId,
 					role: "tooltip",
 					children: ariaLabel || children
@@ -24535,7 +24607,7 @@ var TooltipTrigger = Trigger$5;
 var TooltipContent = import_react.forwardRef(({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$4, {
 	ref,
 	sideOffset,
-	className: cn("z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]", className),
+	className: cn$1("z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]", className),
 	...props
 }));
 TooltipContent.displayName = Content2$4.displayName;
@@ -24655,7 +24727,7 @@ var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespa
 });
 var Button = import_react.forwardRef(({ className, variant, size: size$3, asChild = false, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot$3 : "button", {
-		className: cn(buttonVariants({
+		className: cn$1(buttonVariants({
 			variant,
 			size: size$3,
 			className
@@ -24718,7 +24790,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$27({ inst: {
+			cachedValue = useState$28({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24732,7 +24804,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$19(function() {
+			useEffect$20(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24755,7 +24827,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$27 = React$3.useState, useEffect$19 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$28 = React$3.useState, useEffect$20 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24778,9 +24850,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$6 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$7 = React$3.useRef, useEffect$20 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
-			var instRef = useRef$6(null);
+			var instRef = useRef$7(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -24820,7 +24892,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$19(function() {
+			useEffect$20(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -32774,6 +32846,11 @@ var mapProfileToUser = (profile) => {
 		role,
 		status: profile.status || "pending",
 		phone: profile.phone || "",
+		address: profile.address,
+		rg: profile.rg,
+		cpf: profile.cpf,
+		emergencyContactName: profile.emergency_contact_name,
+		emergencyContactPhone: profile.emergency_contact_phone,
 		avatarUrl: profile.avatar_url,
 		lastActive: profile.last_active || profile.created_at || (/* @__PURE__ */ new Date(0)).toISOString(),
 		createdAt: profile.created_at || (/* @__PURE__ */ new Date()).toISOString(),
@@ -32812,15 +32889,12 @@ const useAuthStore = create((set, get$1) => ({
 					isLoading: false
 				});
 				await supabase.from("profiles").update({ last_active: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", profile.id);
-			} else {
-				console.error("Error fetching profile:", error);
-				set({
-					currentUser: null,
-					currentCompany: null,
-					session: null,
-					isLoading: false
-				});
-			}
+			} else set({
+				currentUser: null,
+				currentCompany: null,
+				session: null,
+				isLoading: false
+			});
 		} catch (e) {
 			console.error("Exception fetching profile", e);
 			set({
@@ -32878,14 +32952,21 @@ const useAuthStore = create((set, get$1) => ({
 		};
 		return { success: true };
 	},
-	register: async (name, email, password, phone, avatarFile) => {
+	register: async (data) => {
+		const { name, email, password, phone, address, rg, cpf, emergencyContactName, emergencyContactPhone, avatarUrl, avatarFile } = data;
 		const { data: authData, error } = await supabase.auth.signUp({
 			email,
 			password,
 			options: {
 				data: {
 					name,
-					phone
+					phone,
+					address,
+					rg,
+					cpf,
+					emergency_contact_name: emergencyContactName,
+					emergency_contact_phone: emergencyContactPhone,
+					avatar_url: avatarUrl
 				},
 				emailRedirectTo: window.location.origin
 			}
@@ -32937,7 +33018,16 @@ const useAuthStore = create((set, get$1) => ({
 			success: false,
 			error: "User not found"
 		};
-		const { error } = await supabase.from("profiles").update(data).eq("id", currentUser.id);
+		const dbUpdates = {};
+		if (data.name !== void 0) dbUpdates.name = data.name;
+		if (data.phone !== void 0) dbUpdates.phone = data.phone;
+		if (data.address !== void 0) dbUpdates.address = data.address;
+		if (data.rg !== void 0) dbUpdates.rg = data.rg;
+		if (data.cpf !== void 0) dbUpdates.cpf = data.cpf;
+		if (data.emergencyContactName !== void 0) dbUpdates.emergency_contact_name = data.emergencyContactName;
+		if (data.emergencyContactPhone !== void 0) dbUpdates.emergency_contact_phone = data.emergencyContactPhone;
+		if (data.avatarUrl !== void 0) dbUpdates.avatar_url = data.avatarUrl;
+		const { error } = await supabase.from("profiles").update(dbUpdates).eq("id", currentUser.id);
 		if (error) return {
 			success: false,
 			error
@@ -32953,10 +33043,10 @@ const useAuthStore = create((set, get$1) => ({
 		};
 		try {
 			const fileExt = file.name.split(".").pop();
-			const filePath = `${`${currentUser.id}/${Date.now()}.${fileExt}`}`;
-			const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
+			const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, { upsert: true });
 			if (uploadError) throw uploadError;
-			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
 			const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", currentUser.id);
 			if (updateError) throw updateError;
 			await syncUser(session);
@@ -33018,6 +33108,12 @@ const useAuthStore = create((set, get$1) => ({
 		if (data.canAccessEvaluation !== void 0) dbUpdates.can_access_evaluation = data.canAccessEvaluation;
 		if (data.canDeleteRecords !== void 0) dbUpdates.can_delete_records = data.canDeleteRecords;
 		if (data.canViewAllLists !== void 0) dbUpdates.can_view_all_lists = data.canViewAllLists;
+		if (data.address !== void 0) dbUpdates.address = data.address;
+		if (data.rg !== void 0) dbUpdates.rg = data.rg;
+		if (data.cpf !== void 0) dbUpdates.cpf = data.cpf;
+		if (data.emergencyContactName !== void 0) dbUpdates.emergency_contact_name = data.emergencyContactName;
+		if (data.emergencyContactPhone !== void 0) dbUpdates.emergency_contact_phone = data.emergencyContactPhone;
+		if (data.avatarUrl !== void 0) dbUpdates.avatar_url = data.avatarUrl;
 		const { error } = await supabase.from("profiles").update(dbUpdates).eq("id", userId);
 		if (error) return {
 			success: false,
@@ -34210,7 +34306,7 @@ var DescriptionWarning$1 = ({ contentRef, descriptionId }) => {
 	]);
 	return null;
 };
-var Root$6 = Dialog$1;
+var Root$7 = Dialog$1;
 var Trigger$4 = DialogTrigger$1;
 var Portal$3 = DialogPortal$1;
 var Overlay = DialogOverlay$1;
@@ -34218,12 +34314,12 @@ var Content$2 = DialogContent$1;
 var Title = DialogTitle$1;
 var Description = DialogDescription$1;
 var Close = DialogClose$1;
-var Sheet = Root$6;
+var Sheet = Root$7;
 var SheetTrigger = Trigger$4;
 var SheetClose = Close;
 var SheetPortal = Portal$3;
 var SheetOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
-	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	className: cn$1("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
 	...props,
 	ref
 }));
@@ -34239,7 +34335,7 @@ var sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg transition
 });
 var SheetContent = import_react.forwardRef(({ side = "right", className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
 	ref,
-	className: cn(sheetVariants({ side }), className),
+	className: cn$1(sheetVariants({ side }), className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
 		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
@@ -34251,24 +34347,24 @@ var SheetContent = import_react.forwardRef(({ side = "right", className, childre
 })] }));
 SheetContent.displayName = Content$2.displayName;
 var SheetHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
+	className: cn$1("flex flex-col space-y-2 text-center sm:text-left", className),
 	...props
 });
 SheetHeader.displayName = "SheetHeader";
 var SheetFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
 	...props
 });
 SheetFooter.displayName = "SheetFooter";
 var SheetTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
 	ref,
-	className: cn("text-lg font-semibold text-foreground", className),
+	className: cn$1("text-lg font-semibold text-foreground", className),
 	...props
 }));
 SheetTitle.displayName = Title.displayName;
 var SheetDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
 	ref,
-	className: cn("text-sm text-muted-foreground", className),
+	className: cn$1("text-sm text-muted-foreground", className),
 	...props
 }));
 SheetDescription.displayName = Description.displayName;
@@ -34315,9 +34411,9 @@ function Sidebar() {
 		className: "flex flex-col h-full py-4",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: cn("px-4 mb-6 transition-all duration-300", !fullWidth && "px-2 text-center"),
+				className: cn$1("px-4 mb-6 transition-all duration-300", !fullWidth && "px-2 text-center"),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-					className: cn("font-bold text-primary tracking-tight transition-all", fullWidth ? "text-xl" : "text-xs scale-90"),
+					className: cn$1("font-bold text-primary tracking-tight transition-all", fullWidth ? "text-xl" : "text-xs scale-90"),
 					children: fullWidth ? currentCompany?.nome_fantasia || "PriceApp" : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 						title: currentCompany?.nome_fantasia || "PriceApp",
 						children: "PA"
@@ -34328,29 +34424,29 @@ function Sidebar() {
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
-				className: cn("flex-1 space-y-2", fullWidth ? "px-3" : "px-2"),
+				className: cn$1("flex-1 space-y-2", fullWidth ? "px-3" : "px-2"),
 				children: filteredLinks.map((link) => {
 					const isActive = location.pathname === link.href;
 					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
 						to: link.href,
 						onClick: () => setOpen(false),
-						className: cn("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group/link relative", isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground", !fullWidth && "justify-center px-0"),
+						className: cn$1("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group/link relative", isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground", !fullWidth && "justify-center px-0"),
 						title: !fullWidth ? link.label : void 0,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: cn("w-5 h-5 shrink-0", !fullWidth && "w-6 h-6") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: cn("transition-all duration-300 overflow-hidden whitespace-nowrap", !fullWidth && "w-0 opacity-0 hidden"),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: cn$1("w-5 h-5 shrink-0", !fullWidth && "w-6 h-6") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: cn$1("transition-all duration-300 overflow-hidden whitespace-nowrap", !fullWidth && "w-0 opacity-0 hidden"),
 							children: link.label
 						})]
 					}, link.href);
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: cn("mt-auto", fullWidth ? "px-3" : "px-2"),
+				className: cn$1("mt-auto", fullWidth ? "px-3" : "px-2"),
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 					variant: "ghost",
-					className: cn("w-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-all", fullWidth ? "justify-start" : "justify-center px-0"),
+					className: cn$1("w-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-all", fullWidth ? "justify-start" : "justify-center px-0"),
 					onClick: () => logout(),
 					title: !fullWidth ? "Sair" : void 0,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LogOut, { className: cn("w-5 h-5", fullWidth && "mr-2") }), fullWidth && "Sair"]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LogOut, { className: cn$1("w-5 h-5", fullWidth && "mr-2") }), fullWidth && "Sair"]
 				})
 			})
 		]
@@ -34384,7 +34480,7 @@ function Sidebar() {
 							const isActive = location.pathname === link.href;
 							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
 								to: link.href,
-								className: cn("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap", isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"),
+								className: cn$1("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap", isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: "w-5 h-5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 									className: "opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75",
 									children: link.label
@@ -34633,24 +34729,24 @@ function useImageLoadingStatus(src, { referrerPolicy, crossOrigin }) {
 	]);
 	return loadingStatus;
 }
-var Root$5 = Avatar$1;
-var Image = AvatarImage$1;
+var Root$6 = Avatar$1;
+var Image$2 = AvatarImage$1;
 var Fallback = AvatarFallback$1;
-var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
+var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$6, {
 	ref,
-	className: cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
+	className: cn$1("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
 	...props
 }));
-Avatar.displayName = Root$5.displayName;
-var AvatarImage = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image, {
+Avatar.displayName = Root$6.displayName;
+var AvatarImage = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$2, {
 	ref,
-	className: cn("aspect-square h-full w-full", className),
+	className: cn$1("aspect-square h-full w-full", className),
 	...props
 }));
-AvatarImage.displayName = Image.displayName;
+AvatarImage.displayName = Image$2.displayName;
 var AvatarFallback = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Fallback, {
 	ref,
-	className: cn("flex h-full w-full items-center justify-center rounded-full bg-muted", className),
+	className: cn$1("flex h-full w-full items-center justify-center rounded-full bg-muted", className),
 	...props
 }));
 AvatarFallback.displayName = Fallback.displayName;
@@ -34665,7 +34761,7 @@ var badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-
 });
 function Badge({ className, variant, ...props }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn(badgeVariants({ variant }), className),
+		className: cn$1(badgeVariants({ variant }), className),
 		...props
 	});
 }
@@ -34696,9 +34792,9 @@ function TopHeader() {
 					})]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-					className: "h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all",
+					className: "h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all bg-white",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
-						src: currentUser.avatarUrl || `https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}`,
+						src: currentUser.avatarUrl || void 0,
 						className: "object-cover"
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: initials })]
 				}),
@@ -34745,7 +34841,7 @@ function DashboardLayout() {
 var Input = import_react.forwardRef(({ className, type, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
 		type,
-		className: cn("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
+		className: cn$1("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
 		ref,
 		...props
 	});
@@ -34764,47 +34860,47 @@ var Label$2 = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 Label$2.displayName = NAME;
-var Root$4 = Label$2;
+var Root$5 = Label$2;
 var labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70");
-var Label = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$4, {
+var Label = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
 	ref,
-	className: cn(labelVariants(), className),
+	className: cn$1(labelVariants(), className),
 	...props
 }));
-Label.displayName = Root$4.displayName;
+Label.displayName = Root$5.displayName;
 var Card = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("rounded-lg border bg-card text-card-foreground shadow-sm", className),
+	className: cn$1("rounded-lg border bg-card text-card-foreground shadow-sm", className),
 	...props
 }));
 Card.displayName = "Card";
 var CardHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("flex flex-col space-y-1.5 p-6", className),
+	className: cn$1("flex flex-col space-y-1.5 p-6", className),
 	...props
 }));
 CardHeader.displayName = "CardHeader";
 var CardTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("text-2xl font-semibold leading-none tracking-tight", className),
+	className: cn$1("text-2xl font-semibold leading-none tracking-tight", className),
 	...props
 }));
 CardTitle.displayName = "CardTitle";
 var CardDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("text-sm text-muted-foreground", className),
+	className: cn$1("text-sm text-muted-foreground", className),
 	...props
 }));
 CardDescription.displayName = "CardDescription";
 var CardContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("p-6 pt-0", className),
+	className: cn$1("p-6 pt-0", className),
 	...props
 }));
 CardContent.displayName = "CardContent";
 var CardFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("flex items-center p-6 pt-0", className),
+	className: cn$1("flex items-center p-6 pt-0", className),
 	...props
 }));
 CardFooter.displayName = "CardFooter";
@@ -34923,18 +35019,727 @@ function LoginPage() {
 		})
 	});
 }
+function clamp(value, [min$1, max$1]) {
+	return Math.min(max$1, Math.max(min$1, value));
+}
+var DirectionContext = import_react.createContext(void 0);
+function useDirection(localDir) {
+	const globalDir = import_react.useContext(DirectionContext);
+	return localDir || globalDir || "ltr";
+}
+function usePrevious(value) {
+	const ref = import_react.useRef({
+		value,
+		previous: value
+	});
+	return import_react.useMemo(() => {
+		if (ref.current.value !== value) {
+			ref.current.previous = ref.current.value;
+			ref.current.value = value;
+		}
+		return ref.current.previous;
+	}, [value]);
+}
+var PAGE_KEYS = ["PageUp", "PageDown"];
+var ARROW_KEYS = [
+	"ArrowUp",
+	"ArrowDown",
+	"ArrowLeft",
+	"ArrowRight"
+];
+var BACK_KEYS = {
+	"from-left": [
+		"Home",
+		"PageDown",
+		"ArrowDown",
+		"ArrowLeft"
+	],
+	"from-right": [
+		"Home",
+		"PageDown",
+		"ArrowDown",
+		"ArrowRight"
+	],
+	"from-bottom": [
+		"Home",
+		"PageDown",
+		"ArrowDown",
+		"ArrowLeft"
+	],
+	"from-top": [
+		"Home",
+		"PageDown",
+		"ArrowUp",
+		"ArrowLeft"
+	]
+};
+var SLIDER_NAME = "Slider";
+var [Collection$3, useCollection$3, createCollectionScope$3] = createCollection(SLIDER_NAME);
+var [createSliderContext, createSliderScope] = createContextScope(SLIDER_NAME, [createCollectionScope$3]);
+var [SliderProvider, useSliderContext] = createSliderContext(SLIDER_NAME);
+var Slider$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { name, min: min$1 = 0, max: max$1 = 100, step = 1, orientation = "horizontal", disabled = false, minStepsBetweenThumbs = 0, defaultValue = [min$1], value, onValueChange = () => {}, onValueCommit = () => {}, inverted = false, form, ...sliderProps } = props;
+	const thumbRefs = import_react.useRef(/* @__PURE__ */ new Set());
+	const valueIndexToChangeRef = import_react.useRef(0);
+	const SliderOrientation = orientation === "horizontal" ? SliderHorizontal : SliderVertical;
+	const [values = [], setValues] = useControllableState({
+		prop: value,
+		defaultProp: defaultValue,
+		onChange: (value2) => {
+			[...thumbRefs.current][valueIndexToChangeRef.current]?.focus();
+			onValueChange(value2);
+		}
+	});
+	const valuesBeforeSlideStartRef = import_react.useRef(values);
+	function handleSlideStart(value2) {
+		updateValues(value2, getClosestValueIndex(values, value2));
+	}
+	function handleSlideMove(value2) {
+		updateValues(value2, valueIndexToChangeRef.current);
+	}
+	function handleSlideEnd() {
+		const prevValue = valuesBeforeSlideStartRef.current[valueIndexToChangeRef.current];
+		if (values[valueIndexToChangeRef.current] !== prevValue) onValueCommit(values);
+	}
+	function updateValues(value2, atIndex, { commit } = { commit: false }) {
+		const decimalCount = getDecimalCount(step);
+		const nextValue = clamp(roundValue(Math.round((value2 - min$1) / step) * step + min$1, decimalCount), [min$1, max$1]);
+		setValues((prevValues = []) => {
+			const nextValues = getNextSortedValues(prevValues, nextValue, atIndex);
+			if (hasMinStepsBetweenValues(nextValues, minStepsBetweenThumbs * step)) {
+				valueIndexToChangeRef.current = nextValues.indexOf(nextValue);
+				const hasChanged = String(nextValues) !== String(prevValues);
+				if (hasChanged && commit) onValueCommit(nextValues);
+				return hasChanged ? nextValues : prevValues;
+			} else return prevValues;
+		});
+	}
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderProvider, {
+		scope: props.__scopeSlider,
+		name,
+		disabled,
+		min: min$1,
+		max: max$1,
+		valueIndexToChangeRef,
+		thumbs: thumbRefs.current,
+		values,
+		orientation,
+		form,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.Provider, {
+			scope: props.__scopeSlider,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.Slot, {
+				scope: props.__scopeSlider,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderOrientation, {
+					"aria-disabled": disabled,
+					"data-disabled": disabled ? "" : void 0,
+					...sliderProps,
+					ref: forwardedRef,
+					onPointerDown: composeEventHandlers(sliderProps.onPointerDown, () => {
+						if (!disabled) valuesBeforeSlideStartRef.current = values;
+					}),
+					min: min$1,
+					max: max$1,
+					inverted,
+					onSlideStart: disabled ? void 0 : handleSlideStart,
+					onSlideMove: disabled ? void 0 : handleSlideMove,
+					onSlideEnd: disabled ? void 0 : handleSlideEnd,
+					onHomeKeyDown: () => !disabled && updateValues(min$1, 0, { commit: true }),
+					onEndKeyDown: () => !disabled && updateValues(max$1, values.length - 1, { commit: true }),
+					onStepKeyDown: ({ event, direction: stepDirection }) => {
+						if (!disabled) {
+							const multiplier = PAGE_KEYS.includes(event.key) || event.shiftKey && ARROW_KEYS.includes(event.key) ? 10 : 1;
+							const atIndex = valueIndexToChangeRef.current;
+							const value2 = values[atIndex];
+							updateValues(value2 + step * multiplier * stepDirection, atIndex, { commit: true });
+						}
+					}
+				})
+			})
+		})
+	});
+});
+Slider$1.displayName = SLIDER_NAME;
+var [SliderOrientationProvider, useSliderOrientationContext] = createSliderContext(SLIDER_NAME, {
+	startEdge: "left",
+	endEdge: "right",
+	size: "width",
+	direction: 1
+});
+var SliderHorizontal = import_react.forwardRef((props, forwardedRef) => {
+	const { min: min$1, max: max$1, dir, inverted, onSlideStart, onSlideMove, onSlideEnd, onStepKeyDown, ...sliderProps } = props;
+	const [slider, setSlider] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setSlider(node));
+	const rectRef = import_react.useRef(void 0);
+	const direction = useDirection(dir);
+	const isDirectionLTR = direction === "ltr";
+	const isSlidingFromLeft = isDirectionLTR && !inverted || !isDirectionLTR && inverted;
+	function getValueFromPointer(pointerPosition) {
+		const rect = rectRef.current || slider.getBoundingClientRect();
+		const value = linearScale$1([0, rect.width], isSlidingFromLeft ? [min$1, max$1] : [max$1, min$1]);
+		rectRef.current = rect;
+		return value(pointerPosition - rect.left);
+	}
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderOrientationProvider, {
+		scope: props.__scopeSlider,
+		startEdge: isSlidingFromLeft ? "left" : "right",
+		endEdge: isSlidingFromLeft ? "right" : "left",
+		direction: isSlidingFromLeft ? 1 : -1,
+		size: "width",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderImpl, {
+			dir: direction,
+			"data-orientation": "horizontal",
+			...sliderProps,
+			ref: composedRefs,
+			style: {
+				...sliderProps.style,
+				["--radix-slider-thumb-transform"]: "translateX(-50%)"
+			},
+			onSlideStart: (event) => {
+				const value = getValueFromPointer(event.clientX);
+				onSlideStart?.(value);
+			},
+			onSlideMove: (event) => {
+				const value = getValueFromPointer(event.clientX);
+				onSlideMove?.(value);
+			},
+			onSlideEnd: () => {
+				rectRef.current = void 0;
+				onSlideEnd?.();
+			},
+			onStepKeyDown: (event) => {
+				const isBackKey = BACK_KEYS[isSlidingFromLeft ? "from-left" : "from-right"].includes(event.key);
+				onStepKeyDown?.({
+					event,
+					direction: isBackKey ? -1 : 1
+				});
+			}
+		})
+	});
+});
+var SliderVertical = import_react.forwardRef((props, forwardedRef) => {
+	const { min: min$1, max: max$1, inverted, onSlideStart, onSlideMove, onSlideEnd, onStepKeyDown, ...sliderProps } = props;
+	const sliderRef = import_react.useRef(null);
+	const ref = useComposedRefs(forwardedRef, sliderRef);
+	const rectRef = import_react.useRef(void 0);
+	const isSlidingFromBottom = !inverted;
+	function getValueFromPointer(pointerPosition) {
+		const rect = rectRef.current || sliderRef.current.getBoundingClientRect();
+		const value = linearScale$1([0, rect.height], isSlidingFromBottom ? [max$1, min$1] : [min$1, max$1]);
+		rectRef.current = rect;
+		return value(pointerPosition - rect.top);
+	}
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderOrientationProvider, {
+		scope: props.__scopeSlider,
+		startEdge: isSlidingFromBottom ? "bottom" : "top",
+		endEdge: isSlidingFromBottom ? "top" : "bottom",
+		size: "height",
+		direction: isSlidingFromBottom ? 1 : -1,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderImpl, {
+			"data-orientation": "vertical",
+			...sliderProps,
+			ref,
+			style: {
+				...sliderProps.style,
+				["--radix-slider-thumb-transform"]: "translateY(50%)"
+			},
+			onSlideStart: (event) => {
+				const value = getValueFromPointer(event.clientY);
+				onSlideStart?.(value);
+			},
+			onSlideMove: (event) => {
+				const value = getValueFromPointer(event.clientY);
+				onSlideMove?.(value);
+			},
+			onSlideEnd: () => {
+				rectRef.current = void 0;
+				onSlideEnd?.();
+			},
+			onStepKeyDown: (event) => {
+				const isBackKey = BACK_KEYS[isSlidingFromBottom ? "from-bottom" : "from-top"].includes(event.key);
+				onStepKeyDown?.({
+					event,
+					direction: isBackKey ? -1 : 1
+				});
+			}
+		})
+	});
+});
+var SliderImpl = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSlider, onSlideStart, onSlideMove, onSlideEnd, onHomeKeyDown, onEndKeyDown, onStepKeyDown, ...sliderProps } = props;
+	const context = useSliderContext(SLIDER_NAME, __scopeSlider);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		...sliderProps,
+		ref: forwardedRef,
+		onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
+			if (event.key === "Home") {
+				onHomeKeyDown(event);
+				event.preventDefault();
+			} else if (event.key === "End") {
+				onEndKeyDown(event);
+				event.preventDefault();
+			} else if (PAGE_KEYS.concat(ARROW_KEYS).includes(event.key)) {
+				onStepKeyDown(event);
+				event.preventDefault();
+			}
+		}),
+		onPointerDown: composeEventHandlers(props.onPointerDown, (event) => {
+			const target = event.target;
+			target.setPointerCapture(event.pointerId);
+			event.preventDefault();
+			if (context.thumbs.has(target)) target.focus();
+			else onSlideStart(event);
+		}),
+		onPointerMove: composeEventHandlers(props.onPointerMove, (event) => {
+			if (event.target.hasPointerCapture(event.pointerId)) onSlideMove(event);
+		}),
+		onPointerUp: composeEventHandlers(props.onPointerUp, (event) => {
+			const target = event.target;
+			if (target.hasPointerCapture(event.pointerId)) {
+				target.releasePointerCapture(event.pointerId);
+				onSlideEnd(event);
+			}
+		})
+	});
+});
+var TRACK_NAME = "SliderTrack";
+var SliderTrack = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSlider, ...trackProps } = props;
+	const context = useSliderContext(TRACK_NAME, __scopeSlider);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-disabled": context.disabled ? "" : void 0,
+		"data-orientation": context.orientation,
+		...trackProps,
+		ref: forwardedRef
+	});
+});
+SliderTrack.displayName = TRACK_NAME;
+var RANGE_NAME = "SliderRange";
+var SliderRange = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSlider, ...rangeProps } = props;
+	const context = useSliderContext(RANGE_NAME, __scopeSlider);
+	const orientation = useSliderOrientationContext(RANGE_NAME, __scopeSlider);
+	const composedRefs = useComposedRefs(forwardedRef, import_react.useRef(null));
+	const valuesCount = context.values.length;
+	const percentages = context.values.map((value) => convertValueToPercentage(value, context.min, context.max));
+	const offsetStart = valuesCount > 1 ? Math.min(...percentages) : 0;
+	const offsetEnd = 100 - Math.max(...percentages);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		"data-orientation": context.orientation,
+		"data-disabled": context.disabled ? "" : void 0,
+		...rangeProps,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			[orientation.startEdge]: offsetStart + "%",
+			[orientation.endEdge]: offsetEnd + "%"
+		}
+	});
+});
+SliderRange.displayName = RANGE_NAME;
+var THUMB_NAME$2 = "SliderThumb";
+var SliderThumb = import_react.forwardRef((props, forwardedRef) => {
+	const getItems = useCollection$3(props.__scopeSlider);
+	const [thumb, setThumb] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setThumb(node));
+	const index$1 = import_react.useMemo(() => thumb ? getItems().findIndex((item) => item.ref.current === thumb) : -1, [getItems, thumb]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderThumbImpl, {
+		...props,
+		ref: composedRefs,
+		index: index$1
+	});
+});
+var SliderThumbImpl = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeSlider, index: index$1, name, ...thumbProps } = props;
+	const context = useSliderContext(THUMB_NAME$2, __scopeSlider);
+	const orientation = useSliderOrientationContext(THUMB_NAME$2, __scopeSlider);
+	const [thumb, setThumb] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node) => setThumb(node));
+	const isFormControl = thumb ? context.form || !!thumb.closest("form") : true;
+	const size$3 = useSize(thumb);
+	const value = context.values[index$1];
+	const percent = value === void 0 ? 0 : convertValueToPercentage(value, context.min, context.max);
+	const label = getLabel(index$1, context.values.length);
+	const orientationSize = size$3?.[orientation.size];
+	const thumbInBoundsOffset = orientationSize ? getThumbInBoundsOffset(orientationSize, percent, orientation.direction) : 0;
+	import_react.useEffect(() => {
+		if (thumb) {
+			context.thumbs.add(thumb);
+			return () => {
+				context.thumbs.delete(thumb);
+			};
+		}
+	}, [thumb, context.thumbs]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+		style: {
+			transform: "var(--radix-slider-thumb-transform)",
+			position: "absolute",
+			[orientation.startEdge]: `calc(${percent}% + ${thumbInBoundsOffset}px)`
+		},
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$3.ItemSlot, {
+			scope: props.__scopeSlider,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+				role: "slider",
+				"aria-label": props["aria-label"] || label,
+				"aria-valuemin": context.min,
+				"aria-valuenow": value,
+				"aria-valuemax": context.max,
+				"aria-orientation": context.orientation,
+				"data-orientation": context.orientation,
+				"data-disabled": context.disabled ? "" : void 0,
+				tabIndex: context.disabled ? void 0 : 0,
+				...thumbProps,
+				ref: composedRefs,
+				style: value === void 0 ? { display: "none" } : props.style,
+				onFocus: composeEventHandlers(props.onFocus, () => {
+					context.valueIndexToChangeRef.current = index$1;
+				})
+			})
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SliderBubbleInput, {
+			name: name ?? (context.name ? context.name + (context.values.length > 1 ? "[]" : "") : void 0),
+			form: context.form,
+			value
+		}, index$1)]
+	});
+});
+SliderThumb.displayName = THUMB_NAME$2;
+var BUBBLE_INPUT_NAME$3 = "RadioBubbleInput";
+var SliderBubbleInput = import_react.forwardRef(({ __scopeSlider, value, ...props }, forwardedRef) => {
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(ref, forwardedRef);
+	const prevValue = usePrevious(value);
+	import_react.useEffect(() => {
+		const input = ref.current;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setValue = Object.getOwnPropertyDescriptor(inputProto, "value").set;
+		if (prevValue !== value && setValue) {
+			const event = new Event("input", { bubbles: true });
+			setValue.call(input, value);
+			input.dispatchEvent(event);
+		}
+	}, [prevValue, value]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.input, {
+		style: { display: "none" },
+		...props,
+		ref: composedRefs,
+		defaultValue: value
+	});
+});
+SliderBubbleInput.displayName = BUBBLE_INPUT_NAME$3;
+function getNextSortedValues(prevValues = [], nextValue, atIndex) {
+	const nextValues = [...prevValues];
+	nextValues[atIndex] = nextValue;
+	return nextValues.sort((a, b$1) => a - b$1);
+}
+function convertValueToPercentage(value, min$1, max$1) {
+	return clamp(100 / (max$1 - min$1) * (value - min$1), [0, 100]);
+}
+function getLabel(index$1, totalValues) {
+	if (totalValues > 2) return `Value ${index$1 + 1} of ${totalValues}`;
+	else if (totalValues === 2) return ["Minimum", "Maximum"][index$1];
+	else return;
+}
+function getClosestValueIndex(values, nextValue) {
+	if (values.length === 1) return 0;
+	const distances = values.map((value) => Math.abs(value - nextValue));
+	const closestDistance = Math.min(...distances);
+	return distances.indexOf(closestDistance);
+}
+function getThumbInBoundsOffset(width, left, direction) {
+	const halfWidth = width / 2;
+	return (halfWidth - linearScale$1([0, 50], [0, halfWidth])(left) * direction) * direction;
+}
+function getStepsBetweenValues(values) {
+	return values.slice(0, -1).map((value, index$1) => values[index$1 + 1] - value);
+}
+function hasMinStepsBetweenValues(values, minStepsBetweenValues) {
+	if (minStepsBetweenValues > 0) {
+		const stepsBetweenValues = getStepsBetweenValues(values);
+		return Math.min(...stepsBetweenValues) >= minStepsBetweenValues;
+	}
+	return true;
+}
+function linearScale$1(input, output) {
+	return (value) => {
+		if (input[0] === input[1] || output[0] === output[1]) return output[0];
+		const ratio = (output[1] - output[0]) / (input[1] - input[0]);
+		return output[0] + ratio * (value - input[0]);
+	};
+}
+function getDecimalCount(value) {
+	return (String(value).split(".")[1] || "").length;
+}
+function roundValue(value, decimalCount) {
+	const rounder = Math.pow(10, decimalCount);
+	return Math.round(value * rounder) / rounder;
+}
+var Root$4 = Slider$1;
+var Track = SliderTrack;
+var Range = SliderRange;
+var Thumb$1 = SliderThumb;
+var Slider = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$4, {
+	ref,
+	className: cn$1("relative flex w-full touch-none select-none items-center", className),
+	...props,
+	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Track, {
+		className: "relative h-2 w-full grow overflow-hidden rounded-full bg-secondary",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Range, { className: "absolute h-full bg-primary" })
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb$1, { className: "block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" })]
+}));
+Slider.displayName = Root$4.displayName;
+function ImageCropper({ imageSrc, onCropComplete, onCancel }) {
+	const [zoom, setZoom] = (0, import_react.useState)(1);
+	const [offset$3, setOffset] = (0, import_react.useState)({
+		x: 0,
+		y: 0
+	});
+	const [isDragging, setIsDragging] = (0, import_react.useState)(false);
+	const [dragStart, setDragStart] = (0, import_react.useState)({
+		x: 0,
+		y: 0
+	});
+	const [imageSize, setImageSize] = (0, import_react.useState)({
+		width: 0,
+		height: 0
+	});
+	(0, import_react.useRef)(null);
+	const containerRef = (0, import_react.useRef)(null);
+	const imgRef = (0, import_react.useRef)(new Image());
+	const CROP_SIZE = 280;
+	(0, import_react.useEffect)(() => {
+		imgRef.current.src = imageSrc;
+		imgRef.current.onload = () => {
+			const aspect = imgRef.current.width / imgRef.current.height;
+			let w, h;
+			if (aspect > 1) {
+				h = CROP_SIZE;
+				w = h * aspect;
+			} else {
+				w = CROP_SIZE;
+				h = w / aspect;
+			}
+			setImageSize({
+				width: w,
+				height: h
+			});
+		};
+	}, [imageSrc]);
+	const handleMouseDown = (e) => {
+		setIsDragging(true);
+		const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+		const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+		setDragStart({
+			x: clientX - offset$3.x,
+			y: clientY - offset$3.y
+		});
+	};
+	const handleMouseMove = (e) => {
+		if (!isDragging) return;
+		const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+		const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+		setOffset({
+			x: clientX - dragStart.x,
+			y: clientY - dragStart.y
+		});
+	};
+	const handleMouseUp = () => {
+		setIsDragging(false);
+	};
+	const handleSave = () => {
+		const canvas = document.createElement("canvas");
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+		const OUTPUT_SIZE = 400;
+		canvas.width = OUTPUT_SIZE;
+		canvas.height = OUTPUT_SIZE;
+		const scale = OUTPUT_SIZE / CROP_SIZE;
+		ctx.fillStyle = "#FFFFFF";
+		ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+		ctx.save();
+		ctx.translate(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2);
+		ctx.scale(zoom, zoom);
+		ctx.translate(-OUTPUT_SIZE / 2, -OUTPUT_SIZE / 2);
+		const x$1 = offset$3.x * scale + (OUTPUT_SIZE - imageSize.width * scale) / 2;
+		const y = offset$3.y * scale + (OUTPUT_SIZE - imageSize.height * scale) / 2;
+		const w = imageSize.width * scale;
+		const h = imageSize.height * scale;
+		ctx.drawImage(imgRef.current, x$1, y, w, h);
+		ctx.restore();
+		canvas.toBlob((blob) => {
+			if (blob) onCropComplete(blob);
+		}, "image/jpeg", .85);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col gap-4 items-center animate-in fade-in zoom-in-95 duration-200",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "relative border-4 border-dashed border-gray-200 rounded-lg p-2 bg-gray-50",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				ref: containerRef,
+				className: "relative overflow-hidden bg-white shadow-inner cursor-move touch-none",
+				style: {
+					width: CROP_SIZE,
+					height: CROP_SIZE
+				},
+				onMouseDown: handleMouseDown,
+				onMouseMove: handleMouseMove,
+				onMouseUp: handleMouseUp,
+				onMouseLeave: handleMouseUp,
+				onTouchStart: handleMouseDown,
+				onTouchMove: handleMouseMove,
+				onTouchEnd: handleMouseUp,
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "absolute inset-0 z-10 pointer-events-none border border-white/30 grid grid-cols-3 grid-rows-3",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-b border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "border-r border-white/30" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "absolute top-1/2 left-1/2 origin-center will-change-transform",
+					style: {
+						width: imageSize.width,
+						height: imageSize.height,
+						transform: `translate(-50%, -50%) translate(${offset$3.x}px, ${offset$3.y}px) scale(${zoom})`
+					},
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						src: imageSrc,
+						alt: "Crop target",
+						className: "w-full h-full object-contain pointer-events-none select-none",
+						draggable: false
+					})
+				})]
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "w-full max-w-[280px] space-y-4",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ZoomOut, { className: "w-4 h-4 text-muted-foreground" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slider, {
+						value: [zoom],
+						min: 1,
+						max: 3,
+						step: .1,
+						onValueChange: (val) => setZoom(val[0]),
+						className: "flex-1"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ZoomIn, { className: "w-4 h-4 text-muted-foreground" })
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex justify-between gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "outline",
+					onClick: onCancel,
+					className: "flex-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4 mr-2" }), " Cancelar"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					onClick: handleSave,
+					className: "flex-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "w-4 h-4 mr-2" }), " Confirmar"]
+				})]
+			})]
+		})]
+	});
+}
+var PRESET_AVATARS = [
+	"https://img.usecurling.com/ppl/medium?gender=male&seed=1",
+	"https://img.usecurling.com/ppl/medium?gender=female&seed=2",
+	"https://img.usecurling.com/ppl/medium?gender=male&seed=3",
+	"https://img.usecurling.com/ppl/medium?gender=female&seed=4",
+	"https://img.usecurling.com/ppl/medium?gender=male&seed=5",
+	"https://img.usecurling.com/ppl/medium?gender=female&seed=6"
+];
+function AvatarSelection({ selectedAvatar, onSelect }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "grid grid-cols-3 sm:grid-cols-6 gap-3",
+		children: PRESET_AVATARS.map((url, index$1) => {
+			const isSelected = selectedAvatar === url;
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative group cursor-pointer",
+				onClick: () => onSelect(url),
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+					className: cn$1("h-14 w-14 border-2 transition-all duration-200", isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-gray-300"),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+						src: url,
+						alt: `Avatar ${index$1 + 1}`
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AvatarFallback, { children: ["A", index$1 + 1] })]
+				}), isSelected && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full p-0.5 shadow-sm",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "w-3 h-3" })
+				})]
+			}, index$1);
+		})
+	});
+}
+var Dialog = Root$7;
+var DialogTrigger = Trigger$4;
+var DialogPortal = Portal$3;
+var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
+	ref,
+	className: cn$1("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	...props
+}));
+DialogOverlay.displayName = Overlay.displayName;
+var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
+	ref,
+	className: cn$1("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
+	...props,
+	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
+		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			className: "sr-only",
+			children: "Close"
+		})]
+	})]
+})] }));
+DialogContent.displayName = Content$2.displayName;
+var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn$1("flex flex-col space-y-1.5 text-center sm:text-left", className),
+	...props
+});
+DialogHeader.displayName = "DialogHeader";
+var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	...props
+});
+DialogFooter.displayName = "DialogFooter";
+var DialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
+	ref,
+	className: cn$1("text-lg font-semibold leading-none tracking-tight", className),
+	...props
+}));
+DialogTitle.displayName = Title.displayName;
+var DialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
+	ref,
+	className: cn$1("text-sm text-muted-foreground", className),
+	...props
+}));
+DialogDescription.displayName = Description.displayName;
 function RegisterPage() {
 	const navigate = useNavigate();
 	const { register, currentUser, isLoading } = useAuthStore();
 	const [localLoading, setLocalLoading] = (0, import_react.useState)(false);
+	const [step, setStep] = (0, import_react.useState)(1);
 	const [formData, setFormData] = (0, import_react.useState)({
 		name: "",
 		email: "",
 		password: "",
-		phone: ""
+		phone: "",
+		address: "",
+		rg: "",
+		cpf: "",
+		emergencyContactName: "",
+		emergencyContactPhone: "",
+		avatarUrl: ""
 	});
 	const [avatarFile, setAvatarFile] = (0, import_react.useState)(null);
-	const [avatarPreview, setAvatarPreview] = (0, import_react.useState)(null);
+	const [cropImage, setCropImage] = (0, import_react.useState)(null);
 	const fileInputRef = (0, import_react.useRef)(null);
 	(0, import_react.useEffect)(() => {
 		if (!isLoading && currentUser) {
@@ -34957,19 +35762,51 @@ function RegisterPage() {
 				toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
 				return;
 			}
-			if (file.size > 5 * 1024 * 1024) {
-				toast.error("A imagem deve ter no máximo 5MB");
-				return;
-			}
-			setAvatarFile(file);
-			setAvatarPreview(URL.createObjectURL(file));
+			const reader = new FileReader();
+			reader.onload = () => {
+				setCropImage(reader.result);
+			};
+			reader.readAsDataURL(file);
+			e.target.value = "";
 		}
+	};
+	const handleCropComplete = (blob) => {
+		setAvatarFile(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
+		setFormData((prev) => ({
+			...prev,
+			avatarUrl: ""
+		}));
+		setCropImage(null);
+	};
+	const handlePresetSelect = (url) => {
+		setFormData((prev) => ({
+			...prev,
+			avatarUrl: url
+		}));
+		setAvatarFile(null);
+	};
+	const handleChange = (e) => {
+		const { id, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[id]: value
+		}));
+	};
+	const handleNext = (e) => {
+		e.preventDefault();
+		setStep((prev) => prev + 1);
+	};
+	const handleBack = () => {
+		setStep((prev) => prev - 1);
 	};
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLocalLoading(true);
 		try {
-			const result = await register(formData.name, formData.email, formData.password, formData.phone, avatarFile);
+			const result = await register({
+				...formData,
+				avatarFile
+			});
 			if (result.success) {
 				toast.success("Cadastro realizado com sucesso!");
 				navigate("/pending");
@@ -34980,133 +35817,269 @@ function RegisterPage() {
 			setLocalLoading(false);
 		}
 	};
+	const avatarPreview = avatarFile ? URL.createObjectURL(avatarFile) : formData.avatarUrl ? formData.avatarUrl : null;
 	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "min-h-screen flex items-center justify-center bg-gray-100 p-4",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" })
 	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "min-h-screen flex items-center justify-center bg-gray-100 p-4",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-			className: "w-full max-w-md shadow-lg",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
-				className: "text-2xl font-bold text-center text-primary",
-				children: "Criar Conta"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
-				className: "text-center",
-				children: "Preencha seus dados para solicitar acesso"
-			})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
-				onSubmit: handleSubmit,
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-					className: "space-y-4",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+			open: !!cropImage,
+			onOpenChange: (open) => !open && setCropImage(null),
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogContent, {
+				className: "sm:max-w-md",
+				children: cropImage && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ImageCropper, {
+					imageSrc: cropImage,
+					onCropComplete: handleCropComplete,
+					onCancel: () => setCropImage(null)
+				})
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "w-full max-w-lg shadow-lg",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+					className: "text-2xl font-bold text-center text-primary",
+					children: "Criar Conta"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+					className: "text-center",
+					children: step === 1 ? "Dados Pessoais" : step === 2 ? "Documentação e Endereço" : "Foto de Perfil"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex justify-center gap-2 mt-4",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex flex-col items-center justify-center gap-3 pb-2",
+						1,
+						2,
+						3
+					].map((i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: `h-1.5 w-8 rounded-full transition-colors ${step >= i ? "bg-primary" : "bg-gray-200"}` }, i))
+				})
+			] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+				onSubmit: step === 3 ? handleSubmit : handleNext,
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "space-y-4 pt-4",
+					children: [
+						step === 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-4 animate-in fade-in slide-in-from-right-4 duration-300",
 							children: [
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "relative cursor-pointer group",
-									onClick: () => fileInputRef.current?.click(),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-										className: "w-24 h-24 border-2 border-dashed border-gray-300 group-hover:border-primary transition-colors",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
-											src: avatarPreview || "",
-											className: "object-cover"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
-											className: "bg-gray-50 text-gray-400 group-hover:text-primary transition-colors",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
-										})]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-										className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6 text-white" })
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "name",
+										children: "Nome Completo"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "name",
+										required: true,
+										value: formData.name,
+										onChange: handleChange
 									})]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-									htmlFor: "avatar-upload",
-									className: "text-xs text-muted-foreground cursor-pointer hover:text-primary",
-									onClick: () => fileInputRef.current?.click(),
-									children: "Adicionar foto de perfil (Opcional)"
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "email",
+										children: "Email"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "email",
+										type: "email",
+										required: true,
+										value: formData.email,
+										onChange: handleChange
+									})]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									id: "avatar-upload",
-									type: "file",
-									ref: fileInputRef,
-									className: "hidden",
-									accept: "image/png, image/jpeg, image/webp",
-									onChange: handleFileChange
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "password",
+										children: "Senha"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "password",
+										type: "password",
+										required: true,
+										value: formData.password,
+										onChange: handleChange
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "phone",
+										children: "WhatsApp"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "phone",
+										type: "tel",
+										placeholder: "(11) 99999-9999",
+										required: true,
+										value: formData.phone,
+										onChange: handleChange
+									})]
 								})
 							]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "name",
-								children: "Nome Completo"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "name",
-								required: true,
-								value: formData.name,
-								onChange: (e) => setFormData({
-									...formData,
-									name: e.target.value
+						step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-4 animate-in fade-in slide-in-from-right-4 duration-300",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "address",
+										children: "Endereço Completo"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "address",
+										placeholder: "Rua, Número, Bairro, Cidade - UF",
+										required: true,
+										value: formData.address,
+										onChange: handleChange
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "rg",
+											children: "RG"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "rg",
+											required: true,
+											value: formData.rg,
+											onChange: handleChange
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "cpf",
+											children: "CPF"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "cpf",
+											required: true,
+											value: formData.cpf,
+											onChange: handleChange
+										})]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "border-t pt-2 mt-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+										className: "text-sm font-medium mb-2 text-primary",
+										children: "Contato de Emergência"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "grid grid-cols-1 gap-3",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "emergencyContactName",
+												children: "Nome"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "emergencyContactName",
+												required: true,
+												value: formData.emergencyContactName,
+												onChange: handleChange
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "emergencyContactPhone",
+												children: "Telefone"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "emergencyContactPhone",
+												type: "tel",
+												required: true,
+												value: formData.emergencyContactPhone,
+												onChange: handleChange
+											})]
+										})]
+									})]
 								})
-							})]
+							]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "email",
-								children: "Email"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "email",
-								type: "email",
-								required: true,
-								value: formData.email,
-								onChange: (e) => setFormData({
-									...formData,
-									email: e.target.value
+						step === 3 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-6 animate-in fade-in slide-in-from-right-4 duration-300",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex flex-col items-center justify-center gap-4",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "relative cursor-pointer group",
+											onClick: () => fileInputRef.current?.click(),
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+													className: "w-32 h-32 border-4 border-white shadow-md group-hover:ring-4 ring-primary/20 transition-all",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+														src: avatarPreview || "",
+														className: "object-cover"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+														className: "bg-gray-100 text-gray-400 group-hover:text-primary transition-colors text-4xl",
+														children: formData.name ? formData.name[0].toUpperCase() : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-10 h-10" })
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-8 h-8 text-white" })
+												}),
+												avatarFile && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white shadow-sm",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-4 h-4" })
+												})
+											]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "text-center",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "avatar-upload",
+												className: "text-sm font-medium text-primary cursor-pointer hover:underline",
+												children: "Carregar Foto Personalizada"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-xs text-muted-foreground mt-1",
+												children: "Clique acima para upload e recorte"
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "avatar-upload",
+											type: "file",
+											ref: fileInputRef,
+											className: "hidden",
+											accept: "image/png, image/jpeg, image/webp",
+											onChange: handleFileChange
+										})
+									]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "relative",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "absolute inset-0 flex items-center",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-full border-t" })
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "relative flex justify-center text-xs uppercase",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+											className: "bg-white px-2 text-muted-foreground",
+											children: "Ou escolha um avatar"
+										})
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarSelection, {
+									selectedAvatar: formData.avatarUrl,
+									onSelect: handlePresetSelect
 								})
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "password",
-								children: "Senha"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "password",
-								type: "password",
-								required: true,
-								value: formData.password,
-								onChange: (e) => setFormData({
-									...formData,
-									password: e.target.value
-								})
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "phone",
-								children: "WhatsApp"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "phone",
-								type: "tel",
-								placeholder: "(11) 99999-9999",
-								required: true,
-								value: formData.phone,
-								onChange: (e) => setFormData({
-									...formData,
-									phone: e.target.value
-								})
-							})]
+							]
 						})
 					]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardFooter, {
-					className: "flex flex-col space-y-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						className: "w-full",
-						type: "submit",
-						disabled: localLoading,
-						children: [localLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Solicitar Acesso"]
+					className: "flex flex-col gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex w-full gap-3",
+						children: [step > 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							type: "button",
+							variant: "outline",
+							onClick: handleBack,
+							disabled: localLoading,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-4 h-4 mr-2" }), "Voltar"]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							className: "flex-1",
+							type: "submit",
+							disabled: localLoading,
+							children: localLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }) : step === 3 ? "Concluir Cadastro" : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: ["Próximo ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "w-4 h-4 ml-2" })] })
+						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "text-center text-sm",
 						children: [
@@ -35121,7 +36094,7 @@ function RegisterPage() {
 					})]
 				})]
 			})]
-		})
+		})]
 	});
 }
 function ForgotPasswordPage() {
@@ -37059,7 +38032,7 @@ const useProductStore = create((set, get$1) => ({
 }));
 function Skeleton({ className, ...props }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn("animate-pulse rounded-md bg-muted", className),
+		className: cn$1("animate-pulse rounded-md bg-muted", className),
 		...props
 	});
 }
@@ -37081,66 +38054,53 @@ var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE
 	className: "relative w-full overflow-auto",
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", {
 		ref,
-		className: cn("w-full caption-bottom text-sm", className),
+		className: cn$1("w-full caption-bottom text-sm", className),
 		...props
 	})
 }));
 Table.displayName = "Table";
 var TableHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
 	ref,
-	className: cn("[&_tr]:border-b", className),
+	className: cn$1("[&_tr]:border-b", className),
 	...props
 }));
 TableHeader.displayName = "TableHeader";
 var TableBody = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
 	ref,
-	className: cn("[&_tr:last-child]:border-0", className),
+	className: cn$1("[&_tr:last-child]:border-0", className),
 	...props
 }));
 TableBody.displayName = "TableBody";
 var TableFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tfoot", {
 	ref,
-	className: cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
+	className: cn$1("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
 	...props
 }));
 TableFooter.displayName = "TableFooter";
 var TableRow = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
 	ref,
-	className: cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
+	className: cn$1("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
 	...props
 }));
 TableRow.displayName = "TableRow";
 var TableHead = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
 	ref,
-	className: cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
+	className: cn$1("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
 	...props
 }));
 TableHead.displayName = "TableHead";
 var TableCell = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
 	ref,
-	className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
+	className: cn$1("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
 	...props
 }));
 TableCell.displayName = "TableCell";
 var TableCaption = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
 	ref,
-	className: cn("mt-4 text-sm text-muted-foreground", className),
+	className: cn$1("mt-4 text-sm text-muted-foreground", className),
 	...props
 }));
 TableCaption.displayName = "TableCaption";
-function usePrevious(value) {
-	const ref = import_react.useRef({
-		value,
-		previous: value
-	});
-	return import_react.useMemo(() => {
-		if (ref.current.value !== value) {
-			ref.current.previous = ref.current.value;
-			ref.current.value = value;
-		}
-		return ref.current.previous;
-	}, [value]);
-}
 var CHECKBOX_NAME = "Checkbox";
 var [createCheckboxContext, createCheckboxScope] = createContextScope(CHECKBOX_NAME);
 var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
@@ -37314,10 +38274,10 @@ function getState$4(checked) {
 }
 var Checkbox = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
 	ref,
-	className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
+	className: cn$1("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxIndicator, {
-		className: cn("flex items-center justify-center text-current"),
+		className: cn$1("flex items-center justify-center text-current"),
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "h-4 w-4" })
 	})
 }));
@@ -37379,7 +38339,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 			const isSelected = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-				className: cn("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
+				className: cn$1("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
 				children: [
 					canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "px-2 py-2",
@@ -37422,7 +38382,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 						className: "py-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 							variant: "outline",
-							className: cn("text-[10px] px-1.5 py-0 font-normal h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
+							className: cn$1("text-[10px] px-1.5 py-0 font-normal h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
 							children: product.estado
 						})
 					}),
@@ -37455,7 +38415,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "text-right font-bold text-slate-900 py-2 text-sm",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: cn(isLowestPrice && "text-emerald-700 scale-105 origin-right transition-transform", product.valor === null && "text-xs font-normal text-muted-foreground"),
+							className: cn$1(isLowestPrice && "text-emerald-700 scale-105 origin-right transition-transform", product.valor === null && "text-xs font-normal text-muted-foreground"),
 							children: formatPrice(product.valor)
 						})
 					})
@@ -37472,7 +38432,7 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 			const isSelected = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: cn("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
+				className: cn$1("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
 				children: [isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "absolute top-0 right-0 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold",
 					children: "MELHOR PREÇO"
@@ -37538,14 +38498,14 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 									className: "flex items-center gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 										variant: "outline",
-										className: cn("text-[10px] h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
+										className: cn$1("text-[10px] h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
 										children: product.estado
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: "text-xs text-gray-500",
 										children: product.cor
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: cn("font-bold text-lg", isLowestPrice ? "text-emerald-600 scale-110 origin-right" : "text-gray-900", product.valor === null && "text-sm font-normal text-muted-foreground"),
+									className: cn$1("font-bold text-lg", isLowestPrice ? "text-emerald-600 scale-110 origin-right" : "text-gray-900", product.valor === null && "text-sm font-normal text-muted-foreground"),
 									children: formatPrice(product.valor)
 								})]
 							}),
@@ -37628,14 +38588,6 @@ function ProductList({ products, isLoading = false }) {
 			if (product) toggleDraftItem(product);
 		}
 	});
-}
-function clamp(value, [min$1, max$1]) {
-	return Math.min(max$1, Math.max(min$1, value));
-}
-var DirectionContext = import_react.createContext(void 0);
-function useDirection(localDir) {
-	const globalDir = import_react.useContext(DirectionContext);
-	return localDir || globalDir || "ltr";
 }
 var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var OPEN_KEYS = [
@@ -38591,7 +39543,7 @@ var Select = Root2$4;
 var SelectValue = Value;
 var SelectTrigger = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger$3, {
 	ref,
-	className: cn("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1", className),
+	className: cn$1("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1", className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, {
 		asChild: true,
@@ -38601,27 +39553,27 @@ var SelectTrigger = import_react.forwardRef(({ className, children, ...props }, 
 SelectTrigger.displayName = Trigger$3.displayName;
 var SelectScrollUpButton = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollUpButton, {
 	ref,
-	className: cn("flex cursor-default items-center justify-center py-1", className),
+	className: cn$1("flex cursor-default items-center justify-center py-1", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronUp, { className: "h-4 w-4" })
 }));
 SelectScrollUpButton.displayName = ScrollUpButton.displayName;
 var SelectScrollDownButton = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollDownButton, {
 	ref,
-	className: cn("flex cursor-default items-center justify-center py-1", className),
+	className: cn$1("flex cursor-default items-center justify-center py-1", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "h-4 w-4" })
 }));
 SelectScrollDownButton.displayName = ScrollDownButton.displayName;
 var SelectContent = import_react.forwardRef(({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal$2, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content2$3, {
 	ref,
-	className: cn("relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className),
+	className: cn$1("relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className),
 	position,
 	...props,
 	children: [
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectScrollUpButton, {}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$1, {
-			className: cn("p-1", position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"),
+			className: cn$1("p-1", position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"),
 			children
 		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectScrollDownButton, {})
@@ -38630,13 +39582,13 @@ var SelectContent = import_react.forwardRef(({ className, children, position = "
 SelectContent.displayName = Content2$3.displayName;
 var SelectLabel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 	ref,
-	className: cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
+	className: cn$1("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
 	...props
 }));
 SelectLabel.displayName = Label$1.displayName;
 var SelectItem = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Item$2, {
 	ref,
-	className: cn("relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className),
+	className: cn$1("relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 		className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
@@ -38646,7 +39598,7 @@ var SelectItem = import_react.forwardRef(({ className, children, ...props }, ref
 SelectItem.displayName = Item$2.displayName;
 var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator, {
 	ref,
-	className: cn("-mx-1 my-1 h-px bg-muted", className),
+	className: cn$1("-mx-1 my-1 h-px bg-muted", className),
 	...props
 }));
 SelectSeparator.displayName = Separator.displayName;
@@ -39002,7 +39954,7 @@ var N = "[cmdk-group=\"\"]", Y = "[cmdk-group-items=\"\"]", be = "[cmdk-group-he
 	}, m$1)));
 }), xe = import_react.forwardRef((r$1, o) => {
 	let { open: n, onOpenChange: u$1, overlayClassName: c, contentClassName: d, container: f, ...p$1 } = r$1;
-	return import_react.createElement(Root$6, {
+	return import_react.createElement(Root$7, {
 		open: n,
 		onOpenChange: u$1
 	}, import_react.createElement(Portal$3, { container: f }, import_react.createElement(Overlay, {
@@ -39112,52 +40064,9 @@ var Te = {
 	whiteSpace: "nowrap",
 	borderWidth: "0"
 };
-var Dialog = Root$6;
-var DialogPortal = Portal$3;
-var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
-	ref,
-	className: cn("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
-	...props
-}));
-DialogOverlay.displayName = Overlay.displayName;
-var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
-	ref,
-	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
-	...props,
-	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
-		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-			className: "sr-only",
-			children: "Close"
-		})]
-	})]
-})] }));
-DialogContent.displayName = Content$2.displayName;
-var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className),
-	...props
-});
-DialogHeader.displayName = "DialogHeader";
-var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
-	...props
-});
-DialogFooter.displayName = "DialogFooter";
-var DialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
-	ref,
-	className: cn("text-lg font-semibold leading-none tracking-tight", className),
-	...props
-}));
-DialogTitle.displayName = Title.displayName;
-var DialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
-	ref,
-	className: cn("text-sm text-muted-foreground", className),
-	...props
-}));
-DialogDescription.displayName = Description.displayName;
 var Command = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e, {
 	ref,
-	className: cn("flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground", className),
+	className: cn$1("flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground", className),
 	...props
 }));
 Command.displayName = _e.displayName;
@@ -39166,14 +40075,14 @@ var CommandInput = import_react.forwardRef(({ className, ...props }, ref) => /* 
 	"cmdk-input-wrapper": "",
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "mr-2 h-4 w-4 shrink-0 opacity-50" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Input, {
 		ref,
-		className: cn("flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50", className),
+		className: cn$1("flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50", className),
 		...props
 	})]
 }));
 CommandInput.displayName = _e.Input.displayName;
 var CommandList = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.List, {
 	ref,
-	className: cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className),
+	className: cn$1("max-h-[300px] overflow-y-auto overflow-x-hidden", className),
 	...props
 }));
 CommandList.displayName = _e.List.displayName;
@@ -39185,25 +40094,25 @@ var CommandEmpty = import_react.forwardRef((props, ref) => /* @__PURE__ */ (0, i
 CommandEmpty.displayName = _e.Empty.displayName;
 var CommandGroup = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Group, {
 	ref,
-	className: cn("overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground", className),
+	className: cn$1("overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground", className),
 	...props
 }));
 CommandGroup.displayName = _e.Group.displayName;
 var CommandSeparator = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Separator, {
 	ref,
-	className: cn("-mx-1 h-px bg-border", className),
+	className: cn$1("-mx-1 h-px bg-border", className),
 	...props
 }));
 CommandSeparator.displayName = _e.Separator.displayName;
 var CommandItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Item, {
 	ref,
-	className: cn("relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className),
+	className: cn$1("relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className),
 	...props
 }));
 CommandItem.displayName = _e.Item.displayName;
 var CommandShortcut = ({ className, ...props }) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-		className: cn("ml-auto text-xs tracking-widest text-muted-foreground", className),
+		className: cn$1("ml-auto text-xs tracking-widest text-muted-foreground", className),
 		...props
 	});
 };
@@ -39452,7 +40361,7 @@ var PopoverContent = import_react.forwardRef(({ className, align = "center", sid
 	ref,
 	align,
 	sideOffset,
-	className: cn("z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]", className),
+	className: cn$1("z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]", className),
 	...props
 }) }));
 PopoverContent.displayName = Content2$2.displayName;
@@ -39471,7 +40380,7 @@ function MultiSelect({ options: options$1, selected, onChange, placeholder = "Se
 				variant: "outline",
 				role: "combobox",
 				"aria-expanded": open,
-				className: cn("w-full justify-between h-auto min-h-10", className),
+				className: cn$1("w-full justify-between h-auto min-h-10", className),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex flex-wrap gap-1 items-center text-left",
 					children: selected.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -39511,7 +40420,7 @@ function MultiSelect({ options: options$1, selected, onChange, placeholder = "Se
 				children: options$1.map((option) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CommandItem, {
 					value: option,
 					onSelect: () => handleSelect(option),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: cn("mr-2 h-4 w-4", selected.includes(option) ? "opacity-100" : "opacity-0") }), option]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: cn$1("mr-2 h-4 w-4", selected.includes(option) ? "opacity-100" : "opacity-0") }), option]
 				}, option))
 			})] })] })
 		})]
@@ -39544,7 +40453,7 @@ function ProductFilters({ className }) {
 	};
 	const hasFilters = filters.search && filters.search.trim() !== "" || filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all" || filters.categories.length > 0 || !!filters.supplier;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: cn("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
+		className: cn$1("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex items-center bg-muted/50 p-1 rounded-md shrink-0",
@@ -39650,25 +40559,25 @@ function ProductFilters({ className }) {
 var Pagination = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
 	role: "navigation",
 	"aria-label": "pagination",
-	className: cn("mx-auto flex w-full justify-center", className),
+	className: cn$1("mx-auto flex w-full justify-center", className),
 	...props
 });
 Pagination.displayName = "Pagination";
 var PaginationContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
 	ref,
-	className: cn("flex flex-row items-center gap-1", className),
+	className: cn$1("flex flex-row items-center gap-1", className),
 	...props
 }));
 PaginationContent.displayName = "PaginationContent";
 var PaginationItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
 	ref,
-	className: cn("", className),
+	className: cn$1("", className),
 	...props
 }));
 PaginationItem.displayName = "PaginationItem";
 var PaginationLink = ({ className, isActive, size: size$3 = "icon", ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 	"aria-current": isActive ? "page" : void 0,
-	className: cn(buttonVariants({
+	className: cn$1(buttonVariants({
 		variant: isActive ? "outline" : "ghost",
 		size: size$3
 	}), className),
@@ -39678,7 +40587,7 @@ PaginationLink.displayName = "PaginationLink";
 var PaginationPrevious = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
 	"aria-label": "Go to previous page",
 	size: "default",
-	className: cn("gap-1 pl-2.5", className),
+	className: cn$1("gap-1 pl-2.5", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Previous" })]
 });
@@ -39686,14 +40595,14 @@ PaginationPrevious.displayName = "PaginationPrevious";
 var PaginationNext = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
 	"aria-label": "Go to next page",
 	size: "default",
-	className: cn("gap-1 pr-2.5", className),
+	className: cn$1("gap-1 pr-2.5", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Next" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "h-4 w-4" })]
 });
 PaginationNext.displayName = "PaginationNext";
 var PaginationEllipsis = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 	"aria-hidden": true,
-	className: cn("flex h-9 w-9 items-center justify-center", className),
+	className: cn$1("flex h-9 w-9 items-center justify-center", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Ellipsis, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 		className: "sr-only",
@@ -39777,7 +40686,7 @@ var useDialogScope = createDialogScope();
 var AlertDialog$1 = (props) => {
 	const { __scopeAlertDialog, ...alertDialogProps } = props;
 	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$6, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$7, {
 		...dialogScope,
 		...alertDialogProps,
 		modal: true
@@ -39921,48 +40830,48 @@ var AlertDialog = Root2$2;
 var AlertDialogTrigger = Trigger2$1;
 var AlertDialogPortal = Portal2;
 var AlertDialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay2, {
-	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	className: cn$1("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
 	...props,
 	ref
 }));
 AlertDialogOverlay.displayName = Overlay2.displayName;
 var AlertDialogContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$1, {
 	ref,
-	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
+	className: cn$1("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
 	...props
 })] }));
 AlertDialogContent.displayName = Content2$1.displayName;
 var AlertDialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
+	className: cn$1("flex flex-col space-y-2 text-center sm:text-left", className),
 	...props
 });
 AlertDialogHeader.displayName = "AlertDialogHeader";
 var AlertDialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
 	...props
 });
 AlertDialogFooter.displayName = "AlertDialogFooter";
 var AlertDialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title2, {
 	ref,
-	className: cn("text-lg font-semibold", className),
+	className: cn$1("text-lg font-semibold", className),
 	...props
 }));
 AlertDialogTitle.displayName = Title2.displayName;
 var AlertDialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description2, {
 	ref,
-	className: cn("text-sm text-muted-foreground", className),
+	className: cn$1("text-sm text-muted-foreground", className),
 	...props
 }));
 AlertDialogDescription.displayName = Description2.displayName;
 var AlertDialogAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
 	ref,
-	className: cn(buttonVariants(), className),
+	className: cn$1(buttonVariants(), className),
 	...props
 }));
 AlertDialogAction.displayName = Action.displayName;
 var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Cancel, {
 	ref,
-	className: cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
+	className: cn$1(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
 	...props
 }));
 AlertDialogCancel.displayName = Cancel.displayName;
@@ -40392,25 +41301,25 @@ var Content$1 = TabsContent$1;
 var Tabs = Root2$1;
 var TabsList = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(List, {
 	ref,
-	className: cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className),
+	className: cn$1("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className),
 	...props
 }));
 TabsList.displayName = List.displayName;
 var TabsTrigger = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger$1, {
 	ref,
-	className: cn("inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm", className),
+	className: cn$1("inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm", className),
 	...props
 }));
 TabsTrigger.displayName = Trigger$1.displayName;
 var TabsContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content$1, {
 	ref,
-	className: cn("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className),
+	className: cn$1("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className),
 	...props
 }));
 TabsContent.displayName = Content$1.displayName;
 var Textarea = import_react.forwardRef(({ className, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-		className: cn("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
+		className: cn$1("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
 		ref,
 		...props
 	});
@@ -42389,7 +43298,7 @@ var Viewport = ScrollAreaViewport;
 var Corner = ScrollAreaCorner;
 var ScrollArea = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$2, {
 	ref,
-	className: cn("relative overflow-hidden", className),
+	className: cn$1("relative overflow-hidden", className),
 	...props,
 	children: [
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport, {
@@ -42404,7 +43313,7 @@ ScrollArea.displayName = Root$2.displayName;
 var ScrollBar = import_react.forwardRef(({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaScrollbar, {
 	ref,
 	orientation,
-	className: cn("flex touch-none select-none transition-colors", orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]", orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]", className),
+	className: cn$1("flex touch-none select-none transition-colors", orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]", orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-border" })
 }));
@@ -42763,7 +43672,7 @@ var Content2 = AccordionContent$1;
 var Accordion = Root2;
 var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Item, {
 	ref,
-	className: cn("border-b", className),
+	className: cn$1("border-b", className),
 	...props
 }));
 AccordionItem.displayName = "AccordionItem";
@@ -42771,7 +43680,7 @@ var AccordionTrigger = import_react.forwardRef(({ className, children, ...props 
 	className: "flex",
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger2, {
 		ref,
-		className: cn("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
+		className: cn$1("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
 		...props,
 		children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "h-4 w-4 shrink-0 transition-transform duration-200" })]
 	})
@@ -42782,7 +43691,7 @@ var AccordionContent = import_react.forwardRef(({ className, children, ...props 
 	className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn("pb-4 pt-0", className),
+		className: cn$1("pb-4 pt-0", className),
 		children
 	})
 }));
@@ -43680,10 +44589,10 @@ function getState(checked) {
 var Root = Switch$1;
 var Thumb = SwitchThumb;
 var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	className: cn$1("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
 	...props,
 	ref,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn$1("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
 }));
 Switch.displayName = Root.displayName;
 function GeneratorHistory() {
@@ -44208,9 +45117,9 @@ function ListGeneratorPage() {
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 							className: "flex-1 relative flex flex-col",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
+								className: cn$1("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
+									className: cn$1("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-2",
 										children: [
@@ -44224,7 +45133,7 @@ function ListGeneratorPage() {
 											}),
 											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
 											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
+												className: cn$1("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
 												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
 											})
 										]
@@ -44237,7 +45146,7 @@ function ListGeneratorPage() {
 												trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 													size: "sm",
 													variant: "ghost",
-													className: cn("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
+													className: cn$1("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
 													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-4 h-4" })
 												}),
 												side: "left"
@@ -44256,7 +45165,7 @@ function ListGeneratorPage() {
 										ref: previewTextareaRef,
 										value: isInternal ? internalText : customerText,
 										onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
-										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
+										className: cn$1("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
 										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévias' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
 									}), (isInternal ? internalText : customerText) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "absolute bottom-6 right-6 flex flex-col gap-2",
@@ -44264,13 +45173,13 @@ function ListGeneratorPage() {
 											onClick: handleSaveList,
 											disabled: isSaving,
 											size: "sm",
-											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
+											className: cn$1("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
 											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 											onClick: handleCopy,
 											size: "sm",
 											variant: "outline",
-											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
+											className: cn$1("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
 											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
 										})]
 									})]
@@ -44328,7 +45237,8 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
 	const [formData, setFormData] = (0, import_react.useState)({});
 	const [avatarFile, setAvatarFile] = (0, import_react.useState)(null);
-	const [avatarPreview, setAvatarPreview] = (0, import_react.useState)(null);
+	const [cropImage, setCropImage] = (0, import_react.useState)(null);
+	const [showCropModal, setShowCropModal] = (0, import_react.useState)(false);
 	const fileInputRef = (0, import_react.useRef)(null);
 	(0, import_react.useEffect)(() => {
 		if (user && open) {
@@ -44338,13 +45248,19 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 				role: user.role,
 				status: user.status,
 				companyId: user.companyId,
+				address: user.address,
+				rg: user.rg,
+				cpf: user.cpf,
+				emergencyContactName: user.emergencyContactName,
+				emergencyContactPhone: user.emergencyContactPhone,
+				avatarUrl: user.avatarUrl,
 				canCreateList: user.canCreateList,
 				canAccessEvaluation: user.canAccessEvaluation,
 				canDeleteRecords: user.canDeleteRecords,
 				canViewAllLists: user.canViewAllLists
 			});
-			setAvatarPreview(user.avatarUrl || null);
 			setAvatarFile(null);
+			setCropImage(null);
 		}
 	}, [user, open]);
 	const handleChange = (key, value) => {
@@ -44361,33 +45277,38 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 				"image/png",
 				"image/webp"
 			].includes(file.type)) {
-				toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
+				toast.error("Formato não suportado");
 				return;
 			}
-			if (file.size > 5 * 1024 * 1024) {
-				toast.error("A imagem deve ter no máximo 5MB");
-				return;
-			}
-			setAvatarFile(file);
-			setAvatarPreview(URL.createObjectURL(file));
+			const reader = new FileReader();
+			reader.onload = () => {
+				setCropImage(reader.result);
+				setShowCropModal(true);
+			};
+			reader.readAsDataURL(file);
+			e.target.value = "";
 		}
+	};
+	const handleCropComplete = (blob) => {
+		setAvatarFile(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
+		setShowCropModal(false);
+		setCropImage(null);
+	};
+	const handlePresetSelect = (url) => {
+		handleChange("avatarUrl", url);
+		setAvatarFile(null);
 	};
 	const handleSave = async () => {
 		if (!user) return;
 		setIsLoading(true);
 		try {
 			if (avatarFile) {
-				const uploadResult = await adminUploadAvatar(user.id, avatarFile);
-				if (!uploadResult.success) {
-					toast.error("Erro ao atualizar foto de perfil, mas salvando dados...");
-					console.error("Avatar error:", uploadResult.error);
-				}
+				if (!(await adminUploadAvatar(user.id, avatarFile)).success) toast.error("Erro ao atualizar foto, mas salvando dados...");
 			}
-			const result = await adminUpdateUser(user.id, formData);
-			if (result.success) {
+			if ((await adminUpdateUser(user.id, formData)).success) {
 				toast.success("Usuário atualizado com sucesso");
 				onOpenChange(false);
-			} else toast.error("Erro ao atualizar usuário: " + (result.error?.message || "Erro desconhecido"));
+			} else toast.error("Erro ao atualizar usuário");
 		} catch (error) {
 			console.error("Error updating user:", error);
 			toast.error("Erro ao atualizar usuário");
@@ -44396,166 +45317,162 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 		}
 	};
 	if (!user) return null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+	const displayAvatar = avatarFile ? URL.createObjectURL(avatarFile) : formData.avatarUrl;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open: showCropModal,
+		onOpenChange: setShowCropModal,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogContent, {
+			className: "sm:max-w-md",
+			children: cropImage && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ImageCropper, {
+				imageSrc: cropImage,
+				onCropComplete: handleCropComplete,
+				onCancel: () => setShowCropModal(false)
+			})
+		})
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
 		open,
 		onOpenChange,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
-			className: "sm:max-w-[600px] max-h-[90vh] overflow-y-auto",
+			className: "sm:max-w-[700px] max-h-[90vh] overflow-y-auto",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Editar Usuário" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Atualize as informações, foto e permissões do usuário." })] }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "grid gap-6 py-4",
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, { children: ["Editar Usuário: ", user.name] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Gerencie todas as informações do perfil do usuário." })] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
+					defaultValue: "basic",
+					className: "w-full",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex flex-col items-center gap-2",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+							className: "w-full justify-start overflow-x-auto",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "relative cursor-pointer group",
-									onClick: () => fileInputRef.current?.click(),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-										className: "h-20 w-20 border-2 border-muted",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
-											src: avatarPreview || `https://img.usecurling.com/ppl/medium?seed=${user.id}`,
-											className: "object-cover"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
-											className: "text-xl",
-											children: user.name[0]
-										})]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-										className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6 text-white" })
-									})]
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "basic",
+									children: "Básico & Foto"
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									variant: "ghost",
-									size: "sm",
-									className: "text-xs h-7",
-									onClick: () => fileInputRef.current?.click(),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-3 h-3 mr-1.5" }), "Alterar Foto"]
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "docs",
+									children: "Documentos"
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									type: "file",
-									ref: fileInputRef,
-									className: "hidden",
-									accept: "image/png, image/jpeg, image/webp",
-									onChange: handleFileChange
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "permissions",
+									children: "Permissões"
 								})
 							]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid grid-cols-2 gap-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-									className: "text-muted-foreground",
-									children: "ID do Usuário"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									value: user.id,
-									disabled: true,
-									className: "bg-muted font-mono text-xs"
-								})]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-									className: "text-muted-foreground",
-									children: "E-mail"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									value: user.email,
-									disabled: true,
-									className: "bg-muted"
-								})]
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-4",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsContent, {
+							value: "basic",
+							className: "space-y-6 pt-4",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-									className: "font-medium text-sm border-b pb-2",
-									children: "Informações Básicas"
-								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "grid grid-cols-2 gap-4",
+									className: "flex flex-col sm:flex-row gap-6 items-start border-b pb-6",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-											htmlFor: "name",
-											children: "Nome Completo"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											id: "name",
-											value: formData.name || "",
-											onChange: (e) => handleChange("name", e.target.value)
+										className: "flex flex-col items-center gap-3",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "relative cursor-pointer group",
+											onClick: () => fileInputRef.current?.click(),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+												className: "h-24 w-24 border-2 border-muted",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+													src: displayAvatar || void 0,
+													className: "object-cover"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+													className: "text-xl",
+													children: user.name[0]
+												})]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6 text-white" })
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex flex-col gap-2 w-full",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+												variant: "outline",
+												size: "sm",
+												className: "text-xs w-full",
+												onClick: () => fileInputRef.current?.click(),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-3 h-3 mr-1.5" }), "Upload"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+												type: "file",
+												ref: fileInputRef,
+												className: "hidden",
+												accept: "image/png, image/jpeg, image/webp",
+												onChange: handleFileChange
+											})]
 										})]
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-											htmlFor: "phone",
-											children: "Telefone"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											id: "phone",
-											value: formData.phone || "",
-											onChange: (e) => handleChange("phone", e.target.value)
+										className: "flex-1 space-y-4 w-full",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Avatar Predefinido" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarSelection, {
+											selectedAvatar: formData.avatarUrl,
+											onSelect: handlePresetSelect
 										})]
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "grid grid-cols-2 gap-4",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-											htmlFor: "role",
-											children: "Função"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-											value: formData.role,
-											onValueChange: (val) => handleChange("role", val),
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-												id: "role",
-												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "ADMIN",
-													children: "Admin (Gestor)"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "VENDEDOR",
-													children: "Vendedor"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "TECNICO",
-													children: "Técnico"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "ADMINISTRATIVO",
-													children: "Administrativo"
-												})
-											] })]
-										})]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-											htmlFor: "status",
-											children: "Status da Conta"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-											value: formData.status,
-											onValueChange: (val) => handleChange("status", val),
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-												id: "status",
-												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "active",
-													children: "Ativo"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "pending",
-													children: "Pendente"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-													value: "blocked",
-													children: "Bloqueado"
-												})
-											] })]
-										})]
-									})]
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "name",
+												children: "Nome Completo"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "name",
+												value: formData.name || "",
+												onChange: (e) => handleChange("name", e.target.value)
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "email",
+												children: "Email (Apenas Leitura)"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												value: user.email,
+												disabled: true,
+												className: "bg-muted"
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "phone",
+												children: "Telefone"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "phone",
+												value: formData.phone || "",
+												onChange: (e) => handleChange("phone", e.target.value)
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "role",
+												children: "Função"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+												value: formData.role,
+												onValueChange: (val) => handleChange("role", val),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+													id: "role",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, {})
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+														value: "ADMIN",
+														children: "Admin"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+														value: "VENDEDOR",
+														children: "Vendedor"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+														value: "TECNICO",
+														children: "Técnico"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+														value: "ADMINISTRATIVO",
+														children: "Admin. (Escritório)"
+													})
+												] })]
+											})]
+										})
+									]
 								}),
 								isSuperAdmin && companies.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "space-y-2",
@@ -44567,113 +45484,177 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 										onValueChange: (val) => handleChange("companyId", val),
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
 											id: "company",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione a empresa..." })
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: companies.map((company) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-											value: company.id,
-											children: company.nome_fantasia
-										}, company.id)) })]
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: companies.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+											value: c.id,
+											children: c.nome_fantasia
+										}, c.id)) })]
 									})]
 								})
 							]
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "space-y-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-								className: "font-medium text-sm border-b pb-2",
-								children: "Permissões de Acesso"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "grid gap-4",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsContent, {
+							value: "docs",
+							className: "space-y-4 pt-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "address",
+										children: "Endereço"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										id: "address",
+										value: formData.address || "",
+										onChange: (e) => handleChange("address", e.target.value)
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "rg",
+											children: "RG"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "rg",
+											value: formData.rg || "",
+											onChange: (e) => handleChange("rg", e.target.value)
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "cpf",
+											children: "CPF"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "cpf",
+											value: formData.cpf || "",
+											onChange: (e) => handleChange("cpf", e.target.value)
+										})]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "border-t pt-4 mt-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+										className: "text-sm font-medium mb-3",
+										children: "Contato de Emergência"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "grid grid-cols-2 gap-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "ecName",
+												children: "Nome"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "ecName",
+												value: formData.emergencyContactName || "",
+												onChange: (e) => handleChange("emergencyContactName", e.target.value)
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "ecPhone",
+												children: "Telefone"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												id: "ecPhone",
+												value: formData.emergencyContactPhone || "",
+												onChange: (e) => handleChange("emergencyContactPhone", e.target.value)
+											})]
+										})]
+									})]
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsContent, {
+							value: "permissions",
+							className: "space-y-4 pt-4",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "space-y-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									htmlFor: "status",
+									children: "Status da Conta"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+									value: formData.status,
+									onValueChange: (val) => handleChange("status", val),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+										id: "status",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, {})
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+											value: "active",
+											children: "Ativo"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+											value: "pending",
+											children: "Pendente"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+											value: "blocked",
+											children: "Bloqueado"
+										})
+									] })]
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "grid gap-4 mt-4",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-0.5",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-												htmlFor: "perm-list",
-												className: "text-base",
-												children: "Criar Listas"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-												className: "text-xs text-muted-foreground",
-												children: "Permite gerar listas de preços e catálogos PDF."
-											})]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-											id: "perm-list",
-											checked: formData.canCreateList || false,
-											onCheckedChange: (checked) => handleChange("canCreateList", checked)
+									{
+										key: "canCreateList",
+										label: "Criar Listas",
+										desc: "Gerar catálogos e listas"
+									},
+									{
+										key: "canAccessEvaluation",
+										label: "Avaliação Técnica",
+										desc: "Acesso ao checklist"
+									},
+									{
+										key: "canViewAllLists",
+										label: "Ver Histórico Global",
+										desc: "Ver listas de outros"
+									},
+									{
+										key: "canDeleteRecords",
+										label: "Deletar Registros",
+										desc: "Excluir dados (Perigoso)",
+										danger: true
+									}
+								].map((perm) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: cn("flex items-center justify-between rounded-lg border p-3 shadow-sm", perm.danger && "border-red-100 bg-red-50/20"),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-0.5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: `perm-${perm.key}`,
+											className: cn("text-base", perm.danger && "text-red-900"),
+											children: perm.label
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "text-xs text-muted-foreground",
+											children: perm.desc
 										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-0.5",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-												htmlFor: "perm-eval",
-												className: "text-base",
-												children: "Avaliação Técnica"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-												className: "text-xs text-muted-foreground",
-												children: "Acesso ao módulo de checklist e avaliação de aparelhos."
-											})]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-											id: "perm-eval",
-											checked: formData.canAccessEvaluation || false,
-											onCheckedChange: (checked) => handleChange("canAccessEvaluation", checked)
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-0.5",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-												htmlFor: "perm-view-all",
-												className: "text-base",
-												children: "Ver Histórico Completo"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-												className: "text-xs text-muted-foreground",
-												children: "Permite visualizar listas geradas por outros usuários da empresa."
-											})]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-											id: "perm-view-all",
-											checked: formData.canViewAllLists || false,
-											onCheckedChange: (checked) => handleChange("canViewAllLists", checked)
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm border-red-100 bg-red-50/10",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-0.5",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-												htmlFor: "perm-delete",
-												className: "text-base text-red-900",
-												children: "Deletar Registros"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-												className: "text-xs text-red-700/70",
-												children: "Permite excluir produtos e dados históricos. Cuidado!"
-											})]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-											id: "perm-delete",
-											checked: formData.canDeleteRecords || false,
-											onCheckedChange: (checked) => handleChange("canDeleteRecords", checked),
-											className: "data-[state=checked]:bg-red-600"
-										})]
-									})
-								]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+										id: `perm-${perm.key}`,
+										checked: !!formData[perm.key],
+										onCheckedChange: (checked) => handleChange(perm.key, checked),
+										className: perm.danger ? "data-[state=checked]:bg-red-600" : ""
+									})]
+								}, perm.key))
 							})]
 						})
 					]
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: "outline",
-					onClick: () => onOpenChange(false),
-					children: "Cancelar"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					onClick: handleSave,
-					disabled: isLoading,
-					children: [isLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar Alterações"]
-				})] })
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, {
+					className: "mt-6",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "outline",
+						onClick: () => onOpenChange(false),
+						children: "Cancelar"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						onClick: handleSave,
+						disabled: isLoading,
+						children: [isLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar Alterações"]
+					})]
+				})
 			]
 		})
-	});
+	})] });
 }
 function UserManagement() {
 	const users = useAuthStore((state) => state.users);
@@ -44729,8 +45710,11 @@ function UserManagement() {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
 				className: "flex items-center gap-3",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-					className: "h-9 w-9 border",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: `https://img.usecurling.com/ppl/thumbnail?seed=${user.id}` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })]
+					className: "h-9 w-9 border bg-white",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+						src: user.avatarUrl || void 0,
+						className: "object-cover"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: user.name[0] })]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "font-medium",
 					children: user.name
@@ -45169,19 +46153,19 @@ var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&
 var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
 	role: "alert",
-	className: cn(alertVariants({ variant }), className),
+	className: cn$1(alertVariants({ variant }), className),
 	...props
 }));
 Alert.displayName = "Alert";
 var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
 	ref,
-	className: cn("mb-1 font-medium leading-none tracking-tight", className),
+	className: cn$1("mb-1 font-medium leading-none tracking-tight", className),
 	...props
 }));
 AlertTitle.displayName = "AlertTitle";
 var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn("text-sm [&_p]:leading-relaxed", className),
+	className: cn$1("text-sm [&_p]:leading-relaxed", className),
 	...props
 }));
 AlertDescription.displayName = "AlertDescription";
@@ -46594,7 +47578,7 @@ function EvaluationChecklist() {
 							isDefectsStep && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "grid gap-3 sm:grid-cols-2",
 								children: [peripheralDiscounts.map((discount) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: cn("flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all", selectedDiscounts.has(discount.id) ? "bg-red-50 border-red-200" : "hover:bg-slate-50 border-transparent bg-slate-50/50"),
+									className: cn$1("flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all", selectedDiscounts.has(discount.id) ? "bg-red-50 border-red-200" : "hover:bg-slate-50 border-transparent bg-slate-50/50"),
 									onClick: () => handleDiscountToggle(discount.id),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-3",
@@ -46605,7 +47589,7 @@ function EvaluationChecklist() {
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 											className: "flex flex-col",
 											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn("text-sm font-medium", selectedDiscounts.has(discount.id) && "text-red-700"),
+												className: cn$1("text-sm font-medium", selectedDiscounts.has(discount.id) && "text-red-700"),
 												children: discount.nome
 											})
 										})]
@@ -46953,88 +47937,160 @@ function EvaluationPage() {
 	});
 }
 function AvatarUpload() {
-	const { currentUser, uploadAvatar } = useAuthStore();
+	const { currentUser, uploadAvatar, updateProfile } = useAuthStore();
 	const [isUploading, setIsUploading] = (0, import_react.useState)(false);
+	const [cropImage, setCropImage] = (0, import_react.useState)(null);
+	const [isDialogOpen, setIsDialogOpen] = (0, import_react.useState)(false);
 	const fileInputRef = (0, import_react.useRef)(null);
 	if (!currentUser) return null;
 	const initials = currentUser.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
-	const handleFileSelect = async (e) => {
+	const handleFileSelect = (e) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		if (!file.type.startsWith("image/")) {
-			toast.error("Por favor selecione um arquivo de imagem válido (JPG, PNG, WebP)");
+			toast.error("Por favor selecione um arquivo de imagem válido");
 			return;
 		}
-		if (![
-			"image/jpeg",
-			"image/png",
-			"image/webp"
-		].includes(file.type)) {
-			toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
-			return;
-		}
-		if (file.size > 5 * 1024 * 1024) {
-			toast.error("A imagem deve ter no máximo 5MB");
-			return;
-		}
+		const reader = new FileReader();
+		reader.onload = () => {
+			setCropImage(reader.result);
+		};
+		reader.readAsDataURL(file);
+		e.target.value = "";
+	};
+	const handleCropComplete = async (blob) => {
+		setCropImage(null);
 		setIsUploading(true);
+		const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
 		try {
-			const result = await uploadAvatar(file);
-			if (result.success) toast.success("Foto de perfil atualizada!");
-			else {
-				console.error("Upload result error:", result.error);
-				toast.error("Erro ao atualizar foto. Tente novamente.");
-			}
+			if ((await uploadAvatar(file)).success) {
+				toast.success("Foto de perfil atualizada!");
+				setIsDialogOpen(false);
+			} else toast.error("Erro ao atualizar foto");
 		} catch (error) {
-			console.error("Upload exception:", error);
 			toast.error("Erro inesperado no upload");
 		} finally {
 			setIsUploading(false);
-			if (fileInputRef.current) fileInputRef.current.value = "";
 		}
 	};
-	const triggerClick = () => {
-		fileInputRef.current?.click();
+	const handlePresetSelect = async (url) => {
+		setIsUploading(true);
+		try {
+			if ((await updateProfile({ avatarUrl: url })).success) {
+				toast.success("Avatar atualizado!");
+				setIsDialogOpen(false);
+			} else toast.error("Erro ao atualizar avatar");
+		} catch (error) {
+			toast.error("Erro inesperado");
+		} finally {
+			setIsUploading(false);
+		}
 	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "flex flex-col items-center gap-4",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "relative group cursor-pointer",
-				onClick: triggerClick,
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-					className: "h-32 w-32 border-4 border-white shadow-lg",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
-						src: currentUser.avatarUrl || `https://img.usecurling.com/ppl/medium?seed=${currentUser.id}`,
-						className: "object-cover"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
-						className: "text-3xl bg-primary/10 text-primary",
-						children: initials
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: cn("absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200", isUploading && "opacity-100 bg-black/60"),
-					children: isUploading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
-				})]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-				type: "file",
-				ref: fileInputRef,
-				onChange: handleFileSelect,
-				accept: "image/png, image/jpeg, image/webp",
-				className: "hidden"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-				variant: "outline",
-				size: "sm",
-				onClick: triggerClick,
-				disabled: isUploading,
-				children: isUploading ? "Enviando..." : "Alterar Foto"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				className: "text-xs text-muted-foreground text-center",
-				children: "Suporta JPG, PNG e WebP até 5MB."
-			})
-		]
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Dialog, {
+		open: isDialogOpen,
+		onOpenChange: setIsDialogOpen,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col items-center gap-4",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTrigger, {
+					asChild: true,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "relative group cursor-pointer",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+							className: "h-32 w-32 border-4 border-white shadow-lg bg-white",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+								src: currentUser.avatarUrl || void 0,
+								className: "object-cover"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+								className: "text-3xl bg-primary/10 text-primary",
+								children: initials
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: cn$1("absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200", isUploading && "opacity-100 bg-black/60"),
+							children: isUploading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
+						})]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTrigger, {
+					asChild: true,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "outline",
+						size: "sm",
+						disabled: isUploading,
+						children: isUploading ? "Atualizando..." : "Alterar Foto"
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs text-muted-foreground text-center",
+					children: "Clique na foto para alterar."
+				})
+			]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "sm:max-w-md max-h-[90vh] overflow-y-auto",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Alterar Foto de Perfil" }) }), cropImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ImageCropper, {
+				imageSrc: cropImage,
+				onCropComplete: handleCropComplete,
+				onCancel: () => setCropImage(null)
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-6",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "font-medium text-sm text-muted-foreground flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-4 h-4" }), "Upload de Imagem"]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer",
+								onClick: () => fileInputRef.current?.click(),
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex flex-col items-center gap-2",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "p-3 bg-primary/10 rounded-full",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-6 h-6 text-primary" })
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "text-sm font-medium text-gray-900",
+											children: "Clique para selecionar uma foto"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+											className: "text-xs text-muted-foreground",
+											children: "JPG, PNG ou WebP. Máx 5MB."
+										})
+									]
+								})
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+								type: "file",
+								ref: fileInputRef,
+								onChange: handleFileSelect,
+								accept: "image/png, image/jpeg, image/webp",
+								className: "hidden"
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "relative",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "absolute inset-0 flex items-center",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-full border-t" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "relative flex justify-center text-xs uppercase",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "bg-background px-2 text-muted-foreground",
+								children: "Ou escolha um avatar"
+							})
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarSelection, {
+						selectedAvatar: currentUser.avatarUrl,
+						onSelect: handlePresetSelect
+					})
+				]
+			})]
+		})]
 	});
 }
 function ProfileForm() {
@@ -47042,7 +48098,12 @@ function ProfileForm() {
 	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
 	const [formData, setFormData] = (0, import_react.useState)({
 		name: currentUser?.name || "",
-		phone: currentUser?.phone || ""
+		phone: currentUser?.phone || "",
+		address: currentUser?.address || "",
+		rg: currentUser?.rg || "",
+		cpf: currentUser?.cpf || "",
+		emergencyContactName: currentUser?.emergencyContactName || "",
+		emergencyContactPhone: currentUser?.emergencyContactPhone || ""
 	});
 	if (!currentUser) return null;
 	const handleSubmit = async (e) => {
@@ -47057,9 +48118,16 @@ function ProfileForm() {
 			setIsLoading(false);
 		}
 	};
+	const handleChange = (e) => {
+		const { id, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[id]: value
+		}));
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
 		onSubmit: handleSubmit,
-		className: "space-y-4",
+		className: "space-y-6",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "space-y-2",
@@ -47081,33 +48149,102 @@ function ProfileForm() {
 				]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "space-y-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-					htmlFor: "name",
-					children: "Nome Completo"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-					id: "name",
-					value: formData.name,
-					onChange: (e) => setFormData({
-						...formData,
-						name: e.target.value
-					}),
-					required: true
+				className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+						htmlFor: "name",
+						children: "Nome Completo"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						id: "name",
+						value: formData.name,
+						onChange: handleChange,
+						required: true
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+						htmlFor: "phone",
+						children: "Telefone / WhatsApp"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						id: "phone",
+						value: formData.phone,
+						onChange: handleChange,
+						placeholder: "(00) 00000-0000",
+						required: true
+					})]
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "space-y-2",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-					htmlFor: "phone",
-					children: "Telefone / WhatsApp"
+					htmlFor: "address",
+					children: "Endereço Completo"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-					id: "phone",
-					value: formData.phone,
-					onChange: (e) => setFormData({
-						...formData,
-						phone: e.target.value
-					}),
-					placeholder: "(00) 00000-0000"
+					id: "address",
+					value: formData.address,
+					onChange: handleChange,
+					placeholder: "Rua, Número, Bairro, Cidade - UF",
+					required: true
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+						htmlFor: "rg",
+						children: "RG"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						id: "rg",
+						value: formData.rg,
+						onChange: handleChange,
+						required: true
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+						htmlFor: "cpf",
+						children: "CPF"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						id: "cpf",
+						value: formData.cpf,
+						onChange: handleChange,
+						required: true
+					})]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "border-t pt-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+					className: "text-sm font-medium mb-4 text-gray-900",
+					children: "Contato de Emergência"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							htmlFor: "emergencyContactName",
+							children: "Nome do Contato"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							id: "emergencyContactName",
+							value: formData.emergencyContactName,
+							onChange: handleChange,
+							required: true
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							htmlFor: "emergencyContactPhone",
+							children: "Telefone do Contato"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							id: "emergencyContactPhone",
+							value: formData.emergencyContactPhone,
+							onChange: handleChange,
+							placeholder: "(00) 00000-0000",
+							required: true
+						})]
+					})]
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -47245,4 +48382,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Boo8ddFl.js.map
+//# sourceMappingURL=index-BCCajOP2.js.map

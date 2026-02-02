@@ -23,6 +23,9 @@ import { Role, User, UserStatus, Company } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
 import { Loader2, Camera, Upload } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AvatarSelection } from '@/components/common/AvatarSelection'
+import { ImageCropper } from '@/components/common/ImageCropper'
 
 interface UserEditDialogProps {
   user: User | null
@@ -43,7 +46,8 @@ export function UserEditDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [cropImage, setCropImage] = useState<string | null>(null)
+  const [showCropModal, setShowCropModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -54,13 +58,19 @@ export function UserEditDialog({
         role: user.role,
         status: user.status,
         companyId: user.companyId,
+        address: user.address,
+        rg: user.rg,
+        cpf: user.cpf,
+        emergencyContactName: user.emergencyContactName,
+        emergencyContactPhone: user.emergencyContactPhone,
+        avatarUrl: user.avatarUrl,
         canCreateList: user.canCreateList,
         canAccessEvaluation: user.canAccessEvaluation,
         canDeleteRecords: user.canDeleteRecords,
         canViewAllLists: user.canViewAllLists,
       })
-      setAvatarPreview(user.avatarUrl || null)
       setAvatarFile(null)
+      setCropImage(null)
     }
   }, [user, open])
 
@@ -72,17 +82,32 @@ export function UserEditDialog({
     const file = e.target.files?.[0]
     if (file) {
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        toast.error('Formato não suportado. Use JPG, PNG ou WebP.')
+        toast.error('Formato não suportado')
         return
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('A imagem deve ter no máximo 5MB')
-        return
+      const reader = new FileReader()
+      reader.onload = () => {
+        setCropImage(reader.result as string)
+        setShowCropModal(true)
       }
-      setAvatarFile(file)
-      const objectUrl = URL.createObjectURL(file)
-      setAvatarPreview(objectUrl)
+      reader.readAsDataURL(file)
+      e.target.value = ''
     }
+  }
+
+  const handleCropComplete = (blob: Blob) => {
+    const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
+    setAvatarFile(file)
+    // Clear preset if custom file is set (just preview for now)
+    // Actual url clear happens on save if we want, but upload happens separately usually?
+    // In admin dialog, let's keep it simple: upload sets avatarUrl
+    setShowCropModal(false)
+    setCropImage(null)
+  }
+
+  const handlePresetSelect = (url: string) => {
+    handleChange('avatarUrl', url)
+    setAvatarFile(null)
   }
 
   const handleSave = async () => {
@@ -90,25 +115,23 @@ export function UserEditDialog({
 
     setIsLoading(true)
     try {
-      // 1. Upload Avatar if changed
+      // 1. Upload Avatar if changed via file
       if (avatarFile) {
         const uploadResult = await adminUploadAvatar(user.id, avatarFile)
         if (!uploadResult.success) {
-          toast.error('Erro ao atualizar foto de perfil, mas salvando dados...')
-          console.error('Avatar error:', uploadResult.error)
+          toast.error('Erro ao atualizar foto, mas salvando dados...')
         }
+        // Note: adminUploadAvatar already updates the profile in DB
       }
 
-      // 2. Update User Data
+      // 2. Update User Data (including avatarUrl if preset selected)
       const result = await adminUpdateUser(user.id, formData)
+
       if (result.success) {
         toast.success('Usuário atualizado com sucesso')
         onOpenChange(false)
       } else {
-        toast.error(
-          'Erro ao atualizar usuário: ' +
-            (result.error?.message || 'Erro desconhecido'),
-        )
+        toast.error('Erro ao atualizar usuário')
       }
     } catch (error) {
       console.error('Error updating user:', error)
@@ -120,116 +143,212 @@ export function UserEditDialog({
 
   if (!user) return null
 
+  const displayAvatar = avatarFile
+    ? URL.createObjectURL(avatarFile)
+    : formData.avatarUrl
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Editar Usuário</DialogTitle>
-          <DialogDescription>
-            Atualize as informações, foto e permissões do usuário.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-6 py-4">
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className="relative cursor-pointer group"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Avatar className="h-20 w-20 border-2 border-muted">
-                <AvatarImage
-                  src={
-                    avatarPreview ||
-                    `https://img.usecurling.com/ppl/medium?seed=${user.id}`
-                  }
-                  className="object-cover"
-                />
-                <AvatarFallback className="text-xl">
-                  {user.name[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Upload className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs h-7"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Camera className="w-3 h-3 mr-1.5" />
-              Alterar Foto
-            </Button>
-            <Input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/png, image/jpeg, image/webp"
-              onChange={handleFileChange}
+    <>
+      <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+        <DialogContent className="sm:max-w-md">
+          {cropImage && (
+            <ImageCropper
+              imageSrc={cropImage}
+              onCropComplete={handleCropComplete}
+              onCancel={() => setShowCropModal(false)}
             />
-          </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
-          {/* Read-only info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-muted-foreground">ID do Usuário</Label>
-              <Input
-                value={user.id}
-                disabled
-                className="bg-muted font-mono text-xs"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-muted-foreground">E-mail</Label>
-              <Input value={user.email} disabled className="bg-muted" />
-            </div>
-          </div>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Usuário: {user.name}</DialogTitle>
+            <DialogDescription>
+              Gerencie todas as informações do perfil do usuário.
+            </DialogDescription>
+          </DialogHeader>
 
-          <div className="space-y-4">
-            <h3 className="font-medium text-sm border-b pb-2">
-              Informações Básicas
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="w-full justify-start overflow-x-auto">
+              <TabsTrigger value="basic">Básico & Foto</TabsTrigger>
+              <TabsTrigger value="docs">Documentos</TabsTrigger>
+              <TabsTrigger value="permissions">Permissões</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-6 pt-4">
+              {/* Avatar Section */}
+              <div className="flex flex-col sm:flex-row gap-6 items-start border-b pb-6">
+                <div className="flex flex-col items-center gap-3">
+                  <div
+                    className="relative cursor-pointer group"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Avatar className="h-24 w-24 border-2 border-muted">
+                      <AvatarImage
+                        src={displayAvatar || undefined}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-xl">
+                        {user.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 w-full">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs w-full"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Camera className="w-3 h-3 mr-1.5" />
+                      Upload
+                    </Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/webp"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex-1 space-y-4 w-full">
+                  <Label>Avatar Predefinido</Label>
+                  <AvatarSelection
+                    selectedAvatar={formData.avatarUrl}
+                    onSelect={handlePresetSelect}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome Completo</Label>
+                  <Input
+                    id="name"
+                    value={formData.name || ''}
+                    onChange={(e) => handleChange('name', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email (Apenas Leitura)</Label>
+                  <Input value={user.email} disabled className="bg-muted" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone || ''}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Função</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(val: Role) => handleChange('role', val)}
+                  >
+                    <SelectTrigger id="role">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="VENDEDOR">Vendedor</SelectItem>
+                      <SelectItem value="TECNICO">Técnico</SelectItem>
+                      <SelectItem value="ADMINISTRATIVO">
+                        Admin. (Escritório)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {isSuperAdmin && companies.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="company">Empresa</Label>
+                  <Select
+                    value={formData.companyId || ''}
+                    onValueChange={(val) => handleChange('companyId', val)}
+                  >
+                    <SelectTrigger id="company">
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.nome_fantasia}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="docs" className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
+                <Label htmlFor="address">Endereço</Label>
                 <Input
-                  id="name"
-                  value={formData.name || ''}
-                  onChange={(e) => handleChange('name', e.target.value)}
+                  id="address"
+                  value={formData.address || ''}
+                  onChange={(e) => handleChange('address', e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone || ''}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="rg">RG</Label>
+                  <Input
+                    id="rg"
+                    value={formData.rg || ''}
+                    onChange={(e) => handleChange('rg', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cpf">CPF</Label>
+                  <Input
+                    id="cpf"
+                    value={formData.cpf || ''}
+                    onChange={(e) => handleChange('cpf', e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="role">Função</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(val: Role) => handleChange('role', val)}
-                >
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ADMIN">Admin (Gestor)</SelectItem>
-                    <SelectItem value="VENDEDOR">Vendedor</SelectItem>
-                    <SelectItem value="TECNICO">Técnico</SelectItem>
-                    <SelectItem value="ADMINISTRATIVO">
-                      Administrativo
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="border-t pt-4 mt-2">
+                <h3 className="text-sm font-medium mb-3">
+                  Contato de Emergência
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="ecName">Nome</Label>
+                    <Input
+                      id="ecName"
+                      value={formData.emergencyContactName || ''}
+                      onChange={(e) =>
+                        handleChange('emergencyContactName', e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ecPhone">Telefone</Label>
+                    <Input
+                      id="ecPhone"
+                      value={formData.emergencyContactPhone || ''}
+                      onChange={(e) =>
+                        handleChange('emergencyContactPhone', e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="permissions" className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label htmlFor="status">Status da Conta</Label>
                 <Select
@@ -239,7 +358,7 @@ export function UserEditDialog({
                   }
                 >
                   <SelectTrigger id="status">
-                    <SelectValue placeholder="Selecione..." />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Ativo</SelectItem>
@@ -248,125 +367,79 @@ export function UserEditDialog({
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            {isSuperAdmin && companies.length > 0 && (
-              <div className="space-y-2">
-                <Label htmlFor="company">Empresa</Label>
-                <Select
-                  value={formData.companyId || ''}
-                  onValueChange={(val) => handleChange('companyId', val)}
-                >
-                  <SelectTrigger id="company">
-                    <SelectValue placeholder="Selecione a empresa..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {companies.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.nome_fantasia}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="font-medium text-sm border-b pb-2">
-              Permissões de Acesso
-            </h3>
-            <div className="grid gap-4">
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <Label htmlFor="perm-list" className="text-base">
-                    Criar Listas
-                  </Label>
-                  <div className="text-xs text-muted-foreground">
-                    Permite gerar listas de preços e catálogos PDF.
-                  </div>
-                </div>
-                <Switch
-                  id="perm-list"
-                  checked={formData.canCreateList || false}
-                  onCheckedChange={(checked) =>
-                    handleChange('canCreateList', checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <Label htmlFor="perm-eval" className="text-base">
-                    Avaliação Técnica
-                  </Label>
-                  <div className="text-xs text-muted-foreground">
-                    Acesso ao módulo de checklist e avaliação de aparelhos.
-                  </div>
-                </div>
-                <Switch
-                  id="perm-eval"
-                  checked={formData.canAccessEvaluation || false}
-                  onCheckedChange={(checked) =>
-                    handleChange('canAccessEvaluation', checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <Label htmlFor="perm-view-all" className="text-base">
-                    Ver Histórico Completo
-                  </Label>
-                  <div className="text-xs text-muted-foreground">
-                    Permite visualizar listas geradas por outros usuários da
-                    empresa.
-                  </div>
-                </div>
-                <Switch
-                  id="perm-view-all"
-                  checked={formData.canViewAllLists || false}
-                  onCheckedChange={(checked) =>
-                    handleChange('canViewAllLists', checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm border-red-100 bg-red-50/10">
-                <div className="space-y-0.5">
-                  <Label
-                    htmlFor="perm-delete"
-                    className="text-base text-red-900"
+              <div className="grid gap-4 mt-4">
+                {[
+                  {
+                    key: 'canCreateList',
+                    label: 'Criar Listas',
+                    desc: 'Gerar catálogos e listas',
+                  },
+                  {
+                    key: 'canAccessEvaluation',
+                    label: 'Avaliação Técnica',
+                    desc: 'Acesso ao checklist',
+                  },
+                  {
+                    key: 'canViewAllLists',
+                    label: 'Ver Histórico Global',
+                    desc: 'Ver listas de outros',
+                  },
+                  {
+                    key: 'canDeleteRecords',
+                    label: 'Deletar Registros',
+                    desc: 'Excluir dados (Perigoso)',
+                    danger: true,
+                  },
+                ].map((perm) => (
+                  <div
+                    key={perm.key}
+                    className={cn(
+                      'flex items-center justify-between rounded-lg border p-3 shadow-sm',
+                      perm.danger && 'border-red-100 bg-red-50/20',
+                    )}
                   >
-                    Deletar Registros
-                  </Label>
-                  <div className="text-xs text-red-700/70">
-                    Permite excluir produtos e dados históricos. Cuidado!
+                    <div className="space-y-0.5">
+                      <Label
+                        htmlFor={`perm-${perm.key}`}
+                        className={cn(
+                          'text-base',
+                          perm.danger && 'text-red-900',
+                        )}
+                      >
+                        {perm.label}
+                      </Label>
+                      <div className="text-xs text-muted-foreground">
+                        {perm.desc}
+                      </div>
+                    </div>
+                    <Switch
+                      id={`perm-${perm.key}`}
+                      checked={!!formData[perm.key as keyof User]}
+                      onCheckedChange={(checked) =>
+                        handleChange(perm.key as keyof User, checked)
+                      }
+                      className={
+                        perm.danger ? 'data-[state=checked]:bg-red-600' : ''
+                      }
+                    />
                   </div>
-                </div>
-                <Switch
-                  id="perm-delete"
-                  checked={formData.canDeleteRecords || false}
-                  onCheckedChange={(checked) =>
-                    handleChange('canDeleteRecords', checked)
-                  }
-                  className="data-[state=checked]:bg-red-600"
-                />
+                ))}
               </div>
-            </div>
-          </div>
-        </div>
+            </TabsContent>
+          </Tabs>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Salvar Alterações
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar Alterações
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

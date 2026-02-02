@@ -21,41 +21,33 @@ import { useState } from 'react'
 
 export function Sidebar() {
   const location = useLocation()
-
-  // Use specific selectors to prevent unnecessary re-renders when other parts of the store (like users list) change
   const currentUser = useAuthStore((state) => state.currentUser)
   const currentCompany = useAuthStore((state) => state.currentCompany)
   const logout = useAuthStore((state) => state.logout)
 
   const [open, setOpen] = useState(false)
 
-  // Check module availability from company config
   const modules = currentCompany?.modulos_ativos || []
-
-  // Robust check: User has module if company has it OR if user is Super Admin (explicit bypass)
   const hasModule = (module: string) =>
     modules.includes(module) || currentUser?.isSuperAdmin
 
-  // Check Role Access
   const isSuperAdmin = currentUser?.isSuperAdmin
   const isAdmin = currentUser?.role === 'ADMIN' || isSuperAdmin
   const isVendedor = currentUser?.role === 'VENDEDOR'
   const isTecnico = currentUser?.role === 'TECNICO'
   const isAdministrativo = currentUser?.role === 'ADMINISTRATIVO'
 
-  // Define visibility logic for each link
   const links = [
     {
       href: '/',
       label: 'Painel',
       icon: LayoutDashboard,
-      isVisible: true, // Everyone sees Dashboard
+      isVisible: true,
     },
     {
       href: '/generator',
       label: 'Gerador',
       icon: FileText,
-      // Visible if module active AND user has permission (Admin, Vendedor, Administrativo)
       isVisible:
         hasModule('generator') &&
         (isAdmin ||
@@ -67,8 +59,6 @@ export function Sidebar() {
       href: '/evaluation',
       label: 'Avaliação',
       icon: ClipboardCheck,
-      // Visible if module active AND user has permission (Admin, Tecnico)
-      // Super Admin bypass ensures this is true if hasModule('evaluation') returns true (which it does for super admin)
       isVisible:
         hasModule('evaluation') &&
         (isAdmin || isTecnico || currentUser?.canAccessEvaluation),
@@ -77,7 +67,6 @@ export function Sidebar() {
       href: '/admin',
       label: 'Admin',
       icon: Settings,
-      // Visible for everyone to access settings/maintenance
       isVisible: true,
     },
   ]
@@ -163,7 +152,6 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop Slim/Expandable Sidebar */}
       <aside className="hidden md:flex flex-col border-r bg-sidebar h-screen sticky top-0 z-50 transition-all duration-300 w-16 hover:w-56 group shadow-lg hover:shadow-xl overflow-hidden">
         <div className="w-56 flex flex-col h-full">
           <div className="flex flex-col h-full py-4">
@@ -219,7 +207,6 @@ export function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Sidebar */}
       <div className="md:hidden fixed top-3 left-3 z-50">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>

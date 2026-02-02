@@ -12,6 +12,11 @@ export function ProfileForm() {
   const [formData, setFormData] = useState({
     name: currentUser?.name || '',
     phone: currentUser?.phone || '',
+    address: currentUser?.address || '',
+    rg: currentUser?.rg || '',
+    cpf: currentUser?.cpf || '',
+    emergencyContactName: currentUser?.emergencyContactName || '',
+    emergencyContactPhone: currentUser?.emergencyContactPhone || '',
   })
 
   if (!currentUser) return null
@@ -34,8 +39,13 @@ export function ProfileForm() {
     }
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setFormData((prev) => ({ ...prev, [id]: value }))
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -49,24 +59,81 @@ export function ProfileForm() {
         </p>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Nome Completo</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Telefone / WhatsApp</Label>
+          <Input
+            id="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="(00) 00000-0000"
+            required
+          />
+        </div>
+      </div>
+
       <div className="space-y-2">
-        <Label htmlFor="name">Nome Completo</Label>
+        <Label htmlFor="address">Endereço Completo</Label>
         <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          id="address"
+          value={formData.address}
+          onChange={handleChange}
+          placeholder="Rua, Número, Bairro, Cidade - UF"
           required
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="phone">Telefone / WhatsApp</Label>
-        <Input
-          id="phone"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          placeholder="(00) 00000-0000"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="rg">RG</Label>
+          <Input id="rg" value={formData.rg} onChange={handleChange} required />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="cpf">CPF</Label>
+          <Input
+            id="cpf"
+            value={formData.cpf}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="border-t pt-4">
+        <h3 className="text-sm font-medium mb-4 text-gray-900">
+          Contato de Emergência
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="emergencyContactName">Nome do Contato</Label>
+            <Input
+              id="emergencyContactName"
+              value={formData.emergencyContactName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="emergencyContactPhone">Telefone do Contato</Label>
+            <Input
+              id="emergencyContactPhone"
+              value={formData.emergencyContactPhone}
+              onChange={handleChange}
+              placeholder="(00) 00000-0000"
+              required
+            />
+          </div>
+        </div>
       </div>
 
       <div className="pt-2">

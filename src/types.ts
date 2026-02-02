@@ -8,6 +8,11 @@ export interface User {
   role: Role
   status: UserStatus
   phone: string
+  address?: string | null
+  rg?: string | null
+  cpf?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   lastActive: string
   createdAt: string
   companyId?: string | null

@@ -26,6 +26,7 @@ import { Loader2, Camera, Upload } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AvatarSelection } from '@/components/common/AvatarSelection'
 import { ImageCropper } from '@/components/common/ImageCropper'
+import { cn } from '@/lib/utils'
 
 interface UserEditDialogProps {
   user: User | null
@@ -98,9 +99,6 @@ export function UserEditDialog({
   const handleCropComplete = (blob: Blob) => {
     const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
     setAvatarFile(file)
-    // Clear preset if custom file is set (just preview for now)
-    // Actual url clear happens on save if we want, but upload happens separately usually?
-    // In admin dialog, let's keep it simple: upload sets avatarUrl
     setShowCropModal(false)
     setCropImage(null)
   }
@@ -121,7 +119,6 @@ export function UserEditDialog({
         if (!uploadResult.success) {
           toast.error('Erro ao atualizar foto, mas salvando dados...')
         }
-        // Note: adminUploadAvatar already updates the profile in DB
       }
 
       // 2. Update User Data (including avatarUrl if preset selected)

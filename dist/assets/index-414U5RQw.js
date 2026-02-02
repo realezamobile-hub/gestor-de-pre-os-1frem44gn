@@ -21304,13 +21304,13 @@ var getDefaultConfig = () => {
 	};
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
-function cn$1(...inputs) {
+function cn(...inputs) {
 	return twMerge(clsx(inputs));
 }
 var ToastProvider = Provider$1;
 var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$2, {
 	ref,
-	className: cn$1("fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]", className),
+	className: cn("fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]", className),
 	...props
 }));
 ToastViewport.displayName = Viewport$2.displayName;
@@ -21324,20 +21324,20 @@ var toastVariants = cva("group pointer-events-auto relative flex w-full items-ce
 var Toast$1 = import_react.forwardRef(({ className, variant, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2$6, {
 		ref,
-		className: cn$1(toastVariants({ variant }), className),
+		className: cn(toastVariants({ variant }), className),
 		...props
 	});
 });
 Toast$1.displayName = Root2$6.displayName;
 var ToastAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action$1, {
 	ref,
-	className: cn$1("inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive", className),
+	className: cn("inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive", className),
 	...props
 }));
 ToastAction.displayName = Action$1.displayName;
 var ToastClose = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close$1, {
 	ref,
-	className: cn$1("absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600", className),
+	className: cn("absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600", className),
 	"toast-close": "",
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "h-4 w-4" })
@@ -21345,13 +21345,13 @@ var ToastClose = import_react.forwardRef(({ className, ...props }, ref) => /* @_
 ToastClose.displayName = Close$1.displayName;
 var ToastTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title$1, {
 	ref,
-	className: cn$1("text-sm font-semibold", className),
+	className: cn("text-sm font-semibold", className),
 	...props
 }));
 ToastTitle.displayName = Title$1.displayName;
 var ToastDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$1, {
 	ref,
-	className: cn$1("text-sm opacity-90", className),
+	className: cn("text-sm opacity-90", className),
 	...props
 }));
 ToastDescription.displayName = Description$1.displayName;
@@ -21767,7 +21767,7 @@ var TOAST_WIDTH = 356;
 var GAP = 14;
 var SWIPE_THRESHOLD = 45;
 var TIME_BEFORE_UNMOUNT = 200;
-function cn$2(...classes) {
+function cn$1(...classes) {
 	return classes.filter(Boolean).join(" ");
 }
 function getDefaultSwipeDirections(position) {
@@ -21920,12 +21920,12 @@ var Toast = (props) => {
 		if (icons == null ? void 0 : icons.loading) {
 			var _toast_classNames1$1;
 			return /* @__PURE__ */ import_react.createElement("div", {
-				className: cn$2(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames1$1 = toast$2.classNames) == null ? void 0 : _toast_classNames1$1.loader, "sonner-loader"),
+				className: cn$1(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames1$1 = toast$2.classNames) == null ? void 0 : _toast_classNames1$1.loader, "sonner-loader"),
 				"data-visible": toastType === "loading"
 			}, icons.loading);
 		}
 		return /* @__PURE__ */ import_react.createElement(Loader, {
-			className: cn$2(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames$1 = toast$2.classNames) == null ? void 0 : _toast_classNames$1.loader),
+			className: cn$1(classNames == null ? void 0 : classNames.loader, toast$2 == null ? void 0 : (_toast_classNames$1 = toast$2.classNames) == null ? void 0 : _toast_classNames$1.loader),
 			visible: toastType === "loading"
 		});
 	}
@@ -21934,7 +21934,7 @@ var Toast = (props) => {
 	return /* @__PURE__ */ import_react.createElement("li", {
 		tabIndex: 0,
 		ref: toastRef,
-		className: cn$2(className, toastClassname, classNames == null ? void 0 : classNames.toast, toast$2 == null ? void 0 : (_toast_classNames = toast$2.classNames) == null ? void 0 : _toast_classNames.toast, classNames == null ? void 0 : classNames.default, classNames == null ? void 0 : classNames[toastType], toast$2 == null ? void 0 : (_toast_classNames1 = toast$2.classNames) == null ? void 0 : _toast_classNames1[toastType]),
+		className: cn$1(className, toastClassname, classNames == null ? void 0 : classNames.toast, toast$2 == null ? void 0 : (_toast_classNames = toast$2.classNames) == null ? void 0 : _toast_classNames.toast, classNames == null ? void 0 : classNames.default, classNames == null ? void 0 : classNames[toastType], toast$2 == null ? void 0 : (_toast_classNames1 = toast$2.classNames) == null ? void 0 : _toast_classNames1[toastType]),
 		"data-sonner-toast": "",
 		"data-rich-colors": (_toast_richColors = toast$2.richColors) != null ? _toast_richColors : defaultRichColors,
 		"data-styled": !Boolean(toast$2.jsx || toast$2.unstyled || unstyled),
@@ -22049,19 +22049,19 @@ var Toast = (props) => {
 			deleteToast();
 			toast$2.onDismiss == null || toast$2.onDismiss.call(toast$2, toast$2);
 		},
-		className: cn$2(classNames == null ? void 0 : classNames.closeButton, toast$2 == null ? void 0 : (_toast_classNames2 = toast$2.classNames) == null ? void 0 : _toast_classNames2.closeButton)
+		className: cn$1(classNames == null ? void 0 : classNames.closeButton, toast$2 == null ? void 0 : (_toast_classNames2 = toast$2.classNames) == null ? void 0 : _toast_classNames2.closeButton)
 	}, (_icons_close = icons == null ? void 0 : icons.close) != null ? _icons_close : CloseIcon) : null, (toastType || toast$2.icon || toast$2.promise) && toast$2.icon !== null && ((icons == null ? void 0 : icons[toastType]) !== null || toast$2.icon) ? /* @__PURE__ */ import_react.createElement("div", {
 		"data-icon": "",
-		className: cn$2(classNames == null ? void 0 : classNames.icon, toast$2 == null ? void 0 : (_toast_classNames3 = toast$2.classNames) == null ? void 0 : _toast_classNames3.icon)
+		className: cn$1(classNames == null ? void 0 : classNames.icon, toast$2 == null ? void 0 : (_toast_classNames3 = toast$2.classNames) == null ? void 0 : _toast_classNames3.icon)
 	}, toast$2.promise || toast$2.type === "loading" && !toast$2.icon ? toast$2.icon || getLoadingIcon() : null, toast$2.type !== "loading" ? icon : null) : null, /* @__PURE__ */ import_react.createElement("div", {
 		"data-content": "",
-		className: cn$2(classNames == null ? void 0 : classNames.content, toast$2 == null ? void 0 : (_toast_classNames4 = toast$2.classNames) == null ? void 0 : _toast_classNames4.content)
+		className: cn$1(classNames == null ? void 0 : classNames.content, toast$2 == null ? void 0 : (_toast_classNames4 = toast$2.classNames) == null ? void 0 : _toast_classNames4.content)
 	}, /* @__PURE__ */ import_react.createElement("div", {
 		"data-title": "",
-		className: cn$2(classNames == null ? void 0 : classNames.title, toast$2 == null ? void 0 : (_toast_classNames5 = toast$2.classNames) == null ? void 0 : _toast_classNames5.title)
+		className: cn$1(classNames == null ? void 0 : classNames.title, toast$2 == null ? void 0 : (_toast_classNames5 = toast$2.classNames) == null ? void 0 : _toast_classNames5.title)
 	}, toast$2.jsx ? toast$2.jsx : typeof toast$2.title === "function" ? toast$2.title() : toast$2.title), toast$2.description ? /* @__PURE__ */ import_react.createElement("div", {
 		"data-description": "",
-		className: cn$2(descriptionClassName, toastDescriptionClassname, classNames == null ? void 0 : classNames.description, toast$2 == null ? void 0 : (_toast_classNames6 = toast$2.classNames) == null ? void 0 : _toast_classNames6.description)
+		className: cn$1(descriptionClassName, toastDescriptionClassname, classNames == null ? void 0 : classNames.description, toast$2 == null ? void 0 : (_toast_classNames6 = toast$2.classNames) == null ? void 0 : _toast_classNames6.description)
 	}, typeof toast$2.description === "function" ? toast$2.description() : toast$2.description) : null), /* @__PURE__ */ import_react.isValidElement(toast$2.cancel) ? toast$2.cancel : toast$2.cancel && isAction(toast$2.cancel) ? /* @__PURE__ */ import_react.createElement("button", {
 		"data-button": true,
 		"data-cancel": true,
@@ -22072,7 +22072,7 @@ var Toast = (props) => {
 			toast$2.cancel.onClick == null || toast$2.cancel.onClick.call(toast$2.cancel, event);
 			deleteToast();
 		},
-		className: cn$2(classNames == null ? void 0 : classNames.cancelButton, toast$2 == null ? void 0 : (_toast_classNames7 = toast$2.classNames) == null ? void 0 : _toast_classNames7.cancelButton)
+		className: cn$1(classNames == null ? void 0 : classNames.cancelButton, toast$2 == null ? void 0 : (_toast_classNames7 = toast$2.classNames) == null ? void 0 : _toast_classNames7.cancelButton)
 	}, toast$2.cancel.label) : null, /* @__PURE__ */ import_react.isValidElement(toast$2.action) ? toast$2.action : toast$2.action && isAction(toast$2.action) ? /* @__PURE__ */ import_react.createElement("button", {
 		"data-button": true,
 		"data-action": true,
@@ -22083,7 +22083,7 @@ var Toast = (props) => {
 			if (event.defaultPrevented) return;
 			deleteToast();
 		},
-		className: cn$2(classNames == null ? void 0 : classNames.actionButton, toast$2 == null ? void 0 : (_toast_classNames8 = toast$2.classNames) == null ? void 0 : _toast_classNames8.actionButton)
+		className: cn$1(classNames == null ? void 0 : classNames.actionButton, toast$2 == null ? void 0 : (_toast_classNames8 = toast$2.classNames) == null ? void 0 : _toast_classNames8.actionButton)
 	}, toast$2.action.label) : null);
 };
 function getDocumentDirection() {
@@ -24607,7 +24607,7 @@ var TooltipTrigger = Trigger$5;
 var TooltipContent = import_react.forwardRef(({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$4, {
 	ref,
 	sideOffset,
-	className: cn$1("z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]", className),
+	className: cn("z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]", className),
 	...props
 }));
 TooltipContent.displayName = Content2$4.displayName;
@@ -24727,7 +24727,7 @@ var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespa
 });
 var Button = import_react.forwardRef(({ className, variant, size: size$3, asChild = false, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot$3 : "button", {
-		className: cn$1(buttonVariants({
+		className: cn(buttonVariants({
 			variant,
 			size: size$3,
 			className
@@ -32975,16 +32975,28 @@ const useAuthStore = create((set, get$1) => ({
 			success: false,
 			error
 		};
-		if (avatarFile && authData.user) try {
-			const fileExt = avatarFile.name.split(".").pop();
-			const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`;
-			const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, avatarFile, { upsert: true });
-			if (!uploadError) {
-				const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
-				await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", authData.user.id);
+		if (authData.user) {
+			await supabase.from("profiles").update({
+				name,
+				phone,
+				address,
+				rg,
+				cpf,
+				emergency_contact_name: emergencyContactName,
+				emergency_contact_phone: emergencyContactPhone,
+				avatar_url: avatarUrl
+			}).eq("id", authData.user.id);
+			if (avatarFile) try {
+				const fileExt = avatarFile.name.split(".").pop();
+				const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`;
+				const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, avatarFile, { upsert: true });
+				if (!uploadError) {
+					const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
+					await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", authData.user.id);
+				}
+			} catch (e) {
+				console.error("Avatar upload failed during registration", e);
 			}
-		} catch (e) {
-			console.error("Avatar upload failed during registration", e);
 		}
 		return { success: true };
 	},
@@ -34319,7 +34331,7 @@ var SheetTrigger = Trigger$4;
 var SheetClose = Close;
 var SheetPortal = Portal$3;
 var SheetOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
-	className: cn$1("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
 	...props,
 	ref
 }));
@@ -34335,7 +34347,7 @@ var sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg transition
 });
 var SheetContent = import_react.forwardRef(({ side = "right", className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SheetPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SheetOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
 	ref,
-	className: cn$1(sheetVariants({ side }), className),
+	className: cn(sheetVariants({ side }), className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
 		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
@@ -34347,24 +34359,24 @@ var SheetContent = import_react.forwardRef(({ side = "right", className, childre
 })] }));
 SheetContent.displayName = Content$2.displayName;
 var SheetHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col space-y-2 text-center sm:text-left", className),
+	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
 	...props
 });
 SheetHeader.displayName = "SheetHeader";
 var SheetFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
 	...props
 });
 SheetFooter.displayName = "SheetFooter";
 var SheetTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
 	ref,
-	className: cn$1("text-lg font-semibold text-foreground", className),
+	className: cn("text-lg font-semibold text-foreground", className),
 	...props
 }));
 SheetTitle.displayName = Title.displayName;
 var SheetDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
 	ref,
-	className: cn$1("text-sm text-muted-foreground", className),
+	className: cn("text-sm text-muted-foreground", className),
 	...props
 }));
 SheetDescription.displayName = Description.displayName;
@@ -34411,9 +34423,9 @@ function Sidebar() {
 		className: "flex flex-col h-full py-4",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: cn$1("px-4 mb-6 transition-all duration-300", !fullWidth && "px-2 text-center"),
+				className: cn("px-4 mb-6 transition-all duration-300", !fullWidth && "px-2 text-center"),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-					className: cn$1("font-bold text-primary tracking-tight transition-all", fullWidth ? "text-xl" : "text-xs scale-90"),
+					className: cn("font-bold text-primary tracking-tight transition-all", fullWidth ? "text-xl" : "text-xs scale-90"),
 					children: fullWidth ? currentCompany?.nome_fantasia || "PriceApp" : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 						title: currentCompany?.nome_fantasia || "PriceApp",
 						children: "PA"
@@ -34424,29 +34436,29 @@ function Sidebar() {
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
-				className: cn$1("flex-1 space-y-2", fullWidth ? "px-3" : "px-2"),
+				className: cn("flex-1 space-y-2", fullWidth ? "px-3" : "px-2"),
 				children: filteredLinks.map((link) => {
 					const isActive = location.pathname === link.href;
 					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
 						to: link.href,
 						onClick: () => setOpen(false),
-						className: cn$1("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group/link relative", isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground", !fullWidth && "justify-center px-0"),
+						className: cn("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group/link relative", isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground", !fullWidth && "justify-center px-0"),
 						title: !fullWidth ? link.label : void 0,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: cn$1("w-5 h-5 shrink-0", !fullWidth && "w-6 h-6") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: cn$1("transition-all duration-300 overflow-hidden whitespace-nowrap", !fullWidth && "w-0 opacity-0 hidden"),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: cn("w-5 h-5 shrink-0", !fullWidth && "w-6 h-6") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: cn("transition-all duration-300 overflow-hidden whitespace-nowrap", !fullWidth && "w-0 opacity-0 hidden"),
 							children: link.label
 						})]
 					}, link.href);
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: cn$1("mt-auto", fullWidth ? "px-3" : "px-2"),
+				className: cn("mt-auto", fullWidth ? "px-3" : "px-2"),
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 					variant: "ghost",
-					className: cn$1("w-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-all", fullWidth ? "justify-start" : "justify-center px-0"),
+					className: cn("w-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-all", fullWidth ? "justify-start" : "justify-center px-0"),
 					onClick: () => logout(),
 					title: !fullWidth ? "Sair" : void 0,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LogOut, { className: cn$1("w-5 h-5", fullWidth && "mr-2") }), fullWidth && "Sair"]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LogOut, { className: cn("w-5 h-5", fullWidth && "mr-2") }), fullWidth && "Sair"]
 				})
 			})
 		]
@@ -34480,7 +34492,7 @@ function Sidebar() {
 							const isActive = location.pathname === link.href;
 							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
 								to: link.href,
-								className: cn$1("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap", isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"),
+								className: cn("flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap", isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(link.icon, { className: "w-5 h-5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 									className: "opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75",
 									children: link.label
@@ -34734,19 +34746,19 @@ var Image$2 = AvatarImage$1;
 var Fallback = AvatarFallback$1;
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$6, {
 	ref,
-	className: cn$1("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
+	className: cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
 	...props
 }));
 Avatar.displayName = Root$6.displayName;
 var AvatarImage = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$2, {
 	ref,
-	className: cn$1("aspect-square h-full w-full", className),
+	className: cn("aspect-square h-full w-full", className),
 	...props
 }));
 AvatarImage.displayName = Image$2.displayName;
 var AvatarFallback = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Fallback, {
 	ref,
-	className: cn$1("flex h-full w-full items-center justify-center rounded-full bg-muted", className),
+	className: cn("flex h-full w-full items-center justify-center rounded-full bg-muted", className),
 	...props
 }));
 AvatarFallback.displayName = Fallback.displayName;
@@ -34761,7 +34773,7 @@ var badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-
 });
 function Badge({ className, variant, ...props }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn$1(badgeVariants({ variant }), className),
+		className: cn(badgeVariants({ variant }), className),
 		...props
 	});
 }
@@ -34841,7 +34853,7 @@ function DashboardLayout() {
 var Input = import_react.forwardRef(({ className, type, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
 		type,
-		className: cn$1("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
+		className: cn("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
 		ref,
 		...props
 	});
@@ -34864,43 +34876,43 @@ var Root$5 = Label$2;
 var labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70");
 var Label = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
 	ref,
-	className: cn$1(labelVariants(), className),
+	className: cn(labelVariants(), className),
 	...props
 }));
 Label.displayName = Root$5.displayName;
 var Card = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("rounded-lg border bg-card text-card-foreground shadow-sm", className),
+	className: cn("rounded-lg border bg-card text-card-foreground shadow-sm", className),
 	...props
 }));
 Card.displayName = "Card";
 var CardHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("flex flex-col space-y-1.5 p-6", className),
+	className: cn("flex flex-col space-y-1.5 p-6", className),
 	...props
 }));
 CardHeader.displayName = "CardHeader";
 var CardTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("text-2xl font-semibold leading-none tracking-tight", className),
+	className: cn("text-2xl font-semibold leading-none tracking-tight", className),
 	...props
 }));
 CardTitle.displayName = "CardTitle";
 var CardDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("text-sm text-muted-foreground", className),
+	className: cn("text-sm text-muted-foreground", className),
 	...props
 }));
 CardDescription.displayName = "CardDescription";
 var CardContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("p-6 pt-0", className),
+	className: cn("p-6 pt-0", className),
 	...props
 }));
 CardContent.displayName = "CardContent";
 var CardFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("flex items-center p-6 pt-0", className),
+	className: cn("flex items-center p-6 pt-0", className),
 	...props
 }));
 CardFooter.displayName = "CardFooter";
@@ -35479,7 +35491,7 @@ var Range = SliderRange;
 var Thumb$1 = SliderThumb;
 var Slider = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$4, {
 	ref,
-	className: cn$1("relative flex w-full touch-none select-none items-center", className),
+	className: cn("relative flex w-full touch-none select-none items-center", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Track, {
 		className: "relative h-2 w-full grow overflow-hidden rounded-full bg-secondary",
@@ -35664,7 +35676,7 @@ function AvatarSelection({ selectedAvatar, onSelect }) {
 				className: "relative group cursor-pointer",
 				onClick: () => onSelect(url),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
-					className: cn$1("h-14 w-14 border-2 transition-all duration-200", isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-gray-300"),
+					className: cn("h-14 w-14 border-2 transition-all duration-200", isSelected ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-gray-300"),
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
 						src: url,
 						alt: `Avatar ${index$1 + 1}`
@@ -35682,13 +35694,13 @@ var DialogTrigger = Trigger$4;
 var DialogPortal = Portal$3;
 var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
 	ref,
-	className: cn$1("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	className: cn("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
 	...props
 }));
 DialogOverlay.displayName = Overlay.displayName;
 var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$2, {
 	ref,
-	className: cn$1("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
+	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-y-auto max-h-screen", className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Close, {
 		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
@@ -35700,24 +35712,24 @@ var DialogContent = import_react.forwardRef(({ className, children, ...props }, 
 })] }));
 DialogContent.displayName = Content$2.displayName;
 var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col space-y-1.5 text-center sm:text-left", className),
+	className: cn("flex flex-col space-y-1.5 text-center sm:text-left", className),
 	...props
 });
 DialogHeader.displayName = "DialogHeader";
 var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
 	...props
 });
 DialogFooter.displayName = "DialogFooter";
 var DialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
 	ref,
-	className: cn$1("text-lg font-semibold leading-none tracking-tight", className),
+	className: cn("text-lg font-semibold leading-none tracking-tight", className),
 	...props
 }));
 DialogTitle.displayName = Title.displayName;
 var DialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
 	ref,
-	className: cn$1("text-sm text-muted-foreground", className),
+	className: cn("text-sm text-muted-foreground", className),
 	...props
 }));
 DialogDescription.displayName = Description.displayName;
@@ -38032,7 +38044,7 @@ const useProductStore = create((set, get$1) => ({
 }));
 function Skeleton({ className, ...props }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn$1("animate-pulse rounded-md bg-muted", className),
+		className: cn("animate-pulse rounded-md bg-muted", className),
 		...props
 	});
 }
@@ -38054,50 +38066,50 @@ var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE
 	className: "relative w-full overflow-auto",
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", {
 		ref,
-		className: cn$1("w-full caption-bottom text-sm", className),
+		className: cn("w-full caption-bottom text-sm", className),
 		...props
 	})
 }));
 Table.displayName = "Table";
 var TableHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
 	ref,
-	className: cn$1("[&_tr]:border-b", className),
+	className: cn("[&_tr]:border-b", className),
 	...props
 }));
 TableHeader.displayName = "TableHeader";
 var TableBody = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
 	ref,
-	className: cn$1("[&_tr:last-child]:border-0", className),
+	className: cn("[&_tr:last-child]:border-0", className),
 	...props
 }));
 TableBody.displayName = "TableBody";
 var TableFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tfoot", {
 	ref,
-	className: cn$1("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
+	className: cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
 	...props
 }));
 TableFooter.displayName = "TableFooter";
 var TableRow = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
 	ref,
-	className: cn$1("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
+	className: cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
 	...props
 }));
 TableRow.displayName = "TableRow";
 var TableHead = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
 	ref,
-	className: cn$1("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
+	className: cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
 	...props
 }));
 TableHead.displayName = "TableHead";
 var TableCell = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
 	ref,
-	className: cn$1("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
+	className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
 	...props
 }));
 TableCell.displayName = "TableCell";
 var TableCaption = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
 	ref,
-	className: cn$1("mt-4 text-sm text-muted-foreground", className),
+	className: cn("mt-4 text-sm text-muted-foreground", className),
 	...props
 }));
 TableCaption.displayName = "TableCaption";
@@ -38274,10 +38286,10 @@ function getState$4(checked) {
 }
 var Checkbox = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
 	ref,
-	className: cn$1("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
+	className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxIndicator, {
-		className: cn$1("flex items-center justify-center text-current"),
+		className: cn("flex items-center justify-center text-current"),
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "h-4 w-4" })
 	})
 }));
@@ -38339,7 +38351,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 			const isSelected = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-				className: cn$1("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
+				className: cn("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
 				children: [
 					canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "px-2 py-2",
@@ -38382,7 +38394,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 						className: "py-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 							variant: "outline",
-							className: cn$1("text-[10px] px-1.5 py-0 font-normal h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
+							className: cn("text-[10px] px-1.5 py-0 font-normal h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
 							children: product.estado
 						})
 					}),
@@ -38415,7 +38427,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "text-right font-bold text-slate-900 py-2 text-sm",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: cn$1(isLowestPrice && "text-emerald-700 scale-105 origin-right transition-transform", product.valor === null && "text-xs font-normal text-muted-foreground"),
+							className: cn(isLowestPrice && "text-emerald-700 scale-105 origin-right transition-transform", product.valor === null && "text-xs font-normal text-muted-foreground"),
 							children: formatPrice(product.valor)
 						})
 					})
@@ -38432,7 +38444,7 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 			const isSelected = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: cn$1("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
+				className: cn("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
 				children: [isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "absolute top-0 right-0 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold",
 					children: "MELHOR PREÇO"
@@ -38498,14 +38510,14 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 									className: "flex items-center gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 										variant: "outline",
-										className: cn$1("text-[10px] h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
+										className: cn("text-[10px] h-5", product.estado === "Novo" ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"),
 										children: product.estado
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: "text-xs text-gray-500",
 										children: product.cor
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: cn$1("font-bold text-lg", isLowestPrice ? "text-emerald-600 scale-110 origin-right" : "text-gray-900", product.valor === null && "text-sm font-normal text-muted-foreground"),
+									className: cn("font-bold text-lg", isLowestPrice ? "text-emerald-600 scale-110 origin-right" : "text-gray-900", product.valor === null && "text-sm font-normal text-muted-foreground"),
 									children: formatPrice(product.valor)
 								})]
 							}),
@@ -39543,7 +39555,7 @@ var Select = Root2$4;
 var SelectValue = Value;
 var SelectTrigger = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger$3, {
 	ref,
-	className: cn$1("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1", className),
+	className: cn("flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1", className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, {
 		asChild: true,
@@ -39553,27 +39565,27 @@ var SelectTrigger = import_react.forwardRef(({ className, children, ...props }, 
 SelectTrigger.displayName = Trigger$3.displayName;
 var SelectScrollUpButton = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollUpButton, {
 	ref,
-	className: cn$1("flex cursor-default items-center justify-center py-1", className),
+	className: cn("flex cursor-default items-center justify-center py-1", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronUp, { className: "h-4 w-4" })
 }));
 SelectScrollUpButton.displayName = ScrollUpButton.displayName;
 var SelectScrollDownButton = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollDownButton, {
 	ref,
-	className: cn$1("flex cursor-default items-center justify-center py-1", className),
+	className: cn("flex cursor-default items-center justify-center py-1", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "h-4 w-4" })
 }));
 SelectScrollDownButton.displayName = ScrollDownButton.displayName;
 var SelectContent = import_react.forwardRef(({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal$2, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content2$3, {
 	ref,
-	className: cn$1("relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className),
+	className: cn("relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]", position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className),
 	position,
 	...props,
 	children: [
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectScrollUpButton, {}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$1, {
-			className: cn$1("p-1", position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"),
+			className: cn("p-1", position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"),
 			children
 		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectScrollDownButton, {})
@@ -39582,13 +39594,13 @@ var SelectContent = import_react.forwardRef(({ className, children, position = "
 SelectContent.displayName = Content2$3.displayName;
 var SelectLabel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 	ref,
-	className: cn$1("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
+	className: cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
 	...props
 }));
 SelectLabel.displayName = Label$1.displayName;
 var SelectItem = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Item$2, {
 	ref,
-	className: cn$1("relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className),
+	className: cn("relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 		className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center",
@@ -39598,7 +39610,7 @@ var SelectItem = import_react.forwardRef(({ className, children, ...props }, ref
 SelectItem.displayName = Item$2.displayName;
 var SelectSeparator = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator, {
 	ref,
-	className: cn$1("-mx-1 my-1 h-px bg-muted", className),
+	className: cn("-mx-1 my-1 h-px bg-muted", className),
 	...props
 }));
 SelectSeparator.displayName = Separator.displayName;
@@ -40066,7 +40078,7 @@ var Te = {
 };
 var Command = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e, {
 	ref,
-	className: cn$1("flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground", className),
+	className: cn("flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground", className),
 	...props
 }));
 Command.displayName = _e.displayName;
@@ -40075,14 +40087,14 @@ var CommandInput = import_react.forwardRef(({ className, ...props }, ref) => /* 
 	"cmdk-input-wrapper": "",
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "mr-2 h-4 w-4 shrink-0 opacity-50" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Input, {
 		ref,
-		className: cn$1("flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50", className),
+		className: cn("flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50", className),
 		...props
 	})]
 }));
 CommandInput.displayName = _e.Input.displayName;
 var CommandList = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.List, {
 	ref,
-	className: cn$1("max-h-[300px] overflow-y-auto overflow-x-hidden", className),
+	className: cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className),
 	...props
 }));
 CommandList.displayName = _e.List.displayName;
@@ -40094,25 +40106,25 @@ var CommandEmpty = import_react.forwardRef((props, ref) => /* @__PURE__ */ (0, i
 CommandEmpty.displayName = _e.Empty.displayName;
 var CommandGroup = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Group, {
 	ref,
-	className: cn$1("overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground", className),
+	className: cn("overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground", className),
 	...props
 }));
 CommandGroup.displayName = _e.Group.displayName;
 var CommandSeparator = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Separator, {
 	ref,
-	className: cn$1("-mx-1 h-px bg-border", className),
+	className: cn("-mx-1 h-px bg-border", className),
 	...props
 }));
 CommandSeparator.displayName = _e.Separator.displayName;
 var CommandItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(_e.Item, {
 	ref,
-	className: cn$1("relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className),
+	className: cn("relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", className),
 	...props
 }));
 CommandItem.displayName = _e.Item.displayName;
 var CommandShortcut = ({ className, ...props }) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-		className: cn$1("ml-auto text-xs tracking-widest text-muted-foreground", className),
+		className: cn("ml-auto text-xs tracking-widest text-muted-foreground", className),
 		...props
 	});
 };
@@ -40361,7 +40373,7 @@ var PopoverContent = import_react.forwardRef(({ className, align = "center", sid
 	ref,
 	align,
 	sideOffset,
-	className: cn$1("z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]", className),
+	className: cn("z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]", className),
 	...props
 }) }));
 PopoverContent.displayName = Content2$2.displayName;
@@ -40380,7 +40392,7 @@ function MultiSelect({ options: options$1, selected, onChange, placeholder = "Se
 				variant: "outline",
 				role: "combobox",
 				"aria-expanded": open,
-				className: cn$1("w-full justify-between h-auto min-h-10", className),
+				className: cn("w-full justify-between h-auto min-h-10", className),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex flex-wrap gap-1 items-center text-left",
 					children: selected.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -40420,7 +40432,7 @@ function MultiSelect({ options: options$1, selected, onChange, placeholder = "Se
 				children: options$1.map((option) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CommandItem, {
 					value: option,
 					onSelect: () => handleSelect(option),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: cn$1("mr-2 h-4 w-4", selected.includes(option) ? "opacity-100" : "opacity-0") }), option]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: cn("mr-2 h-4 w-4", selected.includes(option) ? "opacity-100" : "opacity-0") }), option]
 				}, option))
 			})] })] })
 		})]
@@ -40453,7 +40465,7 @@ function ProductFilters({ className }) {
 	};
 	const hasFilters = filters.search && filters.search.trim() !== "" || filters.ram !== "all" || filters.memory !== "all" || filters.color !== "all" || filters.dateRange !== "all" || filters.categories.length > 0 || !!filters.supplier;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: cn$1("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
+		className: cn("flex flex-col lg:flex-row gap-2 w-full items-start lg:items-center", className),
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex items-center bg-muted/50 p-1 rounded-md shrink-0",
@@ -40559,25 +40571,25 @@ function ProductFilters({ className }) {
 var Pagination = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
 	role: "navigation",
 	"aria-label": "pagination",
-	className: cn$1("mx-auto flex w-full justify-center", className),
+	className: cn("mx-auto flex w-full justify-center", className),
 	...props
 });
 Pagination.displayName = "Pagination";
 var PaginationContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
 	ref,
-	className: cn$1("flex flex-row items-center gap-1", className),
+	className: cn("flex flex-row items-center gap-1", className),
 	...props
 }));
 PaginationContent.displayName = "PaginationContent";
 var PaginationItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
 	ref,
-	className: cn$1("", className),
+	className: cn("", className),
 	...props
 }));
 PaginationItem.displayName = "PaginationItem";
 var PaginationLink = ({ className, isActive, size: size$3 = "icon", ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 	"aria-current": isActive ? "page" : void 0,
-	className: cn$1(buttonVariants({
+	className: cn(buttonVariants({
 		variant: isActive ? "outline" : "ghost",
 		size: size$3
 	}), className),
@@ -40587,7 +40599,7 @@ PaginationLink.displayName = "PaginationLink";
 var PaginationPrevious = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
 	"aria-label": "Go to previous page",
 	size: "default",
-	className: cn$1("gap-1 pl-2.5", className),
+	className: cn("gap-1 pl-2.5", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Previous" })]
 });
@@ -40595,14 +40607,14 @@ PaginationPrevious.displayName = "PaginationPrevious";
 var PaginationNext = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PaginationLink, {
 	"aria-label": "Go to next page",
 	size: "default",
-	className: cn$1("gap-1 pr-2.5", className),
+	className: cn("gap-1 pr-2.5", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Next" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "h-4 w-4" })]
 });
 PaginationNext.displayName = "PaginationNext";
 var PaginationEllipsis = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 	"aria-hidden": true,
-	className: cn$1("flex h-9 w-9 items-center justify-center", className),
+	className: cn("flex h-9 w-9 items-center justify-center", className),
 	...props,
 	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Ellipsis, { className: "h-4 w-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 		className: "sr-only",
@@ -40830,48 +40842,48 @@ var AlertDialog = Root2$2;
 var AlertDialogTrigger = Trigger2$1;
 var AlertDialogPortal = Portal2;
 var AlertDialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay2, {
-	className: cn$1("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
 	...props,
 	ref
 }));
 AlertDialogOverlay.displayName = Overlay2.displayName;
 var AlertDialogContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$1, {
 	ref,
-	className: cn$1("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
+	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
 	...props
 })] }));
 AlertDialogContent.displayName = Content2$1.displayName;
 var AlertDialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col space-y-2 text-center sm:text-left", className),
+	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
 	...props
 });
 AlertDialogHeader.displayName = "AlertDialogHeader";
 var AlertDialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn$1("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
 	...props
 });
 AlertDialogFooter.displayName = "AlertDialogFooter";
 var AlertDialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title2, {
 	ref,
-	className: cn$1("text-lg font-semibold", className),
+	className: cn("text-lg font-semibold", className),
 	...props
 }));
 AlertDialogTitle.displayName = Title2.displayName;
 var AlertDialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description2, {
 	ref,
-	className: cn$1("text-sm text-muted-foreground", className),
+	className: cn("text-sm text-muted-foreground", className),
 	...props
 }));
 AlertDialogDescription.displayName = Description2.displayName;
 var AlertDialogAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
 	ref,
-	className: cn$1(buttonVariants(), className),
+	className: cn(buttonVariants(), className),
 	...props
 }));
 AlertDialogAction.displayName = Action.displayName;
 var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Cancel, {
 	ref,
-	className: cn$1(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
+	className: cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
 	...props
 }));
 AlertDialogCancel.displayName = Cancel.displayName;
@@ -41301,25 +41313,25 @@ var Content$1 = TabsContent$1;
 var Tabs = Root2$1;
 var TabsList = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(List, {
 	ref,
-	className: cn$1("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className),
+	className: cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className),
 	...props
 }));
 TabsList.displayName = List.displayName;
 var TabsTrigger = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger$1, {
 	ref,
-	className: cn$1("inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm", className),
+	className: cn("inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm", className),
 	...props
 }));
 TabsTrigger.displayName = Trigger$1.displayName;
 var TabsContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content$1, {
 	ref,
-	className: cn$1("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className),
+	className: cn("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className),
 	...props
 }));
 TabsContent.displayName = Content$1.displayName;
 var Textarea = import_react.forwardRef(({ className, ...props }, ref) => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-		className: cn$1("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
+		className: cn("flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", className),
 		ref,
 		...props
 	});
@@ -43298,7 +43310,7 @@ var Viewport = ScrollAreaViewport;
 var Corner = ScrollAreaCorner;
 var ScrollArea = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Root$2, {
 	ref,
-	className: cn$1("relative overflow-hidden", className),
+	className: cn("relative overflow-hidden", className),
 	...props,
 	children: [
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport, {
@@ -43313,7 +43325,7 @@ ScrollArea.displayName = Root$2.displayName;
 var ScrollBar = import_react.forwardRef(({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaScrollbar, {
 	ref,
 	orientation,
-	className: cn$1("flex touch-none select-none transition-colors", orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]", orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]", className),
+	className: cn("flex touch-none select-none transition-colors", orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]", orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]", className),
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-border" })
 }));
@@ -43672,7 +43684,7 @@ var Content2 = AccordionContent$1;
 var Accordion = Root2;
 var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Item, {
 	ref,
-	className: cn$1("border-b", className),
+	className: cn("border-b", className),
 	...props
 }));
 AccordionItem.displayName = "AccordionItem";
@@ -43680,7 +43692,7 @@ var AccordionTrigger = import_react.forwardRef(({ className, children, ...props 
 	className: "flex",
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger2, {
 		ref,
-		className: cn$1("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
+		className: cn("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
 		...props,
 		children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "h-4 w-4 shrink-0 transition-transform duration-200" })]
 	})
@@ -43691,7 +43703,7 @@ var AccordionContent = import_react.forwardRef(({ className, children, ...props 
 	className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
 	...props,
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn$1("pb-4 pt-0", className),
+		className: cn("pb-4 pt-0", className),
 		children
 	})
 }));
@@ -44589,10 +44601,10 @@ function getState(checked) {
 var Root = Switch$1;
 var Thumb = SwitchThumb;
 var Switch = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-	className: cn$1("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
+	className: cn("peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", className),
 	...props,
 	ref,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn$1("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thumb, { className: cn("pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0") })
 }));
 Switch.displayName = Root.displayName;
 function GeneratorHistory() {
@@ -45117,9 +45129,9 @@ function ListGeneratorPage() {
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 							className: "flex-1 relative flex flex-col",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-								className: cn$1("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
+								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-									className: cn$1("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
+									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-2",
 										children: [
@@ -45133,7 +45145,7 @@ function ListGeneratorPage() {
 											}),
 											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
 											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn$1("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
+												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
 												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
 											})
 										]
@@ -45146,7 +45158,7 @@ function ListGeneratorPage() {
 												trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 													size: "sm",
 													variant: "ghost",
-													className: cn$1("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
+													className: cn("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
 													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-4 h-4" })
 												}),
 												side: "left"
@@ -45165,7 +45177,7 @@ function ListGeneratorPage() {
 										ref: previewTextareaRef,
 										value: isInternal ? internalText : customerText,
 										onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
-										className: cn$1("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
+										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
 										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévias' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
 									}), (isInternal ? internalText : customerText) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "absolute bottom-6 right-6 flex flex-col gap-2",
@@ -45173,13 +45185,13 @@ function ListGeneratorPage() {
 											onClick: handleSaveList,
 											disabled: isSaving,
 											size: "sm",
-											className: cn$1("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
+											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
 											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 											onClick: handleCopy,
 											size: "sm",
 											variant: "outline",
-											className: cn$1("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
+											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
 											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
 										})]
 									})]
@@ -46153,19 +46165,19 @@ var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&
 var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
 	role: "alert",
-	className: cn$1(alertVariants({ variant }), className),
+	className: cn(alertVariants({ variant }), className),
 	...props
 }));
 Alert.displayName = "Alert";
 var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
 	ref,
-	className: cn$1("mb-1 font-medium leading-none tracking-tight", className),
+	className: cn("mb-1 font-medium leading-none tracking-tight", className),
 	...props
 }));
 AlertTitle.displayName = "AlertTitle";
 var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 	ref,
-	className: cn$1("text-sm [&_p]:leading-relaxed", className),
+	className: cn("text-sm [&_p]:leading-relaxed", className),
 	...props
 }));
 AlertDescription.displayName = "AlertDescription";
@@ -47578,7 +47590,7 @@ function EvaluationChecklist() {
 							isDefectsStep && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "grid gap-3 sm:grid-cols-2",
 								children: [peripheralDiscounts.map((discount) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: cn$1("flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all", selectedDiscounts.has(discount.id) ? "bg-red-50 border-red-200" : "hover:bg-slate-50 border-transparent bg-slate-50/50"),
+									className: cn("flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all", selectedDiscounts.has(discount.id) ? "bg-red-50 border-red-200" : "hover:bg-slate-50 border-transparent bg-slate-50/50"),
 									onClick: () => handleDiscountToggle(discount.id),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-3",
@@ -47589,7 +47601,7 @@ function EvaluationChecklist() {
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 											className: "flex flex-col",
 											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn$1("text-sm font-medium", selectedDiscounts.has(discount.id) && "text-red-700"),
+												className: cn("text-sm font-medium", selectedDiscounts.has(discount.id) && "text-red-700"),
 												children: discount.nome
 											})
 										})]
@@ -48006,7 +48018,7 @@ function AvatarUpload() {
 								children: initials
 							})]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: cn$1("absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200", isUploading && "opacity-100 bg-black/60"),
+							className: cn("absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200", isUploading && "opacity-100 bg-black/60"),
 							children: isUploading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
 						})]
 					})
@@ -48382,4 +48394,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BCCajOP2.js.map
+//# sourceMappingURL=index-414U5RQw.js.map

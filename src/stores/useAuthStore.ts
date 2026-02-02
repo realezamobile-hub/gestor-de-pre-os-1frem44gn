@@ -257,28 +257,45 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (error) return { success: false, error }
 
-    // Upload Custom Avatar if provided
-    if (avatarFile && authData.user) {
-      try {
-        const fileExt = avatarFile.name.split('.').pop()
-        const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`
+    if (authData.user) {
+      // Force update of profile fields to ensure they are saved even if trigger misses them
+      await supabase
+        .from('profiles')
+        .update({
+          name,
+          phone,
+          address,
+          rg,
+          cpf,
+          emergency_contact_name: emergencyContactName,
+          emergency_contact_phone: emergencyContactPhone,
+          avatar_url: avatarUrl,
+        })
+        .eq('id', authData.user.id)
 
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(fileName, avatarFile, { upsert: true })
+      // Upload Custom Avatar if provided
+      if (avatarFile) {
+        try {
+          const fileExt = avatarFile.name.split('.').pop()
+          const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`
 
-        if (!uploadError) {
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from('avatars').getPublicUrl(fileName)
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, avatarFile, { upsert: true })
 
-          await supabase
-            .from('profiles')
-            .update({ avatar_url: publicUrl })
-            .eq('id', authData.user.id)
+          if (!uploadError) {
+            const {
+              data: { publicUrl },
+            } = supabase.storage.from('avatars').getPublicUrl(fileName)
+
+            await supabase
+              .from('profiles')
+              .update({ avatar_url: publicUrl })
+              .eq('id', authData.user.id)
+          }
+        } catch (e) {
+          console.error('Avatar upload failed during registration', e)
         }
-      } catch (e) {
-        console.error('Avatar upload failed during registration', e)
       }
     }
 

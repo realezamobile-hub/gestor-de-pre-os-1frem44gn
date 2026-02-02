@@ -18992,6 +18992,15 @@ var CalendarClock = createLucideIcon("calendar-clock", [
 		key: "qoo3c4"
 	}]
 ]);
+var Camera = createLucideIcon("camera", [["path", {
+	d: "M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z",
+	key: "18u6gg"
+}], ["circle", {
+	cx: "12",
+	cy: "13",
+	r: "3",
+	key: "1vg3eu"
+}]]);
 var Check = createLucideIcon("check", [["path", {
 	d: "M20 6 9 17l-5-5",
 	key: "1gmf2c"
@@ -19064,6 +19073,24 @@ var CircleQuestionMark = createLucideIcon("circle-question-mark", [
 	["path", {
 		d: "M12 17h.01",
 		key: "p32p05"
+	}]
+]);
+var CircleUser = createLucideIcon("circle-user", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "10",
+		r: "3",
+		key: "ilqhr7"
+	}],
+	["path", {
+		d: "M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662",
+		key: "154egf"
 	}]
 ]);
 var ClipboardCheck = createLucideIcon("clipboard-check", [
@@ -19422,6 +19449,17 @@ var LogOut = createLucideIcon("log-out", [
 		key: "1uf3rs"
 	}]
 ]);
+var Mail = createLucideIcon("mail", [["path", {
+	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
+	key: "132q7q"
+}], ["rect", {
+	x: "2",
+	y: "4",
+	width: "20",
+	height: "16",
+	rx: "2",
+	key: "izxlao"
+}]]);
 var Menu = createLucideIcon("menu", [
 	["path", {
 		d: "M4 5h16",
@@ -24666,7 +24704,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$21({ inst: {
+			cachedValue = useState$25({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24703,7 +24741,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$21 = React$3.useState, useEffect$18 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$25 = React$3.useState, useEffect$18 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24726,9 +24764,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$3 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$4 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
-			var instRef = useRef$3(null);
+			var instRef = useRef$4(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -32722,6 +32760,7 @@ var mapProfileToUser = (profile) => {
 		role,
 		status: profile.status || "pending",
 		phone: profile.phone || "",
+		avatarUrl: profile.avatar_url,
 		lastActive: profile.last_active || profile.created_at || (/* @__PURE__ */ new Date(0)).toISOString(),
 		createdAt: profile.created_at || (/* @__PURE__ */ new Date()).toISOString(),
 		companyId: profile.company_id,
@@ -32800,7 +32839,7 @@ const useAuthStore = create((set, get$1) => ({
 			set({ isLoading: false });
 		}
 		supabase.auth.onAuthStateChange(async (event, session) => {
-			if (event === "SIGNED_IN") {
+			if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY") {
 				if (get$1().currentUser?.id !== session?.user.id) {
 					set({ isLoading: true });
 					await syncUser(session);
@@ -32850,6 +32889,62 @@ const useAuthStore = create((set, get$1) => ({
 			currentCompany: null,
 			session: null
 		});
+	},
+	resetPasswordForEmail: async (email) => {
+		const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/update-password` });
+		if (error) return {
+			success: false,
+			error
+		};
+		return { success: true };
+	},
+	updatePassword: async (password) => {
+		const { error } = await supabase.auth.updateUser({ password });
+		if (error) return {
+			success: false,
+			error
+		};
+		return { success: true };
+	},
+	updateProfile: async (data) => {
+		const { currentUser, syncUser, session } = get$1();
+		if (!currentUser) return {
+			success: false,
+			error: "User not found"
+		};
+		const { error } = await supabase.from("profiles").update(data).eq("id", currentUser.id);
+		if (error) return {
+			success: false,
+			error
+		};
+		await syncUser(session);
+		return { success: true };
+	},
+	uploadAvatar: async (file) => {
+		const { currentUser, syncUser, session } = get$1();
+		if (!currentUser) return {
+			success: false,
+			error: "User not found"
+		};
+		try {
+			const fileExt = file.name.split(".").pop();
+			const filePath = `${`${currentUser.id}/${Date.now()}.${fileExt}`}`;
+			const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
+			if (uploadError) throw uploadError;
+			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+			const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", currentUser.id);
+			if (updateError) throw updateError;
+			await syncUser(session);
+			return {
+				success: true,
+				url: publicUrl
+			};
+		} catch (error) {
+			return {
+				success: false,
+				error
+			};
+		}
 	},
 	fetchUsers: async () => {
 		const { data: profiles, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
@@ -34507,8 +34602,9 @@ function TopHeader() {
 				className: "hidden sm:inline",
 				children: "Sessão monitorada"
 			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex items-center gap-3 pl-4 border-l",
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+			to: "/profile",
+			className: "flex items-center gap-3 pl-4 border-l hover:opacity-80 transition-opacity",
 			children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "text-right hidden sm:block",
@@ -34522,7 +34618,10 @@ function TopHeader() {
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
 					className: "h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: `https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: initials })]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+						src: currentUser.avatarUrl || `https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}`,
+						className: "object-cover"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, { children: initials })]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
 					variant: "outline",
@@ -34702,9 +34801,16 @@ function LoginPage() {
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "space-y-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-							htmlFor: "password",
-							children: "Senha"
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								htmlFor: "password",
+								children: "Senha"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+								to: "/forgot-password",
+								className: "text-sm font-medium text-primary hover:underline",
+								children: "Esqueci minha senha"
+							})]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 							id: "password",
 							type: "password",
@@ -34877,6 +34983,184 @@ function RegisterPage() {
 						]
 					})]
 				})]
+			})]
+		})
+	});
+}
+function ForgotPasswordPage() {
+	const [email, setEmail] = (0, import_react.useState)("");
+	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
+	const [isSent, setIsSent] = (0, import_react.useState)(false);
+	const { resetPasswordForEmail } = useAuthStore();
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+		try {
+			const result = await resetPasswordForEmail(email);
+			if (result.success) {
+				setIsSent(true);
+				toast.success("Email de recuperação enviado!");
+			} else toast.error(result.error?.message || "Erro ao enviar email");
+		} catch (error) {
+			toast.error("Erro inesperado");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "min-h-screen flex items-center justify-center bg-gray-100 p-4",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "w-full max-w-md shadow-lg",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+					className: "space-y-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+						className: "text-2xl font-bold text-center text-primary",
+						children: "Recuperar Senha"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+						className: "text-center",
+						children: isSent ? "Verifique sua caixa de entrada" : "Digite seu email para receber um link de recuperação"
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: isSent ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "text-center space-y-4 py-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, { className: "w-8 h-8 text-blue-600" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+						className: "text-sm text-gray-600",
+						children: [
+							"Enviamos um email para ",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: email }),
+							" com instruções para redefinir sua senha."
+						]
+					})]
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+					onSubmit: handleSubmit,
+					className: "space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							htmlFor: "email",
+							children: "Email"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							id: "email",
+							type: "email",
+							placeholder: "exemplo@email.com",
+							required: true,
+							value: email,
+							onChange: (e) => setEmail(e.target.value)
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						className: "w-full",
+						type: "submit",
+						disabled: isLoading,
+						children: [isLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Enviar Link de Recuperação"]
+					})]
+				}) }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardFooter, {
+					className: "flex justify-center",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "link",
+						asChild: true,
+						className: "text-sm text-muted-foreground",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+							to: "/login",
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-4 h-4" }), "Voltar para Login"]
+						})
+					})
+				})
+			]
+		})
+	});
+}
+function UpdatePasswordPage() {
+	const [password, setPassword] = (0, import_react.useState)("");
+	const [confirmPassword, setConfirmPassword] = (0, import_react.useState)("");
+	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
+	const navigate = useNavigate();
+	const { updatePassword } = useAuthStore();
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		if (password !== confirmPassword) {
+			toast.error("As senhas não coincidem");
+			return;
+		}
+		if (password.length < 6) {
+			toast.error("A senha deve ter pelo menos 6 caracteres");
+			return;
+		}
+		setIsLoading(true);
+		try {
+			const result = await updatePassword(password);
+			if (result.success) {
+				toast.success("Senha atualizada com sucesso!");
+				navigate("/login");
+			} else toast.error(result.error?.message || "Erro ao atualizar senha");
+		} catch (error) {
+			toast.error("Erro inesperado");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "min-h-screen flex items-center justify-center bg-gray-100 p-4",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "w-full max-w-md shadow-lg",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+				className: "space-y-1",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-6 h-6 text-primary" })
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+						className: "text-2xl font-bold text-center",
+						children: "Definir Nova Senha"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+						className: "text-center",
+						children: "Digite sua nova senha abaixo para recuperar o acesso"
+					})
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+				onSubmit: handleSubmit,
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							htmlFor: "password",
+							children: "Nova Senha"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							id: "password",
+							type: "password",
+							placeholder: "••••••••",
+							required: true,
+							value: password,
+							onChange: (e) => setPassword(e.target.value)
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+							htmlFor: "confirmPassword",
+							children: "Confirmar Nova Senha"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							id: "confirmPassword",
+							type: "password",
+							placeholder: "••••••••",
+							required: true,
+							value: confirmPassword,
+							onChange: (e) => setConfirmPassword(e.target.value)
+						})]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardFooter, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					className: "w-full",
+					type: "submit",
+					disabled: isLoading,
+					children: [isLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar Nova Senha"]
+				}) })]
 			})]
 		})
 	});
@@ -46249,6 +46533,189 @@ function EvaluationPage() {
 		})]
 	});
 }
+function AvatarUpload() {
+	const { currentUser, uploadAvatar } = useAuthStore();
+	const [isUploading, setIsUploading] = (0, import_react.useState)(false);
+	const fileInputRef = (0, import_react.useRef)(null);
+	if (!currentUser) return null;
+	const initials = currentUser.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+	const handleFileSelect = async (e) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		if (!file.type.startsWith("image/")) {
+			toast.error("Por favor selecione um arquivo de imagem válido");
+			return;
+		}
+		if (file.size > 5 * 1024 * 1024) {
+			toast.error("A imagem deve ter no máximo 5MB");
+			return;
+		}
+		setIsUploading(true);
+		try {
+			if ((await uploadAvatar(file)).success) toast.success("Foto de perfil atualizada!");
+			else toast.error("Erro ao atualizar foto");
+		} catch (error) {
+			toast.error("Erro inesperado no upload");
+		} finally {
+			setIsUploading(false);
+			if (fileInputRef.current) fileInputRef.current.value = "";
+		}
+	};
+	const triggerClick = () => {
+		fileInputRef.current?.click();
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col items-center gap-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative group cursor-pointer",
+				onClick: triggerClick,
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+					className: "h-32 w-32 border-4 border-white shadow-lg",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+						src: currentUser.avatarUrl || `https://img.usecurling.com/ppl/medium?seed=${currentUser.id}`,
+						className: "object-cover"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+						className: "text-3xl bg-primary/10 text-primary",
+						children: initials
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: cn("absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200", isUploading && "opacity-100 bg-black/60"),
+					children: isUploading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+				type: "file",
+				ref: fileInputRef,
+				onChange: handleFileSelect,
+				accept: "image/*",
+				className: "hidden"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				variant: "outline",
+				size: "sm",
+				onClick: triggerClick,
+				disabled: isUploading,
+				children: "Alterar Foto"
+			})
+		]
+	});
+}
+function ProfileForm() {
+	const { currentUser, updateProfile } = useAuthStore();
+	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
+	const [formData, setFormData] = (0, import_react.useState)({
+		name: currentUser?.name || "",
+		phone: currentUser?.phone || ""
+	});
+	if (!currentUser) return null;
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+		try {
+			if ((await updateProfile(formData)).success) toast.success("Perfil atualizado com sucesso!");
+			else toast.error("Erro ao atualizar perfil");
+		} catch (error) {
+			toast.error("Erro inesperado");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+		onSubmit: handleSubmit,
+		className: "space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-2",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+						htmlFor: "email",
+						children: "Email"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						id: "email",
+						value: currentUser.email,
+						disabled: true,
+						className: "bg-muted text-muted-foreground"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-xs text-muted-foreground",
+						children: "O email não pode ser alterado."
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+					htmlFor: "name",
+					children: "Nome Completo"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+					id: "name",
+					value: formData.name,
+					onChange: (e) => setFormData({
+						...formData,
+						name: e.target.value
+					}),
+					required: true
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+					htmlFor: "phone",
+					children: "Telefone / WhatsApp"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+					id: "phone",
+					value: formData.phone,
+					onChange: (e) => setFormData({
+						...formData,
+						phone: e.target.value
+					}),
+					placeholder: "(00) 00000-0000"
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "pt-2",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					type: "submit",
+					disabled: isLoading,
+					className: "w-full sm:w-auto",
+					children: [isLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "mr-2 h-4 w-4" }), "Salvar Alterações"]
+				})
+			})
+		]
+	});
+}
+function ProfilePage() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "max-w-4xl mx-auto space-y-6",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex items-center gap-3",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleUser, { className: "w-8 h-8 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+				className: "text-3xl font-bold tracking-tight text-gray-900",
+				children: "Meu Perfil"
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground",
+				children: "Gerencie suas informações pessoais e foto de perfil."
+			})] })]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "grid grid-cols-1 md:grid-cols-3 gap-6",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "md:col-span-1",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+					className: "text-lg",
+					children: "Foto de Perfil"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Esta imagem será visível para outros usuários." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarUpload, {}) })] })
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "md:col-span-2",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+					className: "text-lg",
+					children: "Informações Pessoais"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Atualize seus dados de cadastro." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProfileForm, {}) })] })
+			})]
+		})]
+	});
+}
 var NotFound = () => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4",
@@ -46295,6 +46762,14 @@ var App = () => {
 					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RegisterPage, {})
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+					path: "/forgot-password",
+					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ForgotPasswordPage, {})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+					path: "/auth/update-password",
+					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UpdatePasswordPage, {})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
 					path: "/pending",
 					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PendingApprovalPage, {})
 				}),
@@ -46316,6 +46791,10 @@ var App = () => {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
 							path: "/admin",
 							element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AdminPage, {})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+							path: "/profile",
+							element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProfilePage, {})
 						})
 					]
 				}),
@@ -46330,4 +46809,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BdKfMsVO.js.map
+//# sourceMappingURL=index-ByX5CNMN.js.map

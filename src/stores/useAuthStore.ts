@@ -24,6 +24,23 @@ interface AuthState {
   ) => Promise<{ success: boolean; error?: any }>
   logout: () => Promise<void>
 
+  // Password Recovery
+  resetPasswordForEmail: (
+    email: string,
+  ) => Promise<{ success: boolean; error?: any }>
+  updatePassword: (
+    password: string,
+  ) => Promise<{ success: boolean; error?: any }>
+
+  // Profile Management
+  updateProfile: (data: {
+    name: string
+    phone: string
+  }) => Promise<{ success: boolean; error?: any }>
+  uploadAvatar: (
+    file: File,
+  ) => Promise<{ success: boolean; url?: string; error?: any }>
+
   // Admin actions
   users: User[]
   fetchUsers: () => Promise<void>
@@ -56,6 +73,7 @@ const mapProfileToUser = (profile: any): User => {
     role: role,
     status: (profile.status as UserStatus) || 'pending',
     phone: profile.phone || '',
+    avatarUrl: profile.avatar_url,
     // Use a fixed fallback date to avoid object identity changes on every mapping
     lastActive:
       profile.last_active || profile.created_at || new Date(0).toISOString(),
@@ -166,7 +184,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Set up auth state listener
     supabase.auth.onAuthStateChange(async (event, session) => {
       // Avoid re-syncing if we just did it via getSession (though handling SIGNED_IN is safe)
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
         // Only set loading if not already loaded or if user changed
         const currentId = get().currentUser?.id
         if (currentId !== session?.user.id) {
@@ -212,6 +230,72 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     await supabase.auth.signOut()
     set({ currentUser: null, currentCompany: null, session: null })
+  },
+
+  resetPasswordForEmail: async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/update-password`,
+    })
+    if (error) return { success: false, error }
+    return { success: true }
+  },
+
+  updatePassword: async (password) => {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) return { success: false, error }
+    return { success: true }
+  },
+
+  updateProfile: async (data) => {
+    const { currentUser, syncUser, session } = get()
+    if (!currentUser) return { success: false, error: 'User not found' }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(data)
+      .eq('id', currentUser.id)
+
+    if (error) return { success: false, error }
+
+    // Refresh local user data
+    await syncUser(session)
+    return { success: true }
+  },
+
+  uploadAvatar: async (file) => {
+    const { currentUser, syncUser, session } = get()
+    if (!currentUser) return { success: false, error: 'User not found' }
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Upload file
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Get Public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(filePath)
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', currentUser.id)
+
+      if (updateError) throw updateError
+
+      await syncUser(session)
+      return { success: true, url: publicUrl }
+    } catch (error) {
+      return { success: false, error }
+    }
   },
 
   fetchUsers: async () => {

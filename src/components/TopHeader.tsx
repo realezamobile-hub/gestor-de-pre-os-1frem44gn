@@ -2,6 +2,7 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Clock } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function TopHeader() {
   const { currentUser } = useAuthStore()
@@ -22,7 +23,10 @@ export function TopHeader() {
         <span className="hidden sm:inline">Sessão monitorada</span>
       </div>
 
-      <div className="flex items-center gap-3 pl-4 border-l">
+      <Link
+        to="/profile"
+        className="flex items-center gap-3 pl-4 border-l hover:opacity-80 transition-opacity"
+      >
         <div className="text-right hidden sm:block">
           <p className="text-sm font-medium leading-none">{currentUser.name}</p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -31,7 +35,11 @@ export function TopHeader() {
         </div>
         <Avatar className="h-9 w-9 border cursor-pointer hover:ring-2 ring-primary transition-all">
           <AvatarImage
-            src={`https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}`}
+            src={
+              currentUser.avatarUrl ||
+              `https://img.usecurling.com/ppl/thumbnail?seed=${currentUser.id}`
+            }
+            className="object-cover"
           />
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
@@ -42,7 +50,7 @@ export function TopHeader() {
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Online
         </Badge>
-      </div>
+      </Link>
     </header>
   )
 }

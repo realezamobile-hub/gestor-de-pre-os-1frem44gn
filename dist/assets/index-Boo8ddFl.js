@@ -19776,6 +19776,20 @@ var Truck = createLucideIcon("truck", [
 		key: "19iecd"
 	}]
 ]);
+var Upload = createLucideIcon("upload", [
+	["path", {
+		d: "M12 3v12",
+		key: "1x0j5s"
+	}],
+	["path", {
+		d: "m17 8-5-5-5 5",
+		key: "7q97r8"
+	}],
+	["path", {
+		d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+		key: "ih7n3h"
+	}]
+]);
 var UserCheck = createLucideIcon("user-check", [
 	["path", {
 		d: "m16 11 2 2 4-4",
@@ -24764,9 +24778,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$4 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$6 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
-			var instRef = useRef$4(null);
+			var instRef = useRef$6(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -32864,8 +32878,8 @@ const useAuthStore = create((set, get$1) => ({
 		};
 		return { success: true };
 	},
-	register: async (name, email, password, phone) => {
-		const { error } = await supabase.auth.signUp({
+	register: async (name, email, password, phone, avatarFile) => {
+		const { data: authData, error } = await supabase.auth.signUp({
 			email,
 			password,
 			options: {
@@ -32880,6 +32894,17 @@ const useAuthStore = create((set, get$1) => ({
 			success: false,
 			error
 		};
+		if (avatarFile && authData.user) try {
+			const fileExt = avatarFile.name.split(".").pop();
+			const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, avatarFile, { upsert: true });
+			if (!uploadError) {
+				const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
+				await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", authData.user.id);
+			}
+		} catch (e) {
+			console.error("Avatar upload failed during registration", e);
+		}
 		return { success: true };
 	},
 	logout: async () => {
@@ -32941,6 +32966,37 @@ const useAuthStore = create((set, get$1) => ({
 			};
 		} catch (error) {
 			console.error("Avatar upload error:", error);
+			return {
+				success: false,
+				error
+			};
+		}
+	},
+	adminUploadAvatar: async (userId, file) => {
+		try {
+			const fileExt = file.name.split(".").pop();
+			const fileName = `${userId}/${Date.now()}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, { upsert: true });
+			if (uploadError) throw uploadError;
+			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
+			const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", userId);
+			if (updateError) throw updateError;
+			set((state) => ({
+				users: state.users.map((u$1) => u$1.id === userId ? {
+					...u$1,
+					avatarUrl: publicUrl
+				} : u$1),
+				currentUser: state.currentUser?.id === userId ? {
+					...state.currentUser,
+					avatarUrl: publicUrl
+				} : state.currentUser
+			}));
+			return {
+				success: true,
+				url: publicUrl
+			};
+		} catch (error) {
+			console.error("Admin avatar upload error:", error);
 			return {
 				success: false,
 				error
@@ -34877,6 +34933,9 @@ function RegisterPage() {
 		password: "",
 		phone: ""
 	});
+	const [avatarFile, setAvatarFile] = (0, import_react.useState)(null);
+	const [avatarPreview, setAvatarPreview] = (0, import_react.useState)(null);
+	const fileInputRef = (0, import_react.useRef)(null);
 	(0, import_react.useEffect)(() => {
 		if (!isLoading && currentUser) {
 			if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate("/");
@@ -34887,11 +34946,30 @@ function RegisterPage() {
 		isLoading,
 		navigate
 	]);
+	const handleFileChange = (e) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			if (![
+				"image/jpeg",
+				"image/png",
+				"image/webp"
+			].includes(file.type)) {
+				toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
+				return;
+			}
+			if (file.size > 5 * 1024 * 1024) {
+				toast.error("A imagem deve ter no máximo 5MB");
+				return;
+			}
+			setAvatarFile(file);
+			setAvatarPreview(URL.createObjectURL(file));
+		}
+	};
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLocalLoading(true);
 		try {
-			const result = await register(formData.name, formData.email, formData.password, formData.phone);
+			const result = await register(formData.name, formData.email, formData.password, formData.phone, avatarFile);
 			if (result.success) {
 				toast.success("Cadastro realizado com sucesso!");
 				navigate("/pending");
@@ -34921,6 +34999,42 @@ function RegisterPage() {
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 					className: "space-y-4",
 					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-col items-center justify-center gap-3 pb-2",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "relative cursor-pointer group",
+									onClick: () => fileInputRef.current?.click(),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+										className: "w-24 h-24 border-2 border-dashed border-gray-300 group-hover:border-primary transition-colors",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+											src: avatarPreview || "",
+											className: "object-cover"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+											className: "bg-gray-50 text-gray-400 group-hover:text-primary transition-colors",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-8 h-8" })
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6 text-white" })
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									htmlFor: "avatar-upload",
+									className: "text-xs text-muted-foreground cursor-pointer hover:text-primary",
+									onClick: () => fileInputRef.current?.click(),
+									children: "Adicionar foto de perfil (Opcional)"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									id: "avatar-upload",
+									type: "file",
+									ref: fileInputRef,
+									className: "hidden",
+									accept: "image/png, image/jpeg, image/webp",
+									onChange: handleFileChange
+								})
+							]
+						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "space-y-2",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
@@ -44210,21 +44324,28 @@ const useCompanyStore = create((set, get$1) => ({
 	}
 }));
 function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin = false }) {
-	const { adminUpdateUser } = useAuthStore();
+	const { adminUpdateUser, adminUploadAvatar } = useAuthStore();
 	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
 	const [formData, setFormData] = (0, import_react.useState)({});
+	const [avatarFile, setAvatarFile] = (0, import_react.useState)(null);
+	const [avatarPreview, setAvatarPreview] = (0, import_react.useState)(null);
+	const fileInputRef = (0, import_react.useRef)(null);
 	(0, import_react.useEffect)(() => {
-		if (user && open) setFormData({
-			name: user.name,
-			phone: user.phone,
-			role: user.role,
-			status: user.status,
-			companyId: user.companyId,
-			canCreateList: user.canCreateList,
-			canAccessEvaluation: user.canAccessEvaluation,
-			canDeleteRecords: user.canDeleteRecords,
-			canViewAllLists: user.canViewAllLists
-		});
+		if (user && open) {
+			setFormData({
+				name: user.name,
+				phone: user.phone,
+				role: user.role,
+				status: user.status,
+				companyId: user.companyId,
+				canCreateList: user.canCreateList,
+				canAccessEvaluation: user.canAccessEvaluation,
+				canDeleteRecords: user.canDeleteRecords,
+				canViewAllLists: user.canViewAllLists
+			});
+			setAvatarPreview(user.avatarUrl || null);
+			setAvatarFile(null);
+		}
 	}, [user, open]);
 	const handleChange = (key, value) => {
 		setFormData((prev) => ({
@@ -44232,10 +44353,36 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 			[key]: value
 		}));
 	};
+	const handleFileChange = (e) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			if (![
+				"image/jpeg",
+				"image/png",
+				"image/webp"
+			].includes(file.type)) {
+				toast.error("Formato não suportado. Use JPG, PNG ou WebP.");
+				return;
+			}
+			if (file.size > 5 * 1024 * 1024) {
+				toast.error("A imagem deve ter no máximo 5MB");
+				return;
+			}
+			setAvatarFile(file);
+			setAvatarPreview(URL.createObjectURL(file));
+		}
+	};
 	const handleSave = async () => {
 		if (!user) return;
 		setIsLoading(true);
 		try {
+			if (avatarFile) {
+				const uploadResult = await adminUploadAvatar(user.id, avatarFile);
+				if (!uploadResult.success) {
+					toast.error("Erro ao atualizar foto de perfil, mas salvando dados...");
+					console.error("Avatar error:", uploadResult.error);
+				}
+			}
 			const result = await adminUpdateUser(user.id, formData);
 			if (result.success) {
 				toast.success("Usuário atualizado com sucesso");
@@ -44255,10 +44402,46 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
 			className: "sm:max-w-[600px] max-h-[90vh] overflow-y-auto",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Editar Usuário" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Atualize as informações, função e permissões do usuário." })] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Editar Usuário" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Atualize as informações, foto e permissões do usuário." })] }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "grid gap-6 py-4",
 					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-col items-center gap-2",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "relative cursor-pointer group",
+									onClick: () => fileInputRef.current?.click(),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+										className: "h-20 w-20 border-2 border-muted",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, {
+											src: avatarPreview || `https://img.usecurling.com/ppl/medium?seed=${user.id}`,
+											className: "object-cover"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+											className: "text-xl",
+											children: user.name[0]
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6 text-white" })
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+									variant: "ghost",
+									size: "sm",
+									className: "text-xs h-7",
+									onClick: () => fileInputRef.current?.click(),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-3 h-3 mr-1.5" }), "Alterar Foto"]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									type: "file",
+									ref: fileInputRef,
+									className: "hidden",
+									accept: "image/png, image/jpeg, image/webp",
+									onChange: handleFileChange
+								})
+							]
+						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "grid grid-cols-2 gap-4",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -47062,4 +47245,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Bo29azYj.js.map
+//# sourceMappingURL=index-Boo8ddFl.js.map

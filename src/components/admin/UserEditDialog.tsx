@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -18,10 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Role, User, UserStatus, Company } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Camera, Upload } from 'lucide-react'
 
 interface UserEditDialogProps {
   user: User | null
@@ -38,9 +39,12 @@ export function UserEditDialog({
   companies = [],
   isSuperAdmin = false,
 }: UserEditDialogProps) {
-  const { adminUpdateUser } = useAuthStore()
+  const { adminUpdateUser, adminUploadAvatar } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (user && open) {
@@ -55,6 +59,8 @@ export function UserEditDialog({
         canDeleteRecords: user.canDeleteRecords,
         canViewAllLists: user.canViewAllLists,
       })
+      setAvatarPreview(user.avatarUrl || null)
+      setAvatarFile(null)
     }
   }, [user, open])
 
@@ -62,11 +68,38 @@ export function UserEditDialog({
     setFormData((prev) => ({ ...prev, [key]: value }))
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        toast.error('Formato não suportado. Use JPG, PNG ou WebP.')
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('A imagem deve ter no máximo 5MB')
+        return
+      }
+      setAvatarFile(file)
+      const objectUrl = URL.createObjectURL(file)
+      setAvatarPreview(objectUrl)
+    }
+  }
+
   const handleSave = async () => {
     if (!user) return
 
     setIsLoading(true)
     try {
+      // 1. Upload Avatar if changed
+      if (avatarFile) {
+        const uploadResult = await adminUploadAvatar(user.id, avatarFile)
+        if (!uploadResult.success) {
+          toast.error('Erro ao atualizar foto de perfil, mas salvando dados...')
+          console.error('Avatar error:', uploadResult.error)
+        }
+      }
+
+      // 2. Update User Data
       const result = await adminUpdateUser(user.id, formData)
       if (result.success) {
         toast.success('Usuário atualizado com sucesso')
@@ -93,11 +126,51 @@ export function UserEditDialog({
         <DialogHeader>
           <DialogTitle>Editar Usuário</DialogTitle>
           <DialogDescription>
-            Atualize as informações, função e permissões do usuário.
+            Atualize as informações, foto e permissões do usuário.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
+          {/* Avatar Section */}
+          <div className="flex flex-col items-center gap-2">
+            <div
+              className="relative cursor-pointer group"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Avatar className="h-20 w-20 border-2 border-muted">
+                <AvatarImage
+                  src={
+                    avatarPreview ||
+                    `https://img.usecurling.com/ppl/medium?seed=${user.id}`
+                  }
+                  className="object-cover"
+                />
+                <AvatarFallback className="text-xl">
+                  {user.name[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Upload className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Camera className="w-3 h-3 mr-1.5" />
+              Alterar Foto
+            </Button>
+            <Input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/png, image/jpeg, image/webp"
+              onChange={handleFileChange}
+            />
+          </div>
+
           {/* Read-only info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

@@ -21,6 +21,7 @@ interface AuthState {
     email: string,
     password: string,
     phone: string,
+    avatarFile?: File | null,
   ) => Promise<{ success: boolean; error?: any }>
   logout: () => Promise<void>
 
@@ -38,6 +39,10 @@ interface AuthState {
     phone: string
   }) => Promise<{ success: boolean; error?: any }>
   uploadAvatar: (
+    file: File,
+  ) => Promise<{ success: boolean; url?: string; error?: any }>
+  adminUploadAvatar: (
+    userId: string,
     file: File,
   ) => Promise<{ success: boolean; url?: string; error?: any }>
 
@@ -218,8 +223,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return { success: true }
   },
 
-  register: async (name, email, password, phone) => {
-    const { error } = await supabase.auth.signUp({
+  register: async (name, email, password, phone, avatarFile) => {
+    const { data: authData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -229,6 +234,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     })
 
     if (error) return { success: false, error }
+
+    // Upload Avatar if provided and user created successfully
+    if (avatarFile && authData.user) {
+      try {
+        const fileExt = avatarFile.name.split('.').pop()
+        const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, avatarFile, {
+            upsert: true,
+          })
+
+        if (!uploadError) {
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from('avatars').getPublicUrl(fileName)
+
+          await supabase
+            .from('profiles')
+            .update({ avatar_url: publicUrl })
+            .eq('id', authData.user.id)
+        }
+      } catch (e) {
+        console.error('Avatar upload failed during registration', e)
+        // We continue even if avatar upload fails
+      }
+    }
+
     return { success: true }
   },
 
@@ -302,6 +336,52 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { success: true, url: publicUrl }
     } catch (error) {
       console.error('Avatar upload error:', error)
+      return { success: false, error }
+    }
+  },
+
+  adminUploadAvatar: async (userId, file) => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${userId}/${Date.now()}.${fileExt}`
+
+      // Upload file
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          upsert: true,
+        })
+
+      if (uploadError) throw uploadError
+
+      // Get Public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(fileName)
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', userId)
+
+      if (updateError) throw updateError
+
+      // Update local state if the user is in the list
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === userId ? { ...u, avatarUrl: publicUrl } : u,
+        ),
+        // Also update currentUser if admin is editing themselves
+        currentUser:
+          state.currentUser?.id === userId
+            ? { ...state.currentUser, avatarUrl: publicUrl }
+            : state.currentUser,
+      }))
+
+      return { success: true, url: publicUrl }
+    } catch (error) {
+      console.error('Admin avatar upload error:', error)
       return { success: false, error }
     }
   },

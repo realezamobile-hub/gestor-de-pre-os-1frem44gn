@@ -44,6 +44,10 @@ interface AuthState {
   // Admin actions
   users: User[]
   fetchUsers: () => Promise<void>
+  adminUpdateUser: (
+    userId: string,
+    data: Partial<User>,
+  ) => Promise<{ success: boolean; error?: any }>
   updateUserStatus: (userId: string, status: UserStatus) => Promise<void>
   updateUserRole: (userId: string, role: Role) => Promise<void>
   updateUserCompany: (userId: string, companyId: string) => Promise<void>
@@ -308,6 +312,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const mappedUsers: User[] = profiles.map(mapProfileToUser)
       set({ users: mappedUsers })
     }
+  },
+
+  adminUpdateUser: async (userId, data) => {
+    const dbUpdates: any = {}
+
+    // Map User interface properties to DB columns
+    if (data.name !== undefined) dbUpdates.name = data.name
+    if (data.phone !== undefined) dbUpdates.phone = data.phone
+    if (data.role !== undefined) dbUpdates.role = data.role
+    if (data.status !== undefined) dbUpdates.status = data.status
+    if (data.companyId !== undefined) dbUpdates.company_id = data.companyId
+    if (data.canCreateList !== undefined)
+      dbUpdates.can_create_list = data.canCreateList
+    if (data.canAccessEvaluation !== undefined)
+      dbUpdates.can_access_evaluation = data.canAccessEvaluation
+    if (data.canDeleteRecords !== undefined)
+      dbUpdates.can_delete_records = data.canDeleteRecords
+    if (data.canViewAllLists !== undefined)
+      dbUpdates.can_view_all_lists = data.canViewAllLists
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(dbUpdates)
+      .eq('id', userId)
+
+    if (error) {
+      return { success: false, error }
+    }
+
+    set((state) => ({
+      users: state.users.map((u) => (u.id === userId ? { ...u, ...data } : u)),
+    }))
+
+    return { success: true }
   },
 
   updateUserStatus: async (userId, status) => {

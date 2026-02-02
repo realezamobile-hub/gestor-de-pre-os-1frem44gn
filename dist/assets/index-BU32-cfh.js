@@ -24704,7 +24704,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$25({ inst: {
+			cachedValue = useState$27({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24718,7 +24718,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$18(function() {
+			useEffect$19(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24741,7 +24741,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$25 = React$3.useState, useEffect$18 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$27 = React$3.useState, useEffect$19 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24764,7 +24764,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$4 = React$3.useRef, useEffect$18 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$4 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$4(null);
 			if (null === instRef.current) {
@@ -24806,7 +24806,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$18(function() {
+			useEffect$19(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -32949,6 +32949,28 @@ const useAuthStore = create((set, get$1) => ({
 	fetchUsers: async () => {
 		const { data: profiles, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
 		if (!error && profiles) set({ users: profiles.map(mapProfileToUser) });
+	},
+	adminUpdateUser: async (userId, data) => {
+		const dbUpdates = {};
+		if (data.name !== void 0) dbUpdates.name = data.name;
+		if (data.phone !== void 0) dbUpdates.phone = data.phone;
+		if (data.role !== void 0) dbUpdates.role = data.role;
+		if (data.status !== void 0) dbUpdates.status = data.status;
+		if (data.companyId !== void 0) dbUpdates.company_id = data.companyId;
+		if (data.canCreateList !== void 0) dbUpdates.can_create_list = data.canCreateList;
+		if (data.canAccessEvaluation !== void 0) dbUpdates.can_access_evaluation = data.canAccessEvaluation;
+		if (data.canDeleteRecords !== void 0) dbUpdates.can_delete_records = data.canDeleteRecords;
+		if (data.canViewAllLists !== void 0) dbUpdates.can_view_all_lists = data.canViewAllLists;
+		const { error } = await supabase.from("profiles").update(dbUpdates).eq("id", userId);
+		if (error) return {
+			success: false,
+			error
+		};
+		set((state) => ({ users: state.users.map((u$1) => u$1.id === userId ? {
+			...u$1,
+			...data
+		} : u$1) }));
+		return { success: true };
 	},
 	updateUserStatus: async (userId, status) => {
 		const { error } = await supabase.from("profiles").update({ status }).eq("id", userId);
@@ -44186,19 +44208,305 @@ const useCompanyStore = create((set, get$1) => ({
 		return { success: true };
 	}
 }));
+function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin = false }) {
+	const { adminUpdateUser } = useAuthStore();
+	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
+	const [formData, setFormData] = (0, import_react.useState)({});
+	(0, import_react.useEffect)(() => {
+		if (user && open) setFormData({
+			name: user.name,
+			phone: user.phone,
+			role: user.role,
+			status: user.status,
+			companyId: user.companyId,
+			canCreateList: user.canCreateList,
+			canAccessEvaluation: user.canAccessEvaluation,
+			canDeleteRecords: user.canDeleteRecords,
+			canViewAllLists: user.canViewAllLists
+		});
+	}, [user, open]);
+	const handleChange = (key, value) => {
+		setFormData((prev) => ({
+			...prev,
+			[key]: value
+		}));
+	};
+	const handleSave = async () => {
+		if (!user) return;
+		setIsLoading(true);
+		try {
+			const result = await adminUpdateUser(user.id, formData);
+			if (result.success) {
+				toast.success("Usuário atualizado com sucesso");
+				onOpenChange(false);
+			} else toast.error("Erro ao atualizar usuário: " + (result.error?.message || "Erro desconhecido"));
+		} catch (error) {
+			console.error("Error updating user:", error);
+			toast.error("Erro ao atualizar usuário");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	if (!user) return null;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open,
+		onOpenChange,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "sm:max-w-[600px] max-h-[90vh] overflow-y-auto",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Editar Usuário" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Atualize as informações, função e permissões do usuário." })] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid gap-6 py-4",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "grid grid-cols-2 gap-4",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "space-y-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									className: "text-muted-foreground",
+									children: "ID do Usuário"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									value: user.id,
+									disabled: true,
+									className: "bg-muted font-mono text-xs"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "space-y-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									className: "text-muted-foreground",
+									children: "E-mail"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									value: user.email,
+									disabled: true,
+									className: "bg-muted"
+								})]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+									className: "font-medium text-sm border-b pb-2",
+									children: "Informações Básicas"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "name",
+											children: "Nome Completo"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "name",
+											value: formData.name || "",
+											onChange: (e) => handleChange("name", e.target.value)
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "phone",
+											children: "Telefone"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "phone",
+											value: formData.phone || "",
+											onChange: (e) => handleChange("phone", e.target.value)
+										})]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "role",
+											children: "Função"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+											value: formData.role,
+											onValueChange: (val) => handleChange("role", val),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+												id: "role",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "ADMIN",
+													children: "Admin (Gestor)"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "VENDEDOR",
+													children: "Vendedor"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "TECNICO",
+													children: "Técnico"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "ADMINISTRATIVO",
+													children: "Administrativo"
+												})
+											] })]
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "status",
+											children: "Status da Conta"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+											value: formData.status,
+											onValueChange: (val) => handleChange("status", val),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+												id: "status",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "active",
+													children: "Ativo"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "pending",
+													children: "Pendente"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+													value: "blocked",
+													children: "Bloqueado"
+												})
+											] })]
+										})]
+									})]
+								}),
+								isSuperAdmin && companies.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+										htmlFor: "company",
+										children: "Empresa"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+										value: formData.companyId || "",
+										onValueChange: (val) => handleChange("companyId", val),
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+											id: "company",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione a empresa..." })
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: companies.map((company) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+											value: company.id,
+											children: company.nome_fantasia
+										}, company.id)) })]
+									})]
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-4",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								className: "font-medium text-sm border-b pb-2",
+								children: "Permissões de Acesso"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "grid gap-4",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-0.5",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "perm-list",
+												className: "text-base",
+												children: "Criar Listas"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "text-xs text-muted-foreground",
+												children: "Permite gerar listas de preços e catálogos PDF."
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+											id: "perm-list",
+											checked: formData.canCreateList || false,
+											onCheckedChange: (checked) => handleChange("canCreateList", checked)
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-0.5",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "perm-eval",
+												className: "text-base",
+												children: "Avaliação Técnica"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "text-xs text-muted-foreground",
+												children: "Acesso ao módulo de checklist e avaliação de aparelhos."
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+											id: "perm-eval",
+											checked: formData.canAccessEvaluation || false,
+											onCheckedChange: (checked) => handleChange("canAccessEvaluation", checked)
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-0.5",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "perm-view-all",
+												className: "text-base",
+												children: "Ver Histórico Completo"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "text-xs text-muted-foreground",
+												children: "Permite visualizar listas geradas por outros usuários da empresa."
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+											id: "perm-view-all",
+											checked: formData.canViewAllLists || false,
+											onCheckedChange: (checked) => handleChange("canViewAllLists", checked)
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center justify-between rounded-lg border p-3 shadow-sm border-red-100 bg-red-50/10",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-0.5",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+												htmlFor: "perm-delete",
+												className: "text-base text-red-900",
+												children: "Deletar Registros"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "text-xs text-red-700/70",
+												children: "Permite excluir produtos e dados históricos. Cuidado!"
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+											id: "perm-delete",
+											checked: formData.canDeleteRecords || false,
+											onCheckedChange: (checked) => handleChange("canDeleteRecords", checked),
+											className: "data-[state=checked]:bg-red-600"
+										})]
+									})
+								]
+							})]
+						})
+					]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "outline",
+					onClick: () => onOpenChange(false),
+					children: "Cancelar"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					onClick: handleSave,
+					disabled: isLoading,
+					children: [isLoading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar Alterações"]
+				})] })
+			]
+		})
+	});
+}
 function UserManagement() {
 	const users = useAuthStore((state) => state.users);
 	const currentUser = useAuthStore((state) => state.currentUser);
 	const updateUserStatus = useAuthStore((state) => state.updateUserStatus);
-	const toggleUserPermission = useAuthStore((state) => state.toggleUserPermission);
-	const updateUserRole = useAuthStore((state) => state.updateUserRole);
-	const updateUserCompany = useAuthStore((state) => state.updateUserCompany);
 	const { companies, fetchCompanies } = useCompanyStore();
+	const [selectedUser, setSelectedUser] = (0, import_react.useState)(null);
+	const [isEditDialogOpen, setIsEditDialogOpen] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		fetchCompanies();
 	}, []);
-	const activeUsers = users.filter((u$1) => u$1.status !== "pending");
 	const isSuperAdmin = currentUser?.isSuperAdmin;
+	const filteredUsers = users.filter((u$1) => {
+		if (u$1.status === "pending") return false;
+		if (isSuperAdmin) return true;
+		return u$1.companyId === currentUser?.companyId;
+	});
 	const handleApprove = async (id) => {
 		await updateUserStatus(id, "active");
 		toast.success("Usuário ativado com sucesso");
@@ -44207,17 +44515,9 @@ function UserManagement() {
 		await updateUserStatus(id, "blocked");
 		toast.info("Usuário bloqueado");
 	};
-	const handleTogglePermission = async (id, permission) => {
-		await toggleUserPermission(id, permission);
-		toast.success("Permissão atualizada");
-	};
-	const handleRoleChange = async (id, newRole) => {
-		await updateUserRole(id, newRole);
-		toast.success(`Função atualizada para ${newRole}`);
-	};
-	const handleCompanyChange = async (id, companyId) => {
-		await updateUserCompany(id, companyId);
-		toast.success("Empresa do usuário atualizada");
+	const handleEditClick = (user) => {
+		setSelectedUser(user);
+		setIsEditDialogOpen(true);
 	};
 	const canEditUser = (targetUser) => {
 		if (isSuperAdmin) return true;
@@ -44225,21 +44525,22 @@ function UserManagement() {
 		if (targetUser.isSuperAdmin) return false;
 		return true;
 	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie funções, empresas e permissões." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, { children: "Base de Usuários" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Gerencie funções, status e permissões de acesso dos usuários." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Usuário" }),
 		isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Empresa" }),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Função (Cargo)" }),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Função" }),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" }),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-			className: "text-center",
-			children: "Permissões Extras"
-		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 			className: "text-right",
 			children: "Ações"
 		})
-	] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: activeUsers.map((user) => {
+	] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: filteredUsers.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+		colSpan: isSuperAdmin ? 5 : 4,
+		className: "h-24 text-center text-muted-foreground",
+		children: "Nenhum usuário encontrado."
+	}) }) : filteredUsers.map((user) => {
 		const canEdit = canEditUser(user);
+		const companyName = companies.find((c) => c.id === user.companyId)?.nome_fantasia || "-";
 		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
 				className: "flex items-center gap-3",
@@ -44254,43 +44555,20 @@ function UserManagement() {
 					children: user.email
 				})] })]
 			}),
-			isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-				value: user.companyId || "",
-				onValueChange: (val) => handleCompanyChange(user.id, val),
-				disabled: !canEdit,
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-					className: "w-[140px] h-8",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: companies.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-					value: c.id,
-					children: c.nome_fantasia
-				}, c.id)) })]
+			isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-sm font-medium",
+					children: companyName
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+					className: "text-xs text-muted-foreground font-mono",
+					children: [user.companyId?.slice(0, 8), "..."]
+				})]
 			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-				value: user.role,
-				onValueChange: (val) => handleRoleChange(user.id, val),
-				disabled: !canEdit,
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
-					className: "w-[140px] h-8",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, {})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "ADMIN",
-						children: "Admin (Gestor)"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "VENDEDOR",
-						children: "Vendedor"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "TECNICO",
-						children: "Técnico"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: "ADMINISTRATIVO",
-						children: "Administrativo"
-					})
-				] })]
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+				variant: "outline",
+				className: "font-normal bg-slate-50",
+				children: user.role
 			}) }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 				variant: "outline",
@@ -44298,90 +44576,40 @@ function UserManagement() {
 				children: user.status === "active" ? "Ativo" : "Bloqueado"
 			}) }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-center",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-col items-start gap-2 max-w-[220px] mx-auto",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-								checked: user.canCreateList,
-								onCheckedChange: () => handleTogglePermission(user.id, "canCreateList"),
-								disabled: !canEdit,
-								id: `list-${user.id}`
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: `list-${user.id}`,
-								className: "text-xs font-normal cursor-pointer",
-								children: "Criar Lista"
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-								checked: user.canAccessEvaluation,
-								onCheckedChange: () => handleTogglePermission(user.id, "canAccessEvaluation"),
-								disabled: !canEdit,
-								id: `eval-${user.id}`
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: `eval-${user.id}`,
-								className: "text-xs font-normal cursor-pointer",
-								children: "Avaliação"
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-								checked: user.canViewAllLists,
-								onCheckedChange: () => handleTogglePermission(user.id, "canViewAllLists"),
-								disabled: !canEdit,
-								id: `view-all-${user.id}`,
-								className: "data-[state=checked]:bg-blue-600"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: `view-all-${user.id}`,
-								className: "text-xs font-normal cursor-pointer text-blue-700",
-								children: "Ver Histórico Completo"
-							})]
-						}),
-						isSuperAdmin && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-								checked: user.canDeleteRecords,
-								onCheckedChange: () => handleTogglePermission(user.id, "canDeleteRecords"),
-								disabled: !canEdit,
-								id: `del-${user.id}`,
-								className: "data-[state=checked]:bg-red-500"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: `del-${user.id}`,
-								className: "text-xs font-normal cursor-pointer text-red-700",
-								children: "Deletar Dados"
-							})]
-						})
-					]
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 				className: "text-right",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex justify-end gap-2",
-					children: canEdit && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: user.status === "active" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						variant: "ghost",
+					children: canEdit && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "outline",
 						size: "sm",
+						onClick: () => handleEditClick(user),
+						title: "Editar Usuário",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pencil, { className: "w-4 h-4 mr-2" }), "Editar"]
+					}), user.status === "active" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "ghost",
+						size: "icon",
 						onClick: () => handleReject(user.id),
-						className: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",
+						className: "text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-9 w-9",
 						title: "Bloquear Acesso",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-1" }), "Bloquear"]
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4" })
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 						variant: "ghost",
-						size: "sm",
+						size: "icon",
 						onClick: () => handleApprove(user.id),
-						className: "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50",
+						className: "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-9 w-9",
 						title: "Restaurar Acesso",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LockOpen, { className: "w-4 h-4 mr-1" }), "Ativar"]
-					}) })
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LockOpen, { className: "w-4 h-4" })
+					})] })
 				})
 			})
 		] }, user.id);
-	}) })] }) })] });
+	}) })] }) })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UserEditDialog, {
+		user: selectedUser,
+		open: isEditDialogOpen,
+		onOpenChange: setIsEditDialogOpen,
+		companies,
+		isSuperAdmin
+	})] });
 }
 function PendingRequests() {
 	const { users, updateUserStatus } = useAuthStore();
@@ -46809,4 +47037,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-ByX5CNMN.js.map
+//# sourceMappingURL=index-BU32-cfh.js.map

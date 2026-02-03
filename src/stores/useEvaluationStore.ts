@@ -210,6 +210,8 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     const mainFile = data.files && data.files.length > 0 ? data.files[0] : null
 
     // Legacy URL mapping
+    // If we have explicit files, we can try to find specific types if we tracked them,
+    // otherwise fallback to first file.
     const urlPrint = data.urlPrintSeguranca || (mainFile ? mainFile.url : '')
     const urlDoc = data.urlFotoDocumento || ''
 
@@ -225,12 +227,12 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       nome_cliente: data.nomeCliente,
       telefone_cliente: data.telefoneCliente,
       cpf_cliente: data.cpfCliente,
-      cliente_id: data.clienteId, // New field
+      cliente_id: data.clienteId,
 
       // Files (Legacy & New)
       url_print_seguranca: urlPrint,
       url_foto_documento: urlDoc,
-      arquivos_consulta: data.files as any, // New field (JSONB)
+      arquivos_consulta: data.files as any, // JSONB
     })
 
     if (!error) await get().fetchEvaluations()
@@ -261,14 +263,19 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   uploadEvidence: async (file) => {
     try {
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
+      const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
+
       const { error: uploadError } = await supabase.storage
         .from('evaluation-evidence')
-        .upload(fileName, file)
+        .upload(fileName, file, { upsert: true })
+
       if (uploadError) return { url: null, error: uploadError }
+
       const {
         data: { publicUrl },
       } = supabase.storage.from('evaluation-evidence').getPublicUrl(fileName)
+
       return { url: publicUrl, error: null }
     } catch (error) {
       return { url: null, error }

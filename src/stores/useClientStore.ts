@@ -103,14 +103,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
   updateClient: async (id, clientData) => {
     set({ isLoading: true })
 
-    // Update legacy address string if address parts are updated
-    let enderecoUpdates = {}
-    if (clientData.rua || clientData.municipio) {
-      // This logic is simplified; ideally we would read current state + updates to form full string
-      // For now we assume if they update address parts, we might want to update the full string or leave it
-      // Let's just update the specific fields provided
-    }
-
     const { error } = await supabase
       .from('clientes')
       .update({ ...clientData, updated_at: new Date().toISOString() })
@@ -123,8 +115,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
     }
 
     // Refresh store states
-    const updatedClient = { ...get().currentClient, ...clientData } as Client
-
     set((state) => ({
       currentClient:
         state.currentClient?.id === id
@@ -140,18 +130,21 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
   uploadClientPhoto: async (file) => {
     try {
+      // Sanitize file name
       const fileExt = file.name.split('.').pop() || 'jpg'
-      const fileName = `client-photos/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
+      const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
 
+      // Upload to 'client-photos' bucket as per requirements
       const { error: uploadError } = await supabase.storage
-        .from('avatars') // Using avatars bucket
+        .from('client-photos')
         .upload(fileName, file, { upsert: true })
 
       if (uploadError) throw uploadError
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from('avatars').getPublicUrl(fileName)
+      } = supabase.storage.from('client-photos').getPublicUrl(fileName)
 
       return { success: true, url: publicUrl }
     } catch (error) {

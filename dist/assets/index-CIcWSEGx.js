@@ -19298,6 +19298,32 @@ var File$1 = createLucideIcon("file", [["path", {
 	d: "M14 2v5a1 1 0 0 0 1 1h5",
 	key: "wfsgrz"
 }]]);
+var FlipHorizontal = createLucideIcon("flip-horizontal", [
+	["path", {
+		d: "M8 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h3",
+		key: "1i73f7"
+	}],
+	["path", {
+		d: "M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3",
+		key: "saxlbk"
+	}],
+	["path", {
+		d: "M12 20v2",
+		key: "1lh1kg"
+	}],
+	["path", {
+		d: "M12 14v2",
+		key: "8jcxud"
+	}],
+	["path", {
+		d: "M12 8v2",
+		key: "1woqiv"
+	}],
+	["path", {
+		d: "M12 2v2",
+		key: "tus03m"
+	}]
+]);
 var Globe = createLucideIcon("globe", [
 	["circle", {
 		cx: "12",
@@ -24893,7 +24919,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$22(function() {
+			useEffect$23(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24916,7 +24942,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$34 = React$3.useState, useEffect$22 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$34 = React$3.useState, useEffect$23 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24939,7 +24965,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$8 = React$3.useRef, useEffect$22 = React$3.useEffect, useMemo$1 = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$8 = React$3.useRef, useEffect$23 = React$3.useEffect, useMemo$1 = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$8(null);
 			if (null === instRef.current) {
@@ -24981,7 +25007,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$22(function() {
+			useEffect$23(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -47055,8 +47081,9 @@ const useEvaluationStore = create((set, get$1) => ({
 	uploadEvidence: async (file) => {
 		try {
 			const fileExt = file.name.split(".").pop();
-			const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, file);
+			const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, "");
+			const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, file, { upsert: true });
 			if (uploadError) return {
 				url: null,
 				error: uploadError
@@ -47788,7 +47815,6 @@ const useClientStore = create((set, get$1) => ({
 	},
 	updateClient: async (id, clientData) => {
 		set({ isLoading: true });
-		if (clientData.rua || clientData.municipio) {}
 		const { error } = await supabase.from("clientes").update({
 			...clientData,
 			updated_at: (/* @__PURE__ */ new Date()).toISOString()
@@ -47798,10 +47824,6 @@ const useClientStore = create((set, get$1) => ({
 			success: false,
 			error
 		};
-		({
-			...get$1().currentClient,
-			...clientData
-		});
 		set((state) => ({
 			currentClient: state.currentClient?.id === id ? {
 				...state.currentClient,
@@ -47817,10 +47839,11 @@ const useClientStore = create((set, get$1) => ({
 	uploadClientPhoto: async (file) => {
 		try {
 			const fileExt = file.name.split(".").pop() || "jpg";
-			const fileName = `client-photos/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-			const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, { upsert: true });
+			const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, "");
+			const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("client-photos").upload(fileName, file, { upsert: true });
 			if (uploadError) throw uploadError;
-			const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
+			const { data: { publicUrl } } = supabase.storage.from("client-photos").getPublicUrl(fileName);
 			return {
 				success: true,
 				url: publicUrl
@@ -47843,35 +47866,60 @@ const useClientStore = create((set, get$1) => ({
 function WebcamCapture({ onCapture, onCancel, className }) {
 	const videoRef = (0, import_react.useRef)(null);
 	const canvasRef = (0, import_react.useRef)(null);
-	const [isStreaming, setIsStreaming] = (0, import_react.useState)(false);
 	const [capturedImage, setCapturedImage] = (0, import_react.useState)(null);
 	const [stream, setStream] = (0, import_react.useState)(null);
-	const startCamera = async () => {
+	const [facingMode, setFacingMode] = (0, import_react.useState)("user");
+	const [hasMultipleCameras, setHasMultipleCameras] = (0, import_react.useState)(false);
+	const checkCameras = async () => {
 		try {
-			const mediaStream = await navigator.mediaDevices.getUserMedia({ video: {
-				facingMode: "user",
-				width: { ideal: 640 },
-				height: { ideal: 480 }
-			} });
+			setHasMultipleCameras((await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === "videoinput").length > 1);
+		} catch (error) {
+			console.error("Error checking cameras:", error);
+		}
+	};
+	const startCamera = async () => {
+		if (stream) stream.getTracks().forEach((track) => track.stop());
+		try {
+			const mediaStream = await navigator.mediaDevices.getUserMedia({
+				video: {
+					facingMode,
+					width: { ideal: 1280 },
+					height: { ideal: 720 }
+				},
+				audio: false
+			});
 			setStream(mediaStream);
 			if (videoRef.current) {
 				videoRef.current.srcObject = mediaStream;
-				videoRef.current.play();
+				try {
+					await videoRef.current.play();
+				} catch (playError) {
+					console.error("Error playing video:", playError);
+				}
 			}
-			setIsStreaming(true);
 		} catch (err) {
 			console.error("Error accessing camera:", err);
 			toast.error("Não foi possível acessar a câmera. Verifique as permissões.");
-			onCancel();
 		}
 	};
+	(0, import_react.useEffect)(() => {
+		checkCameras();
+	}, []);
+	(0, import_react.useEffect)(() => {
+		startCamera();
+		return () => {
+			if (stream) stream.getTracks().forEach((track) => track.stop());
+		};
+	}, [facingMode]);
 	const stopCamera = (0, import_react.useCallback)(() => {
 		if (stream) {
 			stream.getTracks().forEach((track) => track.stop());
 			setStream(null);
-			setIsStreaming(false);
 		}
 	}, [stream]);
+	const toggleCamera = () => {
+		setFacingMode((prev) => prev === "user" ? "environment" : "user");
+	};
 	const capturePhoto = () => {
 		if (videoRef.current && canvasRef.current) {
 			const video = videoRef.current;
@@ -47880,34 +47928,37 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 			canvas.height = video.videoHeight;
 			const context = canvas.getContext("2d");
 			if (context) {
+				if (facingMode === "user") {
+					context.translate(canvas.width, 0);
+					context.scale(-1, 1);
+				}
 				context.drawImage(video, 0, 0, canvas.width, canvas.height);
 				setCapturedImage(canvas.toDataURL("image/jpeg", .85));
-				stopCamera();
 			}
 		}
 	};
 	const handleRetake = () => {
 		setCapturedImage(null);
-		startCamera();
+		if (!stream || !stream.active) startCamera();
 	};
 	const handleConfirm = () => {
 		if (capturedImage && canvasRef.current) canvasRef.current.toBlob((blob) => {
-			if (blob) onCapture(new File([blob], `capture-${Date.now()}.jpg`, { type: "image/jpeg" }));
+			if (blob) {
+				onCapture(new File([blob], `capture-${Date.now()}.jpg`, { type: "image/jpeg" }));
+				stopCamera();
+			}
 		}, "image/jpeg", .85);
 	};
-	(0, import_react.useState)(() => {
-		startCamera();
-		return () => stopCamera();
-	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: cn("flex flex-col items-center gap-4 bg-slate-100 p-4 rounded-lg", className),
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px]",
+			className: "relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner",
 			children: [!capturedImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("video", {
 				ref: videoRef,
-				className: "w-full h-full object-cover mirror",
+				className: cn("w-full h-full object-cover", facingMode === "user" && "scale-x-[-1]"),
 				muted: true,
-				playsInline: true
+				playsInline: true,
+				autoPlay: true
 			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 				src: capturedImage,
 				alt: "Captured",
@@ -47917,21 +47968,30 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 				className: "hidden"
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex gap-4 w-full justify-center",
-			children: !capturedImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-				variant: "outline",
-				onClick: () => {
-					stopCamera();
-					onCancel();
-				},
-				type: "button",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleX, { className: "w-4 h-4 mr-2" }), "Cancelar"]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-				onClick: capturePhoto,
-				type: "button",
-				className: "bg-blue-600 hover:bg-blue-700",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto"]
-			})] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+			className: "flex gap-2 w-full justify-center flex-wrap",
+			children: !capturedImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "outline",
+					onClick: () => {
+						stopCamera();
+						onCancel();
+					},
+					type: "button",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleX, { className: "w-4 h-4 mr-2" }), "Cancelar"]
+				}),
+				hasMultipleCameras && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "secondary",
+					onClick: toggleCamera,
+					type: "button",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FlipHorizontal, { className: "w-4 h-4 mr-2" }), "Trocar Câmera"]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					onClick: capturePhoto,
+					type: "button",
+					className: "bg-blue-600 hover:bg-blue-700",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto"]
+				})
+			] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 				variant: "outline",
 				onClick: handleRetake,
 				type: "button",
@@ -48448,53 +48508,70 @@ function EvaluationChecklist() {
 	const handleSave = async () => {
 		if (!currentUser || !selectedModel || !currentCompany || !currentClient) return;
 		setIsSaving(true);
-		const uploadedFileUrls = [];
-		for (const fileObj of uploadedFiles) {
-			const { url, error } = await uploadEvidence(fileObj.file);
-			if (url && !error) uploadedFileUrls.push({
-				name: fileObj.file.name,
-				url,
-				type: "document"
+		const toastId = toast.loading("Salvando avaliação...");
+		try {
+			const uploadedFileUrls = [];
+			const uploadPromises = uploadedFiles.map(async (fileObj) => {
+				const { url, error } = await uploadEvidence(fileObj.file);
+				if (error || !url) throw new Error(`Falha ao enviar arquivo: ${fileObj.file.name}`);
+				return {
+					name: fileObj.file.name,
+					url,
+					type: "document"
+				};
 			});
-		}
-		if (uploadedFileUrls.length === 0) {
-			toast.error("Erro ao enviar arquivos");
+			let results = [];
+			try {
+				results = await Promise.all(uploadPromises);
+			} catch (uploadError) {
+				toast.error(uploadError.message || "Erro no upload de arquivos", { id: toastId });
+				setIsSaving(false);
+				return;
+			}
+			uploadedFileUrls.push(...results);
+			if (uploadedFileUrls.length === 0) {
+				toast.error("Nenhum arquivo enviado com sucesso", { id: toastId });
+				setIsSaving(false);
+				return;
+			}
+			toast.loading("Gravando dados...", { id: toastId });
+			if ((await saveEvaluation({
+				modelo: selectedModel.modelo,
+				serialNumber,
+				checklistData: checklistStatus,
+				valorFinal: finalPrice,
+				descontos: detectedDefects.map((d) => ({
+					id: d.discount?.id || "unknown",
+					nome: d.item.nome,
+					valor_desconto: d.value
+				})),
+				userId: currentUser.id,
+				clienteId: currentClient.id,
+				nomeCliente: currentClient.nome,
+				telefoneCliente: currentClient.telefone,
+				cpfCliente: currentClient.cpf,
+				files: uploadedFileUrls
+			})).success) {
+				toast.success("Avaliação salva com sucesso!", { id: toastId });
+				setStep(1);
+				setSelectedModelId("");
+				setSerialNumber("");
+				setChecklistStatus({});
+				setSecurityChecks({
+					anatel: false,
+					blacklist: false,
+					mdm: false
+				});
+				clearCurrentClient();
+				setSearchCpf("");
+				setUploadedFiles([]);
+			} else toast.error("Erro ao salvar avaliação no banco de dados", { id: toastId });
+		} catch (e) {
+			console.error(e);
+			toast.error("Ocorreu um erro inesperado", { id: toastId });
+		} finally {
 			setIsSaving(false);
-			return;
 		}
-		const result = await saveEvaluation({
-			modelo: selectedModel.modelo,
-			serialNumber,
-			checklistData: checklistStatus,
-			valorFinal: finalPrice,
-			descontos: detectedDefects.map((d) => ({
-				id: d.discount?.id || "unknown",
-				nome: d.item.nome,
-				valor_desconto: d.value
-			})),
-			userId: currentUser.id,
-			clienteId: currentClient.id,
-			nomeCliente: currentClient.nome,
-			telefoneCliente: currentClient.telefone,
-			cpfCliente: currentClient.cpf,
-			files: uploadedFileUrls
-		});
-		setIsSaving(false);
-		if (result.success) {
-			toast.success("Avaliação salva com sucesso!");
-			setStep(1);
-			setSelectedModelId("");
-			setSerialNumber("");
-			setChecklistStatus({});
-			setSecurityChecks({
-				anatel: false,
-				blacklist: false,
-				mdm: false
-			});
-			clearCurrentClient();
-			setSearchCpf("");
-			setUploadedFiles([]);
-		} else toast.error("Erro ao salvar avaliação");
 	};
 	const getCategoryName = (id) => {
 		return categories.find((c) => c.id === id)?.name || "Outros";
@@ -50015,4 +50092,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CJJC6ONz.js.map
+//# sourceMappingURL=index-CIcWSEGx.js.map

@@ -227,67 +227,93 @@ export function EvaluationChecklist() {
       return
 
     setIsSaving(true)
+    const toastId = toast.loading('Salvando avaliação...')
 
-    // 1. Upload Files
-    const uploadedFileUrls: ConsultationFile[] = []
+    try {
+      // 1. Upload Files
+      const uploadedFileUrls: ConsultationFile[] = []
 
-    for (const fileObj of uploadedFiles) {
-      const { url, error } = await uploadEvidence(fileObj.file)
-      if (url && !error) {
-        uploadedFileUrls.push({
+      // Execute uploads in parallel for efficiency, but handle failures
+      const uploadPromises = uploadedFiles.map(async (fileObj) => {
+        const { url, error } = await uploadEvidence(fileObj.file)
+        if (error || !url) {
+          throw new Error(`Falha ao enviar arquivo: ${fileObj.file.name}`)
+        }
+        return {
           name: fileObj.file.name,
           url,
-          type: 'document', // Simplified for now
+          type: 'document',
+        }
+      })
+
+      let results: ConsultationFile[] = []
+      try {
+        results = await Promise.all(uploadPromises)
+      } catch (uploadError: any) {
+        toast.error(uploadError.message || 'Erro no upload de arquivos', {
+          id: toastId,
+        })
+        setIsSaving(false)
+        return
+      }
+
+      uploadedFileUrls.push(...results)
+
+      if (uploadedFileUrls.length === 0) {
+        toast.error('Nenhum arquivo enviado com sucesso', { id: toastId })
+        setIsSaving(false)
+        return
+      }
+
+      toast.loading('Gravando dados...', { id: toastId })
+
+      // 2. Save Evaluation
+      const result = await saveEvaluation({
+        modelo: selectedModel.modelo,
+        serialNumber,
+        checklistData: checklistStatus,
+        valorFinal: finalPrice,
+        descontos: detectedDefects.map(
+          (d) =>
+            ({
+              id: d.discount?.id || 'unknown',
+              nome: d.item.nome,
+              valor_desconto: d.value,
+            }) as PeripheralDiscountConfig,
+        ),
+        userId: currentUser.id,
+
+        // Client Link
+        clienteId: currentClient.id,
+        nomeCliente: currentClient.nome,
+        telefoneCliente: currentClient.telefone,
+        cpfCliente: currentClient.cpf,
+
+        // Files
+        files: uploadedFileUrls,
+      })
+
+      if (result.success) {
+        toast.success('Avaliação salva com sucesso!', { id: toastId })
+        // Reset
+        setStep(1)
+        setSelectedModelId('')
+        setSerialNumber('')
+        setChecklistStatus({})
+        setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
+        clearCurrentClient()
+        setSearchCpf('')
+        setUploadedFiles([])
+      } else {
+        toast.error('Erro ao salvar avaliação no banco de dados', {
+          id: toastId,
         })
       }
-    }
-
-    if (uploadedFileUrls.length === 0) {
-      toast.error('Erro ao enviar arquivos')
+    } catch (e) {
+      console.error(e)
+      toast.error('Ocorreu um erro inesperado', { id: toastId })
+    } finally {
       setIsSaving(false)
-      return
-    }
-
-    // 2. Save Evaluation
-    const result = await saveEvaluation({
-      modelo: selectedModel.modelo,
-      serialNumber,
-      checklistData: checklistStatus,
-      valorFinal: finalPrice,
-      descontos: detectedDefects.map(
-        (d) =>
-          ({
-            id: d.discount?.id || 'unknown',
-            nome: d.item.nome,
-            valor_desconto: d.value,
-          }) as PeripheralDiscountConfig,
-      ),
-      userId: currentUser.id,
-
-      // Client Link
-      clienteId: currentClient.id,
-      nomeCliente: currentClient.nome,
-      telefoneCliente: currentClient.telefone,
-      cpfCliente: currentClient.cpf,
-
-      // Files
-      files: uploadedFileUrls,
-    })
-
-    setIsSaving(false)
-    if (result.success) {
-      toast.success('Avaliação salva com sucesso!')
-      // Reset
-      setStep(1)
-      setSelectedModelId('')
-      setSerialNumber('')
-      setChecklistStatus({})
-      setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
-      clearCurrentClient()
-      setSearchCpf('')
-      setUploadedFiles([])
-    } else {
-      toast.error('Erro ao salvar avaliação')
     }
   }
 

@@ -227,45 +227,40 @@ export function EvaluationChecklist() {
       return
 
     setIsSaving(true)
-    const toastId = toast.loading('Salvando avaliação...')
+    const toastId = toast.loading('Processando arquivos e salvando...')
 
     try {
-      // 1. Upload Files
-      const uploadedFileUrls: ConsultationFile[] = []
+      // 1. Upload Files concurrently with improved error handling
+      const uploadedFileResults: ConsultationFile[] = []
 
-      // Execute uploads in parallel for efficiency, but handle failures
       const uploadPromises = uploadedFiles.map(async (fileObj) => {
-        const { url, error } = await uploadEvidence(fileObj.file)
-        if (error || !url) {
-          throw new Error(`Falha ao enviar arquivo: ${fileObj.file.name}`)
-        }
-        return {
-          name: fileObj.file.name,
-          url,
-          type: 'document',
+        try {
+          const { url, error } = await uploadEvidence(fileObj.file)
+          if (error || !url) throw error || new Error('Upload falhou')
+          return {
+            name: fileObj.file.name,
+            url,
+            type: fileObj.file.type.startsWith('image/') ? 'image' : 'document',
+          } as ConsultationFile
+        } catch (err) {
+          console.error(`Falha no upload de ${fileObj.file.name}`, err)
+          return null
         }
       })
 
-      let results: ConsultationFile[] = []
-      try {
-        results = await Promise.all(uploadPromises)
-      } catch (uploadError: any) {
-        toast.error(uploadError.message || 'Erro no upload de arquivos', {
-          id: toastId,
-        })
+      const results = await Promise.all(uploadPromises)
+      results.forEach((res) => {
+        if (res) uploadedFileResults.push(res)
+      })
+
+      if (uploadedFileResults.length === 0 && uploadedFiles.length > 0) {
+        toast.error(
+          'Falha crítica: Nenhum arquivo pôde ser enviado. Verifique sua conexão.',
+          { id: toastId },
+        )
         setIsSaving(false)
         return
       }
-
-      uploadedFileUrls.push(...results)
-
-      if (uploadedFileUrls.length === 0) {
-        toast.error('Nenhum arquivo enviado com sucesso', { id: toastId })
-        setIsSaving(false)
-        return
-      }
-
-      toast.loading('Gravando dados...', { id: toastId })
 
       // 2. Save Evaluation
       const result = await saveEvaluation({
@@ -290,11 +285,11 @@ export function EvaluationChecklist() {
         cpfCliente: currentClient.cpf,
 
         // Files
-        files: uploadedFileUrls,
+        files: uploadedFileResults,
       })
 
       if (result.success) {
-        toast.success('Avaliação salva com sucesso!', { id: toastId })
+        toast.success('Avaliação concluída com sucesso!', { id: toastId })
         // Reset
         setStep(1)
         setSelectedModelId('')

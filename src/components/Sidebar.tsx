@@ -9,6 +9,7 @@ import {
   X,
   ClipboardCheck,
   Users,
+  BarChart3,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -69,6 +70,12 @@ export function Sidebar() {
       label: 'Clientes',
       icon: Users,
       isVisible: true,
+    },
+    {
+      href: '/reports',
+      label: 'Relatórios',
+      icon: BarChart3,
+      isVisible: isAdmin,
     },
     {
       href: '/admin',

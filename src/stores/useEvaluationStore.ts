@@ -206,14 +206,14 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   },
 
   saveEvaluation: async (data) => {
-    // Legacy support for print/doc, but prefer arquivos_consulta if available
-    const mainFile = data.files && data.files.length > 0 ? data.files[0] : null
+    // Robust file handling
+    const files = Array.isArray(data.files) ? data.files : []
 
-    // Legacy URL mapping
-    // If we have explicit files, we can try to find specific types if we tracked them,
-    // otherwise fallback to first file.
-    const urlPrint = data.urlPrintSeguranca || (mainFile ? mainFile.url : '')
-    const urlDoc = data.urlFotoDocumento || ''
+    // Legacy mapping (try to find if specific files were uploaded)
+    const printFile = files.find((f: any) =>
+      f.name.toLowerCase().includes('print'),
+    )
+    const docFile = files.find((f: any) => f.name.toLowerCase().includes('doc'))
 
     const { error } = await supabase.from('avaliacoes_iphone').insert({
       modelo: data.modelo,
@@ -223,16 +223,16 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       descontos_aplicados: data.descontos as any,
       user_id: data.userId,
 
-      // Client Data (Legacy & New)
+      // Client Data
       nome_cliente: data.nomeCliente,
       telefone_cliente: data.telefoneCliente,
       cpf_cliente: data.cpfCliente,
       cliente_id: data.clienteId,
 
-      // Files (Legacy & New)
-      url_print_seguranca: urlPrint,
-      url_foto_documento: urlDoc,
-      arquivos_consulta: data.files as any, // JSONB
+      // Files
+      url_print_seguranca: printFile?.url || null,
+      url_foto_documento: docFile?.url || null,
+      arquivos_consulta: files as any, // JSONB
     })
 
     if (!error) await get().fetchEvaluations()
@@ -247,7 +247,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .order('created_at', { ascending: false })
       .limit(100)
 
-    // Map data to include client info if available in relation
     const mappedData = data?.map((d) => ({
       ...d,
       client: d.clientes,

@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/select'
 import { WebcamCapture } from '@/components/common/WebcamCapture'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Camera, Loader2, Save, X, User } from 'lucide-react'
+import { Camera, Loader2, Save, X, User, Search } from 'lucide-react'
 import { formatCPF, formatPhone, validateCPF } from '@/lib/utils'
 import { useClientStore } from '@/stores/useClientStore'
 import { Client } from '@/types'
 import { toast } from 'sonner'
+import { fetchAddressByCEP } from '@/services/cep'
 
 interface ClientFormProps {
   initialData?: Partial<Client>
@@ -63,9 +64,32 @@ export function ClientForm({
   const [showCamera, setShowCamera] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+  const [loadingCep, setLoadingCep] = useState(false)
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleCepBlur = async () => {
+    if (formData.cep.length < 8) return
+
+    setLoadingCep(true)
+    const address = await fetchAddressByCEP(formData.cep)
+    setLoadingCep(false)
+
+    if (address) {
+      setFormData((prev) => ({
+        ...prev,
+        rua: address.logradouro || prev.rua,
+        bairro: address.bairro || prev.bairro,
+        municipio: address.localidade || prev.municipio,
+        estado: address.uf || prev.estado,
+        complemento: address.complemento || prev.complemento,
+      }))
+      toast.success('Endereço encontrado!')
+    } else {
+      toast.error('CEP não encontrado')
+    }
   }
 
   const handlePhotoCapture = async (file: File) => {
@@ -100,9 +124,15 @@ export function ClientForm({
     const success = await onSubmit(formData)
     setIsSubmitting(false)
 
-    if (success && !isEditing) {
-      // Clear form only if creating new (and successful)
-      // If editing, we usually close the modal/drawer
+    if (success) {
+      toast.success(
+        isEditing
+          ? 'Dados do cliente atualizados!'
+          : 'Cliente cadastrado com sucesso!',
+      )
+      if (!isEditing) {
+        // Clear form only if creating new (and successful)
+      }
     }
   }
 
@@ -265,14 +295,24 @@ export function ClientForm({
           Endereço
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label htmlFor="cep">CEP</Label>
-            <Input
-              id="cep"
-              value={formData.cep}
-              onChange={(e) => handleChange('cep', e.target.value)}
-              placeholder="00000-000"
-            />
+            <div className="relative">
+              <Input
+                id="cep"
+                value={formData.cep}
+                onChange={(e) => handleChange('cep', e.target.value)}
+                onBlur={handleCepBlur}
+                placeholder="00000-000"
+                className="pr-8"
+              />
+              {loadingCep && (
+                <Loader2 className="w-4 h-4 absolute right-2 top-3 animate-spin text-muted-foreground" />
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Digite para buscar automaticamente
+            </p>
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="rua">Rua / Avenida</Label>

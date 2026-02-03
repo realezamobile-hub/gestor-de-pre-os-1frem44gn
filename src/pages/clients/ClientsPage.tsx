@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useClientStore } from '@/stores/useClientStore'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -33,13 +32,16 @@ import {
   MapPin,
   Phone,
   Mail,
+  Files,
 } from 'lucide-react'
 import { formatPhone, formatCPF } from '@/lib/utils'
 import { ClientForm } from '@/components/clients/ClientForm'
 import { ClientHistory } from '@/components/clients/ClientHistory'
+import { ClientFiles } from '@/components/clients/ClientFiles'
 import { useDebounce } from '@/hooks/use-debounce'
 import { toast } from 'sonner'
 import { Client } from '@/types'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 export default function ClientsPage() {
   const { clients, searchClients, isLoading, createClient, updateClient } =
@@ -59,7 +61,6 @@ export default function ClientsPage() {
   const handleCreate = async (data: any) => {
     const result = await createClient(data)
     if (result.success) {
-      toast.success('Cliente cadastrado com sucesso!')
       setIsCreateOpen(false)
       return true
     } else {
@@ -72,7 +73,6 @@ export default function ClientsPage() {
     if (!editingClient) return false
     const result = await updateClient(editingClient.id, data)
     if (result.success) {
-      toast.success('Cliente atualizado com sucesso!')
       setEditingClient(null)
       // Update view if open
       if (viewingClient?.id === editingClient.id) {
@@ -229,7 +229,7 @@ export default function ClientsPage() {
         open={!!viewingClient}
         onOpenChange={(open) => !open && setViewingClient(null)}
       >
-        <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0">
           {viewingClient && (
             <div className="flex flex-col h-full">
               <div className="bg-slate-900 text-white p-6 pb-10">
@@ -271,71 +271,108 @@ export default function ClientsPage() {
               </div>
 
               <div className="flex-1 p-6 space-y-8 bg-white -mt-4 rounded-t-xl">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <User className="w-3 h-3" /> CPF
-                    </span>
-                    <p className="font-medium">
-                      {formatCPF(viewingClient.cpf)}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Phone className="w-3 h-3" /> Telefone
-                    </span>
-                    <p className="font-medium">
-                      {formatPhone(viewingClient.telefone)}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1">
-                      <Mail className="w-3 h-3" /> Email
-                    </span>
-                    <p className="font-medium">{viewingClient.email || '-'}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground">Origem</span>
-                    <p className="font-medium">{viewingClient.origem || '-'}</p>
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <span className="text-muted-foreground">
-                      Endereço Completo
-                    </span>
-                    <p className="font-medium">
-                      {[
-                        viewingClient.rua,
-                        viewingClient.numero,
-                        viewingClient.complemento,
-                        viewingClient.bairro,
-                        viewingClient.cep,
-                      ]
-                        .filter(Boolean)
-                        .join(', ') ||
-                        viewingClient.endereco ||
-                        '-'}
-                    </p>
-                  </div>
-                </div>
+                <Tabs defaultValue="info" className="w-full">
+                  <TabsList className="w-full justify-start mb-6">
+                    <TabsTrigger value="info">
+                      <User className="w-4 h-4 mr-2" /> Dados
+                    </TabsTrigger>
+                    <TabsTrigger value="history">
+                      <History className="w-4 h-4 mr-2" /> Histórico
+                    </TabsTrigger>
+                    <TabsTrigger value="files">
+                      <Files className="w-4 h-4 mr-2" /> Arquivos
+                    </TabsTrigger>
+                  </TabsList>
 
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <History className="w-5 h-5 text-primary" /> Histórico de
-                    Avaliações
-                  </h3>
-                  <ClientHistory clientId={viewingClient.id} />
-                </div>
+                  <TabsContent
+                    value="info"
+                    className="space-y-6 animate-in fade-in"
+                  >
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <User className="w-3 h-3" /> CPF
+                        </span>
+                        <p className="font-medium">
+                          {formatCPF(viewingClient.cpf)}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <Phone className="w-3 h-3" /> Telefone
+                        </span>
+                        <p className="font-medium">
+                          {formatPhone(viewingClient.telefone)}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <Mail className="w-3 h-3" /> Email
+                        </span>
+                        <p className="font-medium">
+                          {viewingClient.email || '-'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground">Origem</span>
+                        <p className="font-medium">
+                          {viewingClient.origem || '-'}
+                        </p>
+                      </div>
+                      <div className="col-span-2 space-y-1">
+                        <span className="text-muted-foreground">
+                          Endereço Completo
+                        </span>
+                        <p className="font-medium">
+                          {[
+                            viewingClient.rua,
+                            viewingClient.numero,
+                            viewingClient.complemento,
+                            viewingClient.bairro,
+                            viewingClient.cep,
+                          ]
+                            .filter(Boolean)
+                            .join(', ') ||
+                            viewingClient.endereco ||
+                            '-'}
+                        </p>
+                      </div>
+                    </div>
 
-                {viewingClient.observacoes && (
-                  <div className="space-y-2 bg-yellow-50 p-4 rounded-lg border border-yellow-100">
-                    <span className="text-xs font-bold text-yellow-700 uppercase">
-                      Observações Internas
-                    </span>
-                    <p className="text-sm text-yellow-900 leading-relaxed whitespace-pre-wrap">
-                      {viewingClient.observacoes}
-                    </p>
-                  </div>
-                )}
+                    {viewingClient.observacoes && (
+                      <div className="space-y-2 bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                        <span className="text-xs font-bold text-yellow-700 uppercase">
+                          Observações Internas
+                        </span>
+                        <p className="text-sm text-yellow-900 leading-relaxed whitespace-pre-wrap">
+                          {viewingClient.observacoes}
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent
+                    value="history"
+                    className="space-y-4 animate-in fade-in"
+                  >
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <History className="w-5 h-5 text-primary" /> Histórico de
+                      Avaliações
+                    </h3>
+                    <ClientHistory clientId={viewingClient.id} />
+                  </TabsContent>
+
+                  <TabsContent
+                    value="files"
+                    className="space-y-4 animate-in fade-in"
+                  >
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <Files className="w-5 h-5 text-primary" /> Arquivos e
+                      Documentos
+                    </h3>
+                    <ClientFiles clientId={viewingClient.id} />
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           )}

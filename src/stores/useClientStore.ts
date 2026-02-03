@@ -53,7 +53,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
     let queryBuilder = supabase.from('clientes').select('*').order('nome')
 
     if (query) {
-      // Simple ILIKE search on name or CPF
       queryBuilder = queryBuilder.or(
         `nome.ilike.%${query}%,cpf.ilike.%${query}%`,
       )
@@ -72,7 +71,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
   createClient: async (clientData) => {
     set({ isLoading: true })
-    // Ensure legacy 'endereco' is populated if new fields are present
     let endereco = clientData.endereco
     if (!endereco && clientData.rua) {
       endereco = `${clientData.rua}, ${clientData.numero || 'S/N'}, ${clientData.bairro || ''}, ${clientData.municipio || ''} - ${clientData.estado || ''}`
@@ -92,7 +90,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
     if (data) {
       set({ currentClient: data as Client })
-      // Add to list if not present
       set((state) => ({ clients: [data as Client, ...state.clients] }))
       return { success: true, data: data as Client }
     }
@@ -114,7 +111,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
       return { success: false, error }
     }
 
-    // Refresh store states
     set((state) => ({
       currentClient:
         state.currentClient?.id === id
@@ -130,15 +126,14 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
   uploadClientPhoto: async (file) => {
     try {
-      // Sanitize file name
       const fileExt = file.name.split('.').pop() || 'jpg'
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
       const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
+      const cleanFile = new File([file], fileName, { type: file.type })
 
-      // Upload to 'client-photos' bucket as per requirements
       const { error: uploadError } = await supabase.storage
         .from('client-photos')
-        .upload(fileName, file, { upsert: true })
+        .upload(fileName, cleanFile, { upsert: true })
 
       if (uploadError) throw uploadError
 

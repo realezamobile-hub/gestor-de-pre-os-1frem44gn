@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase/client'
-import { startOfMonth, endOfMonth, subMonths, parseISO } from 'date-fns'
+import { startOfMonth, endOfMonth, subMonths } from 'date-fns'
 
 export interface ReportStats {
   totalEvaluations: number
   totalValue: number
   averageValue: number
-  conversionRate: number // Placeholder for future logic
+  conversionRate: number
   topModels: { model: string; count: number; value: number }[]
   evaluationsByDate: { date: string; count: number; value: number }[]
 }
@@ -22,7 +22,7 @@ interface ReportStore {
 export const useReportStore = create<ReportStore>((set, get) => ({
   isLoading: false,
   dateRange: {
-    from: startOfMonth(subMonths(new Date(), 1)), // Last month default
+    from: startOfMonth(subMonths(new Date(), 1)),
     to: endOfMonth(new Date()),
   },
   stats: {
@@ -46,7 +46,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
     const toStr = dateRange.to.toISOString()
 
     try {
-      // Fetch evaluations within range
       const { data, error } = await supabase
         .from('avaliacoes_iphone')
         .select('*')
@@ -70,7 +69,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
         return
       }
 
-      // Calculate Stats
       const totalEvaluations = data.length
       const totalValue = data.reduce(
         (acc, curr) => acc + (curr.valor_final || 0),
@@ -79,7 +77,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       const averageValue =
         totalEvaluations > 0 ? totalValue / totalEvaluations : 0
 
-      // Top Models
       const modelMap = new Map<string, { count: number; value: number }>()
       data.forEach((item) => {
         const current = modelMap.get(item.modelo) || { count: 0, value: 0 }
@@ -94,10 +91,9 @@ export const useReportStore = create<ReportStore>((set, get) => ({
         .sort((a, b) => b.count - a.count)
         .slice(0, 10)
 
-      // Timeline
       const dateMap = new Map<string, { count: number; value: number }>()
       data.forEach((item) => {
-        const dateKey = item.created_at.split('T')[0] // YYYY-MM-DD
+        const dateKey = item.created_at.split('T')[0]
         const current = dateMap.get(dateKey) || { count: 0, value: 0 }
         dateMap.set(dateKey, {
           count: current.count + 1,

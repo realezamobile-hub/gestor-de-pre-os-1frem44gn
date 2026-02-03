@@ -43,7 +43,6 @@ export function ModelDiscountConfig() {
   const [editingValues, setEditingValues] = useState<Record<string, string>>({})
   const [isSaving, setIsSaving] = useState(false)
 
-  // Filter discounts for selected model
   const modelDiscounts = useMemo(() => {
     if (!selectedModelId) return []
     return peripheralDiscounts.filter((d) => d.modelo_id === selectedModelId)
@@ -61,7 +60,7 @@ export function ModelDiscountConfig() {
 
   const handleSave = async (item: any) => {
     const valStr = editingValues[item.id]
-    if (valStr === undefined) return // No change
+    if (valStr === undefined) return
 
     const val = parseFloat(valStr)
     if (isNaN(val)) return

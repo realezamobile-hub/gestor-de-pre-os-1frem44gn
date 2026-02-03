@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
-import { useAuthStore } from '@/stores/useAuthStore'
 import {
   Table,
   TableBody,
@@ -9,138 +8,91 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Search, Building2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export function EvaluationHistory() {
   const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore()
-  const { currentUser } = useAuthStore()
-  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     fetchEvaluations()
   }, [])
 
-  const filteredEvaluations = evaluations.filter((item) => {
-    const search = searchTerm.toLowerCase()
+  if (isLoading) {
     return (
-      item.modelo.toLowerCase().includes(search) ||
-      (item.serial_number && item.serial_number.toLowerCase().includes(search))
+      <div className="flex justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
     )
-  })
-
-  // Show company column if user is Super Admin
-  const showCompany = currentUser?.isSuperAdmin
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 max-w-sm">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por modelo ou serial..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="rounded-md border bg-white shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50/50">
-              <TableHead>Data</TableHead>
-              {showCompany && <TableHead>Empresa</TableHead>}
-              <TableHead>Modelo</TableHead>
-              <TableHead>Serial</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Valor Final</TableHead>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-50">
+            <TableHead>Data</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Modelo</TableHead>
+            <TableHead>Serial</TableHead>
+            <TableHead className="text-right">Valor Final</TableHead>
+            <TableHead className="text-center">Arquivos</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {evaluations.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="text-center text-muted-foreground py-8"
+              >
+                Nenhuma avaliação registrada.
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={showCompany ? 6 : 5}
-                  className="h-24 text-center"
-                >
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          ) : (
+            evaluations.map((ev) => (
+              <TableRow key={ev.id}>
+                <TableCell>
+                  {format(new Date(ev.created_at), 'dd/MM/yyyy HH:mm', {
+                    locale: ptBR,
+                  })}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {ev.nome_cliente || 'N/A'}
+                  <div className="text-xs text-muted-foreground">
+                    {ev.cpf_cliente}
+                  </div>
+                </TableCell>
+                <TableCell>{ev.modelo}</TableCell>
+                <TableCell className="font-mono text-xs">
+                  {ev.serial_number}
+                </TableCell>
+                <TableCell className="text-right font-bold text-emerald-600">
+                  R${' '}
+                  {ev.valor_final?.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                  })}
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center gap-1">
+                    {ev.url_print_seguranca && (
+                      <Badge variant="outline" className="text-[10px]">
+                        Print
+                      </Badge>
+                    )}
+                    {ev.url_foto_documento && (
+                      <Badge variant="outline" className="text-[10px]">
+                        Doc
+                      </Badge>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
-            ) : filteredEvaluations.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={showCompany ? 6 : 5}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  Nenhuma avaliação encontrada.
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredEvaluations.map((evalItem) => {
-                const hasDefects =
-                  evalItem.descontos_aplicados &&
-                  evalItem.descontos_aplicados.length > 0
-                return (
-                  <TableRow key={evalItem.id} className="hover:bg-gray-50">
-                    <TableCell className="text-muted-foreground whitespace-nowrap">
-                      {format(
-                        new Date(evalItem.created_at),
-                        'dd/MM/yyyy HH:mm',
-                        {
-                          locale: ptBR,
-                        },
-                      )}
-                    </TableCell>
-                    {showCompany && (
-                      <TableCell>
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Building2 className="w-3.5 h-3.5" />
-                          <span className="text-xs font-medium">
-                            {evalItem.empresas?.nome_fantasia || 'N/A'}
-                          </span>
-                        </div>
-                      </TableCell>
-                    )}
-                    <TableCell className="font-medium">
-                      {evalItem.modelo}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {evalItem.serial_number || '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={hasDefects ? 'secondary' : 'default'}
-                        className={
-                          hasDefects
-                            ? 'bg-amber-100 text-amber-800 border-amber-200'
-                            : 'bg-green-100 text-green-800 border-green-200'
-                        }
-                      >
-                        {hasDefects
-                          ? `${evalItem.descontos_aplicados.length} Defeito(s)`
-                          : 'Perfeito'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-bold text-slate-700">
-                      R${' '}
-                      {evalItem.valor_final.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                      })}
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   )
 }

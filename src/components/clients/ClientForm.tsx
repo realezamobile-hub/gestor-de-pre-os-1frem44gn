@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select'
 import { WebcamCapture } from '@/components/common/WebcamCapture'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Camera, Loader2, Save, X, User, Search } from 'lucide-react'
+import { Camera, Loader2, Save, User } from 'lucide-react'
 import { formatCPF, formatPhone, validateCPF } from '@/lib/utils'
 import { useClientStore } from '@/stores/useClientStore'
 import { Client } from '@/types'
@@ -43,8 +43,6 @@ export function ClientForm({
     telefone: initialData?.telefone || '',
     genero: initialData?.genero || '',
     origem: initialData?.origem || '',
-
-    // Address
     cep: initialData?.cep || '',
     rua: initialData?.rua || '',
     numero: initialData?.numero || '',
@@ -52,11 +50,8 @@ export function ClientForm({
     bairro: initialData?.bairro || '',
     municipio: initialData?.municipio || '',
     estado: initialData?.estado || '',
-
-    // Emergency
     nome_contato_emergencia: initialData?.nome_contato_emergencia || '',
     telefone_contato_emergencia: initialData?.telefone_contato_emergencia || '',
-
     observacoes: initialData?.observacoes || '',
     url_foto: initialData?.url_foto || '',
   })
@@ -130,15 +125,11 @@ export function ClientForm({
           ? 'Dados do cliente atualizados!'
           : 'Cliente cadastrado com sucesso!',
       )
-      if (!isEditing) {
-        // Clear form only if creating new (and successful)
-      }
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in">
-      {/* Header / Photo Section */}
       <div className="flex flex-col items-center gap-4 pb-4 border-b">
         {showCamera ? (
           <WebcamCapture
@@ -184,7 +175,6 @@ export function ClientForm({
         )}
       </div>
 
-      {/* Personal Info */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg flex items-center gap-2 text-primary border-b pb-2">
           <User className="w-5 h-5" /> Dados Pessoais
@@ -289,7 +279,6 @@ export function ClientForm({
         </div>
       </div>
 
-      {/* Address */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg text-primary border-b pb-2">
           Endereço
@@ -367,7 +356,6 @@ export function ClientForm({
         </div>
       </div>
 
-      {/* Emergency & Notes */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg text-primary border-b pb-2">
           Outras Informações

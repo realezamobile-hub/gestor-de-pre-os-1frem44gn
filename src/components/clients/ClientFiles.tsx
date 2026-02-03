@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useClientStore } from '@/stores/useClientStore'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { FileIcon, ImageIcon, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
@@ -33,7 +27,6 @@ export function ClientFiles({ clientId }: ClientFilesProps) {
       const allFiles: any[] = []
 
       evals.forEach((ev) => {
-        // Collect files from JSONB column
         if (ev.arquivos_consulta && Array.isArray(ev.arquivos_consulta)) {
           ev.arquivos_consulta.forEach((f: any) => {
             allFiles.push({
@@ -44,7 +37,6 @@ export function ClientFiles({ clientId }: ClientFilesProps) {
             })
           })
         }
-        // Collect legacy columns
         if (ev.url_print_seguranca) {
           allFiles.push({
             url: ev.url_print_seguranca,

@@ -17,10 +17,6 @@ export default function EvaluationPage() {
     fetchConfigs()
   }, [])
 
-  // Robust check for access:
-  // 1. Super Admin (Always allowed)
-  // 2. Role is ADMIN or TECNICO
-  // 3. User has explicit permission flag
   const canAccess =
     currentUser?.isSuperAdmin ||
     currentUser?.role === 'ADMIN' ||

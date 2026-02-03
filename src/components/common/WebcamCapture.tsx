@@ -41,7 +41,6 @@ export function WebcamCapture({
   }
 
   const startCamera = async () => {
-    // Stop any existing stream first
     if (stream) {
       stream.getTracks().forEach((track) => track.stop())
     }
@@ -59,7 +58,6 @@ export function WebcamCapture({
       setStream(mediaStream)
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
-        // Ensure play is called
         try {
           await videoRef.current.play()
         } catch (playError) {
@@ -102,13 +100,11 @@ export function WebcamCapture({
       const video = videoRef.current
       const canvas = canvasRef.current
 
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
 
       const context = canvas.getContext('2d')
       if (context) {
-        // Mirror if user facing
         if (facingMode === 'user') {
           context.translate(canvas.width, 0)
           context.scale(-1, 1)
@@ -124,7 +120,6 @@ export function WebcamCapture({
 
   const handleRetake = () => {
     setCapturedImage(null)
-    // If stream was stopped or lost, restart it
     if (!stream || !stream.active) {
       startCamera()
     }
@@ -135,7 +130,6 @@ export function WebcamCapture({
       canvasRef.current.toBlob(
         (blob) => {
           if (blob) {
-            // Create a clean File object from blob
             const file = new File([blob], `foto-doc-${Date.now()}.jpg`, {
               type: 'image/jpeg',
               lastModified: Date.now(),

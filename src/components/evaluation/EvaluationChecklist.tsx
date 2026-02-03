@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
 import { useClientStore } from '@/stores/useClientStore'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -9,7 +9,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -37,12 +36,11 @@ import {
   X,
   Camera,
   Trash2,
-  Eye,
   ImageIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
-import { PeripheralDiscountConfig, ConsultationFile, Client } from '@/types'
+import { PeripheralDiscountConfig, ConsultationFile } from '@/types'
 import { ClientForm } from '@/components/clients/ClientForm'
 import { WebcamCapture } from '@/components/common/WebcamCapture'
 import {
@@ -70,32 +68,22 @@ export function EvaluationChecklist() {
   } = useClientStore()
   const { currentUser, currentCompany } = useAuthStore()
 
-  // State
   const [step, setStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
-
-  // Step 1: Identification
   const [selectedModelId, setSelectedModelId] = useState('')
   const [serialNumber, setSerialNumber] = useState('')
-
-  // Step 2: Inspection (Checklist)
   const [checklistStatus, setChecklistStatus] = useState<
     Record<string, boolean>
   >({})
-
-  // Step 4: Security & Client & Files
   const [securityChecks, setSecurityChecks] = useState({
     anatel: false,
     blacklist: false,
     mdm: false,
   })
-
-  // Client Search State
   const [searchCpf, setSearchCpf] = useState('')
   const [showClientModal, setShowClientModal] = useState(false)
   const [isNewClient, setIsNewClient] = useState(false)
 
-  // Files State - Refactored for clearer separation
   const [printFile, setPrintFile] = useState<{
     file: File
     preview: string
@@ -109,10 +97,8 @@ export function EvaluationChecklist() {
   >([])
   const [showWebcam, setShowWebcam] = useState(false)
 
-  // Derived
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
 
-  // Step 3 Logic: Calculate Price & Defects
   const getDetectedDefects = () => {
     if (!selectedModel) return []
     const defectItems = checklistItems.filter(
@@ -151,7 +137,6 @@ export function EvaluationChecklist() {
     ? Math.max(0, selectedModel.preco_base - totalDiscounts)
     : 0
 
-  // Handlers
   const handleNext = () => {
     if (step === 1) {
       if (!selectedModelId || !serialNumber) {
@@ -204,11 +189,7 @@ export function EvaluationChecklist() {
   const handleCreateClient = async (data: any) => {
     if (!currentCompany) return false
 
-    const {
-      success,
-      data: client,
-      error,
-    } = await createClient({
+    const { success, data: client } = await createClient({
       ...data,
       company_id: currentCompany.id,
     })
@@ -216,7 +197,6 @@ export function EvaluationChecklist() {
     if (success && client) {
       toast.success('Cliente cadastrado!')
       setShowClientModal(false)
-      // Client is auto-set in store by createClient
       return true
     } else {
       toast.error('Erro ao cadastrar cliente')
@@ -224,7 +204,6 @@ export function EvaluationChecklist() {
     }
   }
 
-  // File Handlers
   const handlePrintUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       const file = e.target.files[0]
@@ -280,27 +259,21 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
-      // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
         throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`)
       }
 
-      // 2. Upload Document
       const docRes = await uploadEvidence(docFile.file)
       if (docRes.error || !docRes.url) {
         throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`)
       }
 
-      // 3. Upload Consultations (Parallel)
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
         const uploadPromises = consultationFiles.map(async (f) => {
           const res = await uploadEvidence(f.file)
           if (res.error || !res.url) {
-            console.error(`Falha no upload extra: ${f.file.name}`, res.error)
-            // We log but maybe continue or throw?
-            // User story says: "If any file fails... prevent database record... and alert user"
             throw new Error(`Erro ao enviar arquivo: ${f.file.name}`)
           }
           return {
@@ -314,7 +287,6 @@ export function EvaluationChecklist() {
         consultationResults.push(...results)
       }
 
-      // 4. Save Record
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -329,14 +301,10 @@ export function EvaluationChecklist() {
             }) as PeripheralDiscountConfig,
         ),
         userId: currentUser.id,
-
-        // Client Data
         clienteId: currentClient.id,
         nomeCliente: currentClient.nome,
         telefoneCliente: currentClient.telefone,
         cpf_cliente: currentClient.cpf,
-
-        // Explicit Files
         urlPrint: printRes.url,
         urlDoc: docRes.url,
         consultationFiles: consultationResults,
@@ -344,7 +312,6 @@ export function EvaluationChecklist() {
 
       if (result.success) {
         toast.success('Avaliação concluída com sucesso!', { id: toastId })
-        // Reset
         setStep(1)
         setSelectedModelId('')
         setSerialNumber('')
@@ -374,7 +341,6 @@ export function EvaluationChecklist() {
 
   return (
     <div className="grid lg:grid-cols-12 gap-6 h-full">
-      {/* Main Wizard Area */}
       <div className="lg:col-span-8 flex flex-col gap-6">
         <Card className="flex-1 flex flex-col shadow-md">
           <CardHeader>
@@ -533,7 +499,6 @@ export function EvaluationChecklist() {
 
             {step === 4 && (
               <div className="space-y-8">
-                {/* 1. Security Checks */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <ShieldCheck className="w-5 h-5 text-primary" />
@@ -595,7 +560,6 @@ export function EvaluationChecklist() {
                   </div>
                 </div>
 
-                {/* 2. Uploads */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <Upload className="w-5 h-5 text-primary" />
@@ -603,7 +567,6 @@ export function EvaluationChecklist() {
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
-                    {/* Print de Segurança */}
                     <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
                       <Label className="font-bold text-slate-700 flex items-center gap-2">
                         <ImageIcon className="w-4 h-4" /> Print de Segurança *
@@ -665,7 +628,6 @@ export function EvaluationChecklist() {
                       )}
                     </div>
 
-                    {/* Foto do Documento */}
                     <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
                       <Label className="font-bold text-slate-700 flex items-center gap-2">
                         <UserIcon className="w-4 h-4" /> Foto do Documento *
@@ -731,7 +693,6 @@ export function EvaluationChecklist() {
                       )}
                     </div>
 
-                    {/* Outros Arquivos */}
                     <div className="col-span-1 md:col-span-2 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
                       <Label className="font-bold text-slate-700 flex items-center gap-2">
                         <FileIcon className="w-4 h-4" /> Consultas Adicionais
@@ -796,7 +757,6 @@ export function EvaluationChecklist() {
                   </div>
                 </div>
 
-                {/* 3. Client Section */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <UserIcon className="w-5 h-5 text-primary" />
@@ -989,7 +949,6 @@ export function EvaluationChecklist() {
         </Card>
       </div>
 
-      {/* Right Panel: Price Calculator Summary */}
       <div className="lg:col-span-4 flex flex-col gap-6">
         <Card className="bg-slate-950 text-white border-slate-800 shadow-xl sticky top-24">
           <CardHeader>
@@ -1080,7 +1039,6 @@ export function EvaluationChecklist() {
         </Card>
       </div>
 
-      {/* Client Modal */}
       <Dialog open={showClientModal} onOpenChange={setShowClientModal}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1097,7 +1055,6 @@ export function EvaluationChecklist() {
         </DialogContent>
       </Dialog>
 
-      {/* Webcam Modal */}
       <Dialog open={showWebcam} onOpenChange={setShowWebcam}>
         <DialogContent className="max-w-xl">
           <DialogHeader>

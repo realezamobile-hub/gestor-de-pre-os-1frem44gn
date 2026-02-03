@@ -69,7 +69,6 @@ export function BasePriceList() {
     if (dialogMode === 'edit' && selectedItem) {
       result = await updateBasePrice(selectedItem.id, modelo, preco)
     } else {
-      // Create or Duplicate (Create new)
       result = await addBasePrice(modelo, preco)
     }
 

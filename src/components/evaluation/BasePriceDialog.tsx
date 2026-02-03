@@ -11,11 +11,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
+import { BasePriceConfig } from '@/types'
 
 interface BasePriceDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  initialData?: { modelo: string; preco_base: number }
+  initialData?: BasePriceConfig
   mode: 'create' | 'edit' | 'duplicate'
   onSubmit: (modelo: string, preco: number) => Promise<boolean>
 }
@@ -27,26 +28,33 @@ export function BasePriceDialog({
   mode,
   onSubmit,
 }: BasePriceDialogProps) {
-  const [model, setModel] = useState('')
-  const [price, setPrice] = useState('')
+  const [modelo, setModelo] = useState('')
+  const [preco, setPreco] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (open && initialData) {
-      setModel(initialData.modelo)
-      setPrice(initialData.preco_base.toString())
+      setModelo(
+        mode === 'duplicate'
+          ? `${initialData.modelo} (Cópia)`
+          : initialData.modelo,
+      )
+      setPreco(initialData.preco_base.toString())
     } else if (open && !initialData) {
-      setModel('')
-      setPrice('')
+      setModelo('')
+      setPreco('')
     }
-  }, [open, initialData])
+  }, [open, initialData, mode])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!model || !price) return
+    if (!modelo.trim() || !preco) return
+
+    const precoNum = parseFloat(preco)
+    if (isNaN(precoNum)) return
 
     setIsSubmitting(true)
-    const success = await onSubmit(model, parseFloat(price))
+    const success = await onSubmit(modelo.trim(), precoNum)
     setIsSubmitting(false)
 
     if (success) {
@@ -55,25 +63,9 @@ export function BasePriceDialog({
   }
 
   const getTitle = () => {
-    switch (mode) {
-      case 'create':
-        return 'Adicionar Modelo'
-      case 'edit':
-        return 'Editar Modelo'
-      case 'duplicate':
-        return 'Duplicar Modelo'
-    }
-  }
-
-  const getDescription = () => {
-    switch (mode) {
-      case 'create':
-        return 'Cadastre um novo modelo e seu preço base.'
-      case 'edit':
-        return 'Atualize as informações do modelo.'
-      case 'duplicate':
-        return 'Crie uma cópia modificada do modelo selecionado.'
-    }
+    if (mode === 'create') return 'Novo Modelo'
+    if (mode === 'edit') return 'Editar Modelo'
+    return 'Duplicar Modelo'
   }
 
   return (
@@ -82,28 +74,32 @@ export function BasePriceDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{getTitle()}</DialogTitle>
-            <DialogDescription>{getDescription()}</DialogDescription>
+            <DialogDescription>
+              {mode === 'edit'
+                ? 'Atualize os dados do modelo.'
+                : 'Defina o nome e o preço base para o novo modelo.'}
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="model">Modelo</Label>
+              <Label htmlFor="modelo">Modelo</Label>
               <Input
-                id="model"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                placeholder="Ex: iPhone 14 128GB"
+                id="modelo"
+                value={modelo}
+                onChange={(e) => setModelo(e.target.value)}
+                placeholder="Ex: iPhone 13 Pro Max"
                 autoFocus
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="price">Preço Base (R$)</Label>
+              <Label htmlFor="preco">Preço Base (R$)</Label>
               <Input
-                id="price"
+                id="preco"
                 type="number"
-                min="0"
                 step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                min="0"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
                 placeholder="0.00"
               />
             </div>

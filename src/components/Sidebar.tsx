@@ -1,246 +1,135 @@
 import { Link, useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/useAuthStore'
 import {
   LayoutDashboard,
-  FileText,
-  Settings,
-  LogOut,
-  Menu,
-  X,
+  ListChecks,
   ClipboardCheck,
   Users,
   BarChart3,
+  Settings,
+  UserCircle,
+  LogOut,
+  Building2,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/stores/useAuthStore'
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from '@/components/ui/sheet'
-import { useState } from 'react'
 
 export function Sidebar() {
   const location = useLocation()
-  const currentUser = useAuthStore((state) => state.currentUser)
-  const currentCompany = useAuthStore((state) => state.currentCompany)
-  const logout = useAuthStore((state) => state.logout)
+  const { currentUser, logout } = useAuthStore()
 
-  const [open, setOpen] = useState(false)
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') return true
+    if (path !== '/' && location.pathname.startsWith(path)) return true
+    return false
+  }
 
-  const modules = currentCompany?.modulos_ativos || []
-  const hasModule = (module: string) =>
-    modules.includes(module) || currentUser?.isSuperAdmin
-
-  const isSuperAdmin = currentUser?.isSuperAdmin
-  const isAdmin = currentUser?.role === 'ADMIN' || isSuperAdmin
-  const isVendedor = currentUser?.role === 'VENDEDOR'
-  const isTecnico = currentUser?.role === 'TECNICO'
-  const isAdministrativo = currentUser?.role === 'ADMINISTRATIVO'
-
-  const links = [
+  const menuItems = [
     {
-      href: '/',
-      label: 'Painel',
+      label: 'Dashboard',
       icon: LayoutDashboard,
-      isVisible: true,
+      path: '/',
+      visible: true,
     },
     {
-      href: '/generator',
-      label: 'Gerador',
-      icon: FileText,
-      isVisible:
-        hasModule('generator') &&
-        (isAdmin ||
-          isVendedor ||
-          isAdministrativo ||
-          currentUser?.canCreateList),
+      label: 'Gerador de Lista',
+      icon: ListChecks,
+      path: '/generator',
+      visible: currentUser?.canCreateList || currentUser?.role === 'ADMIN',
     },
     {
-      href: '/evaluation',
-      label: 'Avaliação',
+      label: 'Avaliação Técnica',
       icon: ClipboardCheck,
-      isVisible:
-        hasModule('evaluation') &&
-        (isAdmin || isTecnico || currentUser?.canAccessEvaluation),
+      path: '/evaluation',
+      visible:
+        currentUser?.canAccessEvaluation ||
+        currentUser?.role === 'TECNICO' ||
+        currentUser?.role === 'ADMIN',
     },
     {
-      href: '/clients',
       label: 'Clientes',
       icon: Users,
-      isVisible: true,
+      path: '/clients',
+      visible: true,
     },
     {
-      href: '/reports',
       label: 'Relatórios',
       icon: BarChart3,
-      isVisible: isAdmin,
+      path: '/reports',
+      visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
     },
     {
-      href: '/admin',
-      label: 'Admin',
+      label: 'Administração',
       icon: Settings,
-      isVisible: true,
+      path: '/admin',
+      visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
     },
   ]
 
-  const filteredLinks = links.filter((link) => link.isVisible)
-
-  const NavContent = ({ fullWidth = true }: { fullWidth?: boolean }) => (
-    <div className="flex flex-col h-full py-4">
-      <div
-        className={cn(
-          'px-4 mb-6 transition-all duration-300',
-          !fullWidth && 'px-2 text-center',
-        )}
-      >
-        <h1
-          className={cn(
-            'font-bold text-primary tracking-tight transition-all',
-            fullWidth ? 'text-xl' : 'text-xs scale-90',
-          )}
-        >
-          {fullWidth ? (
-            currentCompany?.nome_fantasia || 'PriceApp'
-          ) : (
-            <span title={currentCompany?.nome_fantasia || 'PriceApp'}>PA</span>
-          )}
-        </h1>
-        {fullWidth && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            {currentCompany?.razao_social || 'Gestão'}
-          </p>
-        )}
+  return (
+    <aside className="hidden md:flex flex-col w-64 border-r bg-slate-900 text-slate-100 h-screen transition-all">
+      <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center font-bold text-white">
+          P
+        </div>
+        <span className="font-bold text-lg tracking-tight">PriceApp</span>
       </div>
 
-      <nav className={cn('flex-1 space-y-2', fullWidth ? 'px-3' : 'px-2')}>
-        {filteredLinks.map((link) => {
-          const isActive = location.pathname === link.href
-          return (
+      <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+        {menuItems
+          .filter((item) => item.visible)
+          .map((item) => (
             <Link
-              key={link.href}
-              to={link.href}
-              onClick={() => setOpen(false)}
+              key={item.path}
+              to={item.path}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group/link relative',
-                isActive
+                'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
+                isActive(item.path)
                   ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                !fullWidth && 'justify-center px-0',
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800',
               )}
-              title={!fullWidth ? link.label : undefined}
             >
-              <link.icon
-                className={cn('w-5 h-5 shrink-0', !fullWidth && 'w-6 h-6')}
-              />
-              <span
-                className={cn(
-                  'transition-all duration-300 overflow-hidden whitespace-nowrap',
-                  !fullWidth && 'w-0 opacity-0 hidden',
-                )}
-              >
-                {link.label}
-              </span>
+              <item.icon className="w-5 h-5" />
+              {item.label}
             </Link>
-          )
-        })}
-      </nav>
+          ))}
+      </div>
 
-      <div className={cn('mt-auto', fullWidth ? 'px-3' : 'px-2')}>
+      <div className="p-4 border-t border-slate-800 bg-slate-900/50">
+        <Link
+          to="/profile"
+          className="flex items-center gap-3 mb-4 px-2 py-2 hover:bg-slate-800 rounded-md transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-slate-600 overflow-hidden">
+            {currentUser?.avatarUrl ? (
+              <img
+                src={currentUser.avatarUrl}
+                className="w-full h-full object-cover"
+                alt="Avatar"
+              />
+            ) : (
+              <UserCircle className="w-6 h-6 text-slate-400" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate text-white">
+              {currentUser?.name || 'Usuário'}
+            </p>
+            <p className="text-xs text-slate-500 truncate">
+              {currentUser?.role === 'ADMIN' ? 'Administrador' : 'Vendedor'}
+            </p>
+          </div>
+        </Link>
+
         <Button
           variant="ghost"
-          className={cn(
-            'w-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-all',
-            fullWidth ? 'justify-start' : 'justify-center px-0',
-          )}
+          className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/20"
           onClick={() => logout()}
-          title={!fullWidth ? 'Sair' : undefined}
         >
-          <LogOut className={cn('w-5 h-5', fullWidth && 'mr-2')} />
-          {fullWidth && 'Sair'}
+          <LogOut className="w-4 h-4 mr-2" />
+          Sair
         </Button>
       </div>
-    </div>
-  )
-
-  return (
-    <>
-      <aside className="hidden md:flex flex-col border-r bg-sidebar h-screen sticky top-0 z-50 transition-all duration-300 w-16 hover:w-56 group shadow-lg hover:shadow-xl overflow-hidden">
-        <div className="w-56 flex flex-col h-full">
-          <div className="flex flex-col h-full py-4">
-            <div className="px-5 mb-8 flex items-center gap-3 whitespace-nowrap">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="font-bold text-primary">
-                  {currentCompany?.nome_fantasia?.charAt(0) || 'P'}
-                </span>
-              </div>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
-                <h1 className="font-bold text-lg truncate w-32">
-                  {currentCompany?.nome_fantasia || 'PriceApp'}
-                </h1>
-              </div>
-            </div>
-
-            <nav className="flex-1 px-3 space-y-1">
-              {filteredLinks.map((link) => {
-                const isActive = location.pathname === link.href
-                return (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap',
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                    )}
-                  >
-                    <link.icon className="w-5 h-5 shrink-0" />
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
-                      {link.label}
-                    </span>
-                  </Link>
-                )
-              })}
-            </nav>
-
-            <div className="px-3 mt-auto">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 whitespace-nowrap px-3"
-                onClick={() => logout()}
-              >
-                <LogOut className="w-5 h-5 shrink-0" />
-                <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
-                  Sair
-                </span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <div className="md:hidden fixed top-3 left-3 z-50">
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10 bg-background/80 backdrop-blur-sm shadow-sm"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
-            <NavContent fullWidth={true} />
-            <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-          </SheetContent>
-        </Sheet>
-      </div>
-    </>
+    </aside>
   )
 }

@@ -12,8 +12,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
   LineChart,
   Line,
 } from 'recharts'
@@ -26,10 +24,9 @@ import {
 export function ReportCharts() {
   const { stats } = useReportStore()
 
-  // Prepare data for charts
   const timelineData = stats.evaluationsByDate.map((item) => ({
     ...item,
-    formattedDate: item.date.split('-').slice(1).reverse().join('/'), // MM/DD
+    formattedDate: item.date.split('-').slice(1).reverse().join('/'),
   }))
 
   const topModelsData = stats.topModels.map((item) => ({

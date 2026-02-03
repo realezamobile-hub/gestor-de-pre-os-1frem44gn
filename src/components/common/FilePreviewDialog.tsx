@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/dialog'
 import { FileIcon, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { isImageFile, isPdfFile } from '@/lib/utils'
 
 interface FilePreviewDialogProps {
   open: boolean
@@ -20,35 +21,52 @@ export function FilePreviewDialog({
   onOpenChange,
   fileUrl,
   fileName,
-  fileType = 'image',
+  fileType,
 }: FilePreviewDialogProps) {
   if (!fileUrl) return null
 
   const isImage =
     fileType === 'image' ||
-    fileUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ||
-    fileName?.match(/\.(jpeg|jpg|gif|png|webp)$/i)
+    isImageFile(fileUrl) ||
+    (fileName && isImageFile(fileName))
 
   const isPdf =
-    fileUrl.match(/\.pdf$/i) ||
-    fileName?.match(/\.pdf$/i) ||
-    fileType === 'application/pdf'
+    fileType === 'application/pdf' ||
+    isPdfFile(fileUrl) ||
+    (fileName && isPdfFile(fileName))
+
+  const handleOpenExternal = () => {
+    window.open(fileUrl, '_blank')
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl w-[90vw] max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-4 border-b bg-background z-10 shrink-0">
-          <DialogTitle className="flex items-center gap-2 truncate pr-8">
-            {isImage ? 'Visualizar Imagem' : 'Visualizar Arquivo'}
+        <DialogHeader className="p-4 border-b bg-background z-10 shrink-0 flex flex-row items-center justify-between space-y-0">
+          <DialogTitle className="flex items-center gap-2 truncate pr-4">
+            {isImage
+              ? 'Visualizar Imagem'
+              : isPdf
+                ? 'Visualizar Documento'
+                : 'Arquivo'}
             {fileName && (
-              <span className="text-muted-foreground font-normal text-sm truncate">
+              <span className="text-muted-foreground font-normal text-sm truncate max-w-[200px] sm:max-w-md hidden sm:inline-block">
                 - {fileName}
               </span>
             )}
           </DialogTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenExternal}
+            className="gap-2 text-primary hover:text-primary/80"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="hidden sm:inline">Abrir no Navegador</span>
+          </Button>
         </DialogHeader>
 
-        <div className="flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px]">
+        <div className="flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px] relative">
           {isImage ? (
             <img
               src={fileUrl}
@@ -69,11 +87,9 @@ export function FilePreviewDialog({
               <p className="text-muted-foreground">
                 Este tipo de arquivo não pode ser visualizado diretamente aqui.
               </p>
-              <Button asChild>
-                <a href={fileUrl} target="_blank" rel="noreferrer">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Abrir em nova aba
-                </a>
+              <Button onClick={handleOpenExternal}>
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Abrir em nova aba
               </Button>
             </div>
           )}

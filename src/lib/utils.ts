@@ -53,3 +53,11 @@ export function formatPhone(value: string): string {
     return phone.replace(/^(\d*)/, '($1')
   }
 }
+
+export function isImageFile(url: string): boolean {
+  return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url)
+}
+
+export function isPdfFile(url: string): boolean {
+  return /\.(pdf)(\?.*)?$/i.test(url)
+}

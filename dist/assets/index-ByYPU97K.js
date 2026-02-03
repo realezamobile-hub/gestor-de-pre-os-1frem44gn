@@ -21441,6 +21441,12 @@ function formatPhone(value) {
 	else if (phone.length > 2) return phone.replace(/^(\d\d)(\d{0,5}).*/, "($1) $2");
 	else return phone.replace(/^(\d*)/, "($1");
 }
+function isImageFile(url) {
+	return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url);
+}
+function isPdfFile(url) {
+	return /\.(pdf)(\?.*)?$/i.test(url);
+}
 var ToastProvider = Provider$1;
 var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$2, {
 	ref,
@@ -48074,26 +48080,38 @@ function ClientForm({ initialData, onSubmit, onCancel, isEditing = false }) {
 		]
 	});
 }
-function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType = "image" }) {
+function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType }) {
 	if (!fileUrl) return null;
-	const isImage$1 = fileType === "image" || fileUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) || fileName?.match(/\.(jpeg|jpg|gif|png|webp)$/i);
-	const isPdf = fileUrl.match(/\.pdf$/i) || fileName?.match(/\.pdf$/i) || fileType === "application/pdf";
+	const isImage$1 = fileType === "image" || isImageFile(fileUrl) || fileName && isImageFile(fileName);
+	const isPdf = fileType === "application/pdf" || isPdfFile(fileUrl) || fileName && isPdfFile(fileName);
+	const handleOpenExternal = () => {
+		window.open(fileUrl, "_blank");
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
 		open,
 		onOpenChange,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
 			className: "max-w-4xl w-[90vw] max-h-[90vh] flex flex-col p-0 overflow-hidden",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
-				className: "p-4 border-b bg-background z-10 shrink-0",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
-					className: "flex items-center gap-2 truncate pr-8",
-					children: [isImage$1 ? "Visualizar Imagem" : "Visualizar Arquivo", fileName && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-						className: "text-muted-foreground font-normal text-sm truncate",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, {
+				className: "p-4 border-b bg-background z-10 shrink-0 flex flex-row items-center justify-between space-y-0",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
+					className: "flex items-center gap-2 truncate pr-4",
+					children: [isImage$1 ? "Visualizar Imagem" : isPdf ? "Visualizar Documento" : "Arquivo", fileName && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "text-muted-foreground font-normal text-sm truncate max-w-[200px] sm:max-w-md hidden sm:inline-block",
 						children: ["- ", fileName]
 					})]
-				})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "ghost",
+					size: "sm",
+					onClick: handleOpenExternal,
+					className: "gap-2 text-primary hover:text-primary/80",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "hidden sm:inline",
+						children: "Abrir no Navegador"
+					})]
+				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px]",
+				className: "flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px] relative",
 				children: isImage$1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 					src: fileUrl,
 					alt: "Preview",
@@ -48113,14 +48131,9 @@ function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType = "
 							className: "text-muted-foreground",
 							children: "Este tipo de arquivo não pode ser visualizado diretamente aqui."
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-								href: fileUrl,
-								target: "_blank",
-								rel: "noreferrer",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4 mr-2" }), "Abrir em nova aba"]
-							})
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							onClick: handleOpenExternal,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4 mr-2" }), "Abrir em nova aba"]
 						})
 					]
 				})
@@ -49456,45 +49469,52 @@ function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItem
 								className: "mt-0 space-y-6",
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 									className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
-									children: files.length > 0 ? files.map((file, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: cn("group relative aspect-[3/4] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all hover:bg-slate-50 cursor-pointer overflow-hidden", file.color),
-										onClick: () => setPreviewFile({
-											url: file.url,
-											name: file.label
-										}),
-										children: [
-											file.url?.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-												src: file.url,
-												alt: file.label,
-												className: "absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
-											}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "flex flex-col items-center gap-2 z-10",
-												children: [
-													file.icon,
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-														className: "text-sm font-medium text-center",
+									children: files.length > 0 ? files.map((file, idx) => {
+										const isImage$1 = isImageFile(file.url);
+										const isPdf = isPdfFile(file.url);
+										return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: cn("group relative aspect-[3/4] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all hover:bg-slate-50 cursor-pointer overflow-hidden", file.color),
+											onClick: () => {
+												if (isPdf) window.open(file.url, "_blank");
+												else setPreviewFile({
+													url: file.url,
+													name: file.label
+												});
+											},
+											children: [
+												isImage$1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+													src: file.url,
+													alt: file.label,
+													className: "absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+												}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex flex-col items-center gap-2 z-10",
+													children: [
+														isPdf ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileText, { className: "w-12 h-12 text-red-500 mb-2" }) : file.icon,
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "text-sm font-medium text-center",
+															children: file.label
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+															variant: isPdf ? "destructive" : "secondary",
+															className: "mt-2",
+															children: isPdf ? "PDF" : "Documento"
+														})
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-0" }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm text-white transform translate-y-full group-hover:translate-y-0 transition-transform z-20",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "text-xs font-medium truncate",
 														children: file.label
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-														variant: "secondary",
-														className: "mt-2",
-														children: "Documento/PDF"
-													})
-												]
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-0" }),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm text-white transform translate-y-full group-hover:translate-y-0 transition-transform z-20",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-													className: "text-xs font-medium truncate",
-													children: file.label
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-													className: "text-[10px] opacity-80",
-													children: "Clique para visualizar"
-												})]
-											})
-										]
-									}, idx)) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "text-[10px] opacity-80",
+														children: isPdf ? "Clique para abrir em nova aba" : "Clique para visualizar"
+													})]
+												})
+											]
+										}, idx);
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "col-span-full py-12 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed",
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-12 h-12 mx-auto mb-3 opacity-20" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Nenhuma evidência anexada a esta avaliação." })]
 									})
@@ -75637,4 +75657,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-B7vA4w3b.js.map
+//# sourceMappingURL=index-ByYPU97K.js.map

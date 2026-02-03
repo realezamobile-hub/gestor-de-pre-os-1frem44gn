@@ -1242,6 +1242,9 @@ section[aria-label='Notifications alt+T'] {
 .max-w-\[150px\]{
   max-width: 150px;
 }
+.max-w-\[200px\]{
+  max-width: 200px;
+}
 .max-w-\[280px\]{
   max-width: 280px;
 }
@@ -3233,6 +3236,9 @@ section[aria-label='Notifications alt+T'] {
 .hover\:text-primary:hover{
   color: hsl(var(--primary));
 }
+.hover\:text-primary\/80:hover{
+  color: hsl(var(--primary) / 0.8);
+}
 .hover\:text-red-300:hover{
   --tw-text-opacity: 1;
   color: rgb(252 165 165 / var(--tw-text-opacity, 1));
@@ -4036,6 +4042,9 @@ section[aria-label='Notifications alt+T'] {
   }
   .sm\:mt-0{
     margin-top: 0px;
+  }
+  .sm\:inline-block{
+    display: inline-block;
   }
   .sm\:inline{
     display: inline;

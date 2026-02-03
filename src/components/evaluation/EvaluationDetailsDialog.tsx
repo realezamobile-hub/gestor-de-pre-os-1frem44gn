@@ -25,7 +25,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn, formatPhone, formatCPF } from '@/lib/utils'
+import { cn, formatPhone, formatCPF, isImageFile, isPdfFile } from '@/lib/utils'
 import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
 
 interface EvaluationDetailsDialogProps {
@@ -446,50 +446,68 @@ export function EvaluationDetailsDialog({
                 <TabsContent value="evidence" className="mt-0 space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {files.length > 0 ? (
-                      files.map((file, idx) => (
-                        <div
-                          key={idx}
-                          className={cn(
-                            'group relative aspect-[3/4] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all hover:bg-slate-50 cursor-pointer overflow-hidden',
-                            file.color,
-                          )}
-                          onClick={() =>
-                            setPreviewFile({
-                              url: file.url!,
-                              name: file.label,
-                            })
-                          }
-                        >
-                          {file.url?.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
-                            <img
-                              src={file.url!}
-                              alt={file.label}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center gap-2 z-10">
-                              {file.icon}
-                              <span className="text-sm font-medium text-center">
+                      files.map((file, idx) => {
+                        const isImage = isImageFile(file.url!)
+                        const isPdf = isPdfFile(file.url!)
+
+                        return (
+                          <div
+                            key={idx}
+                            className={cn(
+                              'group relative aspect-[3/4] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all hover:bg-slate-50 cursor-pointer overflow-hidden',
+                              file.color,
+                            )}
+                            onClick={() => {
+                              if (isPdf) {
+                                window.open(file.url!, '_blank')
+                              } else {
+                                setPreviewFile({
+                                  url: file.url!,
+                                  name: file.label,
+                                })
+                              }
+                            }}
+                          >
+                            {isImage ? (
+                              <img
+                                src={file.url!}
+                                alt={file.label}
+                                className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center gap-2 z-10">
+                                {isPdf ? (
+                                  <FileText className="w-12 h-12 text-red-500 mb-2" />
+                                ) : (
+                                  file.icon
+                                )}
+                                <span className="text-sm font-medium text-center">
+                                  {file.label}
+                                </span>
+                                <Badge
+                                  variant={isPdf ? 'destructive' : 'secondary'}
+                                  className="mt-2"
+                                >
+                                  {isPdf ? 'PDF' : 'Documento'}
+                                </Badge>
+                              </div>
+                            )}
+
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-0" />
+
+                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm text-white transform translate-y-full group-hover:translate-y-0 transition-transform z-20">
+                              <p className="text-xs font-medium truncate">
                                 {file.label}
-                              </span>
-                              <Badge variant="secondary" className="mt-2">
-                                Documento/PDF
-                              </Badge>
+                              </p>
+                              <p className="text-[10px] opacity-80">
+                                {isPdf
+                                  ? 'Clique para abrir em nova aba'
+                                  : 'Clique para visualizar'}
+                              </p>
                             </div>
-                          )}
-
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-0" />
-
-                          <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm text-white transform translate-y-full group-hover:translate-y-0 transition-transform z-20">
-                            <p className="text-xs font-medium truncate">
-                              {file.label}
-                            </p>
-                            <p className="text-[10px] opacity-80">
-                              Clique para visualizar
-                            </p>
                           </div>
-                        </div>
-                      ))
+                        )
+                      })
                     ) : (
                       <div className="col-span-full py-12 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed">
                         <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />

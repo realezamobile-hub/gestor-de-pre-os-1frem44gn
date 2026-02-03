@@ -5,6 +5,7 @@ import {
   Evaluation,
   ChecklistItem,
   ChecklistCategory,
+  ConsultationFile,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 
@@ -195,6 +196,13 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   },
 
   saveEvaluation: async (data) => {
+    // Extract research files to specific columns
+    const files = data.consultationFiles || []
+    const url_pesquisa_1 = files[0]?.url || null
+    const url_pesquisa_2 = files[1]?.url || null
+    const url_pesquisa_3 = files[2]?.url || null
+    const url_pesquisa_4 = files[3]?.url || null
+
     const { error } = await supabase.from('avaliacoes_iphone').insert({
       modelo: data.modelo,
       serial_number: data.serialNumber,
@@ -209,6 +217,11 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       url_print_seguranca: data.urlPrint || null,
       url_foto_documento: data.urlDoc || null,
       arquivos_consulta: data.consultationFiles || [],
+      // Save specific columns
+      url_pesquisa_1,
+      url_pesquisa_2,
+      url_pesquisa_3,
+      url_pesquisa_4,
     })
 
     if (!error) await get().fetchEvaluations()

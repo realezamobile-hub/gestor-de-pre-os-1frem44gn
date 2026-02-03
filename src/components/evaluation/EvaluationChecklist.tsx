@@ -240,7 +240,15 @@ export function EvaluationChecklist() {
         file,
         preview: URL.createObjectURL(file),
       }))
-      setConsultationFiles((prev) => [...prev, ...newFiles])
+
+      setConsultationFiles((prev) => {
+        const combined = [...prev, ...newFiles]
+        if (combined.length > 4) {
+          toast.error('Máximo de 4 arquivos de consulta permitidos.')
+          return combined.slice(0, 4)
+        }
+        return combined
+      })
     }
   }
 
@@ -711,7 +719,8 @@ export function EvaluationChecklist() {
 
                     <div className="col-span-1 md:col-span-2 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
                       <Label className="font-bold text-slate-700 flex items-center gap-2">
-                        <FileIcon className="w-4 h-4" /> Consultas Adicionais
+                        <FileIcon className="w-4 h-4" /> Pesquisas Adicionais
+                        (Max: 4)
                       </Label>
                       <p className="text-xs text-muted-foreground">
                         Outros arquivos relevantes (PDFs, Prints extras, etc)
@@ -726,17 +735,22 @@ export function EvaluationChecklist() {
                             className="hidden"
                             id="extra-upload"
                             onChange={handleConsultationUpload}
+                            disabled={consultationFiles.length >= 4}
                           />
                           <Label
                             htmlFor="extra-upload"
-                            className="flex items-center justify-center px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 cursor-pointer text-sm font-medium"
+                            className={cn(
+                              'flex items-center justify-center px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 cursor-pointer text-sm font-medium',
+                              consultationFiles.length >= 4 &&
+                                'opacity-50 cursor-not-allowed',
+                            )}
                           >
                             <Upload className="w-4 h-4 mr-2" />
                             Adicionar Arquivos
                           </Label>
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {consultationFiles.length} arquivos selecionados
+                          {consultationFiles.length}/4 arquivos selecionados
                         </span>
                       </div>
 

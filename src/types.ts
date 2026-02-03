@@ -160,4 +160,9 @@ export interface Evaluation {
   url_print_seguranca?: string | null
   url_foto_documento?: string | null
   arquivos_consulta?: ConsultationFile[] | null
+  // New fields for specific research files
+  url_pesquisa_1?: string | null
+  url_pesquisa_2?: string | null
+  url_pesquisa_3?: string | null
+  url_pesquisa_4?: string | null
 }

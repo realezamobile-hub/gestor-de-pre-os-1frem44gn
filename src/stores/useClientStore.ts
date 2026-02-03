@@ -129,6 +129,8 @@ export const useClientStore = create<ClientStore>((set, get) => ({
       const fileExt = file.name.split('.').pop() || 'jpg'
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
       const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
+
+      // Fix for "FormData object could not be cloned" error
       const cleanFile = new File([file], fileName, { type: file.type })
 
       const { error: uploadError } = await supabase.storage

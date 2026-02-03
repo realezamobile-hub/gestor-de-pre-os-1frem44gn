@@ -9,9 +9,17 @@ import {
   Settings,
   UserCircle,
   LogOut,
+  ChevronDown,
+  UserPlus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 
 interface SidebarProps {
   mode?: 'desktop' | 'mobile'
@@ -21,6 +29,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
   const location = useLocation()
   const { currentUser, logout } = useAuthStore()
   const isDesktop = mode === 'desktop'
+  const [isCadastroOpen, setIsCadastroOpen] = useState(true)
 
   const isActive = (path: string) => {
     if (path === '/' && location.pathname === '/') return true
@@ -28,7 +37,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
     return false
   }
 
-  const menuItems = [
+  const mainItems = [
     {
       label: 'Dashboard',
       icon: LayoutDashboard,
@@ -50,12 +59,22 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
         currentUser?.role === 'TECNICO' ||
         currentUser?.role === 'ADMIN',
     },
+  ]
+
+  const cadastroItems = [
     {
       label: 'Clientes',
       icon: Users,
       path: '/clients',
-      visible: true,
     },
+    {
+      label: 'Usuários',
+      icon: UserPlus,
+      path: '/admin', // Since AdminPage has the Users tab by default
+    },
+  ]
+
+  const bottomItems = [
     {
       label: 'Relatórios',
       icon: BarChart3,
@@ -63,7 +82,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
     },
     {
-      label: 'Administração',
+      label: 'Configurações',
       icon: Settings,
       path: '/admin',
       visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
@@ -94,7 +113,95 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-        {menuItems
+        {mainItems
+          .filter((item) => item.visible)
+          .map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+                isActive(item.path)
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800',
+              )}
+            >
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              <span
+                className={cn(
+                  'transition-opacity duration-300',
+                  isDesktop
+                    ? 'opacity-0 group-hover:opacity-100'
+                    : 'opacity-100',
+                )}
+              >
+                {item.label}
+              </span>
+            </Link>
+          ))}
+
+        {/* Cadastro Group */}
+        <Collapsible
+          open={isCadastroOpen}
+          onOpenChange={setIsCadastroOpen}
+          className="space-y-1"
+        >
+          <CollapsibleTrigger
+            className={cn(
+              'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap text-slate-400 hover:text-slate-100 hover:bg-slate-800',
+              isDesktop && 'justify-start',
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 flex-shrink-0" />
+              <span
+                className={cn(
+                  'transition-opacity duration-300',
+                  isDesktop
+                    ? 'opacity-0 group-hover:opacity-100'
+                    : 'opacity-100',
+                )}
+              >
+                Cadastro
+              </span>
+            </div>
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 transition-transform duration-200',
+                isCadastroOpen ? '' : '-rotate-90',
+                isDesktop && 'opacity-0 group-hover:opacity-100',
+              )}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1">
+            {cadastroItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  'flex items-center gap-3 pl-11 pr-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+                  isActive(item.path)
+                    ? 'text-primary'
+                    : 'text-slate-500 hover:text-slate-200',
+                  isDesktop && !isCadastroOpen && 'hidden',
+                )}
+              >
+                <span
+                  className={cn(
+                    'transition-opacity duration-300',
+                    isDesktop
+                      ? 'opacity-0 group-hover:opacity-100'
+                      : 'opacity-100',
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {bottomItems
           .filter((item) => item.visible)
           .map((item) => (
             <Link

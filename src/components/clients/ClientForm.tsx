@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select'
 import { WebcamCapture } from '@/components/common/WebcamCapture'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Camera, Loader2, Save, User } from 'lucide-react'
+import { Camera, Loader2, Save, User, X } from 'lucide-react'
 import { formatCPF, formatPhone, validateCPF } from '@/lib/utils'
 import { useClientStore } from '@/stores/useClientStore'
 import { Client } from '@/types'
@@ -58,8 +58,13 @@ export function ClientForm({
 
   const [showCamera, setShowCamera] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const [loadingCep, setLoadingCep] = useState(false)
+
+  // State for pending photo upload
+  const [pendingPhoto, setPendingPhoto] = useState<{
+    file: File
+    preview: string
+  } | null>(null)
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -88,17 +93,15 @@ export function ClientForm({
     }
   }
 
-  const handlePhotoCapture = async (file: File) => {
+  const handlePhotoCapture = (file: File) => {
     setShowCamera(false)
-    setIsUploadingPhoto(true)
-    const result = await uploadClientPhoto(file)
-    setIsUploadingPhoto(false)
-    if (result.success && result.url) {
-      setFormData((prev) => ({ ...prev, url_foto: result.url! }))
-      toast.success('Foto capturada com sucesso!')
-    } else {
-      toast.error('Erro ao salvar foto.')
-    }
+    const preview = URL.createObjectURL(file)
+    setPendingPhoto({ file, preview })
+  }
+
+  const handleRemovePhoto = () => {
+    setPendingPhoto(null)
+    setFormData((prev) => ({ ...prev, url_foto: '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,17 +114,41 @@ export function ClientForm({
       toast.error('Preencha os campos obrigatórios (*)')
       return
     }
+
     setIsSubmitting(true)
-    const success = await onSubmit(formData)
-    setIsSubmitting(false)
-    if (success) {
-      toast.success(
-        isEditing
-          ? 'Dados do cliente atualizados!'
-          : 'Cliente cadastrado com sucesso!',
-      )
+
+    try {
+      let currentFormData = { ...formData }
+
+      // Upload pending photo if exists
+      if (pendingPhoto) {
+        const result = await uploadClientPhoto(pendingPhoto.file)
+        if (result.success && result.url) {
+          currentFormData.url_foto = result.url
+        } else {
+          toast.error(
+            'Erro ao fazer upload da foto, mas tentando salvar dados...',
+          )
+        }
+      }
+
+      const success = await onSubmit(currentFormData)
+      if (success) {
+        toast.success(
+          isEditing
+            ? 'Dados do cliente atualizados!'
+            : 'Cliente cadastrado com sucesso!',
+        )
+      }
+    } catch (error) {
+      toast.error('Ocorreu um erro ao salvar')
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  // Determine current display photo
+  const displayPhoto = pendingPhoto?.preview || formData.url_foto || undefined
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in">
@@ -136,10 +163,7 @@ export function ClientForm({
           <div className="flex flex-col items-center gap-2">
             <div className="relative group">
               <Avatar className="w-32 h-32 border-4 border-white shadow-md">
-                <AvatarImage
-                  src={formData.url_foto || undefined}
-                  className="object-cover"
-                />
+                <AvatarImage src={displayPhoto} className="object-cover" />
                 <AvatarFallback className="bg-gray-100 text-4xl">
                   {formData.nome ? (
                     formData.nome[0].toUpperCase()
@@ -152,19 +176,29 @@ export function ClientForm({
                 type="button"
                 size="icon"
                 variant="secondary"
-                className="absolute bottom-0 right-0 rounded-full shadow-md"
+                className="absolute bottom-0 right-0 rounded-full shadow-md z-10"
                 onClick={() => setShowCamera(true)}
-                disabled={isUploadingPhoto}
+                disabled={isSubmitting}
               >
-                {isUploadingPhoto ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Camera className="w-4 h-4" />
-                )}
+                <Camera className="w-4 h-4" />
               </Button>
+              {displayPhoto && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                  className="absolute top-0 right-0 rounded-full shadow-md w-6 h-6 z-10"
+                  onClick={handleRemovePhoto}
+                  disabled={isSubmitting}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              )}
             </div>
             <span className="text-sm text-muted-foreground">
-              Clique na câmera para adicionar foto
+              {pendingPhoto
+                ? 'Foto capturada (será salva ao confirmar)'
+                : 'Clique na câmera para adicionar foto'}
             </span>
           </div>
         )}

@@ -5,7 +5,6 @@ import {
   Evaluation,
   ChecklistItem,
   ChecklistCategory,
-  ConsultationFile,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 
@@ -265,16 +264,12 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
       const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
 
-      // CRITICAL FIX: Ensure file is a fresh File object to avoid "FormData object could not be cloned" error
-      // This error often happens with Files from inputs in some environments or if file properties are non-enumerable
-      const cleanFile = new File([file], fileName, {
-        type: file.type || 'application/octet-stream',
-        lastModified: file.lastModified || Date.now(),
-      })
+      // CRITICAL FIX: Convert to ArrayBuffer to prevent "FormData object could not be cloned" error
+      const fileBuffer = await file.arrayBuffer()
 
       const { error: uploadError } = await supabase.storage
         .from('evaluation-evidence')
-        .upload(fileName, cleanFile, {
+        .upload(fileName, fileBuffer, {
           upsert: false,
           contentType: file.type || 'application/octet-stream',
           cacheControl: '3600',

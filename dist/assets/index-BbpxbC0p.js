@@ -47330,11 +47330,8 @@ const useEvaluationStore = create((set, get$8) => ({
 			const fileExt = file.name.split(".").pop()?.toLowerCase() || "unknown";
 			const sanitizedBaseName = (file.name.substring(0, file.name.lastIndexOf(".")) || file.name).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s\-_]/g, "").replace(/\s+/g, "-").toLowerCase();
 			const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`;
-			const cleanFile = new File([file], fileName, {
-				type: file.type || "application/octet-stream",
-				lastModified: file.lastModified || Date.now()
-			});
-			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, cleanFile, {
+			const fileBuffer = await file.arrayBuffer();
+			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, fileBuffer, {
 				upsert: false,
 				contentType: file.type || "application/octet-stream",
 				cacheControl: "3600"
@@ -75195,4 +75192,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Czov-e3c.js.map
+//# sourceMappingURL=index-BbpxbC0p.js.map

@@ -4,9 +4,11 @@ import { Client } from '@/types'
 
 interface ClientStore {
   currentClient: Client | null
+  clients: Client[]
   isLoading: boolean
 
   fetchClientByCpf: (cpf: string) => Promise<Client | null>
+  searchClients: (query: string) => Promise<void>
   createClient: (
     data: Omit<Client, 'id' | 'created_at' | 'updated_at'>,
   ) => Promise<{ success: boolean; data?: Client; error?: any }>
@@ -14,11 +16,16 @@ interface ClientStore {
     id: string,
     data: Partial<Client>,
   ) => Promise<{ success: boolean; error?: any }>
+  uploadClientPhoto: (
+    file: File,
+  ) => Promise<{ success: boolean; url?: string; error?: any }>
   clearCurrentClient: () => void
+  fetchClientEvaluations: (clientId: string) => Promise<any[]>
 }
 
 export const useClientStore = create<ClientStore>((set, get) => ({
   currentClient: null,
+  clients: [],
   isLoading: false,
 
   fetchClientByCpf: async (cpf) => {
@@ -40,11 +47,40 @@ export const useClientStore = create<ClientStore>((set, get) => ({
     return null
   },
 
+  searchClients: async (query) => {
+    set({ isLoading: true })
+
+    let queryBuilder = supabase.from('clientes').select('*').order('nome')
+
+    if (query) {
+      // Simple ILIKE search on name or CPF
+      queryBuilder = queryBuilder.or(
+        `nome.ilike.%${query}%,cpf.ilike.%${query}%`,
+      )
+    } else {
+      queryBuilder = queryBuilder.limit(50)
+    }
+
+    const { data, error } = await queryBuilder
+
+    if (!error && data) {
+      set({ clients: data as Client[] })
+    }
+
+    set({ isLoading: false })
+  },
+
   createClient: async (clientData) => {
     set({ isLoading: true })
+    // Ensure legacy 'endereco' is populated if new fields are present
+    let endereco = clientData.endereco
+    if (!endereco && clientData.rua) {
+      endereco = `${clientData.rua}, ${clientData.numero || 'S/N'}, ${clientData.bairro || ''}, ${clientData.municipio || ''} - ${clientData.estado || ''}`
+    }
+
     const { data, error } = await supabase
       .from('clientes')
-      .insert(clientData)
+      .insert({ ...clientData, endereco })
       .select()
       .single()
 
@@ -56,6 +92,8 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
     if (data) {
       set({ currentClient: data as Client })
+      // Add to list if not present
+      set((state) => ({ clients: [data as Client, ...state.clients] }))
       return { success: true, data: data as Client }
     }
 
@@ -64,6 +102,15 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
   updateClient: async (id, clientData) => {
     set({ isLoading: true })
+
+    // Update legacy address string if address parts are updated
+    let enderecoUpdates = {}
+    if (clientData.rua || clientData.municipio) {
+      // This logic is simplified; ideally we would read current state + updates to form full string
+      // For now we assume if they update address parts, we might want to update the full string or leave it
+      // Let's just update the specific fields provided
+    }
+
     const { error } = await supabase
       .from('clientes')
       .update({ ...clientData, updated_at: new Date().toISOString() })
@@ -75,17 +122,54 @@ export const useClientStore = create<ClientStore>((set, get) => ({
       return { success: false, error }
     }
 
-    // Refresh current client if it matches
-    if (get().currentClient?.id === id) {
-      set((state) => ({
-        currentClient: state.currentClient
+    // Refresh store states
+    const updatedClient = { ...get().currentClient, ...clientData } as Client
+
+    set((state) => ({
+      currentClient:
+        state.currentClient?.id === id
           ? { ...state.currentClient, ...clientData }
-          : null,
-      }))
-    }
+          : state.currentClient,
+      clients: state.clients.map((c) =>
+        c.id === id ? { ...c, ...clientData } : c,
+      ),
+    }))
 
     return { success: true }
   },
 
+  uploadClientPhoto: async (file) => {
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = `client-photos/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars') // Using avatars bucket
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(fileName)
+
+      return { success: true, url: publicUrl }
+    } catch (error) {
+      console.error('Client photo upload error:', error)
+      return { success: false, error }
+    }
+  },
+
   clearCurrentClient: () => set({ currentClient: null }),
+
+  fetchClientEvaluations: async (clientId) => {
+    const { data, error } = await supabase
+      .from('avaliacoes_iphone')
+      .select('*')
+      .eq('cliente_id', clientId)
+      .order('created_at', { ascending: false })
+
+    if (error) return []
+    return data
+  },
 }))

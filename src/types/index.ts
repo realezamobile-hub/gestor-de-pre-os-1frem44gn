@@ -136,7 +136,24 @@ export interface Client {
   cpf: string
   rg?: string | null
   telefone: string
+  // Legacy
   endereco?: string | null
+  // New Fields
+  cep?: string | null
+  rua?: string | null
+  numero?: string | null
+  complemento?: string | null
+  bairro?: string | null
+  municipio?: string | null
+  estado?: string | null
+
+  data_nascimento?: string | null
+  email?: string | null
+  origem?: string | null
+  genero?: string | null
+  url_foto?: string | null
+  observacoes?: string | null
+
   nome_contato_emergencia?: string | null
   telefone_contato_emergencia?: string | null
   created_at: string

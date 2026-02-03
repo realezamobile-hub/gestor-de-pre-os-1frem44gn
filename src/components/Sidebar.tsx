@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   ClipboardCheck,
+  Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -62,6 +63,12 @@ export function Sidebar() {
       isVisible:
         hasModule('evaluation') &&
         (isAdmin || isTecnico || currentUser?.canAccessEvaluation),
+    },
+    {
+      href: '/clients',
+      label: 'Clientes',
+      icon: Users,
+      isVisible: true,
     },
     {
       href: '/admin',

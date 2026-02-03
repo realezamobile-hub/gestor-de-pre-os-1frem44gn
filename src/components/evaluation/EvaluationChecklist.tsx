@@ -39,7 +39,14 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
-import { PeripheralDiscountConfig, ConsultationFile } from '@/types'
+import { PeripheralDiscountConfig, ConsultationFile, Client } from '@/types'
+import { ClientForm } from '@/components/clients/ClientForm'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export function EvaluationChecklist() {
   const {
@@ -81,15 +88,8 @@ export function EvaluationChecklist() {
 
   // Client Search State
   const [searchCpf, setSearchCpf] = useState('')
-  const [showClientForm, setShowClientForm] = useState(false)
-  const [newClientData, setNewClientData] = useState({
-    nome: '',
-    rg: '',
-    telefone: '',
-    endereco: '',
-    nome_contato_emergencia: '',
-    telefone_contato_emergencia: '',
-  })
+  const [showClientModal, setShowClientModal] = useState(false)
+  const [isNewClient, setIsNewClient] = useState(false)
 
   // Files State
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -155,16 +155,9 @@ export function EvaluationChecklist() {
         toast.error('Realize todas as verificações de segurança')
         return
       }
-      if (!currentClient && !showClientForm) {
+      if (!currentClient) {
         toast.error('Identifique o cliente pelo CPF')
         return
-      }
-      if (showClientForm) {
-        // Validate form
-        if (!newClientData.nome || !newClientData.telefone) {
-          toast.error('Preencha os dados obrigatórios do cliente')
-          return
-        }
       }
       if (uploadedFiles.length === 0) {
         toast.error('Anexe pelo menos uma evidência (Consultas/Docs)')
@@ -184,10 +177,33 @@ export function EvaluationChecklist() {
     const client = await fetchClientByCpf(searchCpf)
     if (client) {
       toast.success('Cliente encontrado!')
-      setShowClientForm(false)
     } else {
-      toast.info('Cliente não encontrado. Preencha o cadastro.')
-      setShowClientForm(true)
+      toast.info('Cliente não encontrado. Cadastre agora.')
+      setIsNewClient(true)
+      setShowClientModal(true)
+    }
+  }
+
+  const handleCreateClient = async (data: any) => {
+    if (!currentCompany) return false
+
+    const {
+      success,
+      data: client,
+      error,
+    } = await createClient({
+      ...data,
+      company_id: currentCompany.id,
+    })
+
+    if (success && client) {
+      toast.success('Cliente cadastrado!')
+      setShowClientModal(false)
+      // Client is auto-set in store by createClient
+      return true
+    } else {
+      toast.error('Erro ao cadastrar cliente')
+      return false
     }
   }
 
@@ -207,35 +223,12 @@ export function EvaluationChecklist() {
   }
 
   const handleSave = async () => {
-    if (!currentUser || !selectedModel || !currentCompany) return
+    if (!currentUser || !selectedModel || !currentCompany || !currentClient)
+      return
 
     setIsSaving(true)
 
-    // 1. Handle Client (Create if needed)
-    let clientId = currentClient?.id
-    let clientName = currentClient?.nome || newClientData.nome
-    let clientPhone = currentClient?.telefone || newClientData.telefone
-    let clientCpf = currentClient?.cpf || searchCpf
-
-    if (!clientId && showClientForm) {
-      const { success, data, error } = await createClient({
-        ...newClientData,
-        cpf: searchCpf,
-        company_id: currentCompany.id,
-      })
-
-      if (!success || !data) {
-        toast.error('Erro ao cadastrar cliente: ' + (error?.message || ''))
-        setIsSaving(false)
-        return
-      }
-      clientId = data.id
-      clientName = data.nome
-      clientPhone = data.telefone
-      clientCpf = data.cpf
-    }
-
-    // 2. Upload Files
+    // 1. Upload Files
     const uploadedFileUrls: ConsultationFile[] = []
 
     for (const fileObj of uploadedFiles) {
@@ -255,7 +248,7 @@ export function EvaluationChecklist() {
       return
     }
 
-    // 3. Save Evaluation
+    // 2. Save Evaluation
     const result = await saveEvaluation({
       modelo: selectedModel.modelo,
       serialNumber,
@@ -272,10 +265,10 @@ export function EvaluationChecklist() {
       userId: currentUser.id,
 
       // Client Link
-      clienteId: clientId,
-      nomeCliente: clientName,
-      telefoneCliente: clientPhone,
-      cpfCliente: clientCpf,
+      clienteId: currentClient.id,
+      nomeCliente: currentClient.nome,
+      telefoneCliente: currentClient.telefone,
+      cpfCliente: currentClient.cpf,
 
       // Files
       files: uploadedFileUrls,
@@ -292,15 +285,6 @@ export function EvaluationChecklist() {
       setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
       clearCurrentClient()
       setSearchCpf('')
-      setShowClientForm(false)
-      setNewClientData({
-        nome: '',
-        rg: '',
-        telefone: '',
-        endereco: '',
-        nome_contato_emergencia: '',
-        telefone_contato_emergencia: '',
-      })
       setUploadedFiles([])
     } else {
       toast.error('Erro ao salvar avaliação')
@@ -689,115 +673,25 @@ export function EvaluationChecklist() {
                             Endereço:
                           </span>
                           <p className="font-medium">
-                            {currentClient.endereco || '-'}
+                            {[currentClient.municipio, currentClient.estado]
+                              .filter(Boolean)
+                              .join(' - ') ||
+                              currentClient.endereco ||
+                              '-'}
                           </p>
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                  {showClientForm && !currentClient && (
-                    <div className="bg-slate-50 border rounded-lg p-4 space-y-4 animate-in fade-in slide-in-from-top-4">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-primary">
-                          Novo Cadastro
-                        </h4>
-                        <span className="text-xs text-muted-foreground">
-                          * Campos obrigatórios
-                        </span>
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Nome Completo *</Label>
-                          <Input
-                            value={newClientData.nome}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                nome: e.target.value,
-                              }))
-                            }
-                            placeholder="Nome do cliente"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Telefone / WhatsApp *</Label>
-                          <Input
-                            value={newClientData.telefone}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                telefone: formatPhone(e.target.value),
-                              }))
-                            }
-                            placeholder="(00) 00000-0000"
-                            maxLength={15}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>RG</Label>
-                          <Input
-                            value={newClientData.rg}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                rg: e.target.value,
-                              }))
-                            }
-                            placeholder="Registro Geral"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>CPF</Label>
-                          <Input
-                            value={searchCpf}
-                            disabled
-                            className="bg-gray-100"
-                          />
-                        </div>
-                        <div className="col-span-2 space-y-2">
-                          <Label>Endereço Completo</Label>
-                          <Input
-                            value={newClientData.endereco}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                endereco: e.target.value,
-                              }))
-                            }
-                            placeholder="Rua, Número, Bairro, Cidade - UF"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Contato de Emergência (Nome)</Label>
-                          <Input
-                            value={newClientData.nome_contato_emergencia}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                nome_contato_emergencia: e.target.value,
-                              }))
-                            }
-                            placeholder="Nome do contato"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Tel. Emergência</Label>
-                          <Input
-                            value={newClientData.telefone_contato_emergencia}
-                            onChange={(e) =>
-                              setNewClientData((prev) => ({
-                                ...prev,
-                                telefone_contato_emergencia: formatPhone(
-                                  e.target.value,
-                                ),
-                              }))
-                            }
-                            placeholder="(00) 00000-0000"
-                            maxLength={15}
-                          />
-                        </div>
+                      <div className="flex justify-end pt-2">
+                        <Button
+                          variant="link"
+                          size="sm"
+                          onClick={() => {
+                            setIsNewClient(false)
+                            setShowClientModal(true)
+                          }}
+                        >
+                          Editar Dados
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -805,7 +699,7 @@ export function EvaluationChecklist() {
               </div>
             )}
 
-            {step === 5 && (
+            {step === 5 && currentClient && (
               <div className="space-y-6">
                 <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
                   <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
@@ -828,17 +722,11 @@ export function EvaluationChecklist() {
                     </h4>
                     <div className="flex justify-between">
                       <span className="text-sm">Cliente</span>
-                      <span className="font-medium">
-                        {currentClient
-                          ? currentClient.nome
-                          : newClientData.nome}
-                      </span>
+                      <span className="font-medium">{currentClient.nome}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">CPF</span>
-                      <span className="font-medium">
-                        {currentClient ? currentClient.cpf : searchCpf}
-                      </span>
+                      <span className="font-medium">{currentClient.cpf}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">Arquivos</span>
@@ -956,9 +844,7 @@ export function EvaluationChecklist() {
               <div className="border-t border-slate-700 pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <UserIcon className="w-4 h-4" />
-                  {currentClient?.nome ||
-                    newClientData.nome ||
-                    'Identificando...'}
+                  {currentClient?.nome || 'Identificando...'}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <ShieldCheck
@@ -979,6 +865,23 @@ export function EvaluationChecklist() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Client Modal */}
+      <Dialog open={showClientModal} onOpenChange={setShowClientModal}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {isNewClient ? 'Novo Cadastro' : 'Editar Cliente'}
+            </DialogTitle>
+          </DialogHeader>
+          <ClientForm
+            initialData={isNewClient ? { cpf: searchCpf } : currentClient || {}}
+            onSubmit={handleCreateClient}
+            onCancel={() => setShowClientModal(false)}
+            isEditing={!isNewClient}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

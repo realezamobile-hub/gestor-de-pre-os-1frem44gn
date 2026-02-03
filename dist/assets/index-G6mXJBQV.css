@@ -720,6 +720,9 @@ section[aria-label='Notifications alt+T'] {
 .order-2{
   order: 2;
 }
+.col-span-1{
+  grid-column: span 1 / span 1;
+}
 .col-span-10{
   grid-column: span 10 / span 10;
 }
@@ -878,6 +881,9 @@ section[aria-label='Notifications alt+T'] {
 .hidden{
   display: none;
 }
+.aspect-\[4\/3\]{
+  aspect-ratio: 4/3;
+}
 .size-4{
   width: 1rem;
   height: 1rem;
@@ -957,6 +963,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .h-\[calc\(100vh-3\.5rem\)\]{
   height: calc(100vh - 3.5rem);
+}
+.h-\[calc\(100vh-4rem\)\]{
+  height: calc(100vh - 4rem);
 }
 .h-\[calc\(100vh-6rem\)\]{
   height: calc(100vh - 6rem);
@@ -1185,6 +1194,9 @@ section[aria-label='Notifications alt+T'] {
 .min-w-\[var\(--radix-select-trigger-width\)\]{
   min-width: var(--radix-select-trigger-width);
 }
+.max-w-3xl{
+  max-width: 48rem;
+}
 .max-w-4xl{
   max-width: 56rem;
 }
@@ -1202,6 +1214,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .max-w-\[280px\]{
   max-width: 280px;
+}
+.max-w-\[400px\]{
+  max-width: 400px;
 }
 .max-w-lg{
   max-width: 32rem;
@@ -1577,6 +1592,10 @@ section[aria-label='Notifications alt+T'] {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+.rounded-t-xl{
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
 .rounded-bl-lg{
   border-bottom-left-radius: var(--radius);
 }
@@ -1720,6 +1739,9 @@ section[aria-label='Notifications alt+T'] {
   --tw-border-opacity: 1;
   border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
 }
+.border-white\/10{
+  border-color: rgb(255 255 255 / 0.1);
+}
 .border-white\/30{
   border-color: rgb(255 255 255 / 0.3);
 }
@@ -1765,6 +1787,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-background\/95{
   background-color: hsl(var(--background) / 0.95);
+}
+.bg-black{
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
 }
 .bg-black\/40{
   background-color: rgb(0 0 0 / 0.4);
@@ -1959,6 +1985,9 @@ section[aria-label='Notifications alt+T'] {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
+.bg-white\/10{
+  background-color: rgb(255 255 255 / 0.1);
+}
 .bg-white\/20{
   background-color: rgb(255 255 255 / 0.2);
 }
@@ -2115,6 +2144,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .pb-0\.5{
   padding-bottom: 0.125rem;
+}
+.pb-10{
+  padding-bottom: 2.5rem;
 }
 .pb-12{
   padding-bottom: 3rem;
@@ -2513,9 +2545,17 @@ section[aria-label='Notifications alt+T'] {
   --tw-text-opacity: 1;
   color: rgb(202 138 4 / var(--tw-text-opacity, 1));
 }
+.text-yellow-700{
+  --tw-text-opacity: 1;
+  color: rgb(161 98 7 / var(--tw-text-opacity, 1));
+}
 .text-yellow-800{
   --tw-text-opacity: 1;
   color: rgb(133 77 14 / var(--tw-text-opacity, 1));
+}
+.text-yellow-900{
+  --tw-text-opacity: 1;
+  color: rgb(113 63 18 / var(--tw-text-opacity, 1));
 }
 .underline-offset-4{
   text-underline-offset: 4px;
@@ -2743,9 +2783,6 @@ section[aria-label='Notifications alt+T'] {
 }
 .slide-in-from-right-4{
   --tw-enter-translate-x: 1rem;
-}
-.slide-in-from-top-4{
-  --tw-enter-translate-y: -1rem;
 }
 .duration-1000{
   animation-duration: 1000ms;
@@ -3912,6 +3949,9 @@ section[aria-label='Notifications alt+T'] {
   }
   .sm\:max-w-sm{
     max-width: 24rem;
+  }
+  .sm\:max-w-xl{
+    max-width: 36rem;
   }
   .sm\:grid-cols-2{
     grid-template-columns: repeat(2, minmax(0, 1fr));

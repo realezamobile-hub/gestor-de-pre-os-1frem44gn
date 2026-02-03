@@ -129,6 +129,26 @@ export interface PeripheralDiscountConfig {
   company_id?: string
 }
 
+export interface Client {
+  id: string
+  company_id: string
+  nome: string
+  cpf: string
+  rg?: string | null
+  telefone: string
+  endereco?: string | null
+  nome_contato_emergencia?: string | null
+  telefone_contato_emergencia?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ConsultationFile {
+  name: string
+  url: string
+  type: 'anatel' | 'blacklist' | 'mdm' | 'document' | 'other'
+}
+
 export interface Evaluation {
   id: string
   user_id: string
@@ -142,4 +162,14 @@ export interface Evaluation {
   empresas?: {
     nome_fantasia: string
   } | null
+  // Legacy fields
+  nome_cliente?: string | null
+  telefone_cliente?: string | null
+  cpf_cliente?: string | null
+  url_print_seguranca?: string | null
+  url_foto_documento?: string | null
+  // New fields
+  cliente_id?: string | null
+  client?: Client | null
+  arquivos_consulta?: ConsultationFile[] | null
 }

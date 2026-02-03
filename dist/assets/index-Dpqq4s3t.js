@@ -19275,6 +19275,13 @@ var FileText = createLucideIcon("file-text", [
 		key: "z1uh3a"
 	}]
 ]);
+var File$1 = createLucideIcon("file", [["path", {
+	d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
+	key: "1oefj6"
+}], ["path", {
+	d: "M14 2v5a1 1 0 0 0 1 1h5",
+	key: "wfsgrz"
+}]]);
 var Globe = createLucideIcon("globe", [
 	["circle", {
 		cx: "12",
@@ -21316,6 +21323,33 @@ var getDefaultConfig = () => {
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 function cn(...inputs) {
 	return twMerge(clsx(inputs));
+}
+function validateCPF(cpf) {
+	const strCPF = cpf.replace(/[^\d]+/g, "");
+	if (strCPF.length !== 11) return false;
+	if (/^(\d)\1{10}$/.test(strCPF)) return false;
+	let sum = 0;
+	let remainder;
+	for (let i = 1; i <= 9; i++) sum = sum + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+	remainder = sum * 10 % 11;
+	if (remainder === 10 || remainder === 11) remainder = 0;
+	if (remainder !== parseInt(strCPF.substring(9, 10))) return false;
+	sum = 0;
+	for (let i = 1; i <= 10; i++) sum = sum + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+	remainder = sum * 10 % 11;
+	if (remainder === 10 || remainder === 11) remainder = 0;
+	if (remainder !== parseInt(strCPF.substring(10, 11))) return false;
+	return true;
+}
+function formatCPF(value) {
+	return value.replace(/\D/g, "").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})/, "$1-$2").replace(/(-\d{2})\d+?$/, "$1");
+}
+function formatPhone(value) {
+	const phone = value.replace(/\D/g, "");
+	if (phone.length > 10) return phone.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+	else if (phone.length > 5) return phone.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+	else if (phone.length > 2) return phone.replace(/^(\d\d)(\d{0,5}).*/, "($1) $2");
+	else return phone.replace(/^(\d*)/, "($1");
 }
 var ToastProvider = Provider$1;
 var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport$2, {
@@ -46930,6 +46964,9 @@ const useEvaluationStore = create((set, get$1) => ({
 		};
 	},
 	saveEvaluation: async (data) => {
+		const mainFile = data.files && data.files.length > 0 ? data.files[0] : null;
+		const urlPrint = data.urlPrintSeguranca || (mainFile ? mainFile.url : "");
+		const urlDoc = data.urlFotoDocumento || "";
 		const { error } = await supabase.from("avaliacoes_iphone").insert({
 			modelo: data.modelo,
 			serial_number: data.serialNumber,
@@ -46940,8 +46977,10 @@ const useEvaluationStore = create((set, get$1) => ({
 			nome_cliente: data.nomeCliente,
 			telefone_cliente: data.telefoneCliente,
 			cpf_cliente: data.cpfCliente,
-			url_print_seguranca: data.urlPrintSeguranca,
-			url_foto_documento: data.urlFotoDocumento
+			cliente_id: data.clienteId,
+			url_print_seguranca: urlPrint,
+			url_foto_documento: urlDoc,
+			arquivos_consulta: data.files
 		});
 		if (!error) await get$1().fetchEvaluations();
 		return {
@@ -46951,9 +46990,13 @@ const useEvaluationStore = create((set, get$1) => ({
 	},
 	fetchEvaluations: async () => {
 		set({ isLoading: true });
-		const { data, error } = await supabase.from("avaliacoes_iphone").select("*, empresas(nome_fantasia)").order("created_at", { ascending: false }).limit(100);
+		const { data, error } = await supabase.from("avaliacoes_iphone").select("*, empresas(nome_fantasia), clientes(*)").order("created_at", { ascending: false }).limit(100);
+		const mappedData = data?.map((d) => ({
+			...d,
+			client: d.clientes
+		}));
 		if (!error && data) set({
-			evaluations: data,
+			evaluations: mappedData,
 			isLoading: false
 		});
 		else set({ isLoading: false });
@@ -47642,9 +47685,63 @@ function EvaluationConfig() {
 		})
 	});
 }
+const useClientStore = create((set, get$1) => ({
+	currentClient: null,
+	isLoading: false,
+	fetchClientByCpf: async (cpf) => {
+		set({ isLoading: true });
+		const { data, error } = await supabase.from("clientes").select("*").eq("cpf", cpf).maybeSingle();
+		set({ isLoading: false });
+		if (data) {
+			set({ currentClient: data });
+			return data;
+		}
+		set({ currentClient: null });
+		return null;
+	},
+	createClient: async (clientData) => {
+		set({ isLoading: true });
+		const { data, error } = await supabase.from("clientes").insert(clientData).select().single();
+		set({ isLoading: false });
+		if (error) return {
+			success: false,
+			error
+		};
+		if (data) {
+			set({ currentClient: data });
+			return {
+				success: true,
+				data
+			};
+		}
+		return {
+			success: false,
+			error: "Unknown error"
+		};
+	},
+	updateClient: async (id, clientData) => {
+		set({ isLoading: true });
+		const { error } = await supabase.from("clientes").update({
+			...clientData,
+			updated_at: (/* @__PURE__ */ new Date()).toISOString()
+		}).eq("id", id);
+		set({ isLoading: false });
+		if (error) return {
+			success: false,
+			error
+		};
+		if (get$1().currentClient?.id === id) set((state) => ({ currentClient: state.currentClient ? {
+			...state.currentClient,
+			...clientData
+		} : null }));
+		return { success: true };
+	},
+	clearCurrentClient: () => set({ currentClient: null })
+}));
 function EvaluationChecklist() {
 	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence } = useEvaluationStore();
-	const { currentUser } = useAuthStore();
+	const { currentClient, fetchClientByCpf, createClient: createClient$1, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
+	const { currentUser, currentCompany } = useAuthStore();
 	const [step, setStep] = (0, import_react.useState)(1);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	const [selectedModelId, setSelectedModelId] = (0, import_react.useState)("");
@@ -47655,15 +47752,17 @@ function EvaluationChecklist() {
 		blacklist: false,
 		mdm: false
 	});
-	const [customerData, setCustomerData] = (0, import_react.useState)({
-		name: "",
-		phone: "",
-		cpf: ""
+	const [searchCpf, setSearchCpf] = (0, import_react.useState)("");
+	const [showClientForm, setShowClientForm] = (0, import_react.useState)(false);
+	const [newClientData, setNewClientData] = (0, import_react.useState)({
+		nome: "",
+		rg: "",
+		telefone: "",
+		endereco: "",
+		nome_contato_emergencia: "",
+		telefone_contato_emergencia: ""
 	});
-	const [files, setFiles] = (0, import_react.useState)({
-		print: null,
-		doc: null
-	});
+	const [uploadedFiles, setUploadedFiles] = (0, import_react.useState)([]);
 	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
 	const getDetectedDefects = () => {
 		if (!selectedModel) return [];
@@ -47692,29 +47791,84 @@ function EvaluationChecklist() {
 				toast.error("Realize todas as verificações de segurança");
 				return;
 			}
+			if (!currentClient && !showClientForm) {
+				toast.error("Identifique o cliente pelo CPF");
+				return;
+			}
+			if (showClientForm) {
+				if (!newClientData.nome || !newClientData.telefone) {
+					toast.error("Preencha os dados obrigatórios do cliente");
+					return;
+				}
+			}
+			if (uploadedFiles.length === 0) {
+				toast.error("Anexe pelo menos uma evidência (Consultas/Docs)");
+				return;
+			}
 		}
 		setStep((s) => s + 1);
 	};
+	const handleClientSearch = async () => {
+		if (!searchCpf) return;
+		if (!validateCPF(searchCpf)) {
+			toast.error("CPF inválido");
+			return;
+		}
+		if (await fetchClientByCpf(searchCpf)) {
+			toast.success("Cliente encontrado!");
+			setShowClientForm(false);
+		} else {
+			toast.info("Cliente não encontrado. Preencha o cadastro.");
+			setShowClientForm(true);
+		}
+	};
+	const handleFileUpload = (e) => {
+		if (e.target.files && e.target.files.length > 0) {
+			const newFiles = Array.from(e.target.files).map((file) => ({
+				file,
+				type: "document",
+				preview: URL.createObjectURL(file)
+			}));
+			setUploadedFiles((prev) => [...prev, ...newFiles]);
+		}
+	};
+	const removeFile = (index$1) => {
+		setUploadedFiles((prev) => prev.filter((_$1, i) => i !== index$1));
+	};
 	const handleSave = async () => {
-		if (!currentUser || !selectedModel) return;
-		if (!customerData.name || !customerData.phone || !customerData.cpf) {
-			toast.error("Preencha os dados do cliente");
-			return;
-		}
-		if (!files.print || !files.doc) {
-			toast.error("Anexe as evidências obrigatórias");
-			return;
-		}
+		if (!currentUser || !selectedModel || !currentCompany) return;
 		setIsSaving(true);
-		const printUpload = await uploadEvidence(files.print);
-		if (printUpload.error) {
-			toast.error("Erro ao enviar print de segurança");
-			setIsSaving(false);
-			return;
+		let clientId = currentClient?.id;
+		let clientName = currentClient?.nome || newClientData.nome;
+		let clientPhone = currentClient?.telefone || newClientData.telefone;
+		let clientCpf = currentClient?.cpf || searchCpf;
+		if (!clientId && showClientForm) {
+			const { success, data, error } = await createClient$1({
+				...newClientData,
+				cpf: searchCpf,
+				company_id: currentCompany.id
+			});
+			if (!success || !data) {
+				toast.error("Erro ao cadastrar cliente: " + (error?.message || ""));
+				setIsSaving(false);
+				return;
+			}
+			clientId = data.id;
+			clientName = data.nome;
+			clientPhone = data.telefone;
+			clientCpf = data.cpf;
 		}
-		const docUpload = await uploadEvidence(files.doc);
-		if (docUpload.error) {
-			toast.error("Erro ao enviar foto do documento");
+		const uploadedFileUrls = [];
+		for (const fileObj of uploadedFiles) {
+			const { url, error } = await uploadEvidence(fileObj.file);
+			if (url && !error) uploadedFileUrls.push({
+				name: fileObj.file.name,
+				url,
+				type: "document"
+			});
+		}
+		if (uploadedFileUrls.length === 0) {
+			toast.error("Erro ao enviar arquivos");
 			setIsSaving(false);
 			return;
 		}
@@ -47729,37 +47883,37 @@ function EvaluationChecklist() {
 				valor_desconto: d.value
 			})),
 			userId: currentUser.id,
-			nomeCliente: customerData.name,
-			telefoneCliente: customerData.phone,
-			cpfCliente: customerData.cpf,
-			urlPrintSeguranca: printUpload.url || "",
-			urlFotoDocumento: docUpload.url || ""
+			clienteId: clientId,
+			nomeCliente: clientName,
+			telefoneCliente: clientPhone,
+			cpfCliente: clientCpf,
+			files: uploadedFileUrls
 		});
 		setIsSaving(false);
 		if (result.success) {
 			toast.success("Avaliação salva com sucesso!");
-			resetForm();
+			setStep(1);
+			setSelectedModelId("");
+			setSerialNumber("");
+			setChecklistStatus({});
+			setSecurityChecks({
+				anatel: false,
+				blacklist: false,
+				mdm: false
+			});
+			clearCurrentClient();
+			setSearchCpf("");
+			setShowClientForm(false);
+			setNewClientData({
+				nome: "",
+				rg: "",
+				telefone: "",
+				endereco: "",
+				nome_contato_emergencia: "",
+				telefone_contato_emergencia: ""
+			});
+			setUploadedFiles([]);
 		} else toast.error("Erro ao salvar avaliação");
-	};
-	const resetForm = () => {
-		setStep(1);
-		setSelectedModelId("");
-		setSerialNumber("");
-		setChecklistStatus({});
-		setSecurityChecks({
-			anatel: false,
-			blacklist: false,
-			mdm: false
-		});
-		setCustomerData({
-			name: "",
-			phone: "",
-			cpf: ""
-		});
-		setFiles({
-			print: null,
-			doc: null
-		});
 	};
 	const getCategoryName = (id) => {
 		return categories.find((c) => c.id === id)?.name || "Outros";
@@ -47786,15 +47940,15 @@ function EvaluationChecklist() {
 							step === 1 && "1. Identificação do Aparelho",
 							step === 2 && "2. Inspeção Técnica",
 							step === 3 && "3. Precificação e Defeitos",
-							step === 4 && "4. Verificação de Segurança",
-							step === 5 && "5. Finalização e Cliente"
+							step === 4 && "4. Segurança e Cliente",
+							step === 5 && "5. Resumo e Finalização"
 						] }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: [
 							step === 1 && "Selecione o modelo e informe o serial para iniciar.",
 							step === 2 && "Marque APENAS os itens que estão OK (Funcionando).",
 							step === 3 && "Revise os defeitos detectados e o valor final.",
-							step === 4 && "Confirme as consultas de segurança obrigatórias.",
-							step === 5 && "Preencha os dados do cliente e anexe evidências."
+							step === 4 && "Realize consultas, anexe provas e identifique o cliente.",
+							step === 5 && "Confira todos os dados antes de salvar."
 						] })
 					] }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
@@ -47821,9 +47975,9 @@ function EvaluationChecklist() {
 									})]
 								})]
 							}),
-							step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "space-y-6",
-								children: [categories.map((category) => {
+								children: categories.map((category) => {
 									const items = checklistItems.filter((i) => i.category_id === category.id);
 									if (items.length === 0) return null;
 									return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -47856,35 +48010,7 @@ function EvaluationChecklist() {
 											}, item.id))
 										})]
 									}, category.id);
-								}), checklistItems.some((i) => !i.category_id) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-										className: "font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded",
-										children: "Sem Categoria"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-										className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
-										children: checklistItems.filter((i) => !i.category_id).map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: cn("flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer", checklistStatus[item.id] ? "bg-green-50 border-green-200" : "hover:bg-slate-50"),
-											onClick: () => setChecklistStatus((prev) => ({
-												...prev,
-												[item.id]: !prev[item.id]
-											})),
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-												checked: checklistStatus[item.id] || false,
-												onCheckedChange: () => {}
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "flex-1",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-													className: "cursor-pointer font-medium",
-													children: item.nome
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-													className: "text-xs text-muted-foreground mt-0.5",
-													children: checklistStatus[item.id] ? "OK" : "Defeito / Não verificado"
-												})]
-											})]
-										}, item.id))
-									})]
-								})]
+								})
 							}),
 							step === 3 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "space-y-6",
@@ -47927,161 +48053,366 @@ function EvaluationChecklist() {
 								})
 							}),
 							step === 4 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-6",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										className: "text-sm text-blue-800",
-										children: "Realize as consultas nos sites oficiais e marque as caixas abaixo para confirmar que o aparelho está limpo."
+								className: "space-y-8",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-2 border-b pb-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "font-semibold text-lg",
+												children: "1. Verificações de Segurança"
+											})]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "grid gap-4 md:grid-cols-3",
+											children: [
+												{
+													key: "anatel",
+													label: "Anatel",
+													desc: "Sem roubo/furto"
+												},
+												{
+													key: "blacklist",
+													label: "Blacklist",
+													desc: "Internacional limpo"
+												},
+												{
+													key: "mdm",
+													label: "MDM",
+													desc: "Sem gestão remota"
+												}
+											].map((check) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: cn("flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer hover:shadow-sm", securityChecks[check.key] ? "bg-green-50 border-green-200" : "bg-white"),
+												onClick: () => setSecurityChecks((prev) => ({
+													...prev,
+													[check.key]: !prev[check.key]
+												})),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+													checked: securityChecks[check.key],
+													className: "mt-1 data-[state=checked]:bg-green-600"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+													className: "font-bold cursor-pointer",
+													children: check.label
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-xs text-muted-foreground",
+													children: check.desc
+												})] })]
+											}, check.key))
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-2 border-b pb-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+													className: "font-semibold text-lg",
+													children: "2. Evidências e Documentos"
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "bg-slate-50 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-100 transition-colors",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													type: "file",
+													id: "file-upload",
+													multiple: true,
+													className: "hidden",
+													onChange: handleFileUpload,
+													accept: "image/*,application/pdf"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+													htmlFor: "file-upload",
+													className: "cursor-pointer block",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "flex flex-col items-center gap-2",
+														children: [
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-8 h-8 text-muted-foreground" }),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "font-medium text-primary",
+																children: "Clique para adicionar arquivos"
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-xs text-muted-foreground",
+																children: "Prints das consultas Anatel, Blacklist, MDM e foto do documento."
+															})
+														]
+													})
+												})]
+											}),
+											uploadedFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "grid grid-cols-2 md:grid-cols-3 gap-3",
+												children: uploadedFiles.map((fileObj, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "relative group border rounded-md p-2 flex items-center gap-2 bg-white",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+															className: "w-10 h-10 bg-slate-100 rounded flex items-center justify-center shrink-0 overflow-hidden",
+															children: fileObj.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+																src: fileObj.preview,
+																alt: "preview",
+																className: "w-full h-full object-cover"
+															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-5 h-5 text-slate-500" })
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "flex-1 min-w-0",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																className: "text-sm font-medium truncate",
+																children: fileObj.file.name
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+																className: "text-xs text-muted-foreground",
+																children: [(fileObj.file.size / 1024).toFixed(0), "kb"]
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+															variant: "ghost",
+															size: "icon",
+															className: "h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50",
+															onClick: () => removeFile(idx),
+															children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-3 h-3" })
+														})
+													]
+												}, idx))
+											})
+										]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-2 border-b pb-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+													className: "font-semibold text-lg",
+													children: "3. Dados do Cliente"
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex gap-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex-1",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Pesquisar CPF" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "flex gap-2 mt-1",
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+															placeholder: "000.000.000-00",
+															value: searchCpf,
+															onChange: (e) => setSearchCpf(formatCPF(e.target.value)),
+															maxLength: 14
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+															onClick: handleClientSearch,
+															disabled: isClientLoading || !searchCpf,
+															children: isClientLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4" })
+														})]
+													})]
+												}), currentClient && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "flex-1 flex items-end",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+														variant: "outline",
+														onClick: clearCurrentClient,
+														className: "w-full text-red-500 hover:text-red-600",
+														children: "Limpar Seleção"
+													})
+												})]
+											}),
+											currentClient && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex items-center gap-2 text-emerald-800 font-medium",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4" }), "Cliente Identificado"]
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "grid grid-cols-2 gap-4 text-sm",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "text-muted-foreground",
+															children: "Nome:"
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+															className: "font-medium",
+															children: currentClient.nome
+														})] }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "text-muted-foreground",
+															children: "Telefone:"
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+															className: "font-medium",
+															children: formatPhone(currentClient.telefone)
+														})] }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "col-span-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-muted-foreground",
+																children: "Endereço:"
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																className: "font-medium",
+																children: currentClient.endereco || "-"
+															})]
+														})
+													]
+												})]
+											}),
+											showClientForm && !currentClient && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "bg-slate-50 border rounded-lg p-4 space-y-4 animate-in fade-in slide-in-from-top-4",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex items-center justify-between",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+														className: "font-medium text-primary",
+														children: "Novo Cadastro"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground",
+														children: "* Campos obrigatórios"
+													})]
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "grid md:grid-cols-2 gap-4",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Nome Completo *" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.nome,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	nome: e.target.value
+																})),
+																placeholder: "Nome do cliente"
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Telefone / WhatsApp *" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.telefone,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	telefone: formatPhone(e.target.value)
+																})),
+																placeholder: "(00) 00000-0000",
+																maxLength: 15
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "RG" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.rg,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	rg: e.target.value
+																})),
+																placeholder: "Registro Geral"
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "CPF" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: searchCpf,
+																disabled: true,
+																className: "bg-gray-100"
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "col-span-2 space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Endereço Completo" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.endereco,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	endereco: e.target.value
+																})),
+																placeholder: "Rua, Número, Bairro, Cidade - UF"
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Contato de Emergência (Nome)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.nome_contato_emergencia,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	nome_contato_emergencia: e.target.value
+																})),
+																placeholder: "Nome do contato"
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "space-y-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Tel. Emergência" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																value: newClientData.telefone_contato_emergencia,
+																onChange: (e) => setNewClientData((prev) => ({
+																	...prev,
+																	telefone_contato_emergencia: formatPhone(e.target.value)
+																})),
+																placeholder: "(00) 00000-0000",
+																maxLength: 15
+															})]
+														})
+													]
+												})]
+											})
+										]
 									})
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "grid gap-4",
-									children: [
-										{
-											key: "anatel",
-											label: "Consulta Anatel (Impedimentos)",
-											desc: "Verificar se há bloqueio por roubo/furto na Anatel."
-										},
-										{
-											key: "blacklist",
-											label: "Consulta Blacklist Internacional",
-											desc: "Verificar restrições em operadoras internacionais."
-										},
-										{
-											key: "mdm",
-											label: "Consulta MDM (Gerenciamento)",
-											desc: "Verificar se há perfil corporativo ou financeiro ativo."
-										}
-									].map((check) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: cn("flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer", securityChecks[check.key] ? "bg-green-50 border-green-200" : "bg-white"),
-										onClick: () => setSecurityChecks((prev) => ({
-											...prev,
-											[check.key]: !prev[check.key]
-										})),
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-											checked: securityChecks[check.key],
-											className: "mt-1 data-[state=checked]:bg-green-600"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-											className: "font-bold cursor-pointer text-base",
-											children: check.label
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-											className: "text-sm text-muted-foreground mt-1",
-											children: check.desc
-										})] })]
-									}, check.key))
-								})]
+								]
 							}),
-							step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "space-y-6",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "grid md:grid-cols-2 gap-4",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex flex-col items-center justify-center py-10 text-center space-y-4",
 									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Nome do Cliente" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												value: customerData.name,
-												onChange: (e) => setCustomerData((prev) => ({
-													...prev,
-													name: e.target.value
-												})),
-												placeholder: "Nome completo"
-											})]
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center",
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-8 h-8" })
 										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+											className: "text-2xl font-bold text-gray-900",
+											children: "Tudo Pronto!"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+											className: "text-muted-foreground max-w-md mx-auto mt-2",
+											children: "Revise o resumo ao lado e confirme para gerar a avaliação. Os dados do cliente e as evidências serão salvos automaticamente."
+										})] }),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Telefone / WhatsApp" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												value: customerData.phone,
-												onChange: (e) => setCustomerData((prev) => ({
-													...prev,
-													phone: e.target.value
-												})),
-												placeholder: "(00) 00000-0000"
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "space-y-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "CPF" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												value: customerData.cpf,
-												onChange: (e) => setCustomerData((prev) => ({
-													...prev,
-													cpf: e.target.value
-												})),
-												placeholder: "000.000.000-00"
-											})]
+											className: "bg-slate-50 p-6 rounded-lg border w-full max-w-md text-left space-y-3",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+													className: "font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2",
+													children: "Resumo da Operação"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex justify-between",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-sm",
+														children: "Cliente"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-medium",
+														children: currentClient ? currentClient.nome : newClientData.nome
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex justify-between",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-sm",
+														children: "CPF"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-medium",
+														children: currentClient ? currentClient.cpf : searchCpf
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex justify-between",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-sm",
+														children: "Arquivos"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+														className: "font-medium",
+														children: [uploadedFiles.length, " anexados"]
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex justify-between",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-sm",
+														children: "Valor Final"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+														className: "font-bold text-emerald-600",
+														children: [
+															"R$",
+															" ",
+															finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+														]
+													})]
+												})
+											]
 										})
 									]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "border-t pt-4 space-y-4",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
-										className: "font-semibold flex items-center gap-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-4 h-4" }), "Evidências Obrigatórias"]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "grid md:grid-cols-2 gap-4",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-8 h-8", files.print ? "text-green-500" : "text-muted-foreground") }),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
-													htmlFor: "file-print",
-													className: "cursor-pointer",
-													children: [
-														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "font-semibold text-primary",
-															children: "Clique para enviar"
-														}),
-														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-														" Print das Consultas"
-													]
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-													className: "text-xs text-muted-foreground",
-													children: files.print ? files.print.name : "Anatel, Blacklist, MDM"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-													id: "file-print",
-													type: "file",
-													className: "hidden",
-													accept: "image/*",
-													onChange: (e) => setFiles((prev) => ({
-														...prev,
-														print: e.target.files?.[0] || null
-													}))
-												})
-											]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: cn("w-8 h-8", files.doc ? "text-green-500" : "text-muted-foreground") }),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
-													htmlFor: "file-doc",
-													className: "cursor-pointer",
-													children: [
-														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "font-semibold text-primary",
-															children: "Clique para enviar"
-														}),
-														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-														" Documento do Cliente"
-													]
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-													className: "text-xs text-muted-foreground",
-													children: files.doc ? files.doc.name : "RG ou CNH (Frente/Verso)"
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-													id: "file-doc",
-													type: "file",
-													className: "hidden",
-													accept: "image/*",
-													onChange: (e) => setFiles((prev) => ({
-														...prev,
-														doc: e.target.files?.[0] || null
-													}))
-												})
-											]
-										})]
-									})]
-								})]
+								})
 							})
 						]
 					}),
@@ -48099,7 +48430,7 @@ function EvaluationChecklist() {
 							onClick: handleSave,
 							disabled: isSaving,
 							className: "bg-emerald-600 hover:bg-emerald-700",
-							children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Gravar Avaliação"]
+							children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Confirmar e Gravar"]
 						})]
 					})
 				]
@@ -48170,14 +48501,19 @@ function EvaluationChecklist() {
 								]
 							})]
 						}),
-						step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						(step === 4 || step === 5) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "border-t border-slate-700 pt-4 space-y-2",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "flex items-center gap-2 text-sm text-slate-300",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), customerData.name || "Cliente"]
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), currentClient?.nome || newClientData.nome || "Identificando..."]
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "flex items-center gap-2 text-sm text-slate-300",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-4 h-4", files.print ? "text-green-500" : "text-slate-600") }), "Print Consultas"]
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-4 h-4", securityChecks.anatel ? "text-green-500" : "text-slate-600") }),
+									"Segurança:",
+									" ",
+									Object.values(securityChecks).every(Boolean) ? "OK" : "Pendente"
+								]
 							})]
 						})
 					]
@@ -48809,4 +49145,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DTP5QKTV.js.map
+//# sourceMappingURL=index-Dpqq4s3t.js.map

@@ -1806,6 +1806,10 @@ section[aria-label='Notifications alt+T'] {
 .bg-destructive{
   background-color: hsl(var(--destructive));
 }
+.bg-emerald-100{
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 250 229 / var(--tw-bg-opacity, 1));
+}
 .bg-emerald-100\/50{
   background-color: rgb(209 250 229 / 0.5);
 }
@@ -1924,6 +1928,10 @@ section[aria-label='Notifications alt+T'] {
 }
 .bg-sidebar-border{
   background-color: hsl(var(--sidebar-border));
+}
+.bg-slate-100{
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity, 1));
 }
 .bg-slate-50{
   --tw-bg-opacity: 1;
@@ -2358,6 +2366,10 @@ section[aria-label='Notifications alt+T'] {
   --tw-text-opacity: 1;
   color: rgb(4 120 87 / var(--tw-text-opacity, 1));
 }
+.text-emerald-800{
+  --tw-text-opacity: 1;
+  color: rgb(6 95 70 / var(--tw-text-opacity, 1));
+}
 .text-emerald-900{
   --tw-text-opacity: 1;
   color: rgb(6 78 59 / var(--tw-text-opacity, 1));
@@ -2731,6 +2743,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .slide-in-from-right-4{
   --tw-enter-translate-x: 1rem;
+}
+.slide-in-from-top-4{
+  --tw-enter-translate-y: -1rem;
 }
 .duration-1000{
   animation-duration: 1000ms;
@@ -3127,6 +3142,11 @@ section[aria-label='Notifications alt+T'] {
 .hover\:shadow-md:hover{
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.hover\:shadow-sm:hover{
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .hover\:shadow-xl:hover{

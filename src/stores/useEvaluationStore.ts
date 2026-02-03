@@ -5,6 +5,7 @@ import {
   Evaluation,
   ChecklistItem,
   ChecklistCategory,
+  ConsultationFile,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 
@@ -205,6 +206,13 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   },
 
   saveEvaluation: async (data) => {
+    // Legacy support for print/doc, but prefer arquivos_consulta if available
+    const mainFile = data.files && data.files.length > 0 ? data.files[0] : null
+
+    // Legacy URL mapping
+    const urlPrint = data.urlPrintSeguranca || (mainFile ? mainFile.url : '')
+    const urlDoc = data.urlFotoDocumento || ''
+
     const { error } = await supabase.from('avaliacoes_iphone').insert({
       modelo: data.modelo,
       serial_number: data.serialNumber,
@@ -212,12 +220,19 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       valor_final: data.valorFinal,
       descontos_aplicados: data.descontos as any,
       user_id: data.userId,
+
+      // Client Data (Legacy & New)
       nome_cliente: data.nomeCliente,
       telefone_cliente: data.telefoneCliente,
       cpf_cliente: data.cpfCliente,
-      url_print_seguranca: data.urlPrintSeguranca,
-      url_foto_documento: data.urlFotoDocumento,
+      cliente_id: data.clienteId, // New field
+
+      // Files (Legacy & New)
+      url_print_seguranca: urlPrint,
+      url_foto_documento: urlDoc,
+      arquivos_consulta: data.files as any, // New field (JSONB)
     })
+
     if (!error) await get().fetchEvaluations()
     return { success: !error, error }
   },
@@ -226,11 +241,18 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     set({ isLoading: true })
     const { data, error } = await supabase
       .from('avaliacoes_iphone')
-      .select('*, empresas(nome_fantasia)')
+      .select('*, empresas(nome_fantasia), clientes(*)')
       .order('created_at', { ascending: false })
       .limit(100)
+
+    // Map data to include client info if available in relation
+    const mappedData = data?.map((d) => ({
+      ...d,
+      client: d.clientes,
+    }))
+
     if (!error && data) {
-      set({ evaluations: data as any, isLoading: false })
+      set({ evaluations: mappedData as any, isLoading: false })
     } else {
       set({ isLoading: false })
     }

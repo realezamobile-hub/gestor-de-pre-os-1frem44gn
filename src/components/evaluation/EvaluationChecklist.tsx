@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
+import { useClientStore } from '@/stores/useClientStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,11 +32,14 @@ import {
   User as UserIcon,
   Upload,
   Loader2,
-  Image as ImageIcon,
+  Search,
+  FileIcon,
+  X,
+  Plus,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-import { PeripheralDiscountConfig } from '@/types'
+import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
+import { PeripheralDiscountConfig, ConsultationFile } from '@/types'
 
 export function EvaluationChecklist() {
   const {
@@ -46,7 +50,14 @@ export function EvaluationChecklist() {
     saveEvaluation,
     uploadEvidence,
   } = useEvaluationStore()
-  const { currentUser } = useAuthStore()
+  const {
+    currentClient,
+    fetchClientByCpf,
+    createClient,
+    clearCurrentClient,
+    isLoading: isClientLoading,
+  } = useClientStore()
+  const { currentUser, currentCompany } = useAuthStore()
 
   // State
   const [step, setStep] = useState(1)
@@ -57,28 +68,33 @@ export function EvaluationChecklist() {
   const [serialNumber, setSerialNumber] = useState('')
 
   // Step 2: Inspection (Checklist)
-  // Store status of items: true = OK, false/undefined = Defect
   const [checklistStatus, setChecklistStatus] = useState<
     Record<string, boolean>
   >({})
 
-  // Step 4: Security
+  // Step 4: Security & Client & Files
   const [securityChecks, setSecurityChecks] = useState({
     anatel: false,
     blacklist: false,
     mdm: false,
   })
 
-  // Step 5: Customer & Evidence
-  const [customerData, setCustomerData] = useState({
-    name: '',
-    phone: '',
-    cpf: '',
+  // Client Search State
+  const [searchCpf, setSearchCpf] = useState('')
+  const [showClientForm, setShowClientForm] = useState(false)
+  const [newClientData, setNewClientData] = useState({
+    nome: '',
+    rg: '',
+    telefone: '',
+    endereco: '',
+    nome_contato_emergencia: '',
+    telefone_contato_emergencia: '',
   })
-  const [files, setFiles] = useState<{
-    print: File | null
-    doc: File | null
-  }>({ print: null, doc: null })
+
+  // Files State
+  const [uploadedFiles, setUploadedFiles] = useState<
+    { file: File; type: string; preview: string }[]
+  >([])
 
   // Derived
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
@@ -86,19 +102,15 @@ export function EvaluationChecklist() {
   // Step 3 Logic: Calculate Price & Defects
   const getDetectedDefects = () => {
     if (!selectedModel) return []
-
-    // Items NOT checked are defects
     const defectItems = checklistItems.filter(
       (item) => !checklistStatus[item.id],
     )
 
     return defectItems.map((item) => {
-      // Find discount for this model and this item
       const discount = peripheralDiscounts.find(
         (d) =>
           d.checklist_item_id === item.id && d.modelo_id === selectedModel.id,
       )
-      // Fallback: Try finding a global discount (no model) with same item
       const fallbackDiscount = !discount
         ? peripheralDiscounts.find(
             (d) => d.checklist_item_id === item.id && !d.modelo_id,
@@ -143,39 +155,107 @@ export function EvaluationChecklist() {
         toast.error('Realize todas as verificações de segurança')
         return
       }
+      if (!currentClient && !showClientForm) {
+        toast.error('Identifique o cliente pelo CPF')
+        return
+      }
+      if (showClientForm) {
+        // Validate form
+        if (!newClientData.nome || !newClientData.telefone) {
+          toast.error('Preencha os dados obrigatórios do cliente')
+          return
+        }
+      }
+      if (uploadedFiles.length === 0) {
+        toast.error('Anexe pelo menos uma evidência (Consultas/Docs)')
+        return
+      }
     }
     setStep((s) => s + 1)
   }
 
+  const handleClientSearch = async () => {
+    if (!searchCpf) return
+    if (!validateCPF(searchCpf)) {
+      toast.error('CPF inválido')
+      return
+    }
+
+    const client = await fetchClientByCpf(searchCpf)
+    if (client) {
+      toast.success('Cliente encontrado!')
+      setShowClientForm(false)
+    } else {
+      toast.info('Cliente não encontrado. Preencha o cadastro.')
+      setShowClientForm(true)
+    }
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files).map((file) => ({
+        file,
+        type: 'document', // Default type
+        preview: URL.createObjectURL(file),
+      }))
+      setUploadedFiles((prev) => [...prev, ...newFiles])
+    }
+  }
+
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSave = async () => {
-    if (!currentUser || !selectedModel) return
-    if (!customerData.name || !customerData.phone || !customerData.cpf) {
-      toast.error('Preencha os dados do cliente')
-      return
-    }
-    if (!files.print || !files.doc) {
-      toast.error('Anexe as evidências obrigatórias')
-      return
-    }
+    if (!currentUser || !selectedModel || !currentCompany) return
 
     setIsSaving(true)
 
-    // Upload Files
-    const printUpload = await uploadEvidence(files.print)
-    if (printUpload.error) {
-      toast.error('Erro ao enviar print de segurança')
+    // 1. Handle Client (Create if needed)
+    let clientId = currentClient?.id
+    let clientName = currentClient?.nome || newClientData.nome
+    let clientPhone = currentClient?.telefone || newClientData.telefone
+    let clientCpf = currentClient?.cpf || searchCpf
+
+    if (!clientId && showClientForm) {
+      const { success, data, error } = await createClient({
+        ...newClientData,
+        cpf: searchCpf,
+        company_id: currentCompany.id,
+      })
+
+      if (!success || !data) {
+        toast.error('Erro ao cadastrar cliente: ' + (error?.message || ''))
+        setIsSaving(false)
+        return
+      }
+      clientId = data.id
+      clientName = data.nome
+      clientPhone = data.telefone
+      clientCpf = data.cpf
+    }
+
+    // 2. Upload Files
+    const uploadedFileUrls: ConsultationFile[] = []
+
+    for (const fileObj of uploadedFiles) {
+      const { url, error } = await uploadEvidence(fileObj.file)
+      if (url && !error) {
+        uploadedFileUrls.push({
+          name: fileObj.file.name,
+          url,
+          type: 'document', // Simplified for now
+        })
+      }
+    }
+
+    if (uploadedFileUrls.length === 0) {
+      toast.error('Erro ao enviar arquivos')
       setIsSaving(false)
       return
     }
 
-    const docUpload = await uploadEvidence(files.doc)
-    if (docUpload.error) {
-      toast.error('Erro ao enviar foto do documento')
-      setIsSaving(false)
-      return
-    }
-
-    // Save Record
+    // 3. Save Evaluation
     const result = await saveEvaluation({
       modelo: selectedModel.modelo,
       serialNumber,
@@ -190,30 +270,41 @@ export function EvaluationChecklist() {
           }) as PeripheralDiscountConfig,
       ),
       userId: currentUser.id,
-      nomeCliente: customerData.name,
-      telefoneCliente: customerData.phone,
-      cpfCliente: customerData.cpf,
-      urlPrintSeguranca: printUpload.url || '',
-      urlFotoDocumento: docUpload.url || '',
+
+      // Client Link
+      clienteId: clientId,
+      nomeCliente: clientName,
+      telefoneCliente: clientPhone,
+      cpfCliente: clientCpf,
+
+      // Files
+      files: uploadedFileUrls,
     })
 
     setIsSaving(false)
     if (result.success) {
       toast.success('Avaliação salva com sucesso!')
-      resetForm()
+      // Reset
+      setStep(1)
+      setSelectedModelId('')
+      setSerialNumber('')
+      setChecklistStatus({})
+      setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
+      clearCurrentClient()
+      setSearchCpf('')
+      setShowClientForm(false)
+      setNewClientData({
+        nome: '',
+        rg: '',
+        telefone: '',
+        endereco: '',
+        nome_contato_emergencia: '',
+        telefone_contato_emergencia: '',
+      })
+      setUploadedFiles([])
     } else {
       toast.error('Erro ao salvar avaliação')
     }
-  }
-
-  const resetForm = () => {
-    setStep(1)
-    setSelectedModelId('')
-    setSerialNumber('')
-    setChecklistStatus({})
-    setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
-    setCustomerData({ name: '', phone: '', cpf: '' })
-    setFiles({ print: null, doc: null })
   }
 
   const getCategoryName = (id: string) => {
@@ -241,8 +332,8 @@ export function EvaluationChecklist() {
               {step === 1 && '1. Identificação do Aparelho'}
               {step === 2 && '2. Inspeção Técnica'}
               {step === 3 && '3. Precificação e Defeitos'}
-              {step === 4 && '4. Verificação de Segurança'}
-              {step === 5 && '5. Finalização e Cliente'}
+              {step === 4 && '4. Segurança e Cliente'}
+              {step === 5 && '5. Resumo e Finalização'}
             </CardTitle>
             <CardDescription>
               {step === 1 &&
@@ -250,8 +341,9 @@ export function EvaluationChecklist() {
               {step === 2 &&
                 'Marque APENAS os itens que estão OK (Funcionando).'}
               {step === 3 && 'Revise os defeitos detectados e o valor final.'}
-              {step === 4 && 'Confirme as consultas de segurança obrigatórias.'}
-              {step === 5 && 'Preencha os dados do cliente e anexe evidências.'}
+              {step === 4 &&
+                'Realize consultas, anexe provas e identifique o cliente.'}
+              {step === 5 && 'Confira todos os dados antes de salvar.'}
             </CardDescription>
           </CardHeader>
 
@@ -340,51 +432,6 @@ export function EvaluationChecklist() {
                     </div>
                   )
                 })}
-
-                {/* Handling unassigned items if any */}
-                {checklistItems.some((i) => !i.category_id) && (
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded">
-                      Sem Categoria
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {checklistItems
-                        .filter((i) => !i.category_id)
-                        .map((item) => (
-                          <div
-                            key={item.id}
-                            className={cn(
-                              'flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer',
-                              checklistStatus[item.id]
-                                ? 'bg-green-50 border-green-200'
-                                : 'hover:bg-slate-50',
-                            )}
-                            onClick={() =>
-                              setChecklistStatus((prev) => ({
-                                ...prev,
-                                [item.id]: !prev[item.id],
-                              }))
-                            }
-                          >
-                            <Checkbox
-                              checked={checklistStatus[item.id] || false}
-                              onCheckedChange={() => {}}
-                            />
-                            <div className="flex-1">
-                              <Label className="cursor-pointer font-medium">
-                                {item.nome}
-                              </Label>
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                {checklistStatus[item.id]
-                                  ? 'OK'
-                                  : 'Defeito / Não verificado'}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -434,187 +481,379 @@ export function EvaluationChecklist() {
             )}
 
             {step === 4 && (
-              <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-blue-800">
-                    Realize as consultas nos sites oficiais e marque as caixas
-                    abaixo para confirmar que o aparelho está limpo.
-                  </p>
-                </div>
+              <div className="space-y-8">
+                {/* Security Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b pb-2">
+                    <ShieldCheck className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-lg">
+                      1. Verificações de Segurança
+                    </h3>
+                  </div>
 
-                <div className="grid gap-4">
-                  {[
-                    {
-                      key: 'anatel',
-                      label: 'Consulta Anatel (Impedimentos)',
-                      desc: 'Verificar se há bloqueio por roubo/furto na Anatel.',
-                    },
-                    {
-                      key: 'blacklist',
-                      label: 'Consulta Blacklist Internacional',
-                      desc: 'Verificar restrições em operadoras internacionais.',
-                    },
-                    {
-                      key: 'mdm',
-                      label: 'Consulta MDM (Gerenciamento)',
-                      desc: 'Verificar se há perfil corporativo ou financeiro ativo.',
-                    },
-                  ].map((check) => (
-                    <div
-                      key={check.key}
-                      className={cn(
-                        'flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer',
-                        securityChecks[check.key as keyof typeof securityChecks]
-                          ? 'bg-green-50 border-green-200'
-                          : 'bg-white',
-                      )}
-                      onClick={() =>
-                        setSecurityChecks((prev) => ({
-                          ...prev,
-                          [check.key]:
-                            !prev[check.key as keyof typeof securityChecks],
-                        }))
-                      }
-                    >
-                      <Checkbox
-                        checked={
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[
+                      {
+                        key: 'anatel',
+                        label: 'Anatel',
+                        desc: 'Sem roubo/furto',
+                      },
+                      {
+                        key: 'blacklist',
+                        label: 'Blacklist',
+                        desc: 'Internacional limpo',
+                      },
+                      { key: 'mdm', label: 'MDM', desc: 'Sem gestão remota' },
+                    ].map((check) => (
+                      <div
+                        key={check.key}
+                        className={cn(
+                          'flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer hover:shadow-sm',
                           securityChecks[
                             check.key as keyof typeof securityChecks
                           ]
+                            ? 'bg-green-50 border-green-200'
+                            : 'bg-white',
+                        )}
+                        onClick={() =>
+                          setSecurityChecks((prev) => ({
+                            ...prev,
+                            [check.key]:
+                              !prev[check.key as keyof typeof securityChecks],
+                          }))
                         }
-                        className="mt-1 data-[state=checked]:bg-green-600"
-                      />
-                      <div>
-                        <Label className="font-bold cursor-pointer text-base">
-                          {check.label}
-                        </Label>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {check.desc}
-                        </p>
+                      >
+                        <Checkbox
+                          checked={
+                            securityChecks[
+                              check.key as keyof typeof securityChecks
+                            ]
+                          }
+                          className="mt-1 data-[state=checked]:bg-green-600"
+                        />
+                        <div>
+                          <Label className="font-bold cursor-pointer">
+                            {check.label}
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            {check.desc}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Evidence Files */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b pb-2">
+                    <Upload className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-lg">
+                      2. Evidências e Documentos
+                    </h3>
+                  </div>
+
+                  <div className="bg-slate-50 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-100 transition-colors">
+                    <Input
+                      type="file"
+                      id="file-upload"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      accept="image/*,application/pdf"
+                    />
+                    <Label
+                      htmlFor="file-upload"
+                      className="cursor-pointer block"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload className="w-8 h-8 text-muted-foreground" />
+                        <span className="font-medium text-primary">
+                          Clique para adicionar arquivos
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Prints das consultas Anatel, Blacklist, MDM e foto do
+                          documento.
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  {uploadedFiles.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {uploadedFiles.map((fileObj, idx) => (
+                        <div
+                          key={idx}
+                          className="relative group border rounded-md p-2 flex items-center gap-2 bg-white"
+                        >
+                          <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
+                            {fileObj.file.type.startsWith('image/') ? (
+                              <img
+                                src={fileObj.preview}
+                                alt="preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <FileIcon className="w-5 h-5 text-slate-500" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {fileObj.file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(fileObj.file.size / 1024).toFixed(0)}kb
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => removeFile(idx)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Client Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 border-b pb-2">
+                    <UserIcon className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-lg">
+                      3. Dados do Cliente
+                    </h3>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Label>Pesquisar CPF</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          placeholder="000.000.000-00"
+                          value={searchCpf}
+                          onChange={(e) =>
+                            setSearchCpf(formatCPF(e.target.value))
+                          }
+                          maxLength={14}
+                        />
+                        <Button
+                          onClick={handleClientSearch}
+                          disabled={isClientLoading || !searchCpf}
+                        >
+                          {isClientLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Search className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
-                  ))}
+                    {currentClient && (
+                      <div className="flex-1 flex items-end">
+                        <Button
+                          variant="outline"
+                          onClick={clearCurrentClient}
+                          className="w-full text-red-500 hover:text-red-600"
+                        >
+                          Limpar Seleção
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {currentClient && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-800 font-medium">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Cliente Identificado
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Nome:</span>
+                          <p className="font-medium">{currentClient.nome}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Telefone:
+                          </span>
+                          <p className="font-medium">
+                            {formatPhone(currentClient.telefone)}
+                          </p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">
+                            Endereço:
+                          </span>
+                          <p className="font-medium">
+                            {currentClient.endereco || '-'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {showClientForm && !currentClient && (
+                    <div className="bg-slate-50 border rounded-lg p-4 space-y-4 animate-in fade-in slide-in-from-top-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-primary">
+                          Novo Cadastro
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          * Campos obrigatórios
+                        </span>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Nome Completo *</Label>
+                          <Input
+                            value={newClientData.nome}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                nome: e.target.value,
+                              }))
+                            }
+                            placeholder="Nome do cliente"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Telefone / WhatsApp *</Label>
+                          <Input
+                            value={newClientData.telefone}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                telefone: formatPhone(e.target.value),
+                              }))
+                            }
+                            placeholder="(00) 00000-0000"
+                            maxLength={15}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>RG</Label>
+                          <Input
+                            value={newClientData.rg}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                rg: e.target.value,
+                              }))
+                            }
+                            placeholder="Registro Geral"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>CPF</Label>
+                          <Input
+                            value={searchCpf}
+                            disabled
+                            className="bg-gray-100"
+                          />
+                        </div>
+                        <div className="col-span-2 space-y-2">
+                          <Label>Endereço Completo</Label>
+                          <Input
+                            value={newClientData.endereco}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                endereco: e.target.value,
+                              }))
+                            }
+                            placeholder="Rua, Número, Bairro, Cidade - UF"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Contato de Emergência (Nome)</Label>
+                          <Input
+                            value={newClientData.nome_contato_emergencia}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                nome_contato_emergencia: e.target.value,
+                              }))
+                            }
+                            placeholder="Nome do contato"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Tel. Emergência</Label>
+                          <Input
+                            value={newClientData.telefone_contato_emergencia}
+                            onChange={(e) =>
+                              setNewClientData((prev) => ({
+                                ...prev,
+                                telefone_contato_emergencia: formatPhone(
+                                  e.target.value,
+                                ),
+                              }))
+                            }
+                            placeholder="(00) 00000-0000"
+                            maxLength={15}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {step === 5 && (
               <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Nome do Cliente</Label>
-                    <Input
-                      value={customerData.name}
-                      onChange={(e) =>
-                        setCustomerData((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
-                      placeholder="Nome completo"
-                    />
+                <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Telefone / WhatsApp</Label>
-                    <Input
-                      value={customerData.phone}
-                      onChange={(e) =>
-                        setCustomerData((prev) => ({
-                          ...prev,
-                          phone: e.target.value,
-                        }))
-                      }
-                      placeholder="(00) 00000-0000"
-                    />
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      Tudo Pronto!
+                    </h3>
+                    <p className="text-muted-foreground max-w-md mx-auto mt-2">
+                      Revise o resumo ao lado e confirme para gerar a avaliação.
+                      Os dados do cliente e as evidências serão salvos
+                      automaticamente.
+                    </p>
                   </div>
-                  <div className="space-y-2">
-                    <Label>CPF</Label>
-                    <Input
-                      value={customerData.cpf}
-                      onChange={(e) =>
-                        setCustomerData((prev) => ({
-                          ...prev,
-                          cpf: e.target.value,
-                        }))
-                      }
-                      placeholder="000.000.000-00"
-                    />
-                  </div>
-                </div>
 
-                <div className="border-t pt-4 space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    Evidências Obrigatórias
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors">
-                      <ShieldCheck
-                        className={cn(
-                          'w-8 h-8',
-                          files.print
-                            ? 'text-green-500'
-                            : 'text-muted-foreground',
-                        )}
-                      />
-                      <Label htmlFor="file-print" className="cursor-pointer">
-                        <span className="font-semibold text-primary">
-                          Clique para enviar
-                        </span>
-                        <br /> Print das Consultas
-                      </Label>
-                      <span className="text-xs text-muted-foreground">
-                        {files.print
-                          ? files.print.name
-                          : 'Anatel, Blacklist, MDM'}
+                  <div className="bg-slate-50 p-6 rounded-lg border w-full max-w-md text-left space-y-3">
+                    <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2">
+                      Resumo da Operação
+                    </h4>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Cliente</span>
+                      <span className="font-medium">
+                        {currentClient
+                          ? currentClient.nome
+                          : newClientData.nome}
                       </span>
-                      <Input
-                        id="file-print"
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) =>
-                          setFiles((prev) => ({
-                            ...prev,
-                            print: e.target.files?.[0] || null,
-                          }))
-                        }
-                      />
                     </div>
-
-                    <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors">
-                      <ImageIcon
-                        className={cn(
-                          'w-8 h-8',
-                          files.doc
-                            ? 'text-green-500'
-                            : 'text-muted-foreground',
-                        )}
-                      />
-                      <Label htmlFor="file-doc" className="cursor-pointer">
-                        <span className="font-semibold text-primary">
-                          Clique para enviar
-                        </span>
-                        <br /> Documento do Cliente
-                      </Label>
-                      <span className="text-xs text-muted-foreground">
-                        {files.doc
-                          ? files.doc.name
-                          : 'RG ou CNH (Frente/Verso)'}
+                    <div className="flex justify-between">
+                      <span className="text-sm">CPF</span>
+                      <span className="font-medium">
+                        {currentClient ? currentClient.cpf : searchCpf}
                       </span>
-                      <Input
-                        id="file-doc"
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) =>
-                          setFiles((prev) => ({
-                            ...prev,
-                            doc: e.target.files?.[0] || null,
-                          }))
-                        }
-                      />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Arquivos</span>
+                      <span className="font-medium">
+                        {uploadedFiles.length} anexados
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Valor Final</span>
+                      <span className="font-bold text-emerald-600">
+                        R${' '}
+                        {finalPrice.toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -652,7 +891,7 @@ export function EvaluationChecklist() {
                 ) : (
                   <Save className="w-4 h-4 mr-2" />
                 )}
-                Gravar Avaliação
+                Confirmar e Gravar
               </Button>
             )}
           </CardFooter>
@@ -713,20 +952,27 @@ export function EvaluationChecklist() {
               </div>
             </div>
 
-            {step === 5 && (
+            {(step === 4 || step === 5) && (
               <div className="border-t border-slate-700 pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <UserIcon className="w-4 h-4" />
-                  {customerData.name || 'Cliente'}
+                  {currentClient?.nome ||
+                    newClientData.nome ||
+                    'Identificando...'}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <ShieldCheck
                     className={cn(
                       'w-4 h-4',
-                      files.print ? 'text-green-500' : 'text-slate-600',
+                      securityChecks.anatel
+                        ? 'text-green-500'
+                        : 'text-slate-600',
                     )}
                   />
-                  Print Consultas
+                  Segurança:{' '}
+                  {Object.values(securityChecks).every(Boolean)
+                    ? 'OK'
+                    : 'Pendente'}
                 </div>
               </div>
             )}

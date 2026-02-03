@@ -49,7 +49,6 @@ export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 500)
 
-  // State for Dialogs/Sheets
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
   const [viewingClient, setViewingClient] = useState<Client | null>(null)
@@ -73,8 +72,8 @@ export default function ClientsPage() {
     if (!editingClient) return false
     const result = await updateClient(editingClient.id, data)
     if (result.success) {
+      toast.success('Dados do cliente atualizados!')
       setEditingClient(null)
-      // Update view if open
       if (viewingClient?.id === editingClient.id) {
         setViewingClient({ ...viewingClient, ...data })
       }
@@ -191,7 +190,6 @@ export default function ClientsPage() {
         </Table>
       </div>
 
-      {/* Create Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -204,7 +202,6 @@ export default function ClientsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog
         open={!!editingClient}
         onOpenChange={(open) => !open && setEditingClient(null)}
@@ -224,7 +221,6 @@ export default function ClientsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* View Profile Sheet */}
       <Sheet
         open={!!viewingClient}
         onOpenChange={(open) => !open && setViewingClient(null)}

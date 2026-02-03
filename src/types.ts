@@ -1,3 +1,5 @@
+import { Database } from '@/lib/supabase/types'
+
 export type Role = 'ADMIN' | 'VENDEDOR' | 'TECNICO' | 'ADMINISTRATIVO'
 export type UserStatus = 'pending' | 'active' | 'blocked'
 
@@ -106,6 +108,39 @@ export interface PeripheralDiscountConfig {
   company_id?: string | null
 }
 
+export interface Client {
+  id: string
+  company_id: string
+  nome: string
+  cpf: string
+  rg?: string | null
+  telefone: string
+  endereco?: string | null
+  cep?: string | null
+  rua?: string | null
+  numero?: string | null
+  complemento?: string | null
+  bairro?: string | null
+  municipio?: string | null
+  estado?: string | null
+  data_nascimento?: string | null
+  email?: string | null
+  origem?: string | null
+  genero?: string | null
+  url_foto?: string | null
+  observacoes?: string | null
+  nome_contato_emergencia?: string | null
+  telefone_contato_emergencia?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ConsultationFile {
+  name: string
+  url: string
+  type: 'anatel' | 'blacklist' | 'mdm' | 'document' | 'other' | 'image'
+}
+
 export interface Evaluation {
   id: string
   modelo: string
@@ -120,6 +155,9 @@ export interface Evaluation {
   nome_cliente?: string | null
   telefone_cliente?: string | null
   cpf_cliente?: string | null
+  cliente_id?: string | null
+  client?: Client | null
   url_print_seguranca?: string | null
   url_foto_documento?: string | null
+  arquivos_consulta?: ConsultationFile[] | null
 }

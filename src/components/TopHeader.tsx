@@ -19,7 +19,6 @@ export function TopHeader() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6 shadow-sm">
-      {/* Mobile Menu Trigger */}
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="md:hidden shrink-0">
@@ -28,17 +27,15 @@ export function TopHeader() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64 bg-slate-900 border-r-0">
-          <Sidebar />
+          <Sidebar mode="mobile" />
         </SheetContent>
       </Sheet>
 
       <div className="flex-1 flex justify-end items-center gap-4">
-        {/* Notifications Placeholder */}
         <Button variant="ghost" size="icon" className="text-muted-foreground">
           <Bell className="h-5 w-5" />
         </Button>
 
-        {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">

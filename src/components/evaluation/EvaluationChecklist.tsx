@@ -97,8 +97,6 @@ export function EvaluationChecklist() {
     { file: File; preview: string }[]
   >([])
   const [showWebcam, setShowWebcam] = useState(false)
-
-  // Preview
   const [previewFile, setPreviewFile] = useState<{
     url: string
     name: string
@@ -182,7 +180,6 @@ export function EvaluationChecklist() {
       toast.error('CPF inválido')
       return
     }
-
     const client = await fetchClientByCpf(searchCpf)
     if (client) {
       toast.success('Cliente encontrado!')
@@ -195,12 +192,10 @@ export function EvaluationChecklist() {
 
   const handleCreateClient = async (data: any) => {
     if (!currentCompany) return false
-
     const { success, data: client } = await createClient({
       ...data,
       company_id: currentCompany.id,
     })
-
     if (success && client) {
       toast.success('Cliente cadastrado!')
       setShowClientModal(false)
@@ -266,19 +261,16 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
-      // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
         throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`)
       }
 
-      // 2. Upload Document
       const docRes = await uploadEvidence(docFile.file)
       if (docRes.error || !docRes.url) {
         throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`)
       }
 
-      // 3. Upload Consultations
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
         const uploadPromises = consultationFiles.map(async (f) => {
@@ -292,12 +284,10 @@ export function EvaluationChecklist() {
             type: f.file.type.startsWith('image/') ? 'image' : 'document',
           } as ConsultationFile
         })
-
         const results = await Promise.all(uploadPromises)
         consultationResults.push(...results)
       }
 
-      // 4. Save Record
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -322,7 +312,7 @@ export function EvaluationChecklist() {
       })
 
       if (result.success) {
-        toast.success('Avaliação gravada com sucesso!', { id: toastId })
+        toast.success('Avaliação concluída com sucesso!', { id: toastId })
         setStep(1)
         setSelectedModelId('')
         setSerialNumber('')
@@ -517,7 +507,6 @@ export function EvaluationChecklist() {
                       1. Verificações de Segurança
                     </h3>
                   </div>
-
                   <div className="grid gap-4 md:grid-cols-3">
                     {[
                       {

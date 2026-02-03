@@ -11,10 +11,8 @@ interface ViaCepResponse {
 export const fetchAddressByCEP = async (
   cep: string,
 ): Promise<ViaCepResponse | null> => {
-  // Remove non-digits
   const cleanCep = cep.replace(/\D/g, '')
 
-  // Validate length
   if (cleanCep.length !== 8) {
     return null
   }

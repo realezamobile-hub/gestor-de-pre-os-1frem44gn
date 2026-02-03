@@ -30,16 +30,12 @@ interface AuthState {
     avatarFile?: File | null
   }) => Promise<{ success: boolean; error?: any }>
   logout: () => Promise<void>
-
-  // Password Recovery
   resetPasswordForEmail: (
     email: string,
   ) => Promise<{ success: boolean; error?: any }>
   updatePassword: (
     password: string,
   ) => Promise<{ success: boolean; error?: any }>
-
-  // Profile Management
   updateProfile: (
     data: Partial<User>,
   ) => Promise<{ success: boolean; error?: any }>
@@ -50,8 +46,6 @@ interface AuthState {
     userId: string,
     file: File,
   ) => Promise<{ success: boolean; url?: string; error?: any }>
-
-  // Admin actions
   users: User[]
   fetchUsers: () => Promise<void>
   adminUpdateUser: (
@@ -68,7 +62,6 @@ interface AuthState {
 }
 
 const mapProfileToUser = (profile: any): User => {
-  // Normalize Role (handling legacy 'admin'/'user' strings)
   let role: Role = 'VENDEDOR'
   const rawRole = (profile.role || '').toUpperCase()
   if (rawRole === 'ADMIN') role = 'ADMIN'
@@ -124,7 +117,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         if (profile && !error) {
           const profileWithEmail = { ...profile, email: session.user.email }
           const user = mapProfileToUser(profileWithEmail)
-
           let company = null
           if (user.companyId) {
             const { data: companyData } = await supabase
@@ -134,14 +126,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               .single()
             company = companyData
           }
-
           set({
             currentUser: user,
             currentCompany: company,
             session,
             isLoading: false,
           })
-
           await supabase
             .from('profiles')
             .update({ last_active: new Date().toISOString() })
@@ -176,9 +166,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialize: async () => {
     if (get().initialized) return
     set({ initialized: true, isLoading: true })
-
     const { syncUser } = get()
-
     try {
       const {
         data: { session },
@@ -192,7 +180,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Auth initialization error:', error)
       set({ isLoading: false })
     }
-
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
         const currentId = get().currentUser?.id
@@ -236,7 +223,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       avatarUrl,
       avatarFile,
     } = data
-
     const { data: authData, error } = await supabase.auth.signUp({
       email,
       password,
@@ -254,11 +240,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         emailRedirectTo: window.location.origin,
       },
     })
-
     if (error) return { success: false, error }
-
     if (authData.user) {
-      // Force update of profile fields to ensure they are saved even if trigger misses them
       await supabase
         .from('profiles')
         .update({
@@ -272,22 +255,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           avatar_url: avatarUrl,
         })
         .eq('id', authData.user.id)
-
-      // Upload Custom Avatar if provided
       if (avatarFile) {
         try {
           const fileExt = avatarFile.name.split('.').pop()
           const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`
-
           const { error: uploadError } = await supabase.storage
             .from('avatars')
             .upload(fileName, avatarFile, { upsert: true })
-
           if (!uploadError) {
             const {
               data: { publicUrl },
             } = supabase.storage.from('avatars').getPublicUrl(fileName)
-
             await supabase
               .from('profiles')
               .update({ avatar_url: publicUrl })
@@ -298,7 +276,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       }
     }
-
     return { success: true }
   },
 
@@ -324,7 +301,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   updateProfile: async (data) => {
     const { currentUser, syncUser, session } = get()
     if (!currentUser) return { success: false, error: 'User not found' }
-
     const dbUpdates: any = {}
     if (data.name !== undefined) dbUpdates.name = data.name
     if (data.phone !== undefined) dbUpdates.phone = data.phone
@@ -336,14 +312,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (data.emergencyContactPhone !== undefined)
       dbUpdates.emergency_contact_phone = data.emergencyContactPhone
     if (data.avatarUrl !== undefined) dbUpdates.avatar_url = data.avatarUrl
-
     const { error } = await supabase
       .from('profiles')
       .update(dbUpdates)
       .eq('id', currentUser.id)
-
     if (error) return { success: false, error }
-
     await syncUser(session)
     return { success: true }
   },
@@ -351,28 +324,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   uploadAvatar: async (file) => {
     const { currentUser, syncUser, session } = get()
     if (!currentUser) return { success: false, error: 'User not found' }
-
     try {
       const fileExt = file.name.split('.').pop()
       const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`
-
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, { upsert: true })
-
       if (uploadError) throw uploadError
-
       const {
         data: { publicUrl },
       } = supabase.storage.from('avatars').getPublicUrl(fileName)
-
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', currentUser.id)
-
       if (updateError) throw updateError
-
       await syncUser(session)
       return { success: true, url: publicUrl }
     } catch (error) {
@@ -385,24 +351,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const fileExt = file.name.split('.').pop()
       const fileName = `${userId}/${Date.now()}.${fileExt}`
-
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, { upsert: true })
-
       if (uploadError) throw uploadError
-
       const {
         data: { publicUrl },
       } = supabase.storage.from('avatars').getPublicUrl(fileName)
-
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', userId)
-
       if (updateError) throw updateError
-
       set((state) => ({
         users: state.users.map((u) =>
           u.id === userId ? { ...u, avatarUrl: publicUrl } : u,
@@ -412,7 +372,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             ? { ...state.currentUser, avatarUrl: publicUrl }
             : state.currentUser,
       }))
-
       return { success: true, url: publicUrl }
     } catch (error) {
       console.error('Admin avatar upload error:', error)
@@ -425,7 +384,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false })
-
     if (!error && profiles) {
       const mappedUsers: User[] = profiles.map(mapProfileToUser)
       set({ users: mappedUsers })
@@ -434,7 +392,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   adminUpdateUser: async (userId, data) => {
     const dbUpdates: any = {}
-
     if (data.name !== undefined) dbUpdates.name = data.name
     if (data.phone !== undefined) dbUpdates.phone = data.phone
     if (data.role !== undefined) dbUpdates.role = data.role
@@ -456,18 +413,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (data.emergencyContactPhone !== undefined)
       dbUpdates.emergency_contact_phone = data.emergencyContactPhone
     if (data.avatarUrl !== undefined) dbUpdates.avatar_url = data.avatarUrl
-
     const { error } = await supabase
       .from('profiles')
       .update(dbUpdates)
       .eq('id', userId)
-
     if (error) return { success: false, error }
-
     set((state) => ({
       users: state.users.map((u) => (u.id === userId ? { ...u, ...data } : u)),
     }))
-
     return { success: true }
   },
 
@@ -476,7 +429,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('profiles')
       .update({ status })
       .eq('id', userId)
-
     if (!error) {
       set((state) => ({
         users: state.users.map((u) => (u.id === userId ? { ...u, status } : u)),
@@ -489,7 +441,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('profiles')
       .update({ role })
       .eq('id', userId)
-
     if (!error) {
       set((state) => ({
         users: state.users.map((u) => (u.id === userId ? { ...u, role } : u)),
@@ -502,7 +453,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('profiles')
       .update({ company_id: companyId })
       .eq('id', userId)
-
     if (!error) {
       set((state) => ({
         users: state.users.map((u) =>
@@ -515,22 +465,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   toggleUserPermission: async (userId, permission) => {
     const user = get().users.find((u) => u.id === userId)
     if (!user) return
-
     const newValue = !user[permission]
     let dbColumn = ''
-
     if (permission === 'canCreateList') dbColumn = 'can_create_list'
     if (permission === 'canAccessEvaluation') dbColumn = 'can_access_evaluation'
     if (permission === 'canDeleteRecords') dbColumn = 'can_delete_records'
     if (permission === 'canViewAllLists') dbColumn = 'can_view_all_lists'
-
     if (!dbColumn) return
-
     const { error } = await supabase
       .from('profiles')
       .update({ [dbColumn]: newValue })
       .eq('id', userId)
-
     if (!error) {
       set((state) => ({
         users: state.users.map((u) =>

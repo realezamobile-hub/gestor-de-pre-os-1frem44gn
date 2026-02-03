@@ -61,13 +61,11 @@ export function CategoryConfig() {
 
   const handleSubmit = async (name: string) => {
     let result
-
     if (dialogMode === 'edit' && selectedItem) {
       result = await updateCategory(selectedItem.id, name)
     } else {
       result = await addCategory(name)
     }
-
     if (result.success) {
       toast.success(
         dialogMode === 'edit'
@@ -158,7 +156,6 @@ export function CategoryConfig() {
           </ScrollArea>
         </CardContent>
       </Card>
-
       <CategoryDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}

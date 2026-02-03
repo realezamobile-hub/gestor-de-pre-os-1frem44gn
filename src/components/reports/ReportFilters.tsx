@@ -68,7 +68,6 @@ export function ReportFilters() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-        {/* Date Filter */}
         <div className="space-y-2">
           <Label>Período</Label>
           <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -135,7 +134,6 @@ export function ReportFilters() {
           </Popover>
         </div>
 
-        {/* Model Filter */}
         <div className="space-y-2">
           <Label>Modelo</Label>
           <Select value={filters.model} onValueChange={handleModelChange}>
@@ -153,7 +151,6 @@ export function ReportFilters() {
           </Select>
         </div>
 
-        {/* Value Range */}
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-2">
             <Label>Min (R$)</Label>

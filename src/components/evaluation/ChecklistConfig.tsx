@@ -31,7 +31,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 export function ChecklistConfig() {
   const { checklistItems, categories, addChecklistItem, deleteChecklistItem } =
     useEvaluationStore()
-
   const [newCategoryId, setNewCategoryId] = useState('')
   const [newName, setNewName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
@@ -103,7 +102,6 @@ export function ChecklistConfig() {
             <Plus className="w-4 h-4" />
           </Button>
         </div>
-
         <ScrollArea className="flex-1 border rounded-md">
           <Table>
             <TableHeader>

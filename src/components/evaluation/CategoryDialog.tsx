@@ -42,11 +42,9 @@ export function CategoryDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
-
     setIsSubmitting(true)
     const success = await onSubmit(name.trim())
     setIsSubmitting(false)
-
     if (success) {
       onOpenChange(false)
     }

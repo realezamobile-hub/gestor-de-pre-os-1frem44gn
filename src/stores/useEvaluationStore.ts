@@ -5,7 +5,6 @@ import {
   Evaluation,
   ChecklistItem,
   ChecklistCategory,
-  ConsultationFile,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 
@@ -18,8 +17,6 @@ interface EvaluationStore {
   isLoading: boolean
 
   fetchConfigs: () => Promise<void>
-
-  // Base Prices
   addBasePrice: (
     modelo: string,
     preco: number,
@@ -30,16 +27,12 @@ interface EvaluationStore {
     preco: number,
   ) => Promise<{ success: boolean; error?: any }>
   deleteBasePrice: (id: string) => Promise<{ success: boolean; error?: any }>
-
-  // Categories
   addCategory: (name: string) => Promise<{ success: boolean; error?: any }>
   updateCategory: (
     id: string,
     name: string,
   ) => Promise<{ success: boolean; error?: any }>
   deleteCategory: (id: string) => Promise<{ success: boolean; error?: any }>
-
-  // Checklist Items
   addChecklistItem: (
     categoryId: string,
     nome: string,
@@ -47,8 +40,6 @@ interface EvaluationStore {
   deleteChecklistItem: (
     id: string,
   ) => Promise<{ success: boolean; error?: any }>
-
-  // Discounts
   addDiscount: (
     nome: string,
     valor: number,
@@ -60,8 +51,6 @@ interface EvaluationStore {
     valor: number,
   ) => Promise<{ success: boolean; error?: any }>
   deleteDiscount: (id: string) => Promise<{ success: boolean; error?: any }>
-
-  // Evaluation
   saveEvaluation: (data: any) => Promise<{ success: boolean; error?: any }>
   fetchEvaluations: () => Promise<void>
   uploadEvidence: (file: File) => Promise<{ url: string | null; error: any }>
@@ -248,23 +237,19 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
   uploadEvidence: async (file) => {
     try {
-      // Robust sanitization
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'unknown'
       const nameWithoutExt =
         file.name.substring(0, file.name.lastIndexOf('.')) || file.name
 
-      // Remove special chars, spaces to hyphens, only alphanumeric
       const sanitizedBaseName = nameWithoutExt
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // remove accents
-        .replace(/[^a-zA-Z0-9\s\-_]/g, '') // remove special chars
-        .replace(/\s+/g, '-') // replace spaces with hyphens
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9\s\-_]/g, '')
+        .replace(/\s+/g, '-')
         .toLowerCase()
 
       const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
-
-      // CRITICAL: Create a fresh File object to strip any proxy/react-synthetic wrappers
-      // This solves the "FormData object could not be cloned" error by ensuring a native File object
+      // This is the fix for "FormData object could not be cloned"
       const cleanFile = new File([file], fileName, { type: file.type })
 
       const { error: uploadError } = await supabase.storage

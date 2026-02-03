@@ -27,7 +27,6 @@ export function ClientFiles({ clientId }: ClientFilesProps) {
       const allFiles: any[] = []
 
       evals.forEach((ev) => {
-        // Parse arquivos_consulta if it's a string, or use directly if object
         let extraFiles: any[] = []
         try {
           if (typeof ev.arquivos_consulta === 'string') {

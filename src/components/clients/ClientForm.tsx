@@ -66,7 +66,6 @@ export function ClientForm({
   }
 
   const handleCepBlur = async () => {
-    // Only search if CEP has 8 digits (excluding mask)
     const cleanCep = formData.cep.replace(/\D/g, '')
     if (cleanCep.length !== 8) return
 
@@ -92,9 +91,7 @@ export function ClientForm({
   const handlePhotoCapture = async (file: File) => {
     setShowCamera(false)
     setIsUploadingPhoto(true)
-
     const result = await uploadClientPhoto(file)
-
     setIsUploadingPhoto(false)
     if (result.success && result.url) {
       setFormData((prev) => ({ ...prev, url_foto: result.url! }))
@@ -106,21 +103,17 @@ export function ClientForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateCPF(formData.cpf)) {
       toast.error('CPF inválido')
       return
     }
-
     if (!formData.nome || !formData.telefone || !formData.cpf) {
       toast.error('Preencha os campos obrigatórios (*)')
       return
     }
-
     setIsSubmitting(true)
     const success = await onSubmit(formData)
     setIsSubmitting(false)
-
     if (success) {
       toast.success(
         isEditing
@@ -181,7 +174,6 @@ export function ClientForm({
         <h3 className="font-semibold text-lg flex items-center gap-2 text-primary border-b pb-2">
           <User className="w-5 h-5" /> Dados Pessoais
         </h3>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="nome">Nome Completo *</Label>

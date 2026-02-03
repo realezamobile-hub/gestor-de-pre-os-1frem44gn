@@ -68,7 +68,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
         .gte('created_at', fromStr)
         .lte('created_at', toStr)
 
-      // Apply Filters
       if (filters.model && filters.model !== 'all') {
         query = query.eq('modelo', filters.model)
       }

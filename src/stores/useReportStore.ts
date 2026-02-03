@@ -15,7 +15,13 @@ interface ReportStore {
   isLoading: boolean
   stats: ReportStats
   dateRange: { from: Date; to: Date }
+  filters: {
+    model: string
+    minValue: number
+    maxValue: number
+  }
   setDateRange: (range: { from: Date; to: Date }) => void
+  setFilters: (filters: Partial<ReportStore['filters']>) => void
   fetchReportData: () => Promise<void>
 }
 
@@ -24,6 +30,11 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   dateRange: {
     from: startOfMonth(subMonths(new Date(), 1)),
     to: endOfMonth(new Date()),
+  },
+  filters: {
+    model: 'all',
+    minValue: 0,
+    maxValue: 0,
   },
   stats: {
     totalEvaluations: 0,
@@ -39,18 +50,38 @@ export const useReportStore = create<ReportStore>((set, get) => ({
     get().fetchReportData()
   },
 
+  setFilters: (newFilters) => {
+    set((state) => ({ filters: { ...state.filters, ...newFilters } }))
+    get().fetchReportData()
+  },
+
   fetchReportData: async () => {
     set({ isLoading: true })
-    const { dateRange } = get()
+    const { dateRange, filters } = get()
     const fromStr = dateRange.from.toISOString()
     const toStr = dateRange.to.toISOString()
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('avaliacoes_iphone')
         .select('*')
         .gte('created_at', fromStr)
         .lte('created_at', toStr)
+
+      // Apply Filters
+      if (filters.model && filters.model !== 'all') {
+        query = query.eq('modelo', filters.model)
+      }
+
+      if (filters.minValue > 0) {
+        query = query.gte('valor_final', filters.minValue)
+      }
+
+      if (filters.maxValue > 0) {
+        query = query.lte('valor_final', filters.maxValue)
+      }
+
+      const { data, error } = await query
 
       if (error) throw error
 

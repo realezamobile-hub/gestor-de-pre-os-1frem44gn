@@ -206,11 +206,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   },
 
   saveEvaluation: async (data) => {
-    const files = Array.isArray(data.files) ? data.files : []
-    const urlPrint = data.urlPrint || null
-    const urlDoc = data.urlDoc || null
-    const consultationFiles = data.consultationFiles || []
-
     const { error } = await supabase.from('avaliacoes_iphone').insert({
       modelo: data.modelo,
       serial_number: data.serialNumber,
@@ -222,9 +217,9 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       telefone_cliente: data.telefoneCliente,
       cpf_cliente: data.cpf_cliente,
       cliente_id: data.clienteId,
-      url_print_seguranca: urlPrint,
-      url_foto_documento: urlDoc,
-      arquivos_consulta: consultationFiles as any,
+      url_print_seguranca: data.urlPrint || null,
+      url_foto_documento: data.urlDoc || null,
+      arquivos_consulta: data.consultationFiles || [],
     })
 
     if (!error) await get().fetchEvaluations()
@@ -253,15 +248,23 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
   uploadEvidence: async (file) => {
     try {
+      // Robust sanitization
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'unknown'
       const nameWithoutExt =
         file.name.substring(0, file.name.lastIndexOf('.')) || file.name
-      const sanitizedBaseName = nameWithoutExt.replace(/[^a-zA-Z0-9\s\-_]/g, '')
-      const finalName = sanitizedBaseName.trim().replace(/\s+/g, '-')
-      const fileName = `${Date.now()}-${finalName}.${fileExt}`
 
-      // Create a fresh File object to strip any proxy/react-synthetic wrappers
-      // This solves the "FormData object could not be cloned" error
+      // Remove special chars, spaces to hyphens, only alphanumeric
+      const sanitizedBaseName = nameWithoutExt
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // remove accents
+        .replace(/[^a-zA-Z0-9\s\-_]/g, '') // remove special chars
+        .replace(/\s+/g, '-') // replace spaces with hyphens
+        .toLowerCase()
+
+      const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
+
+      // CRITICAL: Create a fresh File object to strip any proxy/react-synthetic wrappers
+      // This solves the "FormData object could not be cloned" error by ensuring a native File object
       const cleanFile = new File([file], fileName, { type: file.type })
 
       const { error: uploadError } = await supabase.storage
@@ -269,6 +272,7 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
         .upload(fileName, cleanFile, {
           upsert: false,
           contentType: file.type,
+          cacheControl: '3600',
         })
 
       if (uploadError) {

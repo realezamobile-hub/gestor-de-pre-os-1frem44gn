@@ -49,6 +49,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
 
 export function EvaluationChecklist() {
   const {
@@ -96,6 +97,12 @@ export function EvaluationChecklist() {
     { file: File; preview: string }[]
   >([])
   const [showWebcam, setShowWebcam] = useState(false)
+
+  // Preview
+  const [previewFile, setPreviewFile] = useState<{
+    url: string
+    name: string
+  } | null>(null)
 
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
 
@@ -259,16 +266,19 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
+      // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
         throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`)
       }
 
+      // 2. Upload Document
       const docRes = await uploadEvidence(docFile.file)
       if (docRes.error || !docRes.url) {
         throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`)
       }
 
+      // 3. Upload Consultations
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
         const uploadPromises = consultationFiles.map(async (f) => {
@@ -287,6 +297,7 @@ export function EvaluationChecklist() {
         consultationResults.push(...results)
       }
 
+      // 4. Save Record
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -311,7 +322,7 @@ export function EvaluationChecklist() {
       })
 
       if (result.success) {
-        toast.success('Avaliação concluída com sucesso!', { id: toastId })
+        toast.success('Avaliação gravada com sucesso!', { id: toastId })
         setStep(1)
         setSelectedModelId('')
         setSerialNumber('')
@@ -598,7 +609,15 @@ export function EvaluationChecklist() {
                         </div>
                       ) : (
                         <div className="relative group border rounded-md p-2 bg-white flex items-center gap-2">
-                          <div className="w-12 h-12 bg-slate-100 rounded overflow-hidden">
+                          <div
+                            className="w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer"
+                            onClick={() =>
+                              setPreviewFile({
+                                url: printFile.preview,
+                                name: printFile.file.name,
+                              })
+                            }
+                          >
                             {printFile.file.type.startsWith('image/') ? (
                               <img
                                 src={printFile.preview}
@@ -667,7 +686,15 @@ export function EvaluationChecklist() {
                         </div>
                       ) : (
                         <div className="relative group border rounded-md p-2 bg-white flex items-center gap-2">
-                          <div className="w-12 h-12 bg-slate-100 rounded overflow-hidden">
+                          <div
+                            className="w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer"
+                            onClick={() =>
+                              setPreviewFile({
+                                url: docFile.preview,
+                                name: docFile.file.name,
+                              })
+                            }
+                          >
                             <img
                               src={docFile.preview}
                               className="w-full h-full object-cover"
@@ -729,9 +756,17 @@ export function EvaluationChecklist() {
                           {consultationFiles.map((f, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-2 bg-white border rounded text-xs"
+                              className="flex items-center justify-between p-2 bg-white border rounded text-xs cursor-pointer hover:bg-slate-50"
                             >
-                              <div className="flex items-center gap-2 truncate">
+                              <div
+                                className="flex items-center gap-2 truncate flex-1"
+                                onClick={() =>
+                                  setPreviewFile({
+                                    url: f.preview,
+                                    name: f.file.name,
+                                  })
+                                }
+                              >
                                 {f.file.type.startsWith('image/') ? (
                                   <ImageIcon className="w-3 h-3 text-blue-500" />
                                 ) : (
@@ -1066,6 +1101,13 @@ export function EvaluationChecklist() {
           />
         </DialogContent>
       </Dialog>
+
+      <FilePreviewDialog
+        open={!!previewFile}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
+        fileUrl={previewFile?.url || null}
+        fileName={previewFile?.name}
+      />
     </div>
   )
 }

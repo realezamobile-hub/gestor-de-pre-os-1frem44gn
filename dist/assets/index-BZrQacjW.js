@@ -19408,6 +19408,10 @@ var FlipHorizontal = createLucideIcon("flip-horizontal", [
 		key: "tus03m"
 	}]
 ]);
+var Funnel = createLucideIcon("funnel", [["path", {
+	d: "M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z",
+	key: "sc7q7i"
+}]]);
 var Globe = createLucideIcon("globe", [
 	["circle", {
 		cx: "12",
@@ -24870,7 +24874,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$39({ inst: {
+			cachedValue = useState$40({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24884,7 +24888,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$29(function() {
+			useEffect$30(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24907,7 +24911,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$39 = React$60.useState, useEffect$29 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$40 = React$60.useState, useEffect$30 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$60.useSyncExternalStore ? React$60.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24930,7 +24934,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$2 === y$1 && (0 !== x$2 || 1 / x$2 === 1 / y$1) || x$2 !== x$2 && y$1 !== y$1;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$13 = React$60.useRef, useEffect$29 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
+		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$13 = React$60.useRef, useEffect$30 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual$5) {
 			var instRef = useRef$13(null);
 			if (null === instRef.current) {
@@ -24972,7 +24976,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual$5
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$29(function() {
+			useEffect$30(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -41180,7 +41184,7 @@ var ItemIndicator = SelectItemIndicator;
 var ScrollUpButton = SelectScrollUpButton$1;
 var ScrollDownButton = SelectScrollDownButton$1;
 var Separator = SelectSeparator$1;
-var Select$1 = Root2$4;
+var Select = Root2$4;
 var SelectValue = Value;
 var SelectTrigger = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger$3, {
 	ref,
@@ -42126,7 +42130,7 @@ function ProductFilters({ className }) {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2 w-full lg:w-auto flex-1 items-center",
 				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 						value: filters.ram,
 						onValueChange: (val) => setFilters({ ram: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -42140,7 +42144,7 @@ function ProductFilters({ className }) {
 							children: r$1
 						}, r$1))] })]
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 						value: filters.memory,
 						onValueChange: (val) => setFilters({ memory: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -42154,7 +42158,7 @@ function ProductFilters({ className }) {
 							children: m$1
 						}, m$1))] })]
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 						value: filters.color,
 						onValueChange: (val) => setFilters({ color: val }),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -46905,7 +46909,7 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 												htmlFor: "role",
 												children: "Função"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 												value: formData.role,
 												onValueChange: (val) => handleChange("role", val),
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -46938,7 +46942,7 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 										htmlFor: "company",
 										children: "Empresa"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 										value: formData.companyId || "",
 										onValueChange: (val) => handleChange("companyId", val),
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -47031,7 +47035,7 @@ function UserEditDialog({ user, open, onOpenChange, companies = [], isSuperAdmin
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 									htmlFor: "status",
 									children: "Status da Conta"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 									value: formData.status,
 									onValueChange: (val) => handleChange("status", val),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -48367,10 +48371,6 @@ const useEvaluationStore = create((set, get$8) => ({
 		};
 	},
 	saveEvaluation: async (data) => {
-		Array.isArray(data.files) && data.files;
-		const urlPrint = data.urlPrint || null;
-		const urlDoc = data.urlDoc || null;
-		const consultationFiles = data.consultationFiles || [];
 		const { error } = await supabase.from("avaliacoes_iphone").insert({
 			modelo: data.modelo,
 			serial_number: data.serialNumber,
@@ -48382,9 +48382,9 @@ const useEvaluationStore = create((set, get$8) => ({
 			telefone_cliente: data.telefoneCliente,
 			cpf_cliente: data.cpf_cliente,
 			cliente_id: data.clienteId,
-			url_print_seguranca: urlPrint,
-			url_foto_documento: urlDoc,
-			arquivos_consulta: consultationFiles
+			url_print_seguranca: data.urlPrint || null,
+			url_foto_documento: data.urlDoc || null,
+			arquivos_consulta: data.consultationFiles || []
 		});
 		if (!error) await get$8().fetchEvaluations();
 		return {
@@ -48408,12 +48408,13 @@ const useEvaluationStore = create((set, get$8) => ({
 	uploadEvidence: async (file) => {
 		try {
 			const fileExt = file.name.split(".").pop()?.toLowerCase() || "unknown";
-			const finalName = (file.name.substring(0, file.name.lastIndexOf(".")) || file.name).replace(/[^a-zA-Z0-9\s\-_]/g, "").trim().replace(/\s+/g, "-");
-			const fileName = `${Date.now()}-${finalName}.${fileExt}`;
+			const sanitizedBaseName = (file.name.substring(0, file.name.lastIndexOf(".")) || file.name).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s\-_]/g, "").replace(/\s+/g, "-").toLowerCase();
+			const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`;
 			const cleanFile = new File([file], fileName, { type: file.type });
 			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, cleanFile, {
 				upsert: false,
-				contentType: file.type
+				contentType: file.type,
+				cacheControl: "3600"
 			});
 			if (uploadError) {
 				console.error("Supabase upload error:", uploadError);
@@ -48696,7 +48697,7 @@ function ChecklistConfig() {
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "text-xs font-medium",
 							children: "Categoria"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 							value: newCategoryId,
 							onValueChange: setNewCategoryId,
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
@@ -48814,7 +48815,7 @@ function ModelDiscountConfig() {
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "text-sm font-medium",
 					children: "Selecione o Modelo"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 					value: selectedModelId,
 					onValueChange: setSelectedModelId,
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Escolha um modelo..." }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
@@ -49345,7 +49346,9 @@ const fetchAddressByCEP = async (cep) => {
 	const cleanCep = cep.replace(/\D/g, "");
 	if (cleanCep.length !== 8) return null;
 	try {
-		const data = await (await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)).json();
+		const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+		if (!response.ok) throw new Error("Erro ao consultar CEP");
+		const data = await response.json();
 		if (data.erro) return null;
 		return data;
 	} catch (error) {
@@ -49387,9 +49390,10 @@ function ClientForm({ initialData, onSubmit, onCancel, isEditing = false }) {
 		}));
 	};
 	const handleCepBlur = async () => {
-		if (formData.cep.length < 8) return;
+		const cleanCep = formData.cep.replace(/\D/g, "");
+		if (cleanCep.length !== 8) return;
 		setLoadingCep(true);
-		const address = await fetchAddressByCEP(formData.cep);
+		const address = await fetchAddressByCEP(cleanCep);
 		setLoadingCep(false);
 		if (address) {
 			setFormData((prev) => ({
@@ -49530,7 +49534,7 @@ function ClientForm({ initialData, onSubmit, onCancel, isEditing = false }) {
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 								htmlFor: "genero",
 								children: "Gênero"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 								value: formData.genero,
 								onValueChange: (v) => handleChange("genero", v),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
@@ -49558,7 +49562,7 @@ function ClientForm({ initialData, onSubmit, onCancel, isEditing = false }) {
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
 								htmlFor: "origem",
 								children: "Origem do Cliente"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 								value: formData.origem,
 								onValueChange: (v) => handleChange("origem", v),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Como nos conheceu?" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
@@ -49785,6 +49789,60 @@ function ClientForm({ initialData, onSubmit, onCancel, isEditing = false }) {
 		]
 	});
 }
+function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType = "image" }) {
+	if (!fileUrl) return null;
+	const isImage$1 = fileType === "image" || fileUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) || fileName?.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+	const isPdf = fileUrl.match(/\.pdf$/i) || fileName?.match(/\.pdf$/i) || fileType === "application/pdf";
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open,
+		onOpenChange,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "max-w-4xl w-[90vw] max-h-[90vh] flex flex-col p-0 overflow-hidden",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
+				className: "p-4 border-b bg-background z-10 shrink-0",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
+					className: "flex items-center gap-2 truncate pr-8",
+					children: [isImage$1 ? "Visualizar Imagem" : "Visualizar Arquivo", fileName && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "text-muted-foreground font-normal text-sm truncate",
+						children: ["- ", fileName]
+					})]
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px]",
+				children: isImage$1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+					src: fileUrl,
+					alt: "Preview",
+					className: "max-w-full max-h-full object-contain rounded shadow-sm"
+				}) : isPdf ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("iframe", {
+					src: fileUrl,
+					className: "w-full h-full min-h-[500px] rounded shadow-sm bg-white",
+					title: "PDF Preview"
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "text-center space-y-4",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mx-auto",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-10 h-10 text-slate-500" })
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-muted-foreground",
+							children: "Este tipo de arquivo não pode ser visualizado diretamente aqui."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+								href: fileUrl,
+								target: "_blank",
+								rel: "noreferrer",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4 mr-2" }), "Abrir em nova aba"]
+							})
+						})
+					]
+				})
+			})]
+		})
+	});
+}
 function EvaluationChecklist() {
 	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence } = useEvaluationStore();
 	const { currentClient, fetchClientByCpf, createClient: createClient$1, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
@@ -49806,6 +49864,7 @@ function EvaluationChecklist() {
 	const [docFile, setDocFile] = (0, import_react.useState)(null);
 	const [consultationFiles, setConsultationFiles] = (0, import_react.useState)([]);
 	const [showWebcam, setShowWebcam] = (0, import_react.useState)(false);
+	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
 	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
 	const getDetectedDefects = () => {
 		if (!selectedModel) return [];
@@ -49961,7 +50020,7 @@ function EvaluationChecklist() {
 				consultationFiles: consultationResults
 			});
 			if (result.success) {
-				toast.success("Avaliação concluída com sucesso!", { id: toastId });
+				toast.success("Avaliação gravada com sucesso!", { id: toastId });
 				setStep(1);
 				setSelectedModelId("");
 				setSerialNumber("");
@@ -50018,7 +50077,7 @@ function EvaluationChecklist() {
 									className: "space-y-4 max-w-md",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Modelo do iPhone" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Modelo do iPhone" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 											value: selectedModelId,
 											onValueChange: setSelectedModelId,
 											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione o modelo" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
@@ -50205,7 +50264,11 @@ function EvaluationChecklist() {
 																className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
 																children: [
 																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden",
+																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer",
+																		onClick: () => setPreviewFile({
+																			url: printFile.preview,
+																			name: printFile.file.name
+																		}),
 																		children: printFile.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 																			src: printFile.preview,
 																			className: "w-full h-full object-cover"
@@ -50274,7 +50337,11 @@ function EvaluationChecklist() {
 																className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
 																children: [
 																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden",
+																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer",
+																		onClick: () => setPreviewFile({
+																			url: docFile.preview,
+																			name: docFile.file.name
+																		}),
 																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 																			src: docFile.preview,
 																			className: "w-full h-full object-cover"
@@ -50336,9 +50403,13 @@ function EvaluationChecklist() {
 															consultationFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 																className: "grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2",
 																children: consultationFiles.map((f, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-																	className: "flex items-center justify-between p-2 bg-white border rounded text-xs",
+																	className: "flex items-center justify-between p-2 bg-white border rounded text-xs cursor-pointer hover:bg-slate-50",
 																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-																		className: "flex items-center gap-2 truncate",
+																		className: "flex items-center gap-2 truncate flex-1",
+																		onClick: () => setPreviewFile({
+																			url: f.preview,
+																			name: f.file.name
+																		}),
 																		children: [f.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-3 h-3 text-blue-500" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-3 h-3 text-orange-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 																			className: "truncate max-w-[100px]",
 																			children: f.file.name
@@ -50674,80 +50745,133 @@ function EvaluationChecklist() {
 						onCancel: () => setShowWebcam(false)
 					})]
 				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePreviewDialog, {
+				open: !!previewFile,
+				onOpenChange: (open) => !open && setPreviewFile(null),
+				fileUrl: previewFile?.url || null,
+				fileName: previewFile?.name
 			})
 		]
 	});
 }
 function EvaluationHistory() {
 	const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore();
+	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
 	(0, import_react.useEffect)(() => {
 		fetchEvaluations();
 	}, []);
 	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "flex justify-center p-8",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" })
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin text-primary" })
 	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "rounded-md border",
+	if (evaluations.length === 0) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "text-center p-8 border rounded-lg bg-slate-50 text-muted-foreground",
+		children: "Nenhuma avaliação encontrada."
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "border rounded-md overflow-hidden bg-white shadow-sm",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
 			className: "bg-slate-50",
 			children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cliente" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Serial" }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cliente" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 					className: "text-right",
 					children: "Valor Final"
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-					className: "text-center",
+					className: "text-right",
 					children: "Arquivos"
 				})
 			]
-		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-			colSpan: 6,
-			className: "text-center text-muted-foreground py-8",
-			children: "Nenhuma avaliação registrada."
-		}) }) : evaluations.map((ev) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: format$1(new Date(ev.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR }) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
+		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+				className: "text-muted-foreground",
+				children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 				className: "font-medium",
-				children: [ev.nome_cliente || "N/A", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "text-xs text-muted-foreground",
-					children: ev.cpf_cliente
-				})]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: ev.modelo }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "font-mono text-xs",
-				children: ev.serial_number
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-				className: "text-right font-bold text-emerald-600",
-				children: [
-					"R$",
-					" ",
-					ev.valor_final?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-				]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-center",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex justify-center gap-1",
-					children: [ev.url_print_seguranca && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-						variant: "outline",
-						className: "text-[10px]",
-						children: "Print"
-					}), ev.url_foto_documento && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-						variant: "outline",
-						className: "text-[10px]",
-						children: "Doc"
+					className: "flex flex-col",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 text-slate-400" }), item.modelo]
+					}), item.serial_number && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-xs text-muted-foreground font-mono bg-slate-100 px-1 rounded w-fit mt-1",
+						children: item.serial_number
 					})]
 				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.nome_cliente || "N/A" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-xs text-muted-foreground",
+					children: item.cpf_cliente
+				})]
+			}) }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+				className: "text-right",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
+					variant: "outline",
+					className: "text-emerald-600 border-emerald-200 bg-emerald-50",
+					children: [
+						"R$",
+						" ",
+						item.valor_final?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+					]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+				className: "text-right",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex justify-end gap-1",
+					children: [
+						item.url_print_seguranca && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								className: "h-8 w-8 text-blue-500 hover:bg-blue-50",
+								onClick: () => setPreviewFile({
+									url: item.url_print_seguranca,
+									name: "Print Segurança"
+								}),
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4" })
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Ver Print" })] }) }),
+						item.url_foto_documento && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								className: "h-8 w-8 text-orange-500 hover:bg-orange-50",
+								onClick: () => setPreviewFile({
+									url: item.url_foto_documento,
+									name: "Documento"
+								}),
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileText, { className: "w-4 h-4" })
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Ver Documento" })] }) }),
+						item.arquivos_consulta && Array.isArray(item.arquivos_consulta) && item.arquivos_consulta.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
+								variant: "secondary",
+								className: "ml-1 h-8",
+								children: ["+", item.arquivos_consulta.length]
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Arquivos Adicionais (Ver no perfil do cliente)" })] }) })
+					]
+				})
 			})
-		] }, ev.id)) })] })
-	});
+		] }, item.id)) })] })
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePreviewDialog, {
+		open: !!previewFile,
+		onOpenChange: (open) => !open && setPreviewFile(null),
+		fileUrl: previewFile?.url || null,
+		fileName: previewFile?.name
+	})] });
 }
 function EvaluationPage() {
 	const { fetchConfigs } = useEvaluationStore();
@@ -51242,60 +51366,6 @@ function ClientHistory({ clientId }) {
 		] }, item.id)) })] })
 	});
 }
-function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType = "image" }) {
-	if (!fileUrl) return null;
-	const isImage$1 = fileType === "image" || fileUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) || fileName?.match(/\.(jpeg|jpg|gif|png|webp)$/i);
-	const isPdf = fileUrl.match(/\.pdf$/i) || fileName?.match(/\.pdf$/i) || fileType === "application/pdf";
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
-		open,
-		onOpenChange,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
-			className: "max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
-				className: "p-4 border-b bg-background z-10",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
-					className: "flex items-center gap-2 truncate pr-8",
-					children: [isImage$1 ? "Visualizar Imagem" : "Visualizar Arquivo", fileName && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-						className: "text-muted-foreground font-normal text-sm truncate",
-						children: ["- ", fileName]
-					})]
-				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex-1 overflow-auto bg-slate-100 flex items-center justify-center p-4 min-h-[300px]",
-				children: isImage$1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-					src: fileUrl,
-					alt: "Preview",
-					className: "max-w-full max-h-[75vh] object-contain rounded shadow-sm"
-				}) : isPdf ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("iframe", {
-					src: fileUrl,
-					className: "w-full h-[70vh] rounded shadow-sm bg-white",
-					title: "PDF Preview"
-				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "text-center space-y-4",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: "w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mx-auto",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-10 h-10 text-slate-500" })
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							className: "text-muted-foreground",
-							children: "Este tipo de arquivo não pode ser visualizado aqui."
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-								href: fileUrl,
-								target: "_blank",
-								rel: "noreferrer",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4 mr-2" }), "Abrir em nova aba"]
-							})
-						})
-					]
-				})
-			})]
-		})
-	});
-}
 function ClientFiles({ clientId }) {
 	const { fetchClientEvaluations } = useClientStore();
 	const [files, setFiles] = (0, import_react.useState)([]);
@@ -51307,7 +51377,14 @@ function ClientFiles({ clientId }) {
 			const evals = await fetchClientEvaluations(clientId);
 			const allFiles = [];
 			evals.forEach((ev) => {
-				if (ev.arquivos_consulta && Array.isArray(ev.arquivos_consulta)) ev.arquivos_consulta.forEach((f) => {
+				let extraFiles = [];
+				try {
+					if (typeof ev.arquivos_consulta === "string") extraFiles = JSON.parse(ev.arquivos_consulta);
+					else if (Array.isArray(ev.arquivos_consulta)) extraFiles = ev.arquivos_consulta;
+				} catch (e) {
+					console.error("Error parsing files", e);
+				}
+				extraFiles.forEach((f) => {
 					allFiles.push({
 						url: f.url,
 						name: f.name || "Sem nome",
@@ -51317,13 +51394,13 @@ function ClientFiles({ clientId }) {
 				});
 				if (ev.url_print_seguranca) allFiles.push({
 					url: ev.url_print_seguranca,
-					name: "Print Segurança (Legado)",
+					name: "Print Segurança",
 					type: "image",
 					date: ev.created_at
 				});
 				if (ev.url_foto_documento) allFiles.push({
 					url: ev.url_foto_documento,
-					name: "Foto Documento (Legado)",
+					name: "Foto Documento",
 					type: "image",
 					date: ev.created_at
 				});
@@ -51708,6 +51785,11 @@ const useReportStore = create((set, get$8) => ({
 		from: startOfMonth(subMonths(/* @__PURE__ */ new Date(), 1)),
 		to: endOfMonth(/* @__PURE__ */ new Date())
 	},
+	filters: {
+		model: "all",
+		minValue: 0,
+		maxValue: 0
+	},
 	stats: {
 		totalEvaluations: 0,
 		totalValue: 0,
@@ -51720,13 +51802,24 @@ const useReportStore = create((set, get$8) => ({
 		set({ dateRange: range$5 });
 		get$8().fetchReportData();
 	},
+	setFilters: (newFilters) => {
+		set((state) => ({ filters: {
+			...state.filters,
+			...newFilters
+		} }));
+		get$8().fetchReportData();
+	},
 	fetchReportData: async () => {
 		set({ isLoading: true });
-		const { dateRange } = get$8();
+		const { dateRange, filters } = get$8();
 		const fromStr = dateRange.from.toISOString();
 		const toStr = dateRange.to.toISOString();
 		try {
-			const { data, error } = await supabase.from("avaliacoes_iphone").select("*").gte("created_at", fromStr).lte("created_at", toStr);
+			let query = supabase.from("avaliacoes_iphone").select("*").gte("created_at", fromStr).lte("created_at", toStr);
+			if (filters.model && filters.model !== "all") query = query.eq("modelo", filters.model);
+			if (filters.minValue > 0) query = query.gte("valor_final", filters.minValue);
+			if (filters.maxValue > 0) query = query.lte("valor_final", filters.maxValue);
+			const { data, error } = await query;
 			if (error) throw error;
 			if (!data || data.length === 0) {
 				set({
@@ -52447,7 +52540,7 @@ function Root(props) {
 		ref: rootRef
 	});
 }
-function Select(props) {
+function Select$1(props) {
 	return import_react.createElement("select", { ...props });
 }
 function Week(props) {
@@ -52493,7 +52586,7 @@ var custom_components_exports = /* @__PURE__ */ __export({
 	Option: () => Option,
 	PreviousMonthButton: () => PreviousMonthButton,
 	Root: () => Root,
-	Select: () => Select,
+	Select: () => Select$1,
 	Week: () => Week,
 	WeekNumber: () => WeekNumber,
 	WeekNumberHeader: () => WeekNumberHeader,
@@ -54060,8 +54153,12 @@ function CalendarDayButton({ className, day, modifiers, ...props }) {
 	});
 }
 function ReportFilters() {
-	const { dateRange, setDateRange, fetchReportData, isLoading } = useReportStore();
+	const { dateRange, setDateRange, fetchReportData, isLoading, filters, setFilters } = useReportStore();
+	const { basePrices, fetchConfigs } = useEvaluationStore();
 	const [isOpen, setIsOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		fetchConfigs();
+	}, []);
 	const handleQuickSelect = (type) => {
 		const today = /* @__PURE__ */ new Date();
 		let from = today;
@@ -54080,69 +54177,118 @@ function ReportFilters() {
 		});
 		setIsOpen(false);
 	};
+	const handleModelChange = (val) => {
+		setFilters({ model: val });
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-lg border shadow-sm",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex items-center gap-2 w-full sm:w-auto",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, {
-				open: isOpen,
-				onOpenChange: setIsOpen,
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverTrigger, {
-					asChild: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						variant: "outline",
-						className: cn("w-[280px] justify-start text-left font-normal", !dateRange && "text-muted-foreground"),
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, { className: "mr-2 h-4 w-4" }), dateRange?.from ? dateRange.to ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-							format$1(dateRange.from, "dd/MM/yyyy"),
-							" -",
-							" ",
-							format$1(dateRange.to, "dd/MM/yyyy")
-						] }) : format$1(dateRange.from, "dd/MM/yyyy") : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Selecione o período" })]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PopoverContent, {
-					className: "w-auto p-0",
-					align: "start",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "p-2 border-b flex gap-2",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "sm",
-								onClick: () => handleQuickSelect("today"),
-								children: "Hoje"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "sm",
-								onClick: () => handleQuickSelect("week"),
-								children: "7 Dias"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "sm",
-								onClick: () => handleQuickSelect("month"),
-								children: "Este Mês"
+		className: "flex flex-col gap-4 bg-white p-4 rounded-lg border shadow-sm",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex items-center gap-2 mb-2 border-b pb-2 text-sm font-medium text-gray-500",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Funnel, { className: "w-4 h-4" }), " Filtros"]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "grid grid-cols-1 md:grid-cols-4 gap-4 items-end",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Período" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, {
+						open: isOpen,
+						onOpenChange: setIsOpen,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "outline",
+								className: cn("w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground"),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, { className: "mr-2 h-4 w-4" }), dateRange?.from ? dateRange.to ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+									format$1(dateRange.from, "dd/MM/yyyy"),
+									" -",
+									" ",
+									format$1(dateRange.to, "dd/MM/yyyy")
+								] }) : format$1(dateRange.from, "dd/MM/yyyy") : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Selecione o período" })]
 							})
-						]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar, {
-						initialFocus: true,
-						mode: "range",
-						defaultMonth: dateRange?.from,
-						selected: dateRange,
-						onSelect: (range$5) => range$5?.from && setDateRange({
-							from: range$5.from,
-							to: range$5.to || range$5.from
-						}),
-						numberOfMonths: 2,
-						locale: ptBR
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PopoverContent, {
+							className: "w-auto p-0",
+							align: "start",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "p-2 border-b flex gap-2",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+										variant: "ghost",
+										size: "sm",
+										onClick: () => handleQuickSelect("today"),
+										children: "Hoje"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+										variant: "ghost",
+										size: "sm",
+										onClick: () => handleQuickSelect("week"),
+										children: "7 Dias"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+										variant: "ghost",
+										size: "sm",
+										onClick: () => handleQuickSelect("month"),
+										children: "Este Mês"
+									})
+								]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar, {
+								initialFocus: true,
+								mode: "range",
+								defaultMonth: dateRange?.from,
+								selected: dateRange,
+								onSelect: (range$5) => range$5?.from && setDateRange({
+									from: range$5.from,
+									to: range$5.to || range$5.from
+								}),
+								numberOfMonths: 2,
+								locale: ptBR
+							})]
+						})]
 					})]
-				})]
-			})
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-			variant: "secondary",
-			onClick: () => fetchReportData(),
-			disabled: isLoading,
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: cn("w-4 h-4 mr-2", isLoading && "animate-spin") }), "Atualizar"]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Modelo" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: filters.model,
+						onValueChange: handleModelChange,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Todos os modelos" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: "all",
+							children: "Todos os modelos"
+						}), basePrices.map((model) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: model.modelo,
+							children: model.modelo
+						}, model.id))] })]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid grid-cols-2 gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Min (R$)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							type: "number",
+							min: "0",
+							placeholder: "0",
+							value: filters.minValue || "",
+							onChange: (e) => setFilters({ minValue: parseFloat(e.target.value) || 0 })
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "space-y-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Max (R$)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							type: "number",
+							min: "0",
+							placeholder: "Max",
+							value: filters.maxValue || "",
+							onChange: (e) => setFilters({ maxValue: parseFloat(e.target.value) || 0 })
+						})]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "secondary",
+					onClick: () => fetchReportData(),
+					disabled: isLoading,
+					className: "w-full",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: cn("w-4 h-4 mr-2", isLoading && "animate-spin") }), "Atualizar Relatório"]
+				})
+			]
 		})]
 	});
 }
@@ -75482,4 +75628,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D7Y3fy26.js.map
+//# sourceMappingURL=index-BZrQacjW.js.map

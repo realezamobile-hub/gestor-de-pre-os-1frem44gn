@@ -36,8 +36,8 @@ export function FilePreviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-4 border-b bg-background z-10">
+      <DialogContent className="max-w-4xl w-[90vw] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-4 border-b bg-background z-10 shrink-0">
           <DialogTitle className="flex items-center gap-2 truncate pr-8">
             {isImage ? 'Visualizar Imagem' : 'Visualizar Arquivo'}
             {fileName && (
@@ -53,12 +53,12 @@ export function FilePreviewDialog({
             <img
               src={fileUrl}
               alt="Preview"
-              className="max-w-full max-h-[75vh] object-contain rounded shadow-sm"
+              className="max-w-full max-h-full object-contain rounded shadow-sm"
             />
           ) : isPdf ? (
             <iframe
               src={fileUrl}
-              className="w-full h-[70vh] rounded shadow-sm bg-white"
+              className="w-full h-full min-h-[500px] rounded shadow-sm bg-white"
               title="PDF Preview"
             />
           ) : (
@@ -67,7 +67,7 @@ export function FilePreviewDialog({
                 <FileIcon className="w-10 h-10 text-slate-500" />
               </div>
               <p className="text-muted-foreground">
-                Este tipo de arquivo não pode ser visualizado aqui.
+                Este tipo de arquivo não pode ser visualizado diretamente aqui.
               </p>
               <Button asChild>
                 <a href={fileUrl} target="_blank" rel="noreferrer">

@@ -66,10 +66,12 @@ export function ClientForm({
   }
 
   const handleCepBlur = async () => {
-    if (formData.cep.length < 8) return
+    // Only search if CEP has 8 digits (excluding mask)
+    const cleanCep = formData.cep.replace(/\D/g, '')
+    if (cleanCep.length !== 8) return
 
     setLoadingCep(true)
-    const address = await fetchAddressByCEP(formData.cep)
+    const address = await fetchAddressByCEP(cleanCep)
     setLoadingCep(false)
 
     if (address) {

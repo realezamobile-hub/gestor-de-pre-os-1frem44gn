@@ -27,20 +27,31 @@ export function ClientFiles({ clientId }: ClientFilesProps) {
       const allFiles: any[] = []
 
       evals.forEach((ev) => {
-        if (ev.arquivos_consulta && Array.isArray(ev.arquivos_consulta)) {
-          ev.arquivos_consulta.forEach((f: any) => {
-            allFiles.push({
-              url: f.url,
-              name: f.name || 'Sem nome',
-              type: f.type || 'document',
-              date: ev.created_at,
-            })
-          })
+        // Parse arquivos_consulta if it's a string, or use directly if object
+        let extraFiles: any[] = []
+        try {
+          if (typeof ev.arquivos_consulta === 'string') {
+            extraFiles = JSON.parse(ev.arquivos_consulta)
+          } else if (Array.isArray(ev.arquivos_consulta)) {
+            extraFiles = ev.arquivos_consulta
+          }
+        } catch (e) {
+          console.error('Error parsing files', e)
         }
+
+        extraFiles.forEach((f: any) => {
+          allFiles.push({
+            url: f.url,
+            name: f.name || 'Sem nome',
+            type: f.type || 'document',
+            date: ev.created_at,
+          })
+        })
+
         if (ev.url_print_seguranca) {
           allFiles.push({
             url: ev.url_print_seguranca,
-            name: 'Print Segurança (Legado)',
+            name: 'Print Segurança',
             type: 'image',
             date: ev.created_at,
           })
@@ -48,7 +59,7 @@ export function ClientFiles({ clientId }: ClientFilesProps) {
         if (ev.url_foto_documento) {
           allFiles.push({
             url: ev.url_foto_documento,
-            name: 'Foto Documento (Legado)',
+            name: 'Foto Documento',
             type: 'image',
             date: ev.created_at,
           })

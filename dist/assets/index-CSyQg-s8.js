@@ -47307,8 +47307,9 @@ const useEvaluationStore = create((set, get$8) => ({
 	},
 	saveEvaluation: async (data) => {
 		const files = Array.isArray(data.files) ? data.files : [];
-		const printFile = files.find((f) => f.name.toLowerCase().includes("print"));
-		const docFile = files.find((f) => f.name.toLowerCase().includes("doc"));
+		const urlPrint = data.urlPrint || files.find((f) => f.name.toLowerCase().includes("print"))?.url || null;
+		const urlDoc = data.urlDoc || files.find((f) => f.name.toLowerCase().includes("doc"))?.url || null;
+		const consultationFiles = data.consultationFiles || files.filter((f) => f.url !== urlPrint && f.url !== urlDoc);
 		const { error } = await supabase.from("avaliacoes_iphone").insert({
 			modelo: data.modelo,
 			serial_number: data.serialNumber,
@@ -47320,9 +47321,9 @@ const useEvaluationStore = create((set, get$8) => ({
 			telefone_cliente: data.telefoneCliente,
 			cpf_cliente: data.cpfCliente,
 			cliente_id: data.clienteId,
-			url_print_seguranca: printFile?.url || null,
-			url_foto_documento: docFile?.url || null,
-			arquivos_consulta: files
+			url_print_seguranca: urlPrint,
+			url_foto_documento: urlDoc,
+			arquivos_consulta: consultationFiles
 		});
 		if (!error) await get$8().fetchEvaluations();
 		return {
@@ -47345,20 +47346,28 @@ const useEvaluationStore = create((set, get$8) => ({
 	},
 	uploadEvidence: async (file) => {
 		try {
-			const fileExt = file.name.split(".").pop();
-			const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, "");
-			const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`;
-			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, file, { upsert: true });
-			if (uploadError) return {
-				url: null,
-				error: uploadError
-			};
+			const fileExt = file.name.split(".").pop()?.toLowerCase() || "unknown";
+			const finalName = (file.name.substring(0, file.name.lastIndexOf(".")) || file.name).replace(/[^a-zA-Z0-9\s\-_]/g, "").trim().replace(/\s+/g, "-");
+			const fileName = `${Date.now()}-${finalName}.${fileExt}`;
+			const cleanFile = new File([file], fileName, { type: file.type });
+			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, cleanFile, {
+				upsert: false,
+				contentType: file.type
+			});
+			if (uploadError) {
+				console.error("Supabase upload error:", uploadError);
+				return {
+					url: null,
+					error: uploadError
+				};
+			}
 			const { data: { publicUrl } } = supabase.storage.from("evaluation-evidence").getPublicUrl(fileName);
 			return {
 				url: publicUrl,
 				error: null
 			};
 		} catch (error) {
+			console.error("Upload exception:", error);
 			return {
 				url: null,
 				error
@@ -48209,7 +48218,10 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 	const handleConfirm = () => {
 		if (capturedImage && canvasRef.current) canvasRef.current.toBlob((blob) => {
 			if (blob) {
-				onCapture(new File([blob], `capture-${Date.now()}.jpg`, { type: "image/jpeg" }));
+				onCapture(new File([blob], `foto-doc-${Date.now()}.jpg`, {
+					type: "image/jpeg",
+					lastModified: Date.now()
+				}));
 				stopCamera();
 			}
 		}, "image/jpeg", .85);
@@ -48734,7 +48746,10 @@ function EvaluationChecklist() {
 	const [searchCpf, setSearchCpf] = (0, import_react.useState)("");
 	const [showClientModal, setShowClientModal] = (0, import_react.useState)(false);
 	const [isNewClient, setIsNewClient] = (0, import_react.useState)(false);
-	const [uploadedFiles, setUploadedFiles] = (0, import_react.useState)([]);
+	const [printFile, setPrintFile] = (0, import_react.useState)(null);
+	const [docFile, setDocFile] = (0, import_react.useState)(null);
+	const [consultationFiles, setConsultationFiles] = (0, import_react.useState)([]);
+	const [showWebcam, setShowWebcam] = (0, import_react.useState)(false);
 	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
 	const getDetectedDefects = () => {
 		if (!selectedModel) return [];
@@ -48767,8 +48782,12 @@ function EvaluationChecklist() {
 				toast.error("Identifique o cliente pelo CPF");
 				return;
 			}
-			if (uploadedFiles.length === 0) {
-				toast.error("Anexe pelo menos uma evidência (Consultas/Docs)");
+			if (!printFile) {
+				toast.error("Anexe o Print de Segurança");
+				return;
+			}
+			if (!docFile) {
+				toast.error("Anexe a Foto do Documento");
 				return;
 			}
 		}
@@ -48802,48 +48821,74 @@ function EvaluationChecklist() {
 			return false;
 		}
 	};
-	const handleFileUpload = (e) => {
-		if (e.target.files && e.target.files.length > 0) {
-			const newFiles = Array.from(e.target.files).map((file) => ({
+	const handlePrintUpload = (e) => {
+		if (e.target.files?.[0]) {
+			const file = e.target.files[0];
+			setPrintFile({
 				file,
-				type: "document",
 				preview: URL.createObjectURL(file)
-			}));
-			setUploadedFiles((prev) => [...prev, ...newFiles]);
+			});
 		}
 	};
-	const removeFile = (index$1) => {
-		setUploadedFiles((prev) => prev.filter((_$1, i) => i !== index$1));
+	const handleDocUpload = (e) => {
+		if (e.target.files?.[0]) {
+			const file = e.target.files[0];
+			setDocFile({
+				file,
+				preview: URL.createObjectURL(file)
+			});
+		}
+	};
+	const handleDocCapture = (file) => {
+		setDocFile({
+			file,
+			preview: URL.createObjectURL(file)
+		});
+		setShowWebcam(false);
+	};
+	const handleConsultationUpload = (e) => {
+		if (e.target.files) {
+			const newFiles = Array.from(e.target.files).map((file) => ({
+				file,
+				preview: URL.createObjectURL(file)
+			}));
+			setConsultationFiles((prev) => [...prev, ...newFiles]);
+		}
+	};
+	const removeConsultationFile = (index$1) => {
+		setConsultationFiles((prev) => prev.filter((_$1, i) => i !== index$1));
 	};
 	const handleSave = async () => {
 		if (!currentUser || !selectedModel || !currentCompany || !currentClient) return;
+		if (!printFile || !docFile) {
+			toast.error("Arquivos obrigatórios faltando (Print ou Documento).");
+			return;
+		}
 		setIsSaving(true);
-		const toastId = toast.loading("Processando arquivos e salvando...");
+		const toastId = toast.loading("Processando uploads e salvando dados...");
 		try {
-			const uploadedFileResults = [];
-			const uploadPromises = uploadedFiles.map(async (fileObj) => {
-				try {
-					const { url, error } = await uploadEvidence(fileObj.file);
-					if (error || !url) throw error || /* @__PURE__ */ new Error("Upload falhou");
+			const printRes = await uploadEvidence(printFile.file);
+			if (printRes.error || !printRes.url) throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`);
+			const docRes = await uploadEvidence(docFile.file);
+			if (docRes.error || !docRes.url) throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`);
+			const consultationResults = [];
+			if (consultationFiles.length > 0) {
+				const uploadPromises = consultationFiles.map(async (f) => {
+					const res = await uploadEvidence(f.file);
+					if (res.error || !res.url) {
+						console.error(`Falha no upload extra: ${f.file.name}`, res.error);
+						throw new Error(`Erro ao enviar arquivo: ${f.file.name}`);
+					}
 					return {
-						name: fileObj.file.name,
-						url,
-						type: fileObj.file.type.startsWith("image/") ? "image" : "document"
+						name: f.file.name,
+						url: res.url,
+						type: f.file.type.startsWith("image/") ? "image" : "document"
 					};
-				} catch (err) {
-					console.error(`Falha no upload de ${fileObj.file.name}`, err);
-					return null;
-				}
-			});
-			(await Promise.all(uploadPromises)).forEach((res) => {
-				if (res) uploadedFileResults.push(res);
-			});
-			if (uploadedFileResults.length === 0 && uploadedFiles.length > 0) {
-				toast.error("Falha crítica: Nenhum arquivo pôde ser enviado. Verifique sua conexão.", { id: toastId });
-				setIsSaving(false);
-				return;
+				});
+				const results = await Promise.all(uploadPromises);
+				consultationResults.push(...results);
 			}
-			if ((await saveEvaluation({
+			const result = await saveEvaluation({
 				modelo: selectedModel.modelo,
 				serialNumber,
 				checklistData: checklistStatus,
@@ -48857,9 +48902,12 @@ function EvaluationChecklist() {
 				clienteId: currentClient.id,
 				nomeCliente: currentClient.nome,
 				telefoneCliente: currentClient.telefone,
-				cpfCliente: currentClient.cpf,
-				files: uploadedFileResults
-			})).success) {
+				cpf_cliente: currentClient.cpf,
+				urlPrint: printRes.url,
+				urlDoc: docRes.url,
+				consultationFiles: consultationResults
+			});
+			if (result.success) {
 				toast.success("Avaliação concluída com sucesso!", { id: toastId });
 				setStep(1);
 				setSelectedModelId("");
@@ -48872,11 +48920,13 @@ function EvaluationChecklist() {
 				});
 				clearCurrentClient();
 				setSearchCpf("");
-				setUploadedFiles([]);
-			} else toast.error("Erro ao salvar avaliação no banco de dados", { id: toastId });
+				setPrintFile(null);
+				setDocFile(null);
+				setConsultationFiles([]);
+			} else toast.error(`Erro ao salvar no banco: ${result.error?.message}`, { id: toastId });
 		} catch (e) {
 			console.error(e);
-			toast.error("Ocorreu um erro inesperado", { id: toastId });
+			toast.error(e.message || "Ocorreu um erro inesperado", { id: toastId });
 		} finally {
 			setIsSaving(false);
 		}
@@ -48892,32 +48942,22 @@ function EvaluationChecklist() {
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 					className: "flex-1 flex flex-col shadow-md",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "flex items-center gap-2 mb-2",
-								children: [
-									1,
-									2,
-									3,
-									4,
-									5
-								].map((s$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: cn("h-2 flex-1 rounded-full transition-all", s$1 <= step ? "bg-primary" : "bg-muted") }, s$1))
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, { children: [
-								step === 1 && "1. Identificação do Aparelho",
-								step === 2 && "2. Inspeção Técnica",
-								step === 3 && "3. Precificação e Defeitos",
-								step === 4 && "4. Segurança e Cliente",
-								step === 5 && "5. Resumo e Finalização"
-							] }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: [
-								step === 1 && "Selecione o modelo e informe o serial para iniciar.",
-								step === 2 && "Marque APENAS os itens que estão OK (Funcionando).",
-								step === 3 && "Revise os defeitos detectados e o valor final.",
-								step === 4 && "Realize consultas, anexe provas e identifique o cliente.",
-								step === 5 && "Confira todos os dados antes de salvar."
-							] })
-						] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex items-center gap-2 mb-2",
+							children: [
+								1,
+								2,
+								3,
+								4,
+								5
+							].map((s$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: cn("h-2 flex-1 rounded-full transition-all", s$1 <= step ? "bg-primary" : "bg-muted") }, s$1))
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, { children: [
+							step === 1 && "1. Identificação do Aparelho",
+							step === 2 && "2. Inspeção Técnica",
+							step === 3 && "3. Precificação e Defeitos",
+							step === 4 && "4. Segurança e Evidências",
+							step === 5 && "5. Resumo e Finalização"
+						] })] }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 							className: "flex-1 overflow-y-auto",
 							children: [
@@ -49069,76 +49109,200 @@ function EvaluationChecklist() {
 										}),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 											className: "space-y-4",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-													className: "flex items-center gap-2 border-b pb-2",
-													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-														className: "font-semibold text-lg",
-														children: "2. Evidências e Documentos"
-													})]
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-													className: "bg-slate-50 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-100 transition-colors",
-													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-														type: "file",
-														id: "file-upload",
-														multiple: true,
-														className: "hidden",
-														onChange: handleFileUpload,
-														accept: "image/*,application/pdf"
-													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
-														htmlFor: "file-upload",
-														className: "cursor-pointer block",
-														children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-															className: "flex flex-col items-center gap-2",
-															children: [
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-8 h-8 text-muted-foreground" }),
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																	className: "font-medium text-primary",
-																	children: "Clique para adicionar arquivos"
-																}),
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																	className: "text-xs text-muted-foreground",
-																	children: "Prints das consultas Anatel, Blacklist, MDM e foto do documento."
-																})
-															]
-														})
-													})]
-												}),
-												uploadedFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: "grid grid-cols-2 md:grid-cols-3 gap-3",
-													children: uploadedFiles.map((fileObj, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "relative group border rounded-md p-2 flex items-center gap-2 bg-white",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-2 border-b pb-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+													className: "font-semibold text-lg",
+													children: "2. Evidências"
+												})]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "grid md:grid-cols-2 gap-4",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3",
 														children: [
-															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-																className: "w-10 h-10 bg-slate-100 rounded flex items-center justify-center shrink-0 overflow-hidden",
-																children: fileObj.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-																	src: fileObj.preview,
-																	alt: "preview",
-																	className: "w-full h-full object-cover"
-																}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-5 h-5 text-slate-500" })
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$1, {
+																className: "font-bold text-slate-700 flex items-center gap-2",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-4 h-4" }), " Print de Segurança *"]
 															}),
-															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-																className: "flex-1 min-w-0",
-																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-																	className: "text-sm font-medium truncate",
-																	children: fileObj.file.name
-																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-																	className: "text-xs text-muted-foreground",
-																	children: [(fileObj.file.size / 1024).toFixed(0), "kb"]
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																className: "text-xs text-muted-foreground",
+																children: "Anexe o print das consultas (Anatel, Blacklist, MDM)"
+															}),
+															!printFile ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "relative",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																	type: "file",
+																	accept: "image/*,application/pdf",
+																	className: "hidden",
+																	id: "print-upload",
+																	onChange: handlePrintUpload
+																}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+																	htmlFor: "print-upload",
+																	className: "flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
+																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																		className: "flex flex-col items-center gap-1",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-6 h-6" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																			className: "text-xs",
+																			children: "Clique para enviar"
+																		})]
+																	})
 																})]
-															}),
-															/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-																variant: "ghost",
-																size: "icon",
-																className: "h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50",
-																onClick: () => removeFile(idx),
-																children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-3 h-3" })
+															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
+																children: [
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden",
+																		children: printFile.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+																			src: printFile.preview,
+																			className: "w-full h-full object-cover"
+																		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-full h-full p-2 text-slate-500" })
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																		className: "flex-1 min-w-0",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																			className: "text-sm font-medium truncate",
+																			children: printFile.file.name
+																		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+																			className: "text-xs text-muted-foreground",
+																			children: [(printFile.file.size / 1024).toFixed(0), "kb"]
+																		})]
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+																		size: "icon",
+																		variant: "ghost",
+																		className: "text-red-500 hover:bg-red-50",
+																		onClick: () => setPrintFile(null),
+																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+																	})
+																]
 															})
 														]
-													}, idx))
-												})
-											]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3",
+														children: [
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$1, {
+																className: "font-bold text-slate-700 flex items-center gap-2",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), " Foto do Documento *"]
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																className: "text-xs text-muted-foreground",
+																children: "RG, CNH ou documento oficial com foto do cliente"
+															}),
+															!docFile ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "flex flex-col gap-2",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																	className: "relative",
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																		type: "file",
+																		accept: "image/*",
+																		className: "hidden",
+																		id: "doc-upload",
+																		onChange: handleDocUpload
+																	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+																		htmlFor: "doc-upload",
+																		className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
+																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																			className: "flex flex-col items-center gap-1",
+																			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																				className: "text-xs",
+																				children: "Upload Arquivo"
+																			})]
+																		})
+																	})]
+																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+																	variant: "outline",
+																	className: "w-full",
+																	onClick: () => setShowWebcam(true),
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Usar Câmera"]
+																})]
+															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
+																children: [
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+																		className: "w-12 h-12 bg-slate-100 rounded overflow-hidden",
+																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+																			src: docFile.preview,
+																			className: "w-full h-full object-cover"
+																		})
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																		className: "flex-1 min-w-0",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																			className: "text-sm font-medium truncate",
+																			children: docFile.file.name
+																		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+																			className: "text-xs text-muted-foreground",
+																			children: [(docFile.file.size / 1024).toFixed(0), "kb"]
+																		})]
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+																		size: "icon",
+																		variant: "ghost",
+																		className: "text-red-500 hover:bg-red-50",
+																		onClick: () => setDocFile(null),
+																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+																	})
+																]
+															})
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "col-span-1 md:col-span-2 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3",
+														children: [
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$1, {
+																className: "font-bold text-slate-700 flex items-center gap-2",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-4 h-4" }), " Consultas Adicionais"]
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																className: "text-xs text-muted-foreground",
+																children: "Outros arquivos relevantes (PDFs, Prints extras, etc)"
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "flex items-center gap-4",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																	className: "relative",
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																		type: "file",
+																		accept: "image/*,application/pdf",
+																		multiple: true,
+																		className: "hidden",
+																		id: "extra-upload",
+																		onChange: handleConsultationUpload
+																	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$1, {
+																		htmlFor: "extra-upload",
+																		className: "flex items-center justify-center px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 cursor-pointer text-sm font-medium",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-4 h-4 mr-2" }), "Adicionar Arquivos"]
+																	})]
+																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																	className: "text-xs text-muted-foreground",
+																	children: [consultationFiles.length, " arquivos selecionados"]
+																})]
+															}),
+															consultationFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+																className: "grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2",
+																children: consultationFiles.map((f, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																	className: "flex items-center justify-between p-2 bg-white border rounded text-xs",
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																		className: "flex items-center gap-2 truncate",
+																		children: [f.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-3 h-3 text-blue-500" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-3 h-3 text-orange-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																			className: "truncate max-w-[100px]",
+																			children: f.file.name
+																		})]
+																	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+																		size: "icon",
+																		variant: "ghost",
+																		className: "h-5 w-5 text-red-500",
+																		onClick: () => removeConsultationFile(idx),
+																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-3 h-3" })
+																	})]
+																}, idx))
+															})
+														]
+													})
+												]
+											})]
 										}),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 											className: "space-y-4",
@@ -49278,14 +49442,27 @@ function EvaluationChecklist() {
 														className: "flex justify-between",
 														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 															className: "text-sm",
-															children: "Arquivos"
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-															className: "font-medium",
-															children: [uploadedFiles.length, " anexados"]
+															children: "Evidências"
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "text-right text-sm",
+															children: [
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																	className: "block text-green-600",
+																	children: "1 Print de Segurança"
+																}),
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																	className: "block text-green-600",
+																	children: "1 Documento"
+																}),
+																consultationFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																	className: "block text-blue-600",
+																	children: [consultationFiles.length, " Extra(s)"]
+																})
+															]
 														})]
 													}),
 													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex justify-between",
+														className: "flex justify-between border-t pt-2",
 														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 															className: "text-sm",
 															children: "Valor Final"
@@ -49393,18 +49570,29 @@ function EvaluationChecklist() {
 							}),
 							(step === 4 || step === 5) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "border-t border-slate-700 pt-4 space-y-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center gap-2 text-sm text-slate-300",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), currentClient?.nome || "Identificando..."]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center gap-2 text-sm text-slate-300",
-									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-4 h-4", securityChecks.anatel ? "text-green-500" : "text-slate-600") }),
-										"Segurança:",
-										" ",
-										Object.values(securityChecks).every(Boolean) ? "OK" : "Pendente"
-									]
-								})]
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2 text-sm text-slate-300",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), currentClient?.nome || "Identificando..."]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2 text-sm text-slate-300",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-4 h-4", securityChecks.anatel ? "text-green-500" : "text-slate-600") }),
+											"Segurança:",
+											" ",
+											Object.values(securityChecks).every(Boolean) ? "OK" : "Pendente"
+										]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2 text-sm text-slate-300",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: cn("w-4 h-4", printFile && docFile ? "text-green-500" : "text-slate-600") }),
+											"Arquivos: ",
+											printFile && docFile ? "OK" : "Pendente"
+										]
+									})
+								]
 							})
 						]
 					})]
@@ -49420,6 +49608,17 @@ function EvaluationChecklist() {
 						onSubmit: handleCreateClient,
 						onCancel: () => setShowClientModal(false),
 						isEditing: !isNewClient
+					})]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+				open: showWebcam,
+				onOpenChange: setShowWebcam,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+					className: "max-w-xl",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Capturar Foto do Documento" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WebcamCapture, {
+						onCapture: handleDocCapture,
+						onCancel: () => setShowWebcam(false)
 					})]
 				})
 			})
@@ -74253,4 +74452,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D6OPGQfw.js.map
+//# sourceMappingURL=index-CSyQg-s8.js.map

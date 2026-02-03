@@ -135,8 +135,10 @@ export function WebcamCapture({
       canvasRef.current.toBlob(
         (blob) => {
           if (blob) {
-            const file = new File([blob], `capture-${Date.now()}.jpg`, {
+            // Create a clean File object from blob
+            const file = new File([blob], `foto-doc-${Date.now()}.jpg`, {
               type: 'image/jpeg',
+              lastModified: Date.now(),
             })
             onCapture(file)
             stopCamera()

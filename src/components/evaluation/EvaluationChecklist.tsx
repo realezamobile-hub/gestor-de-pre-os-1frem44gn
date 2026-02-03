@@ -35,12 +35,16 @@ import {
   Search,
   FileIcon,
   X,
-  Plus,
+  Camera,
+  Trash2,
+  Eye,
+  ImageIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
 import { PeripheralDiscountConfig, ConsultationFile, Client } from '@/types'
 import { ClientForm } from '@/components/clients/ClientForm'
+import { WebcamCapture } from '@/components/common/WebcamCapture'
 import {
   Dialog,
   DialogContent,
@@ -91,10 +95,19 @@ export function EvaluationChecklist() {
   const [showClientModal, setShowClientModal] = useState(false)
   const [isNewClient, setIsNewClient] = useState(false)
 
-  // Files State
-  const [uploadedFiles, setUploadedFiles] = useState<
-    { file: File; type: string; preview: string }[]
+  // Files State - Refactored for clearer separation
+  const [printFile, setPrintFile] = useState<{
+    file: File
+    preview: string
+  } | null>(null)
+  const [docFile, setDocFile] = useState<{
+    file: File
+    preview: string
+  } | null>(null)
+  const [consultationFiles, setConsultationFiles] = useState<
+    { file: File; preview: string }[]
   >([])
+  const [showWebcam, setShowWebcam] = useState(false)
 
   // Derived
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
@@ -159,8 +172,12 @@ export function EvaluationChecklist() {
         toast.error('Identifique o cliente pelo CPF')
         return
       }
-      if (uploadedFiles.length === 0) {
-        toast.error('Anexe pelo menos uma evidência (Consultas/Docs)')
+      if (!printFile) {
+        toast.error('Anexe o Print de Segurança')
+        return
+      }
+      if (!docFile) {
+        toast.error('Anexe a Foto do Documento')
         return
       }
     }
@@ -207,62 +224,97 @@ export function EvaluationChecklist() {
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).map((file) => ({
+  // File Handlers
+  const handlePrintUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0]
+      setPrintFile({
         file,
-        type: 'document', // Default type
         preview: URL.createObjectURL(file),
-      }))
-      setUploadedFiles((prev) => [...prev, ...newFiles])
+      })
     }
   }
 
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
+  const handleDocUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0]
+      setDocFile({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    }
+  }
+
+  const handleDocCapture = (file: File) => {
+    setDocFile({
+      file,
+      preview: URL.createObjectURL(file),
+    })
+    setShowWebcam(false)
+  }
+
+  const handleConsultationUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }))
+      setConsultationFiles((prev) => [...prev, ...newFiles])
+    }
+  }
+
+  const removeConsultationFile = (index: number) => {
+    setConsultationFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleSave = async () => {
     if (!currentUser || !selectedModel || !currentCompany || !currentClient)
       return
 
+    if (!printFile || !docFile) {
+      toast.error('Arquivos obrigatórios faltando (Print ou Documento).')
+      return
+    }
+
     setIsSaving(true)
-    const toastId = toast.loading('Processando arquivos e salvando...')
+    const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
-      // 1. Upload Files concurrently with improved error handling
-      const uploadedFileResults: ConsultationFile[] = []
-
-      const uploadPromises = uploadedFiles.map(async (fileObj) => {
-        try {
-          const { url, error } = await uploadEvidence(fileObj.file)
-          if (error || !url) throw error || new Error('Upload falhou')
-          return {
-            name: fileObj.file.name,
-            url,
-            type: fileObj.file.type.startsWith('image/') ? 'image' : 'document',
-          } as ConsultationFile
-        } catch (err) {
-          console.error(`Falha no upload de ${fileObj.file.name}`, err)
-          return null
-        }
-      })
-
-      const results = await Promise.all(uploadPromises)
-      results.forEach((res) => {
-        if (res) uploadedFileResults.push(res)
-      })
-
-      if (uploadedFileResults.length === 0 && uploadedFiles.length > 0) {
-        toast.error(
-          'Falha crítica: Nenhum arquivo pôde ser enviado. Verifique sua conexão.',
-          { id: toastId },
-        )
-        setIsSaving(false)
-        return
+      // 1. Upload Print
+      const printRes = await uploadEvidence(printFile.file)
+      if (printRes.error || !printRes.url) {
+        throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`)
       }
 
-      // 2. Save Evaluation
+      // 2. Upload Document
+      const docRes = await uploadEvidence(docFile.file)
+      if (docRes.error || !docRes.url) {
+        throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`)
+      }
+
+      // 3. Upload Consultations (Parallel)
+      const consultationResults: ConsultationFile[] = []
+      if (consultationFiles.length > 0) {
+        const uploadPromises = consultationFiles.map(async (f) => {
+          const res = await uploadEvidence(f.file)
+          if (res.error || !res.url) {
+            console.error(`Falha no upload extra: ${f.file.name}`, res.error)
+            // We log but maybe continue or throw?
+            // User story says: "If any file fails... prevent database record... and alert user"
+            throw new Error(`Erro ao enviar arquivo: ${f.file.name}`)
+          }
+          return {
+            name: f.file.name,
+            url: res.url,
+            type: f.file.type.startsWith('image/') ? 'image' : 'document',
+          } as ConsultationFile
+        })
+
+        const results = await Promise.all(uploadPromises)
+        consultationResults.push(...results)
+      }
+
+      // 4. Save Record
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -278,14 +330,16 @@ export function EvaluationChecklist() {
         ),
         userId: currentUser.id,
 
-        // Client Link
+        // Client Data
         clienteId: currentClient.id,
         nomeCliente: currentClient.nome,
         telefoneCliente: currentClient.telefone,
-        cpfCliente: currentClient.cpf,
+        cpf_cliente: currentClient.cpf,
 
-        // Files
-        files: uploadedFileResults,
+        // Explicit Files
+        urlPrint: printRes.url,
+        urlDoc: docRes.url,
+        consultationFiles: consultationResults,
       })
 
       if (result.success) {
@@ -298,15 +352,17 @@ export function EvaluationChecklist() {
         setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
         clearCurrentClient()
         setSearchCpf('')
-        setUploadedFiles([])
+        setPrintFile(null)
+        setDocFile(null)
+        setConsultationFiles([])
       } else {
-        toast.error('Erro ao salvar avaliação no banco de dados', {
+        toast.error(`Erro ao salvar no banco: ${result.error?.message}`, {
           id: toastId,
         })
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
-      toast.error('Ocorreu um erro inesperado', { id: toastId })
+      toast.error(e.message || 'Ocorreu um erro inesperado', { id: toastId })
     } finally {
       setIsSaving(false)
     }
@@ -337,19 +393,9 @@ export function EvaluationChecklist() {
               {step === 1 && '1. Identificação do Aparelho'}
               {step === 2 && '2. Inspeção Técnica'}
               {step === 3 && '3. Precificação e Defeitos'}
-              {step === 4 && '4. Segurança e Cliente'}
+              {step === 4 && '4. Segurança e Evidências'}
               {step === 5 && '5. Resumo e Finalização'}
             </CardTitle>
-            <CardDescription>
-              {step === 1 &&
-                'Selecione o modelo e informe o serial para iniciar.'}
-              {step === 2 &&
-                'Marque APENAS os itens que estão OK (Funcionando).'}
-              {step === 3 && 'Revise os defeitos detectados e o valor final.'}
-              {step === 4 &&
-                'Realize consultas, anexe provas e identifique o cliente.'}
-              {step === 5 && 'Confira todos os dados antes de salvar.'}
-            </CardDescription>
           </CardHeader>
 
           <CardContent className="flex-1 overflow-y-auto">
@@ -487,7 +533,7 @@ export function EvaluationChecklist() {
 
             {step === 4 && (
               <div className="space-y-8">
-                {/* Security Section */}
+                {/* 1. Security Checks */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <ShieldCheck className="w-5 h-5 text-primary" />
@@ -549,82 +595,208 @@ export function EvaluationChecklist() {
                   </div>
                 </div>
 
-                {/* Evidence Files */}
+                {/* 2. Uploads */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <Upload className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-lg">
-                      2. Evidências e Documentos
-                    </h3>
+                    <h3 className="font-semibold text-lg">2. Evidências</h3>
                   </div>
 
-                  <div className="bg-slate-50 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-100 transition-colors">
-                    <Input
-                      type="file"
-                      id="file-upload"
-                      multiple
-                      className="hidden"
-                      onChange={handleFileUpload}
-                      accept="image/*,application/pdf"
-                    />
-                    <Label
-                      htmlFor="file-upload"
-                      className="cursor-pointer block"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <Upload className="w-8 h-8 text-muted-foreground" />
-                        <span className="font-medium text-primary">
-                          Clique para adicionar arquivos
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          Prints das consultas Anatel, Blacklist, MDM e foto do
-                          documento.
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Print de Segurança */}
+                    <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
+                      <Label className="font-bold text-slate-700 flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4" /> Print de Segurança *
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Anexe o print das consultas (Anatel, Blacklist, MDM)
+                      </p>
 
-                  {uploadedFiles.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {uploadedFiles.map((fileObj, idx) => (
-                        <div
-                          key={idx}
-                          className="relative group border rounded-md p-2 flex items-center gap-2 bg-white"
-                        >
-                          <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                            {fileObj.file.type.startsWith('image/') ? (
+                      {!printFile ? (
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            className="hidden"
+                            id="print-upload"
+                            onChange={handlePrintUpload}
+                          />
+                          <Label
+                            htmlFor="print-upload"
+                            className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500"
+                          >
+                            <span className="flex flex-col items-center gap-1">
+                              <Upload className="w-6 h-6" />
+                              <span className="text-xs">
+                                Clique para enviar
+                              </span>
+                            </span>
+                          </Label>
+                        </div>
+                      ) : (
+                        <div className="relative group border rounded-md p-2 bg-white flex items-center gap-2">
+                          <div className="w-12 h-12 bg-slate-100 rounded overflow-hidden">
+                            {printFile.file.type.startsWith('image/') ? (
                               <img
-                                src={fileObj.preview}
-                                alt="preview"
+                                src={printFile.preview}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <FileIcon className="w-5 h-5 text-slate-500" />
+                              <FileIcon className="w-full h-full p-2 text-slate-500" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">
-                              {fileObj.file.name}
+                              {printFile.file.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {(fileObj.file.size / 1024).toFixed(0)}kb
+                              {(printFile.file.size / 1024).toFixed(0)}kb
                             </p>
                           </div>
                           <Button
-                            variant="ghost"
                             size="icon"
-                            className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => removeFile(idx)}
+                            variant="ghost"
+                            className="text-red-500 hover:bg-red-50"
+                            onClick={() => setPrintFile(null)}
                           >
-                            <X className="w-3 h-3" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
+
+                    {/* Foto do Documento */}
+                    <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
+                      <Label className="font-bold text-slate-700 flex items-center gap-2">
+                        <UserIcon className="w-4 h-4" /> Foto do Documento *
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        RG, CNH ou documento oficial com foto do cliente
+                      </p>
+
+                      {!docFile ? (
+                        <div className="flex flex-col gap-2">
+                          <div className="relative">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              id="doc-upload"
+                              onChange={handleDocUpload}
+                            />
+                            <Label
+                              htmlFor="doc-upload"
+                              className="flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500"
+                            >
+                              <span className="flex flex-col items-center gap-1">
+                                <Upload className="w-5 h-5" />
+                                <span className="text-xs">Upload Arquivo</span>
+                              </span>
+                            </Label>
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setShowWebcam(true)}
+                          >
+                            <Camera className="w-4 h-4 mr-2" />
+                            Usar Câmera
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="relative group border rounded-md p-2 bg-white flex items-center gap-2">
+                          <div className="w-12 h-12 bg-slate-100 rounded overflow-hidden">
+                            <img
+                              src={docFile.preview}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {docFile.file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(docFile.file.size / 1024).toFixed(0)}kb
+                            </p>
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-red-500 hover:bg-red-50"
+                            onClick={() => setDocFile(null)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Outros Arquivos */}
+                    <div className="col-span-1 md:col-span-2 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-4 space-y-3">
+                      <Label className="font-bold text-slate-700 flex items-center gap-2">
+                        <FileIcon className="w-4 h-4" /> Consultas Adicionais
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Outros arquivos relevantes (PDFs, Prints extras, etc)
+                      </p>
+
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            multiple
+                            className="hidden"
+                            id="extra-upload"
+                            onChange={handleConsultationUpload}
+                          />
+                          <Label
+                            htmlFor="extra-upload"
+                            className="flex items-center justify-center px-4 py-2 bg-white border rounded shadow-sm hover:bg-slate-50 cursor-pointer text-sm font-medium"
+                          >
+                            <Upload className="w-4 h-4 mr-2" />
+                            Adicionar Arquivos
+                          </Label>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {consultationFiles.length} arquivos selecionados
+                        </span>
+                      </div>
+
+                      {consultationFiles.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                          {consultationFiles.map((f, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-2 bg-white border rounded text-xs"
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                {f.file.type.startsWith('image/') ? (
+                                  <ImageIcon className="w-3 h-3 text-blue-500" />
+                                ) : (
+                                  <FileIcon className="w-3 h-3 text-orange-500" />
+                                )}
+                                <span className="truncate max-w-[100px]">
+                                  {f.file.name}
+                                </span>
+                              </div>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-5 w-5 text-red-500"
+                                onClick={() => removeConsultationFile(idx)}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Client Section */}
+                {/* 3. Client Section */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 border-b pb-2">
                     <UserIcon className="w-5 h-5 text-primary" />
@@ -750,12 +922,22 @@ export function EvaluationChecklist() {
                       <span className="font-medium">{currentClient.cpf}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Arquivos</span>
-                      <span className="font-medium">
-                        {uploadedFiles.length} anexados
-                      </span>
+                      <span className="text-sm">Evidências</span>
+                      <div className="text-right text-sm">
+                        <span className="block text-green-600">
+                          1 Print de Segurança
+                        </span>
+                        <span className="block text-green-600">
+                          1 Documento
+                        </span>
+                        {consultationFiles.length > 0 && (
+                          <span className="block text-blue-600">
+                            {consultationFiles.length} Extra(s)
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between border-t pt-2">
                       <span className="text-sm">Valor Final</span>
                       <span className="font-bold text-emerald-600">
                         R${' '}
@@ -881,6 +1063,17 @@ export function EvaluationChecklist() {
                     ? 'OK'
                     : 'Pendente'}
                 </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Upload
+                    className={cn(
+                      'w-4 h-4',
+                      printFile && docFile
+                        ? 'text-green-500'
+                        : 'text-slate-600',
+                    )}
+                  />
+                  Arquivos: {printFile && docFile ? 'OK' : 'Pendente'}
+                </div>
               </div>
             )}
           </CardContent>
@@ -900,6 +1093,19 @@ export function EvaluationChecklist() {
             onSubmit={handleCreateClient}
             onCancel={() => setShowClientModal(false)}
             isEditing={!isNewClient}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Webcam Modal */}
+      <Dialog open={showWebcam} onOpenChange={setShowWebcam}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Capturar Foto do Documento</DialogTitle>
+          </DialogHeader>
+          <WebcamCapture
+            onCapture={handleDocCapture}
+            onCancel={() => setShowWebcam(false)}
           />
         </DialogContent>
       </Dialog>

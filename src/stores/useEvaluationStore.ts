@@ -206,14 +206,21 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   },
 
   saveEvaluation: async (data) => {
-    // Robust file handling
+    // Robust data handling using new explicit fields or fallback to legacy
     const files = Array.isArray(data.files) ? data.files : []
 
-    // Legacy mapping (try to find if specific files were uploaded)
-    const printFile = files.find((f: any) =>
-      f.name.toLowerCase().includes('print'),
-    )
-    const docFile = files.find((f: any) => f.name.toLowerCase().includes('doc'))
+    // Explicit URLs are preferred, otherwise try to find in files array (legacy support)
+    const urlPrint =
+      data.urlPrint ||
+      files.find((f: any) => f.name.toLowerCase().includes('print'))?.url ||
+      null
+    const urlDoc =
+      data.urlDoc ||
+      files.find((f: any) => f.name.toLowerCase().includes('doc'))?.url ||
+      null
+    const consultationFiles =
+      data.consultationFiles ||
+      files.filter((f: any) => f.url !== urlPrint && f.url !== urlDoc)
 
     const { error } = await supabase.from('avaliacoes_iphone').insert({
       modelo: data.modelo,
@@ -230,9 +237,9 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       cliente_id: data.clienteId,
 
       // Files
-      url_print_seguranca: printFile?.url || null,
-      url_foto_documento: docFile?.url || null,
-      arquivos_consulta: files as any, // JSONB
+      url_print_seguranca: urlPrint,
+      url_foto_documento: urlDoc,
+      arquivos_consulta: consultationFiles as any, // JSONB
     })
 
     if (!error) await get().fetchEvaluations()
@@ -261,15 +268,33 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
   uploadEvidence: async (file) => {
     try {
-      const fileExt = file.name.split('.').pop()
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
-      const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
+      // 1. Sanitize filename to avoid issues with special characters and spaces
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'unknown'
+      const nameWithoutExt =
+        file.name.substring(0, file.name.lastIndexOf('.')) || file.name
+      // Allow alphanumeric, spaces, dashes, underscores only
+      const sanitizedBaseName = nameWithoutExt.replace(/[^a-zA-Z0-9\s\-_]/g, '')
+      // Replace spaces with dashes for URL safety
+      const finalName = sanitizedBaseName.trim().replace(/\s+/g, '-')
+
+      const fileName = `${Date.now()}-${finalName}.${fileExt}`
+
+      // 2. Fix for "FormData object could not be cloned" error
+      // Create a fresh File object to strip any proxy/react-synthetic wrappers
+      // This ensures we are passing a clean native File object to Supabase
+      const cleanFile = new File([file], fileName, { type: file.type })
 
       const { error: uploadError } = await supabase.storage
         .from('evaluation-evidence')
-        .upload(fileName, file, { upsert: true })
+        .upload(fileName, cleanFile, {
+          upsert: false,
+          contentType: file.type, // Ensure correct content type
+        })
 
-      if (uploadError) return { url: null, error: uploadError }
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError)
+        return { url: null, error: uploadError }
+      }
 
       const {
         data: { publicUrl },
@@ -277,6 +302,7 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
       return { url: publicUrl, error: null }
     } catch (error) {
+      console.error('Upload exception:', error)
       return { url: null, error }
     }
   },

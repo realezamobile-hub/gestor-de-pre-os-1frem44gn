@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
 import { useClientStore } from '@/stores/useClientStore'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -38,6 +38,7 @@ import {
   Trash2,
   ImageIcon,
   ExternalLink,
+  Link as LinkIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
@@ -51,6 +52,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export function EvaluationChecklist() {
   const {
@@ -83,6 +85,8 @@ export function EvaluationChecklist() {
     mdm: false,
   })
   const [searchCpf, setSearchCpf] = useState('')
+  const [manualName, setManualName] = useState('')
+  const [manualPhone, setManualPhone] = useState('')
   const [showClientModal, setShowClientModal] = useState(false)
   const [isNewClient, setIsNewClient] = useState(false)
 
@@ -104,6 +108,21 @@ export function EvaluationChecklist() {
   } | null>(null)
 
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
+
+  // Auto-search CPF when complete
+  useEffect(() => {
+    if (searchCpf.length === 14 && validateCPF(searchCpf)) {
+      handleClientSearch()
+    }
+  }, [searchCpf])
+
+  // Update manual fields when currentClient changes
+  useEffect(() => {
+    if (currentClient) {
+      setManualName(currentClient.nome)
+      setManualPhone(currentClient.telefone)
+    }
+  }, [currentClient])
 
   const getDetectedDefects = () => {
     if (!selectedModel) return []
@@ -159,8 +178,12 @@ export function EvaluationChecklist() {
         toast.error('Realize todas as verificações de segurança')
         return
       }
-      if (!currentClient) {
-        toast.error('Identifique o cliente pelo CPF')
+      if (!searchCpf || !validateCPF(searchCpf)) {
+        toast.error('Informe um CPF válido')
+        return
+      }
+      if (!manualName || !manualPhone) {
+        toast.error('Preencha o nome e telefone do cliente')
         return
       }
       if (!printFile) {
@@ -178,16 +201,17 @@ export function EvaluationChecklist() {
   const handleClientSearch = async () => {
     if (!searchCpf) return
     if (!validateCPF(searchCpf)) {
-      toast.error('CPF inválido')
+      // Don't toast error on auto-search unless button clicked, but here safe to ignore or simple return
+      // We rely on validation before calling this in effect, but button click might pass invalid
       return
     }
+
     const client = await fetchClientByCpf(searchCpf)
     if (client) {
       toast.success('Cliente encontrado!')
     } else {
-      toast.info('Cliente não encontrado. Cadastre agora.')
-      setIsNewClient(true)
-      setShowClientModal(true)
+      clearCurrentClient()
+      toast.info('Cliente não cadastrado. Preencha os dados manualmente.')
     }
   }
 
@@ -200,6 +224,9 @@ export function EvaluationChecklist() {
     if (success && client) {
       toast.success('Cliente cadastrado!')
       setShowClientModal(false)
+      // Update manual fields with new client data
+      setManualName(client.nome)
+      setManualPhone(client.telefone)
       return true
     } else {
       toast.error('Erro ao cadastrar cliente')
@@ -258,7 +285,13 @@ export function EvaluationChecklist() {
   }
 
   const handleSave = async () => {
-    if (!currentUser || !selectedModel || !currentCompany || !currentClient)
+    if (
+      !currentUser ||
+      !selectedModel ||
+      !currentCompany ||
+      !manualName ||
+      !manualPhone
+    )
       return
 
     if (!printFile || !docFile) {
@@ -319,10 +352,10 @@ export function EvaluationChecklist() {
             }) as PeripheralDiscountConfig,
         ),
         userId: currentUser.id,
-        clienteId: currentClient.id,
-        nomeCliente: currentClient.nome,
-        telefoneCliente: currentClient.telefone,
-        cpf_cliente: currentClient.cpf,
+        clienteId: currentClient?.id || null, // Link if exists, otherwise null
+        nomeCliente: manualName,
+        telefoneCliente: manualPhone,
+        cpf_cliente: searchCpf,
         urlPrint: printRes.url,
         urlDoc: docRes.url,
         consultationFiles: consultationResults,
@@ -338,6 +371,8 @@ export function EvaluationChecklist() {
         setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
         clearCurrentClient()
         setSearchCpf('')
+        setManualName('')
+        setManualPhone('')
         setPrintFile(null)
         setDocFile(null)
         setConsultationFiles([])
@@ -843,94 +878,130 @@ export function EvaluationChecklist() {
                     </h3>
                   </div>
 
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <Label>Pesquisar CPF</Label>
-                      <div className="flex gap-2 mt-1">
-                        <Input
-                          placeholder="000.000.000-00"
-                          value={searchCpf}
-                          onChange={(e) =>
-                            setSearchCpf(formatCPF(e.target.value))
-                          }
-                          maxLength={14}
-                        />
+                  <div className="space-y-4">
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1">
+                        <Label>CPF do Cliente</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input
+                            placeholder="000.000.000-00"
+                            value={searchCpf}
+                            onChange={(e) =>
+                              setSearchCpf(formatCPF(e.target.value))
+                            }
+                            maxLength={14}
+                          />
+                          <Button
+                            onClick={handleClientSearch}
+                            disabled={isClientLoading || !searchCpf}
+                            variant="secondary"
+                          >
+                            {isClientLoading ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Search className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {currentClient && (
                         <Button
-                          onClick={handleClientSearch}
-                          disabled={isClientLoading || !searchCpf}
+                          variant="ghost"
+                          onClick={() => {
+                            clearCurrentClient()
+                            setManualName('')
+                            setManualPhone('')
+                          }}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
                         >
-                          {isClientLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Search className="w-4 h-4" />
-                          )}
+                          <X className="w-4 h-4 mr-2" />
+                          Limpar
                         </Button>
+                      )}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Nome Completo</Label>
+                        <Input
+                          value={manualName}
+                          onChange={(e) => setManualName(e.target.value)}
+                          placeholder="Nome do cliente"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Telefone</Label>
+                        <Input
+                          value={manualPhone}
+                          onChange={(e) =>
+                            setManualPhone(formatPhone(e.target.value))
+                          }
+                          placeholder="(00) 00000-0000"
+                          maxLength={15}
+                        />
                       </div>
                     </div>
-                    {currentClient && (
-                      <div className="flex-1 flex items-end">
+
+                    {currentClient ? (
+                      <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                            <AvatarImage
+                              src={currentClient.url_foto || undefined}
+                            />
+                            <AvatarFallback className="bg-emerald-100 text-emerald-700">
+                              {currentClient.nome[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-medium text-emerald-900 flex items-center gap-1">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              Cliente Vinculado
+                            </p>
+                            <p className="text-xs text-emerald-700">
+                              Os dados foram preenchidos automaticamente.
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="text-emerald-700"
+                          asChild
+                        >
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setIsNewClient(false)
+                              setShowClientModal(true)
+                            }}
+                          >
+                            Ver Cadastro{' '}
+                            <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-end">
                         <Button
                           variant="outline"
-                          onClick={clearCurrentClient}
-                          className="w-full text-red-500 hover:text-red-600"
+                          onClick={() => {
+                            setIsNewClient(true)
+                            setShowClientModal(true)
+                          }}
+                          className="text-primary hover:text-primary"
                         >
-                          Limpar Seleção
+                          Cadastrar Novo Cliente Completo
                         </Button>
                       </div>
                     )}
                   </div>
-
-                  {currentClient && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-800 font-medium">
-                        <CheckCircle2 className="w-4 h-4" />
-                        Cliente Identificado
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Nome:</span>
-                          <p className="font-medium">{currentClient.nome}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Telefone:
-                          </span>
-                          <p className="font-medium">
-                            {formatPhone(currentClient.telefone)}
-                          </p>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-muted-foreground">
-                            Endereço:
-                          </span>
-                          <p className="font-medium">
-                            {[currentClient.municipio, currentClient.estado]
-                              .filter(Boolean)
-                              .join(' - ') ||
-                              currentClient.endereco ||
-                              '-'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex justify-end pt-2">
-                        <Button
-                          variant="link"
-                          size="sm"
-                          onClick={() => {
-                            setIsNewClient(false)
-                            setShowClientModal(true)
-                          }}
-                        >
-                          Editar Dados
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
 
-            {step === 5 && currentClient && (
+            {step === 5 && (
               <div className="space-y-6">
                 <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
                   <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
@@ -953,11 +1024,18 @@ export function EvaluationChecklist() {
                     </h4>
                     <div className="flex justify-between">
                       <span className="text-sm">Cliente</span>
-                      <span className="font-medium">{currentClient.nome}</span>
+                      <div className="text-right">
+                        <span className="font-medium block">{manualName}</span>
+                        {currentClient && (
+                          <span className="text-xs text-emerald-600 flex items-center justify-end gap-1">
+                            <LinkIcon className="w-3 h-3" /> Vinculado
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">CPF</span>
-                      <span className="font-medium">{currentClient.cpf}</span>
+                      <span className="font-medium">{searchCpf}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">Evidências</span>
@@ -1084,7 +1162,7 @@ export function EvaluationChecklist() {
               <div className="border-t border-slate-700 pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <UserIcon className="w-4 h-4" />
-                  {currentClient?.nome || 'Identificando...'}
+                  {manualName || 'Identificando...'}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <ShieldCheck

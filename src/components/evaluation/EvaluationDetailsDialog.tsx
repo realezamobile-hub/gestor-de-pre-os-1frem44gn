@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn, formatPhone, formatCPF, isImageFile, isPdfFile } from '@/lib/utils'
 import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface EvaluationDetailsDialogProps {
   open: boolean
@@ -223,68 +224,87 @@ export function EvaluationDetailsDialog({
                         Dados do Cliente
                       </h3>
                       {evaluation.client ? (
-                        <div className="grid gap-3">
-                          <div>
-                            <span className="text-xs text-muted-foreground">
-                              Nome
-                            </span>
-                            <p className="font-medium">
-                              {evaluation.client.nome}
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                CPF
-                              </span>
-                              <p className="font-medium">
-                                {formatCPF(evaluation.client.cpf)}
+                        <div>
+                          <div className="flex items-center gap-4 mb-4">
+                            <Avatar className="h-16 w-16 border-2 border-slate-100 shadow-sm">
+                              <AvatarImage
+                                src={evaluation.client.url_foto || undefined}
+                                className="object-cover"
+                              />
+                              <AvatarFallback className="bg-slate-100 text-slate-500 text-xl font-bold">
+                                {evaluation.client.nome[0].toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="space-y-1">
+                              <p className="font-medium text-lg leading-none">
+                                {evaluation.client.nome}
                               </p>
-                            </div>
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Telefone
-                              </span>
-                              <p className="font-medium">
-                                {formatPhone(evaluation.client.telefone)}
-                              </p>
+                              <Badge variant="outline" className="text-xs">
+                                Cliente Cadastrado
+                              </Badge>
                             </div>
                           </div>
-                          <div>
-                            <span className="text-xs text-muted-foreground">
-                              Localização
-                            </span>
-                            <p className="text-sm">
-                              {[
-                                evaluation.client.municipio,
-                                evaluation.client.estado,
-                              ]
-                                .filter(Boolean)
-                                .join(' - ') || 'Endereço não informado'}
-                            </p>
+                          <div className="grid gap-3 bg-slate-50 p-4 rounded-lg border">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <span className="text-xs text-muted-foreground block mb-1">
+                                  CPF
+                                </span>
+                                <p className="font-medium text-sm">
+                                  {formatCPF(evaluation.client.cpf)}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-xs text-muted-foreground block mb-1">
+                                  Telefone
+                                </span>
+                                <p className="font-medium text-sm">
+                                  {formatPhone(evaluation.client.telefone)}
+                                </p>
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-xs text-muted-foreground block mb-1">
+                                Localização
+                              </span>
+                              <p className="text-sm">
+                                {[
+                                  evaluation.client.municipio,
+                                  evaluation.client.estado,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' - ') || 'Endereço não informado'}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="grid gap-3">
+                        <div className="grid gap-3 bg-amber-50 p-4 rounded-lg border border-amber-100">
+                          <div className="flex items-center gap-2 text-amber-800 mb-2">
+                            <AlertCircle className="w-4 h-4" />
+                            <span className="text-sm font-semibold">
+                              Cliente não vinculado
+                            </span>
+                          </div>
                           <div>
-                            <span className="text-xs text-muted-foreground">
-                              Nome
+                            <span className="text-xs text-muted-foreground block mb-1">
+                              Nome Informado
                             </span>
                             <p className="font-medium">
                               {evaluation.nome_cliente || 'N/A'}
                             </p>
                           </div>
                           <div>
-                            <span className="text-xs text-muted-foreground">
-                              CPF
+                            <span className="text-xs text-muted-foreground block mb-1">
+                              CPF Informado
                             </span>
                             <p className="font-medium">
                               {evaluation.cpf_cliente || 'N/A'}
                             </p>
                           </div>
                           <div>
-                            <span className="text-xs text-muted-foreground">
-                              Telefone
+                            <span className="text-xs text-muted-foreground block mb-1">
+                              Telefone Informado
                             </span>
                             <p className="font-medium">
                               {evaluation.telefone_cliente || 'N/A'}

@@ -231,13 +231,15 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     set({ isLoading: true })
     const { data, error } = await supabase
       .from('avaliacoes_iphone')
-      .select('*, empresas(nome_fantasia), clientes(*)')
+      .select('*, empresas(nome_fantasia), clientes(*), profiles(name)')
       .order('created_at', { ascending: false })
       .limit(100)
 
     const mappedData = data?.map((d) => ({
       ...d,
       client: d.clientes,
+      // Map profiles relationship to the correct property if needed,
+      // though supabase returns it in the object structure already.
     }))
 
     if (!error && data) {

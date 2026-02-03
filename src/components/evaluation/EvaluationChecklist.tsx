@@ -37,6 +37,7 @@ import {
   Camera,
   Trash2,
   ImageIcon,
+  ExternalLink,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
@@ -384,7 +385,7 @@ export function EvaluationChecklist() {
 
           <CardContent className="flex-1 overflow-y-auto">
             {step === 1 && (
-              <div className="space-y-4 max-w-md">
+              <div className="space-y-6 max-w-md">
                 <div className="space-y-2">
                   <Label>Modelo do iPhone</Label>
                   <Select
@@ -412,6 +413,36 @@ export function EvaluationChecklist() {
                       setSerialNumber(e.target.value.toUpperCase())
                     }
                   />
+                  <div className="pt-2 flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs w-full flex items-center justify-center gap-1 text-muted-foreground hover:text-primary"
+                      asChild
+                    >
+                      <a
+                        href="https://www.consultaserialaparelho.com.br/public-web/homeSiga"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Consultar no Siga <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs w-full flex items-center justify-center gap-1 text-muted-foreground hover:text-primary"
+                      asChild
+                    >
+                      <a
+                        href="https://sickw.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Consultar no SickW <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

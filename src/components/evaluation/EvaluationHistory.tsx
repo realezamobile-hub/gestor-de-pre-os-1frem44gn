@@ -10,23 +10,22 @@ import {
 } from '@/components/ui/table'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Smartphone, FileText, Eye, Loader2, ImageIcon } from 'lucide-react'
+import { Smartphone, Eye, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
+import { EvaluationDetailsDialog } from './EvaluationDetailsDialog'
+import { Evaluation } from '@/types'
 
 export function EvaluationHistory() {
-  const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore()
-  const [previewFile, setPreviewFile] = useState<{
-    url: string
-    name: string
-  } | null>(null)
+  const {
+    evaluations,
+    fetchEvaluations,
+    isLoading,
+    checklistItems,
+    categories,
+  } = useEvaluationStore()
+  const [selectedEvaluation, setSelectedEvaluation] =
+    useState<Evaluation | null>(null)
 
   useEffect(() => {
     fetchEvaluations()
@@ -57,14 +56,15 @@ export function EvaluationHistory() {
               <TableHead>Data</TableHead>
               <TableHead>Modelo</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Avaliador</TableHead>
               <TableHead className="text-right">Valor Final</TableHead>
-              <TableHead className="text-right">Arquivos</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {evaluations.map((item) => (
               <TableRow key={item.id}>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground whitespace-nowrap">
                   {format(new Date(item.created_at), 'dd/MM/yyyy HH:mm', {
                     locale: ptBR,
                   })}
@@ -84,9 +84,20 @@ export function EvaluationHistory() {
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span>{item.nome_cliente || 'N/A'}</span>
+                    <span>
+                      {item.nome_cliente ||
+                        (item.client ? item.client.nome : 'N/A')}
+                    </span>
                     <span className="text-xs text-muted-foreground">
-                      {item.cpf_cliente}
+                      {item.cpf_cliente || (item.client ? item.client.cpf : '')}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <User className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-sm">
+                      {item.profiles?.name || 'Sistema'}
                     </span>
                   </div>
                 </TableCell>
@@ -102,80 +113,28 @@ export function EvaluationHistory() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    {item.url_print_seguranca && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-blue-500 hover:bg-blue-50"
-                              onClick={() =>
-                                setPreviewFile({
-                                  url: item.url_print_seguranca!,
-                                  name: 'Print Segurança',
-                                })
-                              }
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver Print</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                    {item.url_foto_documento && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-orange-500 hover:bg-orange-50"
-                              onClick={() =>
-                                setPreviewFile({
-                                  url: item.url_foto_documento!,
-                                  name: 'Documento',
-                                })
-                              }
-                            >
-                              <FileText className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver Documento</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                    {/* Handle extra files count if needed */}
-                    {item.arquivos_consulta &&
-                      Array.isArray(item.arquivos_consulta) &&
-                      item.arquivos_consulta.length > 0 && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="secondary" className="ml-1 h-8">
-                                +{item.arquivos_consulta.length}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Arquivos Adicionais (Ver no perfil do cliente)
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => setSelectedEvaluation(item)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Detalhes
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
-      <FilePreviewDialog
-        open={!!previewFile}
-        onOpenChange={(open) => !open && setPreviewFile(null)}
-        fileUrl={previewFile?.url || null}
-        fileName={previewFile?.name}
+
+      <EvaluationDetailsDialog
+        open={!!selectedEvaluation}
+        onOpenChange={(open) => !open && setSelectedEvaluation(null)}
+        evaluation={selectedEvaluation}
+        checklistItems={checklistItems}
+        categories={categories}
       />
     </>
   )

@@ -24798,7 +24798,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$40({ inst: {
+			cachedValue = useState$41({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24835,7 +24835,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$40 = React$60.useState, useEffect$28 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$41 = React$60.useState, useEffect$28 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$60.useSyncExternalStore ? React$60.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -47310,7 +47310,7 @@ const useEvaluationStore = create((set, get$8) => ({
 	},
 	fetchEvaluations: async () => {
 		set({ isLoading: true });
-		const { data, error } = await supabase.from("avaliacoes_iphone").select("*, empresas(nome_fantasia), clientes(*)").order("created_at", { ascending: false }).limit(100);
+		const { data, error } = await supabase.from("avaliacoes_iphone").select("*, empresas(nome_fantasia), clientes(*), profiles(name)").order("created_at", { ascending: false }).limit(100);
 		const mappedData = data?.map((d) => ({
 			...d,
 			client: d.clientes
@@ -48362,7 +48362,7 @@ function EvaluationChecklist() {
 							className: "flex-1 overflow-y-auto",
 							children: [
 								step === 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-4 max-w-md",
+									className: "space-y-6 max-w-md",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-2",
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Modelo do iPhone" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
@@ -48375,11 +48375,40 @@ function EvaluationChecklist() {
 										})]
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Serial Number / IMEI" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "Ex: DX3PL...",
-											value: serialNumber,
-											onChange: (e) => setSerialNumber(e.target.value.toUpperCase())
-										})]
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Serial Number / IMEI" }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												placeholder: "Ex: DX3PL...",
+												value: serialNumber,
+												onChange: (e) => setSerialNumber(e.target.value.toUpperCase())
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "pt-2 flex gap-2",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+													variant: "outline",
+													size: "sm",
+													className: "text-xs w-full flex items-center justify-center gap-1 text-muted-foreground hover:text-primary",
+													asChild: true,
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+														href: "https://www.consultaserialaparelho.com.br/public-web/homeSiga",
+														target: "_blank",
+														rel: "noopener noreferrer",
+														children: ["Consultar no Siga ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3" })]
+													})
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+													variant: "outline",
+													size: "sm",
+													className: "text-xs w-full flex items-center justify-center gap-1 text-muted-foreground hover:text-primary",
+													asChild: true,
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+														href: "https://sickw.com/",
+														target: "_blank",
+														rel: "noopener noreferrer",
+														children: ["Consultar no SickW ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3" })]
+													})
+												})]
+											})
+										]
 									})]
 								}),
 								step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -49044,9 +49073,448 @@ function EvaluationChecklist() {
 		]
 	});
 }
-function EvaluationHistory() {
-	const { evaluations, fetchEvaluations, isLoading } = useEvaluationStore();
+function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItems, categories }) {
 	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
+	if (!evaluation) return null;
+	const files = [
+		{
+			label: "Print de Segurança",
+			url: evaluation.url_print_seguranca,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: "w-4 h-4" }),
+			color: "text-blue-600 bg-blue-50 border-blue-200"
+		},
+		{
+			label: "Documento do Cliente",
+			url: evaluation.url_foto_documento,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }),
+			color: "text-orange-600 bg-orange-50 border-orange-200"
+		},
+		...evaluation.url_pesquisa_1 ? [{
+			label: "Pesquisa Extra 1",
+			url: evaluation.url_pesquisa_1,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4" }),
+			color: "text-purple-600 bg-purple-50 border-purple-200"
+		}] : [],
+		...evaluation.url_pesquisa_2 ? [{
+			label: "Pesquisa Extra 2",
+			url: evaluation.url_pesquisa_2,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4" }),
+			color: "text-purple-600 bg-purple-50 border-purple-200"
+		}] : [],
+		...evaluation.url_pesquisa_3 ? [{
+			label: "Pesquisa Extra 3",
+			url: evaluation.url_pesquisa_3,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4" }),
+			color: "text-purple-600 bg-purple-50 border-purple-200"
+		}] : [],
+		...evaluation.url_pesquisa_4 ? [{
+			label: "Pesquisa Extra 4",
+			url: evaluation.url_pesquisa_4,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-4 h-4" }),
+			color: "text-purple-600 bg-purple-50 border-purple-200"
+		}] : []
+	].filter((f) => f.url);
+	const getCategoryName = (id) => categories.find((c$1) => c$1.id === id)?.name || "Outros";
+	const checklistData = evaluation.checklist_data || {};
+	const defects = checklistItems.filter((item) => !checklistData[item.id]);
+	const passedItems = checklistItems.filter((item) => checklistData[item.id]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open,
+		onOpenChange,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "max-w-4xl h-[90vh] flex flex-col p-0 overflow-hidden",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
+				className: "p-6 border-b shrink-0 bg-slate-50",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
+					className: "flex items-center justify-between",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-6 h-6 text-primary" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Detalhes da Avaliação" })]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
+						variant: "outline",
+						className: "text-lg px-3 py-1 bg-white text-emerald-600 border-emerald-200",
+						children: [
+							"R$",
+							" ",
+							evaluation.valor_final.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+						]
+					})]
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex-1 overflow-hidden",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
+					defaultValue: "info",
+					className: "h-full flex flex-col",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "px-6 pt-4 shrink-0",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+							className: "w-full justify-start",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "info",
+									children: "Informações Gerais"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "checklist",
+									children: "Checklist & Defeitos"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+									value: "evidence",
+									children: "Evidências & Fotos"
+								})
+							]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ScrollArea, {
+						className: "flex-1 p-6",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsContent, {
+								value: "info",
+								className: "mt-0 space-y-6",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "grid grid-cols-1 md:grid-cols-2 gap-6",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+											className: "font-semibold text-lg flex items-center gap-2 border-b pb-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5 text-slate-500" }), "Dados do Aparelho"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "grid grid-cols-2 gap-4",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "space-y-1",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground uppercase font-bold",
+														children: "Modelo"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "font-medium text-lg",
+														children: evaluation.modelo
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "space-y-1",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground uppercase font-bold",
+														children: "Serial / IMEI"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "font-mono text-sm bg-slate-100 p-1 rounded inline-block",
+														children: evaluation.serial_number || "Não informado"
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "col-span-2 space-y-2 pt-2",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground uppercase font-bold",
+														children: "Consultas Rápidas"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "flex gap-2",
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+															variant: "outline",
+															size: "sm",
+															className: "w-full text-xs",
+															asChild: true,
+															children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+																href: "https://www.consultaserialaparelho.com.br/public-web/homeSiga",
+																target: "_blank",
+																rel: "noopener noreferrer",
+																children: ["Consultar Siga", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3 ml-2" })]
+															})
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+															variant: "outline",
+															size: "sm",
+															className: "w-full text-xs",
+															asChild: true,
+															children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+																href: "https://sickw.com/",
+																target: "_blank",
+																rel: "noopener noreferrer",
+																children: ["Consultar SickW", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3 ml-2" })]
+															})
+														})]
+													})]
+												})
+											]
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+											className: "font-semibold text-lg flex items-center gap-2 border-b pb-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-5 h-5 text-slate-500" }), "Dados do Cliente"]
+										}), evaluation.client ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "grid gap-3",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: "Nome"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "font-medium",
+													children: evaluation.client.nome
+												})] }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "grid grid-cols-2 gap-2",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground",
+														children: "CPF"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "font-medium",
+														children: formatCPF(evaluation.client.cpf)
+													})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs text-muted-foreground",
+														children: "Telefone"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "font-medium",
+														children: formatPhone(evaluation.client.telefone)
+													})] })]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: "Localização"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-sm",
+													children: [evaluation.client.municipio, evaluation.client.estado].filter(Boolean).join(" - ") || "Endereço não informado"
+												})] })
+											]
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "grid gap-3",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: "Nome"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "font-medium",
+													children: evaluation.nome_cliente || "N/A"
+												})] }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: "CPF"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "font-medium",
+													children: evaluation.cpf_cliente || "N/A"
+												})] }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: "Telefone"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "font-medium",
+													children: evaluation.telefone_cliente || "N/A"
+												})] })
+											]
+										})]
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "bg-slate-50 rounded-lg p-4 border grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1 text-xs text-muted-foreground",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, { className: "w-3 h-3" }), " Data"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-sm font-medium",
+												children: format$1(new Date(evaluation.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1 text-xs text-muted-foreground",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3" }), " Avaliador"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-sm font-medium truncate",
+												children: evaluation.profiles?.name || "Sistema"
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1 text-xs text-muted-foreground",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { className: "w-3 h-3" }), " Valor Final"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-sm font-bold text-emerald-600",
+												children: [
+													"R$",
+													" ",
+													evaluation.valor_final.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+												]
+											})]
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1 text-xs text-muted-foreground",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileText, { className: "w-3 h-3" }), " ID"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-xs font-mono text-muted-foreground truncate",
+												title: evaluation.id,
+												children: [evaluation.id.slice(0, 8), "..."]
+											})]
+										})
+									]
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsContent, {
+								value: "checklist",
+								className: "mt-0 space-y-6",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+											className: "font-semibold text-lg flex items-center gap-2 border-b pb-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { className: "w-5 h-5 text-slate-500" }), "Composição do Preço"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "bg-white border rounded-lg overflow-hidden",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "p-4 bg-slate-50 border-b",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+														className: "font-semibold text-sm",
+														children: [
+															"Descontos Aplicados (",
+															evaluation.descontos_aplicados?.length || 0,
+															")"
+														]
+													})
+												}),
+												evaluation.descontos_aplicados && evaluation.descontos_aplicados.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "divide-y",
+													children: evaluation.descontos_aplicados.map((d, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "flex justify-between items-center p-3 text-sm",
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "text-red-600 font-medium",
+															children: d.nome
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+															className: "font-mono text-red-600",
+															children: [
+																"- R$",
+																" ",
+																d.valor_desconto?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+															]
+														})]
+													}, idx))
+												}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "p-4 text-center text-muted-foreground text-sm",
+													children: "Nenhum desconto aplicado."
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "p-4 bg-emerald-50 border-t flex justify-between items-center",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-bold text-emerald-900",
+														children: "Valor Final da Oferta"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+														className: "font-bold text-xl text-emerald-600",
+														children: [
+															"R$",
+															" ",
+															evaluation.valor_final.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+														]
+													})]
+												})
+											]
+										})]
+									}),
+									defects.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+											className: "font-semibold text-lg flex items-center gap-2 border-b pb-2 text-red-600",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-5 h-5" }), "Defeitos / Itens Não Aprovados"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
+											children: defects.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-lg text-red-700",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-4 h-4 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex flex-col",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-medium text-sm",
+														children: item.nome
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs opacity-80",
+														children: getCategoryName(item.category_id)
+													})]
+												})]
+											}, item.id))
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+											className: "font-semibold text-lg flex items-center gap-2 border-b pb-2 text-emerald-600",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5" }), "Itens Aprovados"]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "grid grid-cols-2 sm:grid-cols-3 gap-2",
+											children: passedItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-2 p-2 bg-emerald-50/50 border border-emerald-100 rounded text-emerald-700 text-sm",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-3 h-3 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "truncate",
+													children: item.nome
+												})]
+											}, item.id))
+										})]
+									})
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+								value: "evidence",
+								className: "mt-0 space-y-6",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
+									children: files.length > 0 ? files.map((file, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: cn("group relative aspect-[3/4] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-all hover:bg-slate-50 cursor-pointer overflow-hidden", file.color),
+										onClick: () => setPreviewFile({
+											url: file.url,
+											name: file.label
+										}),
+										children: [
+											file.url?.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+												src: file.url,
+												alt: file.label,
+												className: "absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+											}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex flex-col items-center gap-2 z-10",
+												children: [
+													file.icon,
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-sm font-medium text-center",
+														children: file.label
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+														variant: "secondary",
+														className: "mt-2",
+														children: "Documento/PDF"
+													})
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-0" }),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm text-white transform translate-y-full group-hover:translate-y-0 transition-transform z-20",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-xs font-medium truncate",
+													children: file.label
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-[10px] opacity-80",
+													children: "Clique para visualizar"
+												})]
+											})
+										]
+									}, idx)) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "col-span-full py-12 text-center text-muted-foreground bg-slate-50 rounded-lg border border-dashed",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: "w-12 h-12 mx-auto mb-3 opacity-20" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Nenhuma evidência anexada a esta avaliação." })]
+									})
+								})
+							})
+						]
+					})]
+				})
+			})]
+		})
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePreviewDialog, {
+		open: !!previewFile,
+		onOpenChange: (open$1) => !open$1 && setPreviewFile(null),
+		fileUrl: previewFile?.url || null,
+		fileName: previewFile?.name
+	})] });
+}
+function EvaluationHistory() {
+	const { evaluations, fetchEvaluations, isLoading, checklistItems, categories } = useEvaluationStore();
+	const [selectedEvaluation, setSelectedEvaluation] = (0, import_react.useState)(null);
 	(0, import_react.useEffect)(() => {
 		fetchEvaluations();
 	}, []);
@@ -49066,18 +49534,19 @@ function EvaluationHistory() {
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cliente" }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Avaliador" }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 					className: "text-right",
 					children: "Valor Final"
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 					className: "text-right",
-					children: "Arquivos"
+					children: "Ações"
 				})
 			]
 		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-muted-foreground",
+				className: "text-muted-foreground whitespace-nowrap",
 				children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -49095,9 +49564,16 @@ function EvaluationHistory() {
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex flex-col",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.nome_cliente || "N/A" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.nome_cliente || (item.client ? item.client.nome : "N/A") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "text-xs text-muted-foreground",
-					children: item.cpf_cliente
+					children: item.cpf_cliente || (item.client ? item.client.cpf : "")
+				})]
+			}) }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-sm",
+					children: item.profiles?.name || "Sistema"
 				})]
 			}) }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -49114,52 +49590,21 @@ function EvaluationHistory() {
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 				className: "text-right",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex justify-end gap-1",
-					children: [
-						item.url_print_seguranca && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "icon",
-								className: "h-8 w-8 text-blue-500 hover:bg-blue-50",
-								onClick: () => setPreviewFile({
-									url: item.url_print_seguranca,
-									name: "Print Segurança"
-								}),
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4" })
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Ver Print" })] }) }),
-						item.url_foto_documento && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "icon",
-								className: "h-8 w-8 text-orange-500 hover:bg-orange-50",
-								onClick: () => setPreviewFile({
-									url: item.url_foto_documento,
-									name: "Documento"
-								}),
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileText, { className: "w-4 h-4" })
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Ver Documento" })] }) }),
-						item.arquivos_consulta && Array.isArray(item.arquivos_consulta) && item.arquivos_consulta.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
-								variant: "secondary",
-								className: "ml-1 h-8",
-								children: ["+", item.arquivos_consulta.length]
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Arquivos Adicionais (Ver no perfil do cliente)" })] }) })
-					]
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "ghost",
+					size: "sm",
+					className: "h-8",
+					onClick: () => setSelectedEvaluation(item),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4 mr-2" }), "Detalhes"]
 				})
 			})
 		] }, item.id)) })] })
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePreviewDialog, {
-		open: !!previewFile,
-		onOpenChange: (open) => !open && setPreviewFile(null),
-		fileUrl: previewFile?.url || null,
-		fileName: previewFile?.name
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvaluationDetailsDialog, {
+		open: !!selectedEvaluation,
+		onOpenChange: (open) => !open && setSelectedEvaluation(null),
+		evaluation: selectedEvaluation,
+		checklistItems,
+		categories
 	})] });
 }
 function BasePriceDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
@@ -75192,4 +75637,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BbpxbC0p.js.map
+//# sourceMappingURL=index-B7vA4w3b.js.map

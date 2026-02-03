@@ -152,6 +152,7 @@ export interface Evaluation {
   company_id?: string | null
   created_at: string
   empresas?: { nome_fantasia: string } | null
+  profiles?: { name: string | null } | null
   nome_cliente?: string | null
   telefone_cliente?: string | null
   cpf_cliente?: string | null

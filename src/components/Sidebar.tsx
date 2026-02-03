@@ -39,7 +39,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
 
   const mainItems = [
     {
-      label: 'Dashboard',
+      label: 'Melhor Preço',
       icon: LayoutDashboard,
       path: '/',
       visible: true,
@@ -70,7 +70,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
     {
       label: 'Usuários',
       icon: UserPlus,
-      path: '/admin', // Since AdminPage has the Users tab by default
+      path: '/users',
     },
   ]
 

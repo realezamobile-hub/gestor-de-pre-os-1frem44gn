@@ -250,6 +250,8 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
 
   uploadEvidence: async (file) => {
     try {
+      if (!file) return { url: null, error: 'Arquivo inválido' }
+
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'unknown'
       const nameWithoutExt =
         file.name.substring(0, file.name.lastIndexOf('.')) || file.name
@@ -262,14 +264,19 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
         .toLowerCase()
 
       const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
-      // This is the fix for "FormData object could not be cloned"
-      const cleanFile = new File([file], fileName, { type: file.type })
+
+      // CRITICAL FIX: Ensure file is a fresh File object to avoid "FormData object could not be cloned" error
+      // This error often happens with Files from inputs in some environments or if file properties are non-enumerable
+      const cleanFile = new File([file], fileName, {
+        type: file.type || 'application/octet-stream',
+        lastModified: file.lastModified || Date.now(),
+      })
 
       const { error: uploadError } = await supabase.storage
         .from('evaluation-evidence')
         .upload(fileName, cleanFile, {
           upsert: false,
-          contentType: file.type,
+          contentType: file.type || 'application/octet-stream',
           cacheControl: '3600',
         })
 

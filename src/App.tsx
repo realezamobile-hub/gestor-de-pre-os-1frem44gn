@@ -15,6 +15,7 @@ import EvaluationPage from './pages/evaluation/EvaluationPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import ClientsPage from './pages/clients/ClientsPage'
 import ReportsPage from './pages/reports/ReportsPage'
+import UsersPage from './pages/users/UsersPage'
 import NotFound from './pages/NotFound'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/generator" element={<ListGeneratorPage />} />
             <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/users" element={<UsersPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/profile" element={<ProfilePage />} />

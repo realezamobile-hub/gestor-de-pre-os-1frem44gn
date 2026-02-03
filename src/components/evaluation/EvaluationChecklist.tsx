@@ -269,33 +269,41 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
+      // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
-        throw new Error(`Erro ao enviar Print: ${printRes.error?.message}`)
+        throw new Error(
+          `Erro ao enviar Print: ${printRes.error?.message || 'Falha no upload'}`,
+        )
       }
 
+      // 2. Upload Document
       const docRes = await uploadEvidence(docFile.file)
       if (docRes.error || !docRes.url) {
-        throw new Error(`Erro ao enviar Documento: ${docRes.error?.message}`)
+        throw new Error(
+          `Erro ao enviar Documento: ${docRes.error?.message || 'Falha no upload'}`,
+        )
       }
 
+      // 3. Upload Additional Files
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
-        const uploadPromises = consultationFiles.map(async (f) => {
+        for (const f of consultationFiles) {
           const res = await uploadEvidence(f.file)
           if (res.error || !res.url) {
-            throw new Error(`Erro ao enviar arquivo: ${f.file.name}`)
+            throw new Error(
+              `Erro ao enviar arquivo ${f.file.name}: ${res.error?.message || 'Falha no upload'}`,
+            )
           }
-          return {
+          consultationResults.push({
             name: f.file.name,
             url: res.url,
             type: f.file.type.startsWith('image/') ? 'image' : 'document',
-          } as ConsultationFile
-        })
-        const results = await Promise.all(uploadPromises)
-        consultationResults.push(...results)
+          })
+        }
       }
 
+      // 4. Save to Database
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -321,6 +329,7 @@ export function EvaluationChecklist() {
 
       if (result.success) {
         toast.success('Avaliação concluída com sucesso!', { id: toastId })
+        // Reset form
         setStep(1)
         setSelectedModelId('')
         setSerialNumber('')

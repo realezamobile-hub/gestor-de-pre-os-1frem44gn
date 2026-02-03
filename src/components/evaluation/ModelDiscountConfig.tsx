@@ -34,6 +34,7 @@ export function ModelDiscountConfig() {
     basePrices,
     checklistItems,
     peripheralDiscounts,
+    categories,
     addDiscount,
     updateDiscount,
   } = useEvaluationStore()
@@ -80,7 +81,6 @@ export function ModelDiscountConfig() {
     setIsSaving(false)
     if (result.success) {
       toast.success('Valor salvo')
-      // Clear edit state for this item
       setEditingValues((prev) => {
         const next = { ...prev }
         delete next[item.id]
@@ -89,6 +89,10 @@ export function ModelDiscountConfig() {
     } else {
       toast.error('Erro ao salvar')
     }
+  }
+
+  const getCategoryName = (id: string) => {
+    return categories.find((c) => c.id === id)?.name || 'Desconhecida'
   }
 
   return (
@@ -137,7 +141,7 @@ export function ModelDiscountConfig() {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.nome}</TableCell>
                       <TableCell className="text-muted-foreground text-xs">
-                        {item.categoria}
+                        {getCategoryName(item.category_id)}
                       </TableCell>
                       <TableCell>
                         <Input

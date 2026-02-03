@@ -19349,6 +19349,20 @@ var Italic = createLucideIcon("italic", [
 		key: "uljnxc"
 	}]
 ]);
+var Layers = createLucideIcon("layers", [
+	["path", {
+		d: "M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z",
+		key: "zw3jo"
+	}],
+	["path", {
+		d: "M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12",
+		key: "1wduqc"
+	}],
+	["path", {
+		d: "M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17",
+		key: "kqbvx6"
+	}]
+]);
 var LayoutDashboard = createLucideIcon("layout-dashboard", [
 	["rect", {
 		width: "7",
@@ -24786,7 +24800,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$28({ inst: {
+			cachedValue = useState$30({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24800,7 +24814,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$19(function() {
+			useEffect$20(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24823,7 +24837,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$28 = React$3.useState, useEffect$19 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$30 = React$3.useState, useEffect$20 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24846,7 +24860,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$7 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo$1 = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$7 = React$3.useRef, useEffect$20 = React$3.useEffect, useMemo$1 = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$7(null);
 			if (null === instRef.current) {
@@ -24888,7 +24902,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$19(function() {
+			useEffect$20(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -46795,6 +46809,7 @@ function AdminPage() {
 const useEvaluationStore = create((set, get$1) => ({
 	basePrices: [],
 	peripheralDiscounts: [],
+	categories: [],
 	checklistItems: [],
 	evaluations: [],
 	isLoading: false,
@@ -46802,10 +46817,12 @@ const useEvaluationStore = create((set, get$1) => ({
 		set({ isLoading: true });
 		const { data: prices } = await supabase.from("config_precos_base").select("*").order("modelo");
 		const { data: discounts } = await supabase.from("config_descontos_perifericos").select("*");
-		const { data: checklist } = await supabase.from("config_checklist_items").select("*").order("categoria");
+		const { data: categories } = await supabase.from("config_checklist_categories").select("*").order("name");
+		const { data: checklist } = await supabase.from("config_checklist_items").select("*").order("nome");
 		set({
 			basePrices: prices || [],
 			peripheralDiscounts: discounts || [],
+			categories: categories || [],
 			checklistItems: checklist || [],
 			isLoading: false
 		});
@@ -46840,9 +46857,33 @@ const useEvaluationStore = create((set, get$1) => ({
 			error
 		};
 	},
-	addChecklistItem: async (categoria, nome) => {
+	addCategory: async (name) => {
+		const { error } = await supabase.from("config_checklist_categories").insert({ name });
+		if (!error) await get$1().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
+	updateCategory: async (id, name) => {
+		const { error } = await supabase.from("config_checklist_categories").update({ name }).eq("id", id);
+		if (!error) await get$1().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
+	deleteCategory: async (id) => {
+		const { error } = await supabase.from("config_checklist_categories").delete().eq("id", id);
+		if (!error) await get$1().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
+	addChecklistItem: async (categoryId, nome) => {
 		const { error } = await supabase.from("config_checklist_items").insert({
-			categoria,
+			category_id: categoryId,
 			nome
 		});
 		if (!error) await get$1().fetchConfigs();
@@ -46889,19 +46930,18 @@ const useEvaluationStore = create((set, get$1) => ({
 		};
 	},
 	saveEvaluation: async (data) => {
-		const { modelo, serialNumber, checklistData, valorFinal, descontos, userId, nomeCliente, telefoneCliente, cpfCliente, urlPrintSeguranca, urlFotoDocumento } = data;
 		const { error } = await supabase.from("avaliacoes_iphone").insert({
-			modelo,
-			serial_number: serialNumber,
-			checklist_data: checklistData,
-			valor_final: valorFinal,
-			descontos_aplicados: descontos,
-			user_id: userId,
-			nome_cliente: nomeCliente,
-			telefone_cliente: telefoneCliente,
-			cpf_cliente: cpfCliente,
-			url_print_seguranca: urlPrintSeguranca,
-			url_foto_documento: urlFotoDocumento
+			modelo: data.modelo,
+			serial_number: data.serialNumber,
+			checklist_data: data.checklistData,
+			valor_final: data.valorFinal,
+			descontos_aplicados: data.descontos,
+			user_id: data.userId,
+			nome_cliente: data.nomeCliente,
+			telefone_cliente: data.telefoneCliente,
+			cpf_cliente: data.cpfCliente,
+			url_print_seguranca: data.urlPrintSeguranca,
+			url_foto_documento: data.urlFotoDocumento
 		});
 		if (!error) await get$1().fetchEvaluations();
 		return {
@@ -46916,10 +46956,7 @@ const useEvaluationStore = create((set, get$1) => ({
 			evaluations: data,
 			isLoading: false
 		});
-		else {
-			console.error("Error fetching evaluations:", error);
-			set({ isLoading: false });
-		}
+		else set({ isLoading: false });
 	},
 	uploadEvidence: async (file) => {
 		try {
@@ -47168,23 +47205,17 @@ function BasePriceList() {
 	})] });
 }
 function ChecklistConfig() {
-	const { checklistItems, addChecklistItem, deleteChecklistItem } = useEvaluationStore();
-	const [newCategory, setNewCategory] = (0, import_react.useState)("");
+	const { checklistItems, categories, addChecklistItem, deleteChecklistItem } = useEvaluationStore();
+	const [newCategoryId, setNewCategoryId] = (0, import_react.useState)("");
 	const [newName, setNewName] = (0, import_react.useState)("");
 	const [isAdding, setIsAdding] = (0, import_react.useState)(false);
-	const CATEGORIES = [
-		"Aparencia",
-		"Hardware",
-		"Software",
-		"Outros"
-	];
 	const handleAdd = async () => {
-		if (!newCategory || !newName) {
-			toast.error("Preencha categoria e nome");
+		if (!newCategoryId || !newName) {
+			toast.error("Selecione uma categoria e informe o nome");
 			return;
 		}
 		setIsAdding(true);
-		const result = await addChecklistItem(newCategory, newName);
+		const result = await addChecklistItem(newCategoryId, newName);
 		setIsAdding(false);
 		if (result.success) {
 			toast.success("Item adicionado");
@@ -47193,6 +47224,9 @@ function ChecklistConfig() {
 	};
 	const handleDelete = async (id) => {
 		if (confirm("Tem certeza? Isso pode afetar descontos configurados.")) await deleteChecklistItem(id);
+	};
+	const getCategoryName = (id) => {
+		return categories.find((c) => c.id === id)?.name || "Desconhecida";
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 		className: "flex flex-col h-[600px]",
@@ -47210,15 +47244,15 @@ function ChecklistConfig() {
 							className: "text-xs font-medium",
 							children: "Categoria"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-							value: newCategory,
-							onValueChange: setNewCategory,
+							value: newCategoryId,
+							onValueChange: setNewCategoryId,
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
 								className: "bg-white",
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: CATEGORIES.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: c,
-								children: c
-							}, c)) })]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: c.id,
+								children: c.name
+							}, c.id)) })]
 						})]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -47254,7 +47288,7 @@ function ChecklistConfig() {
 				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: checklistItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "font-medium text-muted-foreground",
-						children: item.categoria
+						children: getCategoryName(item.category_id)
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: item.nome }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -47273,7 +47307,7 @@ function ChecklistConfig() {
 	});
 }
 function ModelDiscountConfig() {
-	const { basePrices, checklistItems, peripheralDiscounts, addDiscount, updateDiscount } = useEvaluationStore();
+	const { basePrices, checklistItems, peripheralDiscounts, categories, addDiscount, updateDiscount } = useEvaluationStore();
 	const [selectedModelId, setSelectedModelId] = (0, import_react.useState)("");
 	const [editingValues, setEditingValues] = (0, import_react.useState)({});
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
@@ -47311,6 +47345,9 @@ function ModelDiscountConfig() {
 				return next;
 			});
 		} else toast.error("Erro ao salvar");
+	};
+	const getCategoryName = (id) => {
+		return categories.find((c) => c.id === id)?.name || "Desconhecida";
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 		className: "flex flex-col h-[600px]",
@@ -47354,7 +47391,7 @@ function ModelDiscountConfig() {
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 							className: "text-muted-foreground text-xs",
-							children: item.categoria
+							children: getCategoryName(item.category_id)
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 							type: "number",
@@ -47382,6 +47419,165 @@ function ModelDiscountConfig() {
 		})]
 	});
 }
+function CategoryDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
+	const [name, setName] = (0, import_react.useState)("");
+	const [isSubmitting, setIsSubmitting] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		if (open && initialData) setName(initialData.name);
+		else if (open && !initialData) setName("");
+	}, [open, initialData]);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		if (!name.trim()) return;
+		setIsSubmitting(true);
+		const success = await onSubmit(name.trim());
+		setIsSubmitting(false);
+		if (success) onOpenChange(false);
+	};
+	const getTitle = () => {
+		return mode === "create" ? "Nova Categoria" : "Editar Categoria";
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open,
+		onOpenChange,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogContent, {
+			className: "sm:max-w-[425px]",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+				onSubmit: handleSubmit,
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: getTitle() }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: mode === "create" ? "Crie uma nova categoria para agrupar itens do checklist." : "Renomeie a categoria existente." })] }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "grid gap-4 py-4",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "grid gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								htmlFor: "name",
+								children: "Nome da Categoria"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								id: "name",
+								value: name,
+								onChange: (e) => setName(e.target.value),
+								placeholder: "Ex: Aparência, Hardware...",
+								autoFocus: true
+							})]
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						type: "button",
+						variant: "outline",
+						onClick: () => onOpenChange(false),
+						children: "Cancelar"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						type: "submit",
+						disabled: isSubmitting,
+						children: [isSubmitting && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar"]
+					})] })
+				]
+			})
+		})
+	});
+}
+function CategoryConfig() {
+	const { categories, addCategory, updateCategory, deleteCategory } = useEvaluationStore();
+	const [dialogOpen, setDialogOpen] = (0, import_react.useState)(false);
+	const [dialogMode, setDialogMode] = (0, import_react.useState)("create");
+	const [selectedItem, setSelectedItem] = (0, import_react.useState)(void 0);
+	const handleAdd = () => {
+		setDialogMode("create");
+		setSelectedItem(void 0);
+		setDialogOpen(true);
+	};
+	const handleEdit = (item) => {
+		setDialogMode("edit");
+		setSelectedItem(item);
+		setDialogOpen(true);
+	};
+	const handleDelete = async (id) => {
+		if (confirm("Tem certeza? Todos os itens desta categoria também serão excluídos.")) if ((await deleteCategory(id)).success) toast.success("Categoria removida");
+		else toast.error("Erro ao remover categoria");
+	};
+	const handleSubmit = async (name) => {
+		let result;
+		if (dialogMode === "edit" && selectedItem) result = await updateCategory(selectedItem.id, name);
+		else result = await addCategory(name);
+		if (result.success) {
+			toast.success(dialogMode === "edit" ? "Categoria atualizada com sucesso" : "Categoria adicionada com sucesso");
+			return true;
+		} else {
+			toast.error("Erro ao salvar categoria");
+			return false;
+		}
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		className: "flex flex-col h-[600px]",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
+			className: "pb-3",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center justify-between",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Layers, { className: "w-5 h-5 text-primary" }), "Categorias de Inspeção"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+					className: "mt-1",
+					children: "Gerencie os grupos do checklist (ex: Aparência, Hardware)."
+				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					onClick: handleAdd,
+					size: "sm",
+					className: "h-8",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4 mr-2" }), "Adicionar"]
+				})]
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+			className: "flex-1 overflow-hidden p-0",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+				className: "h-full",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
+					className: "bg-slate-50 sticky top-0 hover:bg-slate-50 z-10",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+						className: "pl-6",
+						children: "Nome"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+						className: "w-[100px] text-right pr-6",
+						children: "Ações"
+					})]
+				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: categories.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					colSpan: 2,
+					className: "text-center text-muted-foreground py-8",
+					children: "Nenhuma categoria cadastrada."
+				}) }) : categories.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "font-medium pl-6",
+					children: item.name
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "text-right pr-6",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center justify-end gap-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "ghost",
+							size: "icon",
+							className: "h-8 w-8 text-muted-foreground hover:text-blue-600",
+							onClick: () => handleEdit(item),
+							title: "Editar",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pencil, { className: "w-4 h-4" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "ghost",
+							size: "icon",
+							className: "h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50",
+							onClick: () => handleDelete(item.id),
+							title: "Excluir",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+						})]
+					})
+				})] }, item.id)) })] })
+			})
+		})]
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CategoryDialog, {
+		open: dialogOpen,
+		onOpenChange: setDialogOpen,
+		mode: dialogMode,
+		initialData: selectedItem,
+		onSubmit: handleSubmit
+	})] });
+}
 function EvaluationConfig() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "h-full",
@@ -47389,26 +47585,41 @@ function EvaluationConfig() {
 			defaultValue: "models",
 			className: "h-full flex flex-col space-y-4",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, { children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
-						value: "models",
-						children: "1. Modelos Base"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
-						value: "checklist",
-						children: "2. Itens de Checklist"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
-						value: "discounts",
-						children: "3. Preços de Defeitos"
-					})
-				] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+					className: "w-full justify-start overflow-x-auto",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+							value: "models",
+							children: "1. Modelos Base"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+							value: "categories",
+							children: "2. Categorias"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+							value: "checklist",
+							children: "3. Itens de Checklist"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+							value: "discounts",
+							children: "4. Preços de Defeitos"
+						})
+					]
+				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
 					value: "models",
 					className: "flex-1 mt-0",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "max-w-4xl",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BasePriceList, {})
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					value: "categories",
+					className: "flex-1 mt-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "max-w-4xl",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CategoryConfig, {})
 					})
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
@@ -47432,7 +47643,7 @@ function EvaluationConfig() {
 	});
 }
 function EvaluationChecklist() {
-	const { basePrices, peripheralDiscounts, checklistItems, saveEvaluation, uploadEvidence } = useEvaluationStore();
+	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence } = useEvaluationStore();
 	const { currentUser } = useAuthStore();
 	const [step, setStep] = (0, import_react.useState)(1);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
@@ -47550,11 +47761,9 @@ function EvaluationChecklist() {
 			doc: null
 		});
 	};
-	const groupedChecklist = checklistItems.reduce((acc, item) => {
-		if (!acc[item.categoria]) acc[item.categoria] = [];
-		acc[item.categoria].push(item);
-		return acc;
-	}, {});
+	const getCategoryName = (id) => {
+		return categories.find((c) => c.id === id)?.name || "Outros";
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid lg:grid-cols-12 gap-6 h-full",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -47612,16 +47821,49 @@ function EvaluationChecklist() {
 									})]
 								})]
 							}),
-							step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "space-y-6",
-								children: Object.entries(groupedChecklist).map(([category, items]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								children: [categories.map((category) => {
+									const items = checklistItems.filter((i) => i.category_id === category.id);
+									if (items.length === 0) return null;
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-3",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+											className: "font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded",
+											children: category.name
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+											className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
+											children: items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: cn("flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer", checklistStatus[item.id] ? "bg-green-50 border-green-200" : "hover:bg-slate-50"),
+												onClick: () => setChecklistStatus((prev) => ({
+													...prev,
+													[item.id]: !prev[item.id]
+												})),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+													checked: checklistStatus[item.id] || false,
+													onCheckedChange: () => {},
+													className: "mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex-1",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+														className: "cursor-pointer font-medium",
+														children: item.nome
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+														className: "text-xs text-muted-foreground mt-0.5",
+														children: checklistStatus[item.id] ? "OK" : "Defeito / Não verificado"
+													})]
+												})]
+											}, item.id))
+										})]
+									}, category.id);
+								}), checklistItems.some((i) => !i.category_id) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "space-y-3",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
 										className: "font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded",
-										children: category
+										children: "Sem Categoria"
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 										className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
-										children: items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										children: checklistItems.filter((i) => !i.category_id).map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 											className: cn("flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer", checklistStatus[item.id] ? "bg-green-50 border-green-200" : "hover:bg-slate-50"),
 											onClick: () => setChecklistStatus((prev) => ({
 												...prev,
@@ -47629,8 +47871,7 @@ function EvaluationChecklist() {
 											})),
 											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
 												checked: checklistStatus[item.id] || false,
-												onCheckedChange: () => {},
-												className: "mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+												onCheckedChange: () => {}
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 												className: "flex-1",
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
@@ -47643,7 +47884,7 @@ function EvaluationChecklist() {
 											})]
 										}, item.id))
 									})]
-								}, category))
+								})]
 							}),
 							step === 3 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "space-y-6",
@@ -47669,7 +47910,7 @@ function EvaluationChecklist() {
 												children: d.item.nome
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 												className: "text-xs text-muted-foreground block",
-												children: d.item.categoria
+												children: getCategoryName(d.item.category_id)
 											})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 												className: "text-red-600 font-bold",
 												children: [
@@ -48568,4 +48809,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CWmbZwv1.js.map
+//# sourceMappingURL=index-DTP5QKTV.js.map

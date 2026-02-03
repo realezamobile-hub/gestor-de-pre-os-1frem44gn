@@ -35,13 +35,14 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { BasePriceConfig, PeripheralDiscountConfig } from '@/types'
+import { PeripheralDiscountConfig } from '@/types'
 
 export function EvaluationChecklist() {
   const {
     basePrices,
     peripheralDiscounts,
     checklistItems,
+    categories,
     saveEvaluation,
     uploadEvidence,
   } = useEvaluationStore()
@@ -215,15 +216,9 @@ export function EvaluationChecklist() {
     setFiles({ print: null, doc: null })
   }
 
-  // Group checklist items
-  const groupedChecklist = checklistItems.reduce(
-    (acc, item) => {
-      if (!acc[item.categoria]) acc[item.categoria] = []
-      acc[item.categoria].push(item)
-      return acc
-    },
-    {} as Record<string, typeof checklistItems>,
-  )
+  const getCategoryName = (id: string) => {
+    return categories.find((c) => c.id === id)?.name || 'Outros'
+  }
 
   return (
     <div className="grid lg:grid-cols-12 gap-6 h-full">
@@ -296,48 +291,100 @@ export function EvaluationChecklist() {
 
             {step === 2 && (
               <div className="space-y-6">
-                {Object.entries(groupedChecklist).map(([category, items]) => (
-                  <div key={category} className="space-y-3">
+                {categories.map((category) => {
+                  const items = checklistItems.filter(
+                    (i) => i.category_id === category.id,
+                  )
+                  if (items.length === 0) return null
+
+                  return (
+                    <div key={category.id} className="space-y-3">
+                      <h3 className="font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded">
+                        {category.name}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {items.map((item) => (
+                          <div
+                            key={item.id}
+                            className={cn(
+                              'flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer',
+                              checklistStatus[item.id]
+                                ? 'bg-green-50 border-green-200'
+                                : 'hover:bg-slate-50',
+                            )}
+                            onClick={() =>
+                              setChecklistStatus((prev) => ({
+                                ...prev,
+                                [item.id]: !prev[item.id],
+                              }))
+                            }
+                          >
+                            <Checkbox
+                              checked={checklistStatus[item.id] || false}
+                              onCheckedChange={() => {}}
+                              className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                            />
+                            <div className="flex-1">
+                              <Label className="cursor-pointer font-medium">
+                                {item.nome}
+                              </Label>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {checklistStatus[item.id]
+                                  ? 'OK'
+                                  : 'Defeito / Não verificado'}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Handling unassigned items if any */}
+                {checklistItems.some((i) => !i.category_id) && (
+                  <div className="space-y-3">
                     <h3 className="font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded">
-                      {category}
+                      Sem Categoria
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className={cn(
-                            'flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer',
-                            checklistStatus[item.id]
-                              ? 'bg-green-50 border-green-200'
-                              : 'hover:bg-slate-50',
-                          )}
-                          onClick={() =>
-                            setChecklistStatus((prev) => ({
-                              ...prev,
-                              [item.id]: !prev[item.id],
-                            }))
-                          }
-                        >
-                          <Checkbox
-                            checked={checklistStatus[item.id] || false}
-                            onCheckedChange={() => {}}
-                            className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                          />
-                          <div className="flex-1">
-                            <Label className="cursor-pointer font-medium">
-                              {item.nome}
-                            </Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {checklistStatus[item.id]
-                                ? 'OK'
-                                : 'Defeito / Não verificado'}
-                            </p>
+                      {checklistItems
+                        .filter((i) => !i.category_id)
+                        .map((item) => (
+                          <div
+                            key={item.id}
+                            className={cn(
+                              'flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer',
+                              checklistStatus[item.id]
+                                ? 'bg-green-50 border-green-200'
+                                : 'hover:bg-slate-50',
+                            )}
+                            onClick={() =>
+                              setChecklistStatus((prev) => ({
+                                ...prev,
+                                [item.id]: !prev[item.id],
+                              }))
+                            }
+                          >
+                            <Checkbox
+                              checked={checklistStatus[item.id] || false}
+                              onCheckedChange={() => {}}
+                            />
+                            <div className="flex-1">
+                              <Label className="cursor-pointer font-medium">
+                                {item.nome}
+                              </Label>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {checklistStatus[item.id]
+                                  ? 'OK'
+                                  : 'Defeito / Não verificado'}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
 
@@ -367,7 +414,7 @@ export function EvaluationChecklist() {
                               {d.item.nome}
                             </span>
                             <span className="text-xs text-muted-foreground block">
-                              {d.item.categoria}
+                              {getCategoryName(d.item.category_id)}
                             </span>
                           </div>
                           <div className="text-red-600 font-bold">

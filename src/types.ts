@@ -84,9 +84,15 @@ export interface BasePriceConfig {
   company_id?: string | null
 }
 
+export interface ChecklistCategory {
+  id: string
+  name: string
+  company_id?: string | null
+}
+
 export interface ChecklistItem {
   id: string
-  categoria: string
+  category_id: string
   nome: string
   company_id?: string | null
 }

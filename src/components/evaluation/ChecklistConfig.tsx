@@ -29,22 +29,20 @@ import { toast } from 'sonner'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function ChecklistConfig() {
-  const { checklistItems, addChecklistItem, deleteChecklistItem } =
+  const { checklistItems, categories, addChecklistItem, deleteChecklistItem } =
     useEvaluationStore()
 
-  const [newCategory, setNewCategory] = useState('')
+  const [newCategoryId, setNewCategoryId] = useState('')
   const [newName, setNewName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
 
-  const CATEGORIES = ['Aparencia', 'Hardware', 'Software', 'Outros']
-
   const handleAdd = async () => {
-    if (!newCategory || !newName) {
-      toast.error('Preencha categoria e nome')
+    if (!newCategoryId || !newName) {
+      toast.error('Selecione uma categoria e informe o nome')
       return
     }
     setIsAdding(true)
-    const result = await addChecklistItem(newCategory, newName)
+    const result = await addChecklistItem(newCategoryId, newName)
     setIsAdding(false)
     if (result.success) {
       toast.success('Item adicionado')
@@ -58,6 +56,10 @@ export function ChecklistConfig() {
     if (confirm('Tem certeza? Isso pode afetar descontos configurados.')) {
       await deleteChecklistItem(id)
     }
+  }
+
+  const getCategoryName = (id: string) => {
+    return categories.find((c) => c.id === id)?.name || 'Desconhecida'
   }
 
   return (
@@ -75,14 +77,14 @@ export function ChecklistConfig() {
         <div className="flex gap-2 items-end bg-slate-50 p-3 rounded-lg border">
           <div className="flex-1 space-y-1">
             <span className="text-xs font-medium">Categoria</span>
-            <Select value={newCategory} onValueChange={setNewCategory}>
+            <Select value={newCategoryId} onValueChange={setNewCategoryId}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -115,7 +117,7 @@ export function ChecklistConfig() {
               {checklistItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium text-muted-foreground">
-                    {item.categoria}
+                    {getCategoryName(item.category_id)}
                   </TableCell>
                   <TableCell>{item.nome}</TableCell>
                   <TableCell className="text-right">

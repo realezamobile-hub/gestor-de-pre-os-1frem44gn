@@ -4,12 +4,14 @@ import {
   PeripheralDiscountConfig,
   Evaluation,
   ChecklistItem,
+  ChecklistCategory,
 } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 
 interface EvaluationStore {
   basePrices: BasePriceConfig[]
   peripheralDiscounts: PeripheralDiscountConfig[]
+  categories: ChecklistCategory[]
   checklistItems: ChecklistItem[]
   evaluations: Evaluation[]
   isLoading: boolean
@@ -28,9 +30,17 @@ interface EvaluationStore {
   ) => Promise<{ success: boolean; error?: any }>
   deleteBasePrice: (id: string) => Promise<{ success: boolean; error?: any }>
 
+  // Categories
+  addCategory: (name: string) => Promise<{ success: boolean; error?: any }>
+  updateCategory: (
+    id: string,
+    name: string,
+  ) => Promise<{ success: boolean; error?: any }>
+  deleteCategory: (id: string) => Promise<{ success: boolean; error?: any }>
+
   // Checklist Items
   addChecklistItem: (
-    categoria: string,
+    categoryId: string,
     nome: string,
   ) => Promise<{ success: boolean; error?: any }>
   deleteChecklistItem: (
@@ -51,20 +61,7 @@ interface EvaluationStore {
   deleteDiscount: (id: string) => Promise<{ success: boolean; error?: any }>
 
   // Evaluation
-  saveEvaluation: (data: {
-    modelo: string
-    serialNumber: string
-    checklistData: any
-    valorFinal: number
-    descontos: PeripheralDiscountConfig[]
-    userId: string
-    nomeCliente: string
-    telefoneCliente: string
-    cpfCliente: string
-    urlPrintSeguranca: string
-    urlFotoDocumento: string
-  }) => Promise<{ success: boolean; error?: any }>
-
+  saveEvaluation: (data: any) => Promise<{ success: boolean; error?: any }>
   fetchEvaluations: () => Promise<void>
   uploadEvidence: (file: File) => Promise<{ url: string | null; error: any }>
 }
@@ -72,6 +69,7 @@ interface EvaluationStore {
 export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
   basePrices: [],
   peripheralDiscounts: [],
+  categories: [],
   checklistItems: [],
   evaluations: [],
   isLoading: false,
@@ -87,14 +85,20 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_descontos_perifericos')
       .select('*')
 
+    const { data: categories } = await supabase
+      .from('config_checklist_categories')
+      .select('*')
+      .order('name')
+
     const { data: checklist } = await supabase
       .from('config_checklist_items')
       .select('*')
-      .order('categoria')
+      .order('nome')
 
     set({
       basePrices: (prices as any) || [],
       peripheralDiscounts: (discounts as any) || [],
+      categories: (categories as any) || [],
       checklistItems: (checklist as any) || [],
       isLoading: false,
     })
@@ -104,7 +108,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     const { error } = await supabase
       .from('config_precos_base')
       .insert({ modelo, preco_base: preco })
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -114,7 +117,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_precos_base')
       .update({ modelo, preco_base: preco })
       .eq('id', id)
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -124,16 +126,40 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_precos_base')
       .delete()
       .eq('id', id)
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
 
-  addChecklistItem: async (categoria, nome) => {
+  addCategory: async (name) => {
+    const { error } = await supabase
+      .from('config_checklist_categories')
+      .insert({ name })
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
+  updateCategory: async (id, name) => {
+    const { error } = await supabase
+      .from('config_checklist_categories')
+      .update({ name })
+      .eq('id', id)
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
+  deleteCategory: async (id) => {
+    const { error } = await supabase
+      .from('config_checklist_categories')
+      .delete()
+      .eq('id', id)
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
+  addChecklistItem: async (categoryId, nome) => {
     const { error } = await supabase
       .from('config_checklist_items')
-      .insert({ categoria, nome })
-
+      .insert({ category_id: categoryId, nome })
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -143,7 +169,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_checklist_items')
       .delete()
       .eq('id', id)
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -157,7 +182,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
         modelo_id: modeloId,
         checklist_item_id: checklistItemId,
       })
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -167,7 +191,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_descontos_perifericos')
       .update({ valor_desconto: valor })
       .eq('id', id)
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
@@ -177,40 +200,24 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .from('config_descontos_perifericos')
       .delete()
       .eq('id', id)
-
     if (!error) await get().fetchConfigs()
     return { success: !error, error }
   },
 
   saveEvaluation: async (data) => {
-    const {
-      modelo,
-      serialNumber,
-      checklistData,
-      valorFinal,
-      descontos,
-      userId,
-      nomeCliente,
-      telefoneCliente,
-      cpfCliente,
-      urlPrintSeguranca,
-      urlFotoDocumento,
-    } = data
-
     const { error } = await supabase.from('avaliacoes_iphone').insert({
-      modelo,
-      serial_number: serialNumber,
-      checklist_data: checklistData,
-      valor_final: valorFinal,
-      descontos_aplicados: descontos as any,
-      user_id: userId,
-      nome_cliente: nomeCliente,
-      telefone_cliente: telefoneCliente,
-      cpf_cliente: cpfCliente,
-      url_print_seguranca: urlPrintSeguranca,
-      url_foto_documento: urlFotoDocumento,
+      modelo: data.modelo,
+      serial_number: data.serialNumber,
+      checklist_data: data.checklistData,
+      valor_final: data.valorFinal,
+      descontos_aplicados: data.descontos as any,
+      user_id: data.userId,
+      nome_cliente: data.nomeCliente,
+      telefone_cliente: data.telefoneCliente,
+      cpf_cliente: data.cpfCliente,
+      url_print_seguranca: data.urlPrintSeguranca,
+      url_foto_documento: data.urlFotoDocumento,
     })
-
     if (!error) await get().fetchEvaluations()
     return { success: !error, error }
   },
@@ -222,11 +229,9 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       .select('*, empresas(nome_fantasia)')
       .order('created_at', { ascending: false })
       .limit(100)
-
     if (!error && data) {
       set({ evaluations: data as any, isLoading: false })
     } else {
-      console.error('Error fetching evaluations:', error)
       set({ isLoading: false })
     }
   },
@@ -235,17 +240,13 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     try {
       const fileExt = file.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-
       const { error: uploadError } = await supabase.storage
         .from('evaluation-evidence')
         .upload(fileName, file)
-
       if (uploadError) return { url: null, error: uploadError }
-
       const {
         data: { publicUrl },
       } = supabase.storage.from('evaluation-evidence').getPublicUrl(fileName)
-
       return { url: publicUrl, error: null }
     } catch (error) {
       return { url: null, error }

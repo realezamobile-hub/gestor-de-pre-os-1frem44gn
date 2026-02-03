@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useEvaluationStore } from '@/stores/useEvaluationStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
@@ -27,139 +27,174 @@ import {
   ChevronRight,
   Smartphone,
   Save,
-  RotateCcw,
-  Wrench,
-  HelpCircle,
+  ShieldCheck,
+  User as UserIcon,
+  Upload,
+  Loader2,
+  Image as ImageIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-
-const CHECKLIST_SECTIONS = [
-  {
-    id: 'physical',
-    title: '1. Inspeção Física',
-    items: [
-      { id: 'pentalobe', label: 'Parafusos Pentalobe (Inferiores) presentes' },
-      {
-        id: 'lci',
-        label: 'LCI (Sensor de Umidade) - Branco/Prata',
-        note: 'VERMELHO = REJEITAR IMEDIATAMENTE',
-      },
-      { id: 'housing', label: 'Carcaça sem amassados graves/empenos' },
-      { id: 'screen_align', label: 'Alinhamento da Tela (Descolamento)' },
-    ],
-  },
-  {
-    id: 'display',
-    title: '2. Tela e Sensores',
-    items: [
-      { id: 'touch', label: 'Touch (Teste de arraste de ícone)' },
-      { id: 'ghost_touch', label: 'Toque Fantasma (Ghost Touch)' },
-      { id: 'dead_pixel', label: 'Pixels Mortos / Manchas' },
-      { id: 'true_tone', label: 'True Tone Ativo' },
-    ],
-  },
-  {
-    id: 'hardware',
-    title: '3. Hardware Crítico',
-    items: [
-      { id: 'face_id', label: 'Face ID (Configuração e Desbloqueio)' },
-      { id: 'cameras', label: 'Câmeras (Foco e Manchas)' },
-      {
-        id: 'ois',
-        label: 'Estabilizador Óptico (Teste de Agitação)',
-        note: 'Agite levemente para ouvir barulhos soltos',
-      },
-      { id: 'mics', label: 'Microfones (Frontal, Traseiro, Inferior)' },
-      { id: 'speakers', label: 'Alto-falantes (Estéreo)' },
-    ],
-  },
-  {
-    id: 'system',
-    title: '4. Análise de Sistema',
-    items: [
-      { id: 'battery_health', label: 'Saúde da Bateria (>80%)' },
-      { id: 'genuine_parts', label: 'Peças Genuínas (Avisos nos Ajustes)' },
-      {
-        id: 'panic_full',
-        label: 'Panic Full (Logs de Erro)',
-        note: 'Ajustes > Privacidade > Análise > Dados',
-        help: 'Procure por arquivos começando com "panic-full" na lista de dados de análise. A presença indica falha grave na placa lógica.',
-      },
-    ],
-  },
-  {
-    id: 'connectivity',
-    title: '5. Conectividade e Segurança',
-    items: [
-      { id: 'wifi_bt', label: 'Wi-Fi e Bluetooth' },
-      { id: 'icloud', label: 'iCloud (Buscar iPhone) Desativado' },
-      { id: 'imei', label: 'IMEI Limpo (Sem Blacklist)' },
-      { id: 'mdm', label: 'Sem perfil MDM (Gerenciamento Remoto)' },
-    ],
-  },
-]
+import { BasePriceConfig, PeripheralDiscountConfig } from '@/types'
 
 export function EvaluationChecklist() {
-  const { basePrices, peripheralDiscounts, saveEvaluation } =
-    useEvaluationStore()
+  const {
+    basePrices,
+    peripheralDiscounts,
+    checklistItems,
+    saveEvaluation,
+    uploadEvidence,
+  } = useEvaluationStore()
   const { currentUser } = useAuthStore()
 
-  // Steps: 0 = Info, 1..5 = Checklist Sections, 6 = Defects, 7 = Summary
-  const [step, setStep] = useState(0)
-  const [selectedModelId, setSelectedModelId] = useState('')
-  const [serialNumber, setSerialNumber] = useState('')
-  const [checks, setChecks] = useState<Record<string, boolean>>({})
-  const [selectedDiscounts, setSelectedDiscounts] = useState<Set<string>>(
-    new Set(),
-  )
+  // State
+  const [step, setStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
 
+  // Step 1: Identification
+  const [selectedModelId, setSelectedModelId] = useState('')
+  const [serialNumber, setSerialNumber] = useState('')
+
+  // Step 2: Inspection (Checklist)
+  // Store status of items: true = OK, false/undefined = Defect
+  const [checklistStatus, setChecklistStatus] = useState<
+    Record<string, boolean>
+  >({})
+
+  // Step 4: Security
+  const [securityChecks, setSecurityChecks] = useState({
+    anatel: false,
+    blacklist: false,
+    mdm: false,
+  })
+
+  // Step 5: Customer & Evidence
+  const [customerData, setCustomerData] = useState({
+    name: '',
+    phone: '',
+    cpf: '',
+  })
+  const [files, setFiles] = useState<{
+    print: File | null
+    doc: File | null
+  }>({ print: null, doc: null })
+
+  // Derived
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
 
-  const calculateTotal = () => {
-    if (!selectedModel) return 0
-    let total = selectedModel.preco_base
-    selectedDiscounts.forEach((id) => {
-      const discount = peripheralDiscounts.find((d) => d.id === id)
-      if (discount) total -= discount.valor_desconto
+  // Step 3 Logic: Calculate Price & Defects
+  const getDetectedDefects = () => {
+    if (!selectedModel) return []
+
+    // Items NOT checked are defects
+    const defectItems = checklistItems.filter(
+      (item) => !checklistStatus[item.id],
+    )
+
+    return defectItems.map((item) => {
+      // Find discount for this model and this item
+      const discount = peripheralDiscounts.find(
+        (d) =>
+          d.checklist_item_id === item.id && d.modelo_id === selectedModel.id,
+      )
+      // Fallback: Try finding a global discount (no model) with same item
+      const fallbackDiscount = !discount
+        ? peripheralDiscounts.find(
+            (d) => d.checklist_item_id === item.id && !d.modelo_id,
+          )
+        : null
+
+      return {
+        item,
+        discount: discount || fallbackDiscount,
+        value: discount
+          ? discount.valor_desconto
+          : fallbackDiscount
+            ? fallbackDiscount.valor_desconto
+            : 0,
+      }
     })
-    return total > 0 ? total : 0
   }
 
-  const handleCheck = (id: string, checked: boolean) => {
-    setChecks((prev) => ({ ...prev, [id]: checked }))
-  }
+  const detectedDefects = getDetectedDefects()
+  const totalDiscounts = detectedDefects.reduce(
+    (acc, def) => acc + def.value,
+    0,
+  )
+  const finalPrice = selectedModel
+    ? Math.max(0, selectedModel.preco_base - totalDiscounts)
+    : 0
 
-  const handleDiscountToggle = (id: string) => {
-    const next = new Set(selectedDiscounts)
-    if (next.has(id)) next.delete(id)
-    else next.add(id)
-    setSelectedDiscounts(next)
+  // Handlers
+  const handleNext = () => {
+    if (step === 1) {
+      if (!selectedModelId || !serialNumber) {
+        toast.error('Preencha todos os campos')
+        return
+      }
+    }
+    if (step === 4) {
+      if (
+        !securityChecks.anatel ||
+        !securityChecks.blacklist ||
+        !securityChecks.mdm
+      ) {
+        toast.error('Realize todas as verificações de segurança')
+        return
+      }
+    }
+    setStep((s) => s + 1)
   }
 
   const handleSave = async () => {
-    if (!selectedModel || !currentUser) return
+    if (!currentUser || !selectedModel) return
+    if (!customerData.name || !customerData.phone || !customerData.cpf) {
+      toast.error('Preencha os dados do cliente')
+      return
+    }
+    if (!files.print || !files.doc) {
+      toast.error('Anexe as evidências obrigatórias')
+      return
+    }
 
     setIsSaving(true)
-    const discountObjects = Array.from(selectedDiscounts)
-      .map((id) => peripheralDiscounts.find((d) => d.id === id))
-      .filter(Boolean) as any[]
 
-    const result = await saveEvaluation(
-      selectedModel.modelo,
+    // Upload Files
+    const printUpload = await uploadEvidence(files.print)
+    if (printUpload.error) {
+      toast.error('Erro ao enviar print de segurança')
+      setIsSaving(false)
+      return
+    }
+
+    const docUpload = await uploadEvidence(files.doc)
+    if (docUpload.error) {
+      toast.error('Erro ao enviar foto do documento')
+      setIsSaving(false)
+      return
+    }
+
+    // Save Record
+    const result = await saveEvaluation({
+      modelo: selectedModel.modelo,
       serialNumber,
-      checks,
-      calculateTotal(),
-      discountObjects,
-      currentUser.id,
-    )
+      checklistData: checklistStatus,
+      valorFinal: finalPrice,
+      descontos: detectedDefects.map(
+        (d) =>
+          ({
+            id: d.discount?.id || 'unknown',
+            nome: d.item.nome,
+            valor_desconto: d.value,
+          }) as PeripheralDiscountConfig,
+      ),
+      userId: currentUser.id,
+      nomeCliente: customerData.name,
+      telefoneCliente: customerData.phone,
+      cpfCliente: customerData.cpf,
+      urlPrintSeguranca: printUpload.url || '',
+      urlFotoDocumento: docUpload.url || '',
+    })
 
     setIsSaving(false)
     if (result.success) {
@@ -171,63 +206,62 @@ export function EvaluationChecklist() {
   }
 
   const resetForm = () => {
-    setStep(0)
+    setStep(1)
     setSelectedModelId('')
     setSerialNumber('')
-    setChecks({})
-    setSelectedDiscounts(new Set())
+    setChecklistStatus({})
+    setSecurityChecks({ anatel: false, blacklist: false, mdm: false })
+    setCustomerData({ name: '', phone: '', cpf: '' })
+    setFiles({ print: null, doc: null })
   }
 
-  const isStepValid = () => {
-    if (step === 0) return !!selectedModelId && !!serialNumber
-    return true
-  }
-
-  const currentChecklistSection =
-    step > 0 && step <= CHECKLIST_SECTIONS.length
-      ? CHECKLIST_SECTIONS[step - 1]
-      : null
-
-  const isDefectsStep = step === CHECKLIST_SECTIONS.length + 1
-  const isSummaryStep = step === CHECKLIST_SECTIONS.length + 2
+  // Group checklist items
+  const groupedChecklist = checklistItems.reduce(
+    (acc, item) => {
+      if (!acc[item.categoria]) acc[item.categoria] = []
+      acc[item.categoria].push(item)
+      return acc
+    },
+    {} as Record<string, typeof checklistItems>,
+  )
 
   return (
     <div className="grid lg:grid-cols-12 gap-6 h-full">
-      {/* Left Panel: Checklist Wizard */}
+      {/* Main Wizard Area */}
       <div className="lg:col-span-8 flex flex-col gap-6">
         <Card className="flex-1 flex flex-col shadow-md">
           <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>
-                {step === 0 && 'Passo 1: Identificação do Aparelho'}
-                {currentChecklistSection &&
-                  `Passo 2: ${currentChecklistSection.title}`}
-                {isDefectsStep && 'Passo 3: Seleção de Defeitos'}
-                {isSummaryStep && 'Passo 4: Resumo da Avaliação'}
-              </span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {step > 0 && !isSummaryStep && (
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold">
-                    {Math.round((step / (CHECKLIST_SECTIONS.length + 2)) * 100)}
-                    %
-                  </span>
-                )}
-              </span>
+            <div className="flex items-center gap-2 mb-2">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <div
+                  key={s}
+                  className={cn(
+                    'h-2 flex-1 rounded-full transition-all',
+                    s <= step ? 'bg-primary' : 'bg-muted',
+                  )}
+                />
+              ))}
+            </div>
+            <CardTitle>
+              {step === 1 && '1. Identificação do Aparelho'}
+              {step === 2 && '2. Inspeção Técnica'}
+              {step === 3 && '3. Precificação e Defeitos'}
+              {step === 4 && '4. Verificação de Segurança'}
+              {step === 5 && '5. Finalização e Cliente'}
             </CardTitle>
             <CardDescription>
-              {step === 0 &&
-                'Selecione o modelo e informe o serial para iniciar a avaliação.'}
-              {currentChecklistSection &&
-                'Marque os itens que estão EM BOM ESTADO (OK).'}
-              {isDefectsStep &&
-                'Identifique os defeitos encontrados para calcular as deduções.'}
-              {isSummaryStep &&
-                'Revise os dados e o valor final antes de salvar.'}
+              {step === 1 &&
+                'Selecione o modelo e informe o serial para iniciar.'}
+              {step === 2 &&
+                'Marque APENAS os itens que estão OK (Funcionando).'}
+              {step === 3 && 'Revise os defeitos detectados e o valor final.'}
+              {step === 4 && 'Confirme as consultas de segurança obrigatórias.'}
+              {step === 5 && 'Preencha os dados do cliente e anexe evidências.'}
             </CardDescription>
           </CardHeader>
 
           <CardContent className="flex-1 overflow-y-auto">
-            {step === 0 && (
+            {step === 1 && (
               <div className="space-y-4 max-w-md">
                 <div className="space-y-2">
                   <Label>Modelo do iPhone</Label>
@@ -241,14 +275,14 @@ export function EvaluationChecklist() {
                     <SelectContent>
                       {basePrices.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
-                          {p.modelo} - R$ {p.preco_base}
+                          {p.modelo}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Número de Série / IMEI</Label>
+                  <Label>Serial Number / IMEI</Label>
                   <Input
                     placeholder="Ex: DX3PL..."
                     value={serialNumber}
@@ -260,166 +294,294 @@ export function EvaluationChecklist() {
               </div>
             )}
 
-            {currentChecklistSection && (
-              <div className="space-y-4">
-                {currentChecklistSection.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-slate-50 transition-colors"
-                  >
-                    <Checkbox
-                      id={item.id}
-                      checked={checks[item.id] || false}
-                      onCheckedChange={(checked) =>
-                        handleCheck(item.id, checked as boolean)
-                      }
-                      className="mt-1"
-                    />
-                    <div className="flex-1 grid gap-1.5 leading-none">
-                      <div className="flex items-center gap-2">
-                        <label
-                          htmlFor={item.id}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {item.label}
-                        </label>
-                        {item.help && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="max-w-xs">{item.help}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
-                      </div>
-                      {item.note && (
-                        <p className="text-xs text-amber-600 font-medium flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          {item.note}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {isDefectsStep && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {peripheralDiscounts.map((discount) => (
-                  <div
-                    key={discount.id}
-                    className={cn(
-                      'flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all',
-                      selectedDiscounts.has(discount.id)
-                        ? 'bg-red-50 border-red-200'
-                        : 'hover:bg-slate-50 border-transparent bg-slate-50/50',
-                    )}
-                    onClick={() => handleDiscountToggle(discount.id)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedDiscounts.has(discount.id)}
-                        onCheckedChange={() =>
-                          handleDiscountToggle(discount.id)
-                        }
-                        className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
-                      />
-                      <div className="flex flex-col">
-                        <span
-                          className={cn(
-                            'text-sm font-medium',
-                            selectedDiscounts.has(discount.id) &&
-                              'text-red-700',
-                          )}
-                        >
-                          {discount.nome}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">
-                      -R$ {discount.valor_desconto}
-                    </span>
-                  </div>
-                ))}
-                {peripheralDiscounts.length === 0 && (
-                  <div className="col-span-2 text-center py-8 text-muted-foreground">
-                    Nenhum desconto configurado.
-                  </div>
-                )}
-              </div>
-            )}
-
-            {isSummaryStep && (
+            {step === 2 && (
               <div className="space-y-6">
-                <div className="bg-slate-50 p-6 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-lg flex items-center gap-2">
-                      <Smartphone className="w-5 h-5 text-primary" />
-                      {selectedModel?.modelo}
+                {Object.entries(groupedChecklist).map(([category, items]) => (
+                  <div key={category} className="space-y-3">
+                    <h3 className="font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded">
+                      {category}
                     </h3>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      SN: {serialNumber}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Checklist: {Object.values(checks).filter(Boolean).length}{' '}
-                      itens aprovados
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm text-muted-foreground">
-                      Valor Final Avaliado
-                    </span>
-                    <div className="text-3xl font-bold text-emerald-600">
-                      R$ {calculateTotal().toFixed(2)}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            'flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer',
+                            checklistStatus[item.id]
+                              ? 'bg-green-50 border-green-200'
+                              : 'hover:bg-slate-50',
+                          )}
+                          onClick={() =>
+                            setChecklistStatus((prev) => ({
+                              ...prev,
+                              [item.id]: !prev[item.id],
+                            }))
+                          }
+                        >
+                          <Checkbox
+                            checked={checklistStatus[item.id] || false}
+                            onCheckedChange={() => {}}
+                            className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                          />
+                          <div className="flex-1">
+                            <Label className="cursor-pointer font-medium">
+                              {item.nome}
+                            </Label>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {checklistStatus[item.id]
+                                ? 'OK'
+                                : 'Defeito / Não verificado'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-6">
+                <div className="bg-slate-50 p-4 rounded-lg border">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                    Defeitos Identificados ({detectedDefects.length})
+                  </h3>
+                  {detectedDefects.length === 0 ? (
+                    <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded border border-emerald-100">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span>
+                        Nenhum defeito encontrado. Aparelho em perfeito estado!
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {detectedDefects.map((d, idx) => (
+                        <div
+                          key={idx}
+                          className="flex justify-between items-center p-3 bg-white border rounded shadow-sm"
+                        >
+                          <div>
+                            <span className="font-medium text-red-700">
+                              {d.item.nome}
+                            </span>
+                            <span className="text-xs text-muted-foreground block">
+                              {d.item.categoria}
+                            </span>
+                          </div>
+                          <div className="text-red-600 font-bold">
+                            - R$ {d.value.toFixed(2)}
+                            {!d.discount && (
+                              <span className="text-xs font-normal text-muted-foreground ml-1">
+                                (Sem config)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-blue-800">
+                    Realize as consultas nos sites oficiais e marque as caixas
+                    abaixo para confirmar que o aparelho está limpo.
+                  </p>
+                </div>
+
+                <div className="grid gap-4">
+                  {[
+                    {
+                      key: 'anatel',
+                      label: 'Consulta Anatel (Impedimentos)',
+                      desc: 'Verificar se há bloqueio por roubo/furto na Anatel.',
+                    },
+                    {
+                      key: 'blacklist',
+                      label: 'Consulta Blacklist Internacional',
+                      desc: 'Verificar restrições em operadoras internacionais.',
+                    },
+                    {
+                      key: 'mdm',
+                      label: 'Consulta MDM (Gerenciamento)',
+                      desc: 'Verificar se há perfil corporativo ou financeiro ativo.',
+                    },
+                  ].map((check) => (
+                    <div
+                      key={check.key}
+                      className={cn(
+                        'flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer',
+                        securityChecks[check.key as keyof typeof securityChecks]
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-white',
+                      )}
+                      onClick={() =>
+                        setSecurityChecks((prev) => ({
+                          ...prev,
+                          [check.key]:
+                            !prev[check.key as keyof typeof securityChecks],
+                        }))
+                      }
+                    >
+                      <Checkbox
+                        checked={
+                          securityChecks[
+                            check.key as keyof typeof securityChecks
+                          ]
+                        }
+                        className="mt-1 data-[state=checked]:bg-green-600"
+                      />
+                      <div>
+                        <Label className="font-bold cursor-pointer text-base">
+                          {check.label}
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {check.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {step === 5 && (
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Nome do Cliente</Label>
+                    <Input
+                      value={customerData.name}
+                      onChange={(e) =>
+                        setCustomerData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      placeholder="Nome completo"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Telefone / WhatsApp</Label>
+                    <Input
+                      value={customerData.phone}
+                      onChange={(e) =>
+                        setCustomerData((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CPF</Label>
+                    <Input
+                      value={customerData.cpf}
+                      onChange={(e) =>
+                        setCustomerData((prev) => ({
+                          ...prev,
+                          cpf: e.target.value,
+                        }))
+                      }
+                      placeholder="000.000.000-00"
+                    />
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-red-500" />
-                    Defeitos Identificados
+                <div className="border-t pt-4 space-y-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    Evidências Obrigatórias
                   </h3>
-                  {selectedDiscounts.size === 0 ? (
-                    <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100">
-                      <CheckCircle2 className="w-5 h-5" />
-                      <p className="text-sm font-medium">
-                        Nenhum defeito apontado. Aparelho em perfeito estado!
-                      </p>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors">
+                      <ShieldCheck
+                        className={cn(
+                          'w-8 h-8',
+                          files.print
+                            ? 'text-green-500'
+                            : 'text-muted-foreground',
+                        )}
+                      />
+                      <Label htmlFor="file-print" className="cursor-pointer">
+                        <span className="font-semibold text-primary">
+                          Clique para enviar
+                        </span>
+                        <br /> Print das Consultas
+                      </Label>
+                      <span className="text-xs text-muted-foreground">
+                        {files.print
+                          ? files.print.name
+                          : 'Anatel, Blacklist, MDM'}
+                      </span>
+                      <Input
+                        id="file-print"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setFiles((prev) => ({
+                            ...prev,
+                            print: e.target.files?.[0] || null,
+                          }))
+                        }
+                      />
                     </div>
-                  ) : (
-                    <ul className="space-y-2">
-                      {Array.from(selectedDiscounts).map((id) => {
-                        const discount = peripheralDiscounts.find(
-                          (d) => d.id === id,
-                        )
-                        return discount ? (
-                          <li
-                            key={id}
-                            className="flex justify-between text-sm p-3 bg-red-50 text-red-700 rounded border border-red-100 items-center"
-                          >
-                            <span>{discount.nome}</span>
-                            <span className="font-bold">
-                              - R$ {discount.valor_desconto}
-                            </span>
-                          </li>
-                        ) : null
-                      })}
-                    </ul>
-                  )}
+
+                    <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors">
+                      <ImageIcon
+                        className={cn(
+                          'w-8 h-8',
+                          files.doc
+                            ? 'text-green-500'
+                            : 'text-muted-foreground',
+                        )}
+                      />
+                      <Label htmlFor="file-doc" className="cursor-pointer">
+                        <span className="font-semibold text-primary">
+                          Clique para enviar
+                        </span>
+                        <br /> Documento do Cliente
+                      </Label>
+                      <span className="text-xs text-muted-foreground">
+                        {files.doc
+                          ? files.doc.name
+                          : 'RG ou CNH (Frente/Verso)'}
+                      </span>
+                      <Input
+                        id="file-doc"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setFiles((prev) => ({
+                            ...prev,
+                            doc: e.target.files?.[0] || null,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
           </CardContent>
 
           <CardFooter className="flex justify-between border-t pt-6 bg-gray-50/30">
-            {step > 0 ? (
-              <Button variant="outline" onClick={() => setStep(step - 1)}>
+            {step > 1 ? (
+              <Button
+                variant="outline"
+                onClick={() => setStep(step - 1)}
+                disabled={isSaving}
+              >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Voltar
               </Button>
@@ -427,11 +589,8 @@ export function EvaluationChecklist() {
               <div />
             )}
 
-            {!isSummaryStep ? (
-              <Button
-                onClick={() => setStep(step + 1)}
-                disabled={!isStepValid()}
-              >
+            {step < 5 ? (
+              <Button onClick={handleNext}>
                 Próximo
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -441,35 +600,43 @@ export function EvaluationChecklist() {
                 disabled={isSaving}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
-                <Save className="w-4 h-4 mr-2" />
-                {isSaving ? 'Salvando...' : 'Salvar Avaliação'}
+                {isSaving ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                Gravar Avaliação
               </Button>
             )}
           </CardFooter>
         </Card>
       </div>
 
-      {/* Right Panel: Price Calculator (Always Visible) */}
+      {/* Right Panel: Price Calculator Summary */}
       <div className="lg:col-span-4 flex flex-col gap-6">
         <Card className="bg-slate-950 text-white border-slate-800 shadow-xl sticky top-24">
           <CardHeader>
             <CardTitle className="text-slate-100 flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-emerald-400" />
-              Calculadora
+              Resumo
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-1">
               <span className="text-xs uppercase text-slate-400 font-bold tracking-wider">
-                Preço Base
+                Modelo
               </span>
-              <div className="text-2xl font-bold text-white">
-                R${' '}
-                {selectedModel ? selectedModel.preco_base.toFixed(2) : '0.00'}
+              <div className="text-lg font-bold text-white truncate">
+                {selectedModel?.modelo || 'Selecione...'}
               </div>
-              <p className="text-xs text-slate-500 truncate">
-                {selectedModel?.modelo || 'Nenhum modelo selecionado'}
-              </p>
+              <div className="text-2xl text-white">
+                R${' '}
+                {selectedModel
+                  ? selectedModel.preco_base.toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })
+                  : '0,00'}
+              </div>
             </div>
 
             <div className="space-y-1">
@@ -478,20 +645,12 @@ export function EvaluationChecklist() {
               </span>
               <div className="text-xl font-medium text-red-400">
                 - R${' '}
-                {selectedDiscounts.size > 0
-                  ? Array.from(selectedDiscounts)
-                      .reduce(
-                        (acc, id) =>
-                          acc +
-                          (peripheralDiscounts.find((d) => d.id === id)
-                            ?.valor_desconto || 0),
-                        0,
-                      )
-                      .toFixed(2)
-                  : '0.00'}
+                {totalDiscounts.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                })}
               </div>
               <p className="text-xs text-slate-500">
-                {selectedDiscounts.size} defeitos selecionados
+                {detectedDefects.length} defeitos detectados
               </p>
             </div>
 
@@ -500,22 +659,31 @@ export function EvaluationChecklist() {
                 Valor Final Sugerido
               </span>
               <div className="text-4xl font-black text-emerald-400 mt-1">
-                R$ {calculateTotal().toFixed(2)}
+                R${' '}
+                {finalPrice.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                })}
               </div>
             </div>
-          </CardContent>
-          <CardFooter className="border-t border-slate-800 pt-4 pb-4">
-            {selectedDiscounts.size > 0 && !isDefectsStep && !isSummaryStep && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full text-xs text-slate-400 hover:text-white hover:bg-slate-800"
-                onClick={() => setStep(CHECKLIST_SECTIONS.length + 1)} // Go to Defects Step
-              >
-                Editar Defeitos
-              </Button>
+
+            {step === 5 && (
+              <div className="border-t border-slate-700 pt-4 space-y-2">
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <UserIcon className="w-4 h-4" />
+                  {customerData.name || 'Cliente'}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <ShieldCheck
+                    className={cn(
+                      'w-4 h-4',
+                      files.print ? 'text-green-500' : 'text-slate-600',
+                    )}
+                  />
+                  Print Consultas
+                </div>
+              </div>
             )}
-          </CardFooter>
+          </CardContent>
         </Card>
       </div>
     </div>

@@ -19059,22 +19059,6 @@ var CircleCheck = createLucideIcon("circle-check", [["circle", {
 	d: "m9 12 2 2 4-4",
 	key: "dzmm74"
 }]]);
-var CircleQuestionMark = createLucideIcon("circle-question-mark", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["path", {
-		d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3",
-		key: "1u773s"
-	}],
-	["path", {
-		d: "M12 17h.01",
-		key: "p32p05"
-	}]
-]);
 var CircleUser = createLucideIcon("circle-user", [
 	["circle", {
 		cx: "12",
@@ -19673,6 +19657,13 @@ var ShieldAlert = createLucideIcon("shield-alert", [
 		key: "1drbdi"
 	}]
 ]);
+var ShieldCheck = createLucideIcon("shield-check", [["path", {
+	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+	key: "oel41y"
+}], ["path", {
+	d: "m9 12 2 2 4-4",
+	key: "dzmm74"
+}]]);
 var Smartphone = createLucideIcon("smartphone", [["rect", {
 	width: "14",
 	height: "20",
@@ -19853,9 +19844,14 @@ var UserX = createLucideIcon("user-x", [
 		key: "1swrse"
 	}]
 ]);
-var Wrench = createLucideIcon("wrench", [["path", {
-	d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z",
-	key: "1ngwbx"
+var User = createLucideIcon("user", [["path", {
+	d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",
+	key: "975kel"
+}], ["circle", {
+	cx: "12",
+	cy: "7",
+	r: "4",
+	key: "17ys0d"
 }]]);
 var X = createLucideIcon("x", [["path", {
 	d: "M18 6 6 18",
@@ -24804,7 +24800,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$20(function() {
+			useEffect$19(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24827,7 +24823,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$28 = React$3.useState, useEffect$20 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$3 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$28 = React$3.useState, useEffect$19 = React$3.useEffect, useLayoutEffect$1 = React$3.useLayoutEffect, useDebugValue$1 = React$3.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$3.useSyncExternalStore ? React$3.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24850,7 +24846,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$1 === y && (0 !== x$1 || 1 / x$1 === 1 / y) || x$1 !== x$1 && y !== y;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$7 = React$3.useRef, useEffect$20 = React$3.useEffect, useMemo = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
+		var React$3 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$7 = React$3.useRef, useEffect$19 = React$3.useEffect, useMemo$1 = React$3.useMemo, useDebugValue$1 = React$3.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual) {
 			var instRef = useRef$7(null);
 			if (null === instRef.current) {
@@ -24860,7 +24856,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				};
 				instRef.current = inst;
 			} else inst = instRef.current;
-			instRef = useMemo(function() {
+			instRef = useMemo$1(function() {
 				function memoizedSelector(nextSnapshot) {
 					if (!hasMemo) {
 						hasMemo = !0;
@@ -24892,7 +24888,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$20(function() {
+			useEffect$19(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -46799,15 +46795,18 @@ function AdminPage() {
 const useEvaluationStore = create((set, get$1) => ({
 	basePrices: [],
 	peripheralDiscounts: [],
+	checklistItems: [],
 	evaluations: [],
 	isLoading: false,
 	fetchConfigs: async () => {
 		set({ isLoading: true });
 		const { data: prices } = await supabase.from("config_precos_base").select("*").order("modelo");
-		const { data: discounts } = await supabase.from("config_descontos_perifericos").select("*").order("nome");
+		const { data: discounts } = await supabase.from("config_descontos_perifericos").select("*");
+		const { data: checklist } = await supabase.from("config_checklist_items").select("*").order("categoria");
 		set({
 			basePrices: prices || [],
 			peripheralDiscounts: discounts || [],
+			checklistItems: checklist || [],
 			isLoading: false
 		});
 	},
@@ -46841,10 +46840,10 @@ const useEvaluationStore = create((set, get$1) => ({
 			error
 		};
 	},
-	addDiscount: async (nome, valor) => {
-		const { error } = await supabase.from("config_descontos_perifericos").insert({
-			nome,
-			valor_desconto: valor
+	addChecklistItem: async (categoria, nome) => {
+		const { error } = await supabase.from("config_checklist_items").insert({
+			categoria,
+			nome
 		});
 		if (!error) await get$1().fetchConfigs();
 		return {
@@ -46852,11 +46851,29 @@ const useEvaluationStore = create((set, get$1) => ({
 			error
 		};
 	},
-	updateDiscount: async (id, nome, valor) => {
-		const { error } = await supabase.from("config_descontos_perifericos").update({
+	deleteChecklistItem: async (id) => {
+		const { error } = await supabase.from("config_checklist_items").delete().eq("id", id);
+		if (!error) await get$1().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
+	addDiscount: async (nome, valor, modeloId, checklistItemId) => {
+		const { error } = await supabase.from("config_descontos_perifericos").insert({
 			nome,
-			valor_desconto: valor
-		}).eq("id", id);
+			valor_desconto: valor,
+			modelo_id: modeloId,
+			checklist_item_id: checklistItemId
+		});
+		if (!error) await get$1().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
+	updateDiscount: async (id, valor) => {
+		const { error } = await supabase.from("config_descontos_perifericos").update({ valor_desconto: valor }).eq("id", id);
 		if (!error) await get$1().fetchConfigs();
 		return {
 			success: !error,
@@ -46871,14 +46888,20 @@ const useEvaluationStore = create((set, get$1) => ({
 			error
 		};
 	},
-	saveEvaluation: async (modelo, serialNumber, checklistData, valorFinal, descontos, userId) => {
+	saveEvaluation: async (data) => {
+		const { modelo, serialNumber, checklistData, valorFinal, descontos, userId, nomeCliente, telefoneCliente, cpfCliente, urlPrintSeguranca, urlFotoDocumento } = data;
 		const { error } = await supabase.from("avaliacoes_iphone").insert({
 			modelo,
 			serial_number: serialNumber,
 			checklist_data: checklistData,
 			valor_final: valorFinal,
 			descontos_aplicados: descontos,
-			user_id: userId
+			user_id: userId,
+			nome_cliente: nomeCliente,
+			telefone_cliente: telefoneCliente,
+			cpf_cliente: cpfCliente,
+			url_print_seguranca: urlPrintSeguranca,
+			url_foto_documento: urlFotoDocumento
 		});
 		if (!error) await get$1().fetchEvaluations();
 		return {
@@ -46896,6 +46919,27 @@ const useEvaluationStore = create((set, get$1) => ({
 		else {
 			console.error("Error fetching evaluations:", error);
 			set({ isLoading: false });
+		}
+	},
+	uploadEvidence: async (file) => {
+		try {
+			const fileExt = file.name.split(".").pop();
+			const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+			const { error: uploadError } = await supabase.storage.from("evaluation-evidence").upload(fileName, file);
+			if (uploadError) return {
+				url: null,
+				error: uploadError
+			};
+			const { data: { publicUrl } } = supabase.storage.from("evaluation-evidence").getPublicUrl(fileName);
+			return {
+				url: publicUrl,
+				error: null
+			};
+		} catch (error) {
+			return {
+				url: null,
+				error
+			};
 		}
 	}
 }));
@@ -47123,364 +47167,363 @@ function BasePriceList() {
 		onSubmit: handleSubmit
 	})] });
 }
-function PeripheralDiscountDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
-	const [name, setName] = (0, import_react.useState)("");
-	const [value, setValue] = (0, import_react.useState)("");
-	const [isSubmitting, setIsSubmitting] = (0, import_react.useState)(false);
-	(0, import_react.useEffect)(() => {
-		if (open && initialData) {
-			setName(initialData.nome);
-			setValue(initialData.valor_desconto.toString());
-		} else if (open && !initialData) {
-			setName("");
-			setValue("");
+function ChecklistConfig() {
+	const { checklistItems, addChecklistItem, deleteChecklistItem } = useEvaluationStore();
+	const [newCategory, setNewCategory] = (0, import_react.useState)("");
+	const [newName, setNewName] = (0, import_react.useState)("");
+	const [isAdding, setIsAdding] = (0, import_react.useState)(false);
+	const CATEGORIES = [
+		"Aparencia",
+		"Hardware",
+		"Software",
+		"Outros"
+	];
+	const handleAdd = async () => {
+		if (!newCategory || !newName) {
+			toast.error("Preencha categoria e nome");
+			return;
 		}
-	}, [open, initialData]);
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		if (!name || !value) return;
-		setIsSubmitting(true);
-		const success = await onSubmit(name, parseFloat(value));
-		setIsSubmitting(false);
-		if (success) onOpenChange(false);
-	};
-	const getTitle = () => {
-		switch (mode) {
-			case "create": return "Adicionar Desconto";
-			case "edit": return "Editar Desconto";
-		}
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
-		open,
-		onOpenChange,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogContent, {
-			className: "sm:max-w-[425px]",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
-				onSubmit: handleSubmit,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: getTitle() }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: mode === "create" ? "Cadastre um novo desconto para defeitos ou peças." : "Atualize as informações do desconto." })] }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "grid gap-4 py-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "name",
-								children: "Defeito / Peça"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "name",
-								value: name,
-								onChange: (e) => setName(e.target.value),
-								placeholder: "Ex: Tela Quebrada",
-								autoFocus: true
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid gap-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "value",
-								children: "Dedução (R$)"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "value",
-								type: "number",
-								min: "0",
-								step: "0.01",
-								value,
-								onChange: (e) => setValue(e.target.value),
-								placeholder: "0.00"
-							})]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-						type: "button",
-						variant: "outline",
-						onClick: () => onOpenChange(false),
-						children: "Cancelar"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						type: "submit",
-						disabled: isSubmitting,
-						children: [isSubmitting && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "mr-2 h-4 w-4 animate-spin" }), "Salvar"]
-					})] })
-				]
-			})
-		})
-	});
-}
-function DiscountList() {
-	const { peripheralDiscounts, addDiscount, updateDiscount, deleteDiscount } = useEvaluationStore();
-	const [dialogOpen, setDialogOpen] = (0, import_react.useState)(false);
-	const [dialogMode, setDialogMode] = (0, import_react.useState)("create");
-	const [selectedItem, setSelectedItem] = (0, import_react.useState)(void 0);
-	const handleAdd = () => {
-		setDialogMode("create");
-		setSelectedItem(void 0);
-		setDialogOpen(true);
-	};
-	const handleEdit = (item) => {
-		setDialogMode("edit");
-		setSelectedItem(item);
-		setDialogOpen(true);
+		setIsAdding(true);
+		const result = await addChecklistItem(newCategory, newName);
+		setIsAdding(false);
+		if (result.success) {
+			toast.success("Item adicionado");
+			setNewName("");
+		} else toast.error("Erro ao adicionar");
 	};
 	const handleDelete = async (id) => {
-		if (confirm("Tem certeza que deseja remover este desconto?")) if ((await deleteDiscount(id)).success) toast.success("Desconto removido");
-		else toast.error("Erro ao remover desconto");
+		if (confirm("Tem certeza? Isso pode afetar descontos configurados.")) await deleteChecklistItem(id);
 	};
-	const handleSubmit = async (nome, valor) => {
-		let result;
-		if (dialogMode === "edit" && selectedItem) result = await updateDiscount(selectedItem.id, nome, valor);
-		else result = await addDiscount(nome, valor);
-		if (result.success) {
-			toast.success(dialogMode === "edit" ? "Desconto atualizado com sucesso" : "Desconto adicionado com sucesso");
-			return true;
-		} else {
-			toast.error("Erro ao salvar desconto");
-			return false;
-		}
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 		className: "flex flex-col h-[600px]",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
-			className: "pb-3",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex items-center justify-between",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-					className: "flex items-center gap-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Wrench, { className: "w-5 h-5 text-red-500" }), "Descontos de Periféricos"]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
-					className: "mt-1",
-					children: "Defina os valores a serem deduzidos para cada defeito."
-				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					onClick: handleAdd,
-					size: "sm",
-					className: "h-8",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4 mr-2" }), "Adicionar"]
-				})]
-			})
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-			className: "flex-1 overflow-hidden p-0",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
-				className: "h-full",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+			className: "flex items-center gap-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListChecks, { className: "w-5 h-5 text-primary" }), "Itens de Inspeção"]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Defina os itens que aparecerão no checklist." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+			className: "flex-col gap-4 flex h-full min-h-0",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex gap-2 items-end bg-slate-50 p-3 rounded-lg border",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex-1 space-y-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-xs font-medium",
+							children: "Categoria"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+							value: newCategory,
+							onValueChange: setNewCategory,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, {
+								className: "bg-white",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione..." })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: CATEGORIES.map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+								value: c,
+								children: c
+							}, c)) })]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex-[2] space-y-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-xs font-medium",
+							children: "Nome do Item"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							value: newName,
+							onChange: (e) => setNewName(e.target.value),
+							placeholder: "Ex: Câmera Traseira",
+							className: "bg-white"
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						onClick: handleAdd,
+						disabled: isAdding,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4" })
+					})
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+				className: "flex-1 border rounded-md",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-					className: "bg-slate-50 sticky top-0 hover:bg-slate-50 z-10",
+					className: "bg-slate-50",
 					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Categoria" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Item" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "pl-6",
-							children: "Defeito"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "text-right",
-							children: "Dedução"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "w-[100px] text-right pr-6",
-							children: "Ações"
+							className: "w-[80px] text-right",
+							children: "Ação"
 						})
 					]
-				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: peripheralDiscounts.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-					colSpan: 3,
-					className: "text-center text-muted-foreground py-8",
-					children: "Nenhum desconto cadastrado."
-				}) }) : peripheralDiscounts.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: checklistItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "font-medium pl-6",
-						children: item.nome
+						className: "font-medium text-muted-foreground",
+						children: item.categoria
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
-						className: "text-right font-bold text-red-600",
-						children: [
-							"- R$",
-							" ",
-							item.valor_desconto.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-						]
-					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: item.nome }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "text-right pr-6",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex items-center justify-end gap-1",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "icon",
-								className: "h-8 w-8 text-muted-foreground hover:text-blue-600",
-								onClick: () => handleEdit(item),
-								title: "Editar",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pencil, { className: "w-4 h-4" })
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-								variant: "ghost",
-								size: "icon",
-								className: "h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50",
-								onClick: () => handleDelete(item.id),
-								title: "Excluir",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
-							})]
+						className: "text-right",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "ghost",
+							size: "icon",
+							onClick: () => handleDelete(item.id),
+							className: "text-red-500 hover:text-red-700 hover:bg-red-50",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
 						})
 					})
 				] }, item.id)) })] })
-			})
+			})]
 		})]
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PeripheralDiscountDialog, {
-		open: dialogOpen,
-		onOpenChange: setDialogOpen,
-		mode: dialogMode,
-		initialData: selectedItem,
-		onSubmit: handleSubmit
-	})] });
-}
-function EvaluationConfig() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "grid lg:grid-cols-2 gap-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(BasePriceList, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DiscountList, {})]
 	});
 }
-var CHECKLIST_SECTIONS = [
-	{
-		id: "physical",
-		title: "1. Inspeção Física",
-		items: [
-			{
-				id: "pentalobe",
-				label: "Parafusos Pentalobe (Inferiores) presentes"
-			},
-			{
-				id: "lci",
-				label: "LCI (Sensor de Umidade) - Branco/Prata",
-				note: "VERMELHO = REJEITAR IMEDIATAMENTE"
-			},
-			{
-				id: "housing",
-				label: "Carcaça sem amassados graves/empenos"
-			},
-			{
-				id: "screen_align",
-				label: "Alinhamento da Tela (Descolamento)"
-			}
-		]
-	},
-	{
-		id: "display",
-		title: "2. Tela e Sensores",
-		items: [
-			{
-				id: "touch",
-				label: "Touch (Teste de arraste de ícone)"
-			},
-			{
-				id: "ghost_touch",
-				label: "Toque Fantasma (Ghost Touch)"
-			},
-			{
-				id: "dead_pixel",
-				label: "Pixels Mortos / Manchas"
-			},
-			{
-				id: "true_tone",
-				label: "True Tone Ativo"
-			}
-		]
-	},
-	{
-		id: "hardware",
-		title: "3. Hardware Crítico",
-		items: [
-			{
-				id: "face_id",
-				label: "Face ID (Configuração e Desbloqueio)"
-			},
-			{
-				id: "cameras",
-				label: "Câmeras (Foco e Manchas)"
-			},
-			{
-				id: "ois",
-				label: "Estabilizador Óptico (Teste de Agitação)",
-				note: "Agite levemente para ouvir barulhos soltos"
-			},
-			{
-				id: "mics",
-				label: "Microfones (Frontal, Traseiro, Inferior)"
-			},
-			{
-				id: "speakers",
-				label: "Alto-falantes (Estéreo)"
-			}
-		]
-	},
-	{
-		id: "system",
-		title: "4. Análise de Sistema",
-		items: [
-			{
-				id: "battery_health",
-				label: "Saúde da Bateria (>80%)"
-			},
-			{
-				id: "genuine_parts",
-				label: "Peças Genuínas (Avisos nos Ajustes)"
-			},
-			{
-				id: "panic_full",
-				label: "Panic Full (Logs de Erro)",
-				note: "Ajustes > Privacidade > Análise > Dados",
-				help: "Procure por arquivos começando com \"panic-full\" na lista de dados de análise. A presença indica falha grave na placa lógica."
-			}
-		]
-	},
-	{
-		id: "connectivity",
-		title: "5. Conectividade e Segurança",
-		items: [
-			{
-				id: "wifi_bt",
-				label: "Wi-Fi e Bluetooth"
-			},
-			{
-				id: "icloud",
-				label: "iCloud (Buscar iPhone) Desativado"
-			},
-			{
-				id: "imei",
-				label: "IMEI Limpo (Sem Blacklist)"
-			},
-			{
-				id: "mdm",
-				label: "Sem perfil MDM (Gerenciamento Remoto)"
-			}
-		]
-	}
-];
-function EvaluationChecklist() {
-	const { basePrices, peripheralDiscounts, saveEvaluation } = useEvaluationStore();
-	const { currentUser } = useAuthStore();
-	const [step, setStep] = (0, import_react.useState)(0);
+function ModelDiscountConfig() {
+	const { basePrices, checklistItems, peripheralDiscounts, addDiscount, updateDiscount } = useEvaluationStore();
 	const [selectedModelId, setSelectedModelId] = (0, import_react.useState)("");
-	const [serialNumber, setSerialNumber] = (0, import_react.useState)("");
-	const [checks, setChecks] = (0, import_react.useState)({});
-	const [selectedDiscounts, setSelectedDiscounts] = (0, import_react.useState)(/* @__PURE__ */ new Set());
+	const [editingValues, setEditingValues] = (0, import_react.useState)({});
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
-	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
-	const calculateTotal = () => {
-		if (!selectedModel) return 0;
-		let total = selectedModel.preco_base;
-		selectedDiscounts.forEach((id) => {
-			const discount = peripheralDiscounts.find((d) => d.id === id);
-			if (discount) total -= discount.valor_desconto;
-		});
-		return total > 0 ? total : 0;
-	};
-	const handleCheck = (id, checked) => {
-		setChecks((prev) => ({
+	const modelDiscounts = (0, import_react.useMemo)(() => {
+		if (!selectedModelId) return [];
+		return peripheralDiscounts.filter((d) => d.modelo_id === selectedModelId);
+	}, [peripheralDiscounts, selectedModelId]);
+	const handleValueChange = (checklistItemId, value) => {
+		setEditingValues((prev) => ({
 			...prev,
-			[id]: checked
+			[checklistItemId]: value
 		}));
 	};
-	const handleDiscountToggle = (id) => {
-		const next = new Set(selectedDiscounts);
-		if (next.has(id)) next.delete(id);
-		else next.add(id);
-		setSelectedDiscounts(next);
+	const getCurrentValue = (itemId) => {
+		if (editingValues[itemId] !== void 0) return editingValues[itemId];
+		const discount = modelDiscounts.find((d) => d.checklist_item_id === itemId);
+		return discount ? discount.valor_desconto.toString() : "";
+	};
+	const handleSave = async (item) => {
+		const valStr = editingValues[item.id];
+		if (valStr === void 0) return;
+		const val = parseFloat(valStr);
+		if (isNaN(val)) return;
+		setIsSaving(true);
+		const existingDiscount = modelDiscounts.find((d) => d.checklist_item_id === item.id);
+		let result;
+		if (existingDiscount) result = await updateDiscount(existingDiscount.id, val);
+		else result = await addDiscount(item.nome, val, selectedModelId, item.id);
+		setIsSaving(false);
+		if (result.success) {
+			toast.success("Valor salvo");
+			setEditingValues((prev) => {
+				const next = { ...prev };
+				delete next[item.id];
+				return next;
+			});
+		} else toast.error("Erro ao salvar");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		className: "flex flex-col h-[600px]",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+			className: "flex items-center gap-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { className: "w-5 h-5 text-red-500" }), "Preços de Defeitos por Modelo"]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Configure o valor de dedução para cada defeito em cada modelo." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+			className: "flex-col gap-4 flex h-full min-h-0",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-sm font-medium",
+					children: "Selecione o Modelo"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+					value: selectedModelId,
+					onValueChange: setSelectedModelId,
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Escolha um modelo..." }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+						value: p$1.id,
+						children: p$1.modelo
+					}, p$1.id)) })]
+				})]
+			}), selectedModelId ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+				className: "flex-1 border rounded-md",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
+					className: "bg-slate-50",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Item / Defeito" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Categoria" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+							className: "w-[150px]",
+							children: "Dedução (R$)"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { className: "w-[50px]" })
+					]
+				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: checklistItems.map((item) => {
+					const hasEdit = editingValues[item.id] !== void 0;
+					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+							className: "font-medium",
+							children: item.nome
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+							className: "text-muted-foreground text-xs",
+							children: item.categoria
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+							type: "number",
+							min: "0",
+							step: "0.01",
+							placeholder: "0.00",
+							value: getCurrentValue(item.id),
+							onChange: (e) => handleValueChange(item.id, e.target.value),
+							className: cn("h-8 text-right", hasEdit && "border-amber-400 bg-amber-50")
+						}) }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: hasEdit && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							size: "icon",
+							variant: "ghost",
+							className: "h-8 w-8 text-emerald-600",
+							onClick: () => handleSave(item),
+							disabled: isSaving,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4" })
+						}) })
+					] }, item.id);
+				}) })] })
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex-1 flex items-center justify-center text-muted-foreground border border-dashed rounded-lg bg-slate-50",
+				children: "Selecione um modelo para configurar os descontos"
+			})]
+		})]
+	});
+}
+function EvaluationConfig() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "h-full",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
+			defaultValue: "models",
+			className: "h-full flex flex-col space-y-4",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, { children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+						value: "models",
+						children: "1. Modelos Base"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+						value: "checklist",
+						children: "2. Itens de Checklist"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
+						value: "discounts",
+						children: "3. Preços de Defeitos"
+					})
+				] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					value: "models",
+					className: "flex-1 mt-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "max-w-4xl",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BasePriceList, {})
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					value: "checklist",
+					className: "flex-1 mt-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "max-w-4xl",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChecklistConfig, {})
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsContent, {
+					value: "discounts",
+					className: "flex-1 mt-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "max-w-4xl",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ModelDiscountConfig, {})
+					})
+				})
+			]
+		})
+	});
+}
+function EvaluationChecklist() {
+	const { basePrices, peripheralDiscounts, checklistItems, saveEvaluation, uploadEvidence } = useEvaluationStore();
+	const { currentUser } = useAuthStore();
+	const [step, setStep] = (0, import_react.useState)(1);
+	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	const [selectedModelId, setSelectedModelId] = (0, import_react.useState)("");
+	const [serialNumber, setSerialNumber] = (0, import_react.useState)("");
+	const [checklistStatus, setChecklistStatus] = (0, import_react.useState)({});
+	const [securityChecks, setSecurityChecks] = (0, import_react.useState)({
+		anatel: false,
+		blacklist: false,
+		mdm: false
+	});
+	const [customerData, setCustomerData] = (0, import_react.useState)({
+		name: "",
+		phone: "",
+		cpf: ""
+	});
+	const [files, setFiles] = (0, import_react.useState)({
+		print: null,
+		doc: null
+	});
+	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
+	const getDetectedDefects = () => {
+		if (!selectedModel) return [];
+		return checklistItems.filter((item) => !checklistStatus[item.id]).map((item) => {
+			const discount = peripheralDiscounts.find((d) => d.checklist_item_id === item.id && d.modelo_id === selectedModel.id);
+			const fallbackDiscount = !discount ? peripheralDiscounts.find((d) => d.checklist_item_id === item.id && !d.modelo_id) : null;
+			return {
+				item,
+				discount: discount || fallbackDiscount,
+				value: discount ? discount.valor_desconto : fallbackDiscount ? fallbackDiscount.valor_desconto : 0
+			};
+		});
+	};
+	const detectedDefects = getDetectedDefects();
+	const totalDiscounts = detectedDefects.reduce((acc, def) => acc + def.value, 0);
+	const finalPrice = selectedModel ? Math.max(0, selectedModel.preco_base - totalDiscounts) : 0;
+	const handleNext = () => {
+		if (step === 1) {
+			if (!selectedModelId || !serialNumber) {
+				toast.error("Preencha todos os campos");
+				return;
+			}
+		}
+		if (step === 4) {
+			if (!securityChecks.anatel || !securityChecks.blacklist || !securityChecks.mdm) {
+				toast.error("Realize todas as verificações de segurança");
+				return;
+			}
+		}
+		setStep((s) => s + 1);
 	};
 	const handleSave = async () => {
-		if (!selectedModel || !currentUser) return;
+		if (!currentUser || !selectedModel) return;
+		if (!customerData.name || !customerData.phone || !customerData.cpf) {
+			toast.error("Preencha os dados do cliente");
+			return;
+		}
+		if (!files.print || !files.doc) {
+			toast.error("Anexe as evidências obrigatórias");
+			return;
+		}
 		setIsSaving(true);
-		const discountObjects = Array.from(selectedDiscounts).map((id) => peripheralDiscounts.find((d) => d.id === id)).filter(Boolean);
-		const result = await saveEvaluation(selectedModel.modelo, serialNumber, checks, calculateTotal(), discountObjects, currentUser.id);
+		const printUpload = await uploadEvidence(files.print);
+		if (printUpload.error) {
+			toast.error("Erro ao enviar print de segurança");
+			setIsSaving(false);
+			return;
+		}
+		const docUpload = await uploadEvidence(files.doc);
+		if (docUpload.error) {
+			toast.error("Erro ao enviar foto do documento");
+			setIsSaving(false);
+			return;
+		}
+		const result = await saveEvaluation({
+			modelo: selectedModel.modelo,
+			serialNumber,
+			checklistData: checklistStatus,
+			valorFinal: finalPrice,
+			descontos: detectedDefects.map((d) => ({
+				id: d.discount?.id || "unknown",
+				nome: d.item.nome,
+				valor_desconto: d.value
+			})),
+			userId: currentUser.id,
+			nomeCliente: customerData.name,
+			telefoneCliente: customerData.phone,
+			cpfCliente: customerData.cpf,
+			urlPrintSeguranca: printUpload.url || "",
+			urlFotoDocumento: docUpload.url || ""
+		});
 		setIsSaving(false);
 		if (result.success) {
 			toast.success("Avaliação salva com sucesso!");
@@ -47488,19 +47531,30 @@ function EvaluationChecklist() {
 		} else toast.error("Erro ao salvar avaliação");
 	};
 	const resetForm = () => {
-		setStep(0);
+		setStep(1);
 		setSelectedModelId("");
 		setSerialNumber("");
-		setChecks({});
-		setSelectedDiscounts(/* @__PURE__ */ new Set());
+		setChecklistStatus({});
+		setSecurityChecks({
+			anatel: false,
+			blacklist: false,
+			mdm: false
+		});
+		setCustomerData({
+			name: "",
+			phone: "",
+			cpf: ""
+		});
+		setFiles({
+			print: null,
+			doc: null
+		});
 	};
-	const isStepValid = () => {
-		if (step === 0) return !!selectedModelId && !!serialNumber;
-		return true;
-	};
-	const currentChecklistSection = step > 0 && step <= CHECKLIST_SECTIONS.length ? CHECKLIST_SECTIONS[step - 1] : null;
-	const isDefectsStep = step === CHECKLIST_SECTIONS.length + 1;
-	const isSummaryStep = step === CHECKLIST_SECTIONS.length + 2;
+	const groupedChecklist = checklistItems.reduce((acc, item) => {
+		if (!acc[item.categoria]) acc[item.categoria] = [];
+		acc[item.categoria].push(item);
+		return acc;
+	}, {});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid lg:grid-cols-12 gap-6 h-full",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -47508,184 +47562,303 @@ function EvaluationChecklist() {
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 				className: "flex-1 flex flex-col shadow-md",
 				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "flex justify-between items-center",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-							step === 0 && "Passo 1: Identificação do Aparelho",
-							currentChecklistSection && `Passo 2: ${currentChecklistSection.title}`,
-							isDefectsStep && "Passo 3: Seleção de Defeitos",
-							isSummaryStep && "Passo 4: Resumo da Avaliação"
-						] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "text-sm font-normal text-muted-foreground",
-							children: step > 0 && !isSummaryStep && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-								className: "bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold",
-								children: [Math.round(step / (CHECKLIST_SECTIONS.length + 2) * 100), "%"]
-							})
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: [
-						step === 0 && "Selecione o modelo e informe o serial para iniciar a avaliação.",
-						currentChecklistSection && "Marque os itens que estão EM BOM ESTADO (OK).",
-						isDefectsStep && "Identifique os defeitos encontrados para calcular as deduções.",
-						isSummaryStep && "Revise os dados e o valor final antes de salvar."
-					] })] }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex items-center gap-2 mb-2",
+							children: [
+								1,
+								2,
+								3,
+								4,
+								5
+							].map((s) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: cn("h-2 flex-1 rounded-full transition-all", s <= step ? "bg-primary" : "bg-muted") }, s))
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, { children: [
+							step === 1 && "1. Identificação do Aparelho",
+							step === 2 && "2. Inspeção Técnica",
+							step === 3 && "3. Precificação e Defeitos",
+							step === 4 && "4. Verificação de Segurança",
+							step === 5 && "5. Finalização e Cliente"
+						] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardDescription, { children: [
+							step === 1 && "Selecione o modelo e informe o serial para iniciar.",
+							step === 2 && "Marque APENAS os itens que estão OK (Funcionando).",
+							step === 3 && "Revise os defeitos detectados e o valor final.",
+							step === 4 && "Confirme as consultas de segurança obrigatórias.",
+							step === 5 && "Preencha os dados do cliente e anexe evidências."
+						] })
+					] }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 						className: "flex-1 overflow-y-auto",
 						children: [
-							step === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							step === 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "space-y-4 max-w-md",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "space-y-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Modelo do iPhone" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
 										value: selectedModelId,
 										onValueChange: setSelectedModelId,
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione o modelo" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectItem, {
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Selecione o modelo" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
 											value: p$1.id,
-											children: [
-												p$1.modelo,
-												" - R$ ",
-												p$1.preco_base
-											]
+											children: p$1.modelo
 										}, p$1.id)) })]
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "space-y-2",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Número de Série / IMEI" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Serial Number / IMEI" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
 										placeholder: "Ex: DX3PL...",
 										value: serialNumber,
 										onChange: (e) => setSerialNumber(e.target.value.toUpperCase())
 									})]
 								})]
 							}),
-							currentChecklistSection && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "space-y-4",
-								children: currentChecklistSection.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-start space-x-3 p-3 rounded-lg border hover:bg-slate-50 transition-colors",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-										id: item.id,
-										checked: checks[item.id] || false,
-										onCheckedChange: (checked) => handleCheck(item.id, checked),
-										className: "mt-1"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex-1 grid gap-1.5 leading-none",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "flex items-center gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-												htmlFor: item.id,
-												className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer",
-												children: item.label
-											}), item.help && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-												asChild: true,
-												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleQuestionMark, { className: "w-3.5 h-3.5 text-muted-foreground cursor-help" })
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-												className: "max-w-xs",
-												children: item.help
-											}) })] }) })]
-										}), item.note && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-											className: "text-xs text-amber-600 font-medium flex items-center gap-1",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-3 h-3" }), item.note]
-										})]
+							step === 2 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "space-y-6",
+								children: Object.entries(groupedChecklist).map(([category, items]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "space-y-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+										className: "font-semibold text-sm uppercase text-muted-foreground tracking-wider bg-slate-50 p-2 rounded",
+										children: category
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
+										children: items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: cn("flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer", checklistStatus[item.id] ? "bg-green-50 border-green-200" : "hover:bg-slate-50"),
+											onClick: () => setChecklistStatus((prev) => ({
+												...prev,
+												[item.id]: !prev[item.id]
+											})),
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+												checked: checklistStatus[item.id] || false,
+												onCheckedChange: () => {},
+												className: "mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex-1",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+													className: "cursor-pointer font-medium",
+													children: item.nome
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+													className: "text-xs text-muted-foreground mt-0.5",
+													children: checklistStatus[item.id] ? "OK" : "Defeito / Não verificado"
+												})]
+											})]
+										}, item.id))
 									})]
-								}, item.id))
+								}, category))
 							}),
-							isDefectsStep && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "grid gap-3 sm:grid-cols-2",
-								children: [peripheralDiscounts.map((discount) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: cn("flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all", selectedDiscounts.has(discount.id) ? "bg-red-50 border-red-200" : "hover:bg-slate-50 border-transparent bg-slate-50/50"),
-									onClick: () => handleDiscountToggle(discount.id),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-3",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-											checked: selectedDiscounts.has(discount.id),
-											onCheckedChange: () => handleDiscountToggle(discount.id),
-											className: "data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "flex flex-col",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn("text-sm font-medium", selectedDiscounts.has(discount.id) && "text-red-700"),
-												children: discount.nome
-											})
-										})]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-										className: "text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded",
-										children: ["-R$ ", discount.valor_desconto]
+							step === 3 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "space-y-6",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "bg-slate-50 p-4 rounded-lg border",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+										className: "font-semibold mb-4 flex items-center gap-2",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-5 h-5 text-amber-500" }),
+											"Defeitos Identificados (",
+											detectedDefects.length,
+											")"
+										]
+									}), detectedDefects.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded border border-emerald-100",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Nenhum defeito encontrado. Aparelho em perfeito estado!" })]
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "space-y-2",
+										children: detectedDefects.map((d, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex justify-between items-center p-3 bg-white border rounded shadow-sm",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "font-medium text-red-700",
+												children: d.item.nome
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "text-xs text-muted-foreground block",
+												children: d.item.categoria
+											})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "text-red-600 font-bold",
+												children: [
+													"- R$ ",
+													d.value.toFixed(2),
+													!d.discount && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs font-normal text-muted-foreground ml-1",
+														children: "(Sem config)"
+													})
+												]
+											})]
+										}, idx))
 									})]
-								}, discount.id)), peripheralDiscounts.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "col-span-2 text-center py-8 text-muted-foreground",
-									children: "Nenhum desconto configurado."
+								})
+							}),
+							step === 4 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "space-y-6",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+										className: "text-sm text-blue-800",
+										children: "Realize as consultas nos sites oficiais e marque as caixas abaixo para confirmar que o aparelho está limpo."
+									})
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "grid gap-4",
+									children: [
+										{
+											key: "anatel",
+											label: "Consulta Anatel (Impedimentos)",
+											desc: "Verificar se há bloqueio por roubo/furto na Anatel."
+										},
+										{
+											key: "blacklist",
+											label: "Consulta Blacklist Internacional",
+											desc: "Verificar restrições em operadoras internacionais."
+										},
+										{
+											key: "mdm",
+											label: "Consulta MDM (Gerenciamento)",
+											desc: "Verificar se há perfil corporativo ou financeiro ativo."
+										}
+									].map((check) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: cn("flex items-start space-x-3 p-4 rounded-lg border transition-all cursor-pointer", securityChecks[check.key] ? "bg-green-50 border-green-200" : "bg-white"),
+										onClick: () => setSecurityChecks((prev) => ({
+											...prev,
+											[check.key]: !prev[check.key]
+										})),
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+											checked: securityChecks[check.key],
+											className: "mt-1 data-[state=checked]:bg-green-600"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											className: "font-bold cursor-pointer text-base",
+											children: check.label
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+											className: "text-sm text-muted-foreground mt-1",
+											children: check.desc
+										})] })]
+									}, check.key))
 								})]
 							}),
-							isSummaryStep && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "space-y-6",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "bg-slate-50 p-6 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
-											className: "font-bold text-lg flex items-center gap-2",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5 text-primary" }), selectedModel?.modelo]
+									className: "grid md:grid-cols-2 gap-4",
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Nome do Cliente" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												value: customerData.name,
+												onChange: (e) => setCustomerData((prev) => ({
+													...prev,
+													name: e.target.value
+												})),
+												placeholder: "Nome completo"
+											})]
 										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-											className: "text-sm text-muted-foreground font-mono",
-											children: ["SN: ", serialNumber]
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Telefone / WhatsApp" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												value: customerData.phone,
+												onChange: (e) => setCustomerData((prev) => ({
+													...prev,
+													phone: e.target.value
+												})),
+												placeholder: "(00) 00000-0000"
+											})]
 										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-											className: "text-xs text-muted-foreground mt-2",
-											children: [
-												"Checklist: ",
-												Object.values(checks).filter(Boolean).length,
-												" ",
-												"itens aprovados"
-											]
+										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "space-y-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "CPF" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+												value: customerData.cpf,
+												onChange: (e) => setCustomerData((prev) => ({
+													...prev,
+													cpf: e.target.value
+												})),
+												placeholder: "000.000.000-00"
+											})]
 										})
-									] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "text-right",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "text-sm text-muted-foreground",
-											children: "Valor Final Avaliado"
+									]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "border-t pt-4 space-y-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+										className: "font-semibold flex items-center gap-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-4 h-4" }), "Evidências Obrigatórias"]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "grid md:grid-cols-2 gap-4",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-8 h-8", files.print ? "text-green-500" : "text-muted-foreground") }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
+													htmlFor: "file-print",
+													className: "cursor-pointer",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "font-semibold text-primary",
+															children: "Clique para enviar"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+														" Print das Consultas"
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: files.print ? files.print.name : "Anatel, Blacklist, MDM"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													id: "file-print",
+													type: "file",
+													className: "hidden",
+													accept: "image/*",
+													onChange: (e) => setFiles((prev) => ({
+														...prev,
+														print: e.target.files?.[0] || null
+													}))
+												})
+											]
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "text-3xl font-bold text-emerald-600",
-											children: ["R$ ", calculateTotal().toFixed(2)]
+											className: "border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Image$1, { className: cn("w-8 h-8", files.doc ? "text-green-500" : "text-muted-foreground") }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
+													htmlFor: "file-doc",
+													className: "cursor-pointer",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+															className: "font-semibold text-primary",
+															children: "Clique para enviar"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+														" Documento do Cliente"
+													]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-xs text-muted-foreground",
+													children: files.doc ? files.doc.name : "RG ou CNH (Frente/Verso)"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													id: "file-doc",
+													type: "file",
+													className: "hidden",
+													accept: "image/*",
+													onChange: (e) => setFiles((prev) => ({
+														...prev,
+														doc: e.target.files?.[0] || null
+													}))
+												})
+											]
 										})]
 									})]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
-									className: "font-semibold mb-3 flex items-center gap-2",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Wrench, { className: "w-4 h-4 text-red-500" }), "Defeitos Identificados"]
-								}), selectedDiscounts.size === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										className: "text-sm font-medium",
-										children: "Nenhum defeito apontado. Aparelho em perfeito estado!"
-									})]
-								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
-									className: "space-y-2",
-									children: Array.from(selectedDiscounts).map((id) => {
-										const discount = peripheralDiscounts.find((d) => d.id === id);
-										return discount ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-											className: "flex justify-between text-sm p-3 bg-red-50 text-red-700 rounded border border-red-100 items-center",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: discount.nome }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-												className: "font-bold",
-												children: ["- R$ ", discount.valor_desconto]
-											})]
-										}, id) : null;
-									})
-								})] })]
+								})]
 							})
 						]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardFooter, {
 						className: "flex justify-between border-t pt-6 bg-gray-50/30",
-						children: [step > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						children: [step > 1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							variant: "outline",
 							onClick: () => setStep(step - 1),
+							disabled: isSaving,
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, { className: "w-4 h-4 mr-2" }), "Voltar"]
-						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {}), !isSummaryStep ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							onClick: () => setStep(step + 1),
-							disabled: !isStepValid(),
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {}), step < 5 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							onClick: handleNext,
 							children: ["Próximo", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "w-4 h-4 ml-2" })]
 						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							onClick: handleSave,
 							disabled: isSaving,
 							className: "bg-emerald-600 hover:bg-emerald-700",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), isSaving ? "Salvando..." : "Salvar Avaliação"]
+							children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Gravar Avaliação"]
 						})]
 					})
 				]
@@ -47694,79 +47867,80 @@ function EvaluationChecklist() {
 			className: "lg:col-span-4 flex flex-col gap-6",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 				className: "bg-slate-950 text-white border-slate-800 shadow-xl sticky top-24",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-						className: "text-slate-100 flex items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5 text-emerald-400" }), "Calculadora"]
-					}) }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-						className: "space-y-6",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-1",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "text-slate-100 flex items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5 text-emerald-400" }), "Resumo"]
+				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "space-y-6",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-1",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs uppercase text-slate-400 font-bold tracking-wider",
+									children: "Modelo"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "text-lg font-bold text-white truncate",
+									children: selectedModel?.modelo || "Selecione..."
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-2xl text-white",
+									children: [
+										"R$",
+										" ",
+										selectedModel ? selectedModel.preco_base.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "0,00"
+									]
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-1",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs uppercase text-slate-400 font-bold tracking-wider",
+									children: "Deduções"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "text-xl font-medium text-red-400",
+									children: [
+										"- R$",
+										" ",
+										totalDiscounts.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+									]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+									className: "text-xs text-slate-500",
+									children: [detectedDefects.length, " defeitos detectados"]
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "border-t border-slate-700 pt-4",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs uppercase text-emerald-400 font-bold tracking-wider",
+								children: "Valor Final Sugerido"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "text-4xl font-black text-emerald-400 mt-1",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-xs uppercase text-slate-400 font-bold tracking-wider",
-										children: "Preço Base"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "text-2xl font-bold text-white",
-										children: [
-											"R$",
-											" ",
-											selectedModel ? selectedModel.preco_base.toFixed(2) : "0.00"
-										]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										className: "text-xs text-slate-500 truncate",
-										children: selectedModel?.modelo || "Nenhum modelo selecionado"
-									})
+									"R$",
+									" ",
+									finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
 								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-1",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-xs uppercase text-slate-400 font-bold tracking-wider",
-										children: "Deduções"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "text-xl font-medium text-red-400",
-										children: [
-											"- R$",
-											" ",
-											selectedDiscounts.size > 0 ? Array.from(selectedDiscounts).reduce((acc, id) => acc + (peripheralDiscounts.find((d) => d.id === id)?.valor_desconto || 0), 0).toFixed(2) : "0.00"
-										]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-										className: "text-xs text-slate-500",
-										children: [selectedDiscounts.size, " defeitos selecionados"]
-									})
-								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "border-t border-slate-700 pt-4",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-xs uppercase text-emerald-400 font-bold tracking-wider",
-									children: "Valor Final Sugerido"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "text-4xl font-black text-emerald-400 mt-1",
-									children: ["R$ ", calculateTotal().toFixed(2)]
-								})]
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardFooter, {
-						className: "border-t border-slate-800 pt-4 pb-4",
-						children: selectedDiscounts.size > 0 && !isDefectsStep && !isSummaryStep && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							variant: "ghost",
-							size: "sm",
-							className: "w-full text-xs text-slate-400 hover:text-white hover:bg-slate-800",
-							onClick: () => setStep(CHECKLIST_SECTIONS.length + 1),
-							children: "Editar Defeitos"
+							})]
+						}),
+						step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "border-t border-slate-700 pt-4 space-y-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2 text-sm text-slate-300",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }), customerData.name || "Cliente"]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2 text-sm text-slate-300",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: cn("w-4 h-4", files.print ? "text-green-500" : "text-slate-600") }), "Print Consultas"]
+							})]
 						})
-					})
-				]
+					]
+				})]
 			})
 		})]
 	});
@@ -48394,4 +48568,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-414U5RQw.js.map
+//# sourceMappingURL=index-CWmbZwv1.js.map

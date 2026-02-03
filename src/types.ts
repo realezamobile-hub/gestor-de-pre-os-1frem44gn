@@ -76,3 +76,44 @@ export interface GeneratorConfigData {
   contactNumber: string
   markup: number
 }
+
+export interface BasePriceConfig {
+  id: string
+  modelo: string
+  preco_base: number
+  company_id?: string | null
+}
+
+export interface ChecklistItem {
+  id: string
+  categoria: string
+  nome: string
+  company_id?: string | null
+}
+
+export interface PeripheralDiscountConfig {
+  id: string
+  nome: string
+  valor_desconto: number
+  modelo_id?: string | null
+  checklist_item_id?: string | null
+  company_id?: string | null
+}
+
+export interface Evaluation {
+  id: string
+  modelo: string
+  serial_number: string | null
+  checklist_data: any
+  valor_final: number
+  descontos_aplicados: any[]
+  user_id: string
+  company_id?: string | null
+  created_at: string
+  empresas?: { nome_fantasia: string } | null
+  nome_cliente?: string | null
+  telefone_cliente?: string | null
+  cpf_cliente?: string | null
+  url_print_seguranca?: string | null
+  url_foto_documento?: string | null
+}

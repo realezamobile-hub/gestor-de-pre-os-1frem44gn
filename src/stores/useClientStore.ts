@@ -71,6 +71,18 @@ export const useClientStore = create<ClientStore>((set, get) => ({
 
   createClient: async (clientData) => {
     set({ isLoading: true })
+
+    // Validation to prevent placeholder or missing company_id issues
+    if (!clientData.company_id) {
+      console.error('Missing company_id in createClient')
+      set({ isLoading: false })
+      return {
+        success: false,
+        error:
+          'Erro interno: Identificação da empresa ausente. Tente recarregar a página.',
+      }
+    }
+
     let endereco = clientData.endereco
     if (!endereco && clientData.rua) {
       endereco = `${clientData.rua}, ${clientData.numero || 'S/N'}, ${clientData.bairro || ''}, ${clientData.municipio || ''} - ${clientData.estado || ''}`
@@ -85,6 +97,7 @@ export const useClientStore = create<ClientStore>((set, get) => ({
     set({ isLoading: false })
 
     if (error) {
+      console.error('Error creating client:', error)
       return { success: false, error }
     }
 

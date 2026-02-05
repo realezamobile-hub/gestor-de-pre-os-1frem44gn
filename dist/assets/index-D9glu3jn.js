@@ -47389,6 +47389,14 @@ const useClientStore = create((set, get$8) => ({
 	},
 	createClient: async (clientData) => {
 		set({ isLoading: true });
+		if (!clientData.company_id) {
+			console.error("Missing company_id in createClient");
+			set({ isLoading: false });
+			return {
+				success: false,
+				error: "Erro interno: Identificação da empresa ausente. Tente recarregar a página."
+			};
+		}
 		let endereco = clientData.endereco;
 		if (!endereco && clientData.rua) endereco = `${clientData.rua}, ${clientData.numero || "S/N"}, ${clientData.bairro || ""}, ${clientData.municipio || ""} - ${clientData.estado || ""}`;
 		const { data, error } = await supabase.from("clientes").insert({
@@ -47396,10 +47404,13 @@ const useClientStore = create((set, get$8) => ({
 			endereco
 		}).select().single();
 		set({ isLoading: false });
-		if (error) return {
-			success: false,
-			error
-		};
+		if (error) {
+			console.error("Error creating client:", error);
+			return {
+				success: false,
+				error
+			};
+		}
 		if (data) {
 			set({ currentClient: data });
 			set((state) => ({ clients: [data, ...state.clients] }));
@@ -48231,8 +48242,11 @@ function EvaluationChecklist() {
 		}
 	};
 	const handleCreateClient = async (data) => {
-		if (!currentCompany) return false;
-		const { success, data: client } = await createClient$1({
+		if (!currentCompany?.id) {
+			toast.error("Sessão inválida ou empresa não identificada.");
+			return false;
+		}
+		const { success, data: client, error } = await createClient$1({
 			...data,
 			company_id: currentCompany.id
 		});
@@ -48243,7 +48257,7 @@ function EvaluationChecklist() {
 			setManualPhone(client.telefone);
 			return true;
 		} else {
-			toast.error("Erro ao cadastrar cliente");
+			toast.error(`Erro ao cadastrar cliente: ${error?.message || error || "Erro desconhecido"}`);
 			return false;
 		}
 	};
@@ -75718,4 +75732,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-X8Jt8eHJ.js.map
+//# sourceMappingURL=index-D9glu3jn.js.map

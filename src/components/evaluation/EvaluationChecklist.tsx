@@ -201,8 +201,6 @@ export function EvaluationChecklist() {
   const handleClientSearch = async () => {
     if (!searchCpf) return
     if (!validateCPF(searchCpf)) {
-      // Don't toast error on auto-search unless button clicked, but here safe to ignore or simple return
-      // We rely on validation before calling this in effect, but button click might pass invalid
       return
     }
 
@@ -216,11 +214,20 @@ export function EvaluationChecklist() {
   }
 
   const handleCreateClient = async (data: any) => {
-    if (!currentCompany) return false
-    const { success, data: client } = await createClient({
+    if (!currentCompany?.id) {
+      toast.error('Sessão inválida ou empresa não identificada.')
+      return false
+    }
+
+    const {
+      success,
+      data: client,
+      error,
+    } = await createClient({
       ...data,
       company_id: currentCompany.id,
     })
+
     if (success && client) {
       toast.success('Cliente cadastrado!')
       setShowClientModal(false)
@@ -229,7 +236,9 @@ export function EvaluationChecklist() {
       setManualPhone(client.telefone)
       return true
     } else {
-      toast.error('Erro ao cadastrar cliente')
+      toast.error(
+        `Erro ao cadastrar cliente: ${error?.message || error || 'Erro desconhecido'}`,
+      )
       return false
     }
   }

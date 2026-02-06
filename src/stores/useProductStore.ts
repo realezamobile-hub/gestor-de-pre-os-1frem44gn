@@ -694,15 +694,18 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         throw new Error('Company ID is required')
       }
 
+      // Ensure that we handle potential timeouts by checking return
       const { data, error } = await supabase.rpc('delete_zero_value_products', {
         p_company_id: companyId,
       } as any)
 
       if (error) throw error
+
+      // Refresh product list after cleanup
       get().fetchProducts()
       return { success: true, count: data as number }
-    } catch (error) {
-      // Suppress console error to avoid noise for automatic cleanup
+    } catch (error: any) {
+      console.error('Error in deleteZeroValueProducts:', error)
       return { success: false, error }
     }
   },

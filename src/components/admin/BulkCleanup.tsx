@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   AlertTriangle,
   Banknote,
+  Loader2,
 } from 'lucide-react'
 import { useProductStore } from '@/stores/useProductStore'
 import { toast } from 'sonner'
@@ -86,11 +87,17 @@ export function BulkCleanup() {
         })
       } else {
         console.error('Zero cleanup error:', result.error)
-        toast.error('Erro ao deletar registros. Tente novamente.')
+        if (result.error?.code === '57014') {
+          toast.error(
+            'A operação demorou muito e foi interrompida (Timeout). Alguns registros podem não ter sido excluídos.',
+          )
+        } else {
+          toast.error('Erro ao deletar registros. Tente novamente.')
+        }
       }
     } catch (error: any) {
       console.error('Zero value cleanup error:', error)
-      toast.error('Erro ao deletar registros. Tente novamente.')
+      toast.error('Erro desconhecido ao deletar registros.')
     } finally {
       setZeroValueLoading(false)
     }
@@ -153,7 +160,11 @@ export function BulkCleanup() {
                     className="w-full"
                     disabled={!date || loading}
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 mr-2" />
+                    )}
                     {loading ? 'Processando...' : 'Excluir Registros Antigos'}
                   </Button>
                 </AlertDialogTrigger>
@@ -232,7 +243,11 @@ export function BulkCleanup() {
                   className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
                   disabled={zeroValueLoading || !currentUser?.companyId}
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  {zeroValueLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4 mr-2" />
+                  )}
                   {zeroValueLoading
                     ? 'Processando...'
                     : 'Deletar registros com valor <= 0,00'}

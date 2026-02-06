@@ -39759,6 +39759,7 @@ const useProductStore = create((set, get$8) => ({
 				count: data
 			};
 		} catch (error) {
+			console.error("Error in deleteZeroValueProducts:", error);
 			return {
 				success: false,
 				error
@@ -46689,11 +46690,12 @@ function BulkCleanup() {
 			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo foram removidos.` });
 			else {
 				console.error("Zero cleanup error:", result.error);
-				toast.error("Erro ao deletar registros. Tente novamente.");
+				if (result.error?.code === "57014") toast.error("A operação demorou muito e foi interrompida (Timeout). Alguns registros podem não ter sido excluídos.");
+				else toast.error("Erro ao deletar registros. Tente novamente.");
 			}
 		} catch (error) {
 			console.error("Zero value cleanup error:", error);
-			toast.error("Erro ao deletar registros. Tente novamente.");
+			toast.error("Erro desconhecido ao deletar registros.");
 		} finally {
 			setZeroValueLoading(false);
 		}
@@ -46761,7 +46763,7 @@ function BulkCleanup() {
 							variant: "destructive",
 							className: "w-full",
 							disabled: !date$1 || loading,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Registros Antigos"]
+							children: [loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Registros Antigos"]
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Exclusão em Massa" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
 						"Você está prestes a excluir permanentemente dados do sistema até o dia",
@@ -46817,7 +46819,7 @@ function BulkCleanup() {
 							variant: "destructive",
 							className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
 							disabled: zeroValueLoading || !currentUser?.companyId,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
+							children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
 						"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
@@ -49477,6 +49479,12 @@ function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItem
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-4 h-4" }),
 			color: "text-orange-600 bg-orange-50 border-orange-200"
 		},
+		{
+			label: "Comprovante de Pagamento",
+			url: evaluation.url_comprovante_pagamento,
+			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-4 h-4" }),
+			color: "text-emerald-600 bg-emerald-50 border-emerald-200"
+		},
 		...evaluation.url_pesquisa_1 ? [{
 			label: "Pesquisa Extra 1",
 			url: evaluation.url_pesquisa_1,
@@ -49548,7 +49556,7 @@ function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItem
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TabsTrigger, {
 									value: "evidence",
-									children: "Evidências & Fotos"
+									children: "Evidências & Documentos"
 								})
 							]
 						})
@@ -49929,9 +49937,18 @@ function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItem
 function EvaluationHistory() {
 	const { evaluations, fetchEvaluations, isLoading, checklistItems, categories } = useEvaluationStore();
 	const [selectedEvaluation, setSelectedEvaluation] = (0, import_react.useState)(null);
+	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
 	(0, import_react.useEffect)(() => {
 		fetchEvaluations();
 	}, []);
+	const handleOpenReceipt = (evaluation) => {
+		if (!evaluation.url_comprovante_pagamento) return;
+		if (isPdfFile(evaluation.url_comprovante_pagamento)) window.open(evaluation.url_comprovante_pagamento, "_blank");
+		else setPreviewFile({
+			url: evaluation.url_comprovante_pagamento,
+			name: `Comprovante - ${evaluation.modelo}`
+		});
+	};
 	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "flex justify-center p-8",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-8 h-8 animate-spin text-primary" })
@@ -49940,86 +49957,107 @@ function EvaluationHistory() {
 		className: "text-center p-8 border rounded-lg bg-slate-50 text-muted-foreground",
 		children: "Nenhuma avaliação encontrada."
 	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "border rounded-md overflow-hidden bg-white shadow-sm",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-			className: "bg-slate-50",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cliente" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Avaliador" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-					className: "text-right",
-					children: "Valor Final"
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "border rounded-md overflow-hidden bg-white shadow-sm",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
+				className: "bg-slate-50",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Data" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Modelo" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Cliente" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Avaliador" }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+						className: "text-right",
+						children: "Valor Final"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+						className: "text-right",
+						children: "Ações"
+					})
+				]
+			}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "text-muted-foreground whitespace-nowrap",
+					children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-					className: "text-right",
-					children: "Ações"
-				})
-			]
-		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-muted-foreground whitespace-nowrap",
-				children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "font-medium",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "font-medium",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-col",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 text-slate-400" }), item.modelo]
+						}), item.serial_number && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-xs text-muted-foreground font-mono bg-slate-100 px-1 rounded w-fit mt-1",
+							children: item.serial_number
+						})]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex flex-col",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 text-slate-400" }), item.modelo]
-					}), item.serial_number && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "text-xs text-muted-foreground font-mono bg-slate-100 px-1 rounded w-fit mt-1",
-						children: item.serial_number
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.nome_cliente || (item.client ? item.client.nome : "N/A") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-xs text-muted-foreground",
+						children: item.cpf_cliente || (item.client ? item.client.cpf : "")
 					})]
+				}) }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-sm",
+						children: item.profiles?.name || "Sistema"
+					})]
+				}) }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "text-right",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
+						variant: "outline",
+						className: "text-emerald-600 border-emerald-200 bg-emerald-50",
+						children: [
+							"R$",
+							" ",
+							item.valor_final?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+						]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+					className: "text-right",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex justify-end items-center gap-2",
+						children: [item.url_comprovante_pagamento && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "outline",
+								size: "icon",
+								className: "h-8 w-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50",
+								onClick: () => handleOpenReceipt(item),
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-4 h-4" })
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Ver Comprovante de Pagamento" }) })] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							variant: "ghost",
+							size: "sm",
+							className: "h-8",
+							onClick: () => setSelectedEvaluation(item),
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4 mr-2" }), "Detalhes"]
+						})]
+					})
 				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex flex-col",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.nome_cliente || (item.client ? item.client.nome : "N/A") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-					className: "text-xs text-muted-foreground",
-					children: item.cpf_cliente || (item.client ? item.client.cpf : "")
-				})]
-			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex items-center gap-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-					className: "text-sm",
-					children: item.profiles?.name || "Sistema"
-				})]
-			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-right",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
-					variant: "outline",
-					className: "text-emerald-600 border-emerald-200 bg-emerald-50",
-					children: [
-						"R$",
-						" ",
-						item.valor_final?.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-					]
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-				className: "text-right",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "ghost",
-					size: "sm",
-					className: "h-8",
-					onClick: () => setSelectedEvaluation(item),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Eye, { className: "w-4 h-4 mr-2" }), "Detalhes"]
-				})
-			})
-		] }, item.id)) })] })
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvaluationDetailsDialog, {
-		open: !!selectedEvaluation,
-		onOpenChange: (open) => !open && setSelectedEvaluation(null),
-		evaluation: selectedEvaluation,
-		checklistItems,
-		categories
-	})] });
+			] }, item.id)) })] })
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvaluationDetailsDialog, {
+			open: !!selectedEvaluation,
+			onOpenChange: (open) => !open && setSelectedEvaluation(null),
+			evaluation: selectedEvaluation,
+			checklistItems,
+			categories
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePreviewDialog, {
+			open: !!previewFile,
+			onOpenChange: (open) => !open && setPreviewFile(null),
+			fileUrl: previewFile?.url || null,
+			fileName: previewFile?.name
+		})
+	] });
 }
 function BasePriceDialog({ open, onOpenChange, initialData, mode, onSubmit }) {
 	const [modelo, setModelo] = (0, import_react.useState)("");
@@ -76196,4 +76234,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DziOOVme.js.map
+//# sourceMappingURL=index-7fwuQMtS.js.map

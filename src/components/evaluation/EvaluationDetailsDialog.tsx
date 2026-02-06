@@ -21,6 +21,7 @@ import {
   ExternalLink,
   ShieldCheck,
   Search,
+  Banknote,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -64,6 +65,12 @@ export function EvaluationDetailsDialog({
       url: evaluation.url_foto_documento,
       icon: <User className="w-4 h-4" />,
       color: 'text-orange-600 bg-orange-50 border-orange-200',
+    },
+    {
+      label: 'Comprovante de Pagamento',
+      url: evaluation.url_comprovante_pagamento,
+      icon: <Banknote className="w-4 h-4" />,
+      color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
     },
     // Add additional research files if they exist
     ...(evaluation.url_pesquisa_1
@@ -146,7 +153,9 @@ export function EvaluationDetailsDialog({
                   <TabsTrigger value="checklist">
                     Checklist & Defeitos
                   </TabsTrigger>
-                  <TabsTrigger value="evidence">Evidências & Fotos</TabsTrigger>
+                  <TabsTrigger value="evidence">
+                    Evidências & Documentos
+                  </TabsTrigger>
                 </TabsList>
               </div>
 

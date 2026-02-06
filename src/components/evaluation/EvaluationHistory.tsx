@@ -10,11 +10,26 @@ import {
 } from '@/components/ui/table'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Smartphone, Eye, Loader2, User } from 'lucide-react'
+import {
+  Smartphone,
+  Eye,
+  Loader2,
+  User,
+  Banknote,
+  FileText,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { EvaluationDetailsDialog } from './EvaluationDetailsDialog'
 import { Evaluation } from '@/types'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { FilePreviewDialog } from '@/components/common/FilePreviewDialog'
+import { isPdfFile } from '@/lib/utils'
 
 export function EvaluationHistory() {
   const {
@@ -26,10 +41,27 @@ export function EvaluationHistory() {
   } = useEvaluationStore()
   const [selectedEvaluation, setSelectedEvaluation] =
     useState<Evaluation | null>(null)
+  const [previewFile, setPreviewFile] = useState<{
+    url: string
+    name: string
+  } | null>(null)
 
   useEffect(() => {
     fetchEvaluations()
   }, [])
+
+  const handleOpenReceipt = (evaluation: Evaluation) => {
+    if (!evaluation.url_comprovante_pagamento) return
+
+    if (isPdfFile(evaluation.url_comprovante_pagamento)) {
+      window.open(evaluation.url_comprovante_pagamento, '_blank')
+    } else {
+      setPreviewFile({
+        url: evaluation.url_comprovante_pagamento,
+        name: `Comprovante - ${evaluation.modelo}`,
+      })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -113,15 +145,36 @@ export function EvaluationHistory() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8"
-                    onClick={() => setSelectedEvaluation(item)}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Detalhes
-                  </Button>
+                  <div className="flex justify-end items-center gap-2">
+                    {item.url_comprovante_pagamento && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                              onClick={() => handleOpenReceipt(item)}
+                            >
+                              <Banknote className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver Comprovante de Pagamento</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => setSelectedEvaluation(item)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Detalhes
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -135,6 +188,13 @@ export function EvaluationHistory() {
         evaluation={selectedEvaluation}
         checklistItems={checklistItems}
         categories={categories}
+      />
+
+      <FilePreviewDialog
+        open={!!previewFile}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
+        fileUrl={previewFile?.url || null}
+        fileName={previewFile?.name}
       />
     </>
   )

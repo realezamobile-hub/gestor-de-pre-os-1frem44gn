@@ -829,7 +829,7 @@ export function EvaluationChecklist() {
                             >
                               <span className="flex flex-col items-center gap-1">
                                 <Upload className="w-5 h-5" />
-                                <span className="text-xs">Upload Arquivo</span>
+                                <span className="text-xs">Fazer Upload</span>
                               </span>
                             </Label>
                           </div>
@@ -848,7 +848,7 @@ export function EvaluationChecklist() {
                             onClick={() => openWebcam('doc')}
                           >
                             <Camera className="w-4 h-4 mr-2" />
-                            Tirar Foto com Câmera
+                            Tirar Foto
                           </Button>
                         </div>
                       ) : (

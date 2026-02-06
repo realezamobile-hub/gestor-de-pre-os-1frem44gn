@@ -47584,7 +47584,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 	const [error, setError] = (0, import_react.useState)(null);
 	const checkCameras = async () => {
 		try {
-			if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) throw new Error("Câmera não suportada neste dispositivo/navegador");
+			if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
 			setHasMultipleCameras((await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === "videoinput").length > 1);
 		} catch (error$1) {
 			console.error("Error checking cameras:", error$1);
@@ -47615,8 +47615,9 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 		} catch (err) {
 			console.error("Error accessing camera:", err);
 			let msg = "Não foi possível acessar a câmera.";
-			if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") msg = "Permissão da câmera negada. Verifique as configurações.";
+			if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") msg = "Permissão da câmera negada. Verifique as configurações do navegador.";
 			else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") msg = "Nenhuma câmera encontrada.";
+			else if (err.name === "NotReadableError" || err.name === "TrackStartError") msg = "A câmera já está em uso por outro aplicativo.";
 			setError(msg);
 			toast.error(msg);
 		}
@@ -47647,10 +47648,6 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 			canvas.height = video.videoHeight;
 			const context = canvas.getContext("2d");
 			if (context) {
-				if (facingMode === "user") {
-					context.translate(canvas.width, 0);
-					context.scale(-1, 1);
-				}
 				context.drawImage(video, 0, 0, canvas.width, canvas.height);
 				setCapturedImage(canvas.toDataURL("image/jpeg", .9));
 			}
@@ -47658,12 +47655,13 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 	};
 	const handleRetake = () => {
 		setCapturedImage(null);
-		if (!stream || !stream.active) startCamera();
+		if (videoRef.current && stream) videoRef.current.play().catch(console.error);
+		else startCamera();
 	};
 	const handleConfirm = () => {
 		if (capturedImage && canvasRef.current) canvasRef.current.toBlob((blob) => {
 			if (blob) {
-				onCapture(new File([blob], `foto-doc-${Date.now()}.jpg`, {
+				onCapture(new File([blob], `foto-camera-${Date.now()}.jpg`, {
 					type: "image/jpeg",
 					lastModified: Date.now()
 				}));
@@ -47708,7 +47706,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 			className: "relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner flex items-center justify-center",
 			children: [!capturedImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("video", {
 				ref: videoRef,
-				className: cn("w-full h-full object-cover", facingMode === "user" && "scale-x-[-1]"),
+				className: cn("w-full h-full object-contain", facingMode === "user" && "scale-x-[-1]"),
 				muted: true,
 				playsInline: true,
 				autoPlay: true
@@ -47742,7 +47740,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 					onClick: capturePhoto,
 					type: "button",
 					className: "bg-blue-600 hover:bg-blue-700",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto"]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Capturar"]
 				})
 			] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 				variant: "outline",
@@ -47753,7 +47751,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 				onClick: handleConfirm,
 				type: "button",
 				className: "bg-emerald-600 hover:bg-emerald-700",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4 mr-2" }), "Confirmar"]
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4 mr-2" }), "Usar Foto"]
 			})] })
 		})]
 	});
@@ -48870,7 +48868,7 @@ function EvaluationChecklist() {
 																				className: "flex flex-col items-center gap-1",
 																				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 																					className: "text-xs",
-																					children: "Upload Arquivo"
+																					children: "Fazer Upload"
 																				})]
 																			})
 																		})]
@@ -48890,7 +48888,7 @@ function EvaluationChecklist() {
 																		variant: "outline",
 																		className: "w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800",
 																		onClick: () => openWebcam("doc"),
-																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto com Câmera"]
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto"]
 																	})
 																]
 															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -76187,4 +76185,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Ctkavrf4.js.map
+//# sourceMappingURL=index-BO18IHnp.js.map

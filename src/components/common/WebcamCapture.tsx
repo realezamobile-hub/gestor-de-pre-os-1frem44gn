@@ -35,7 +35,8 @@ export function WebcamCapture({
   const checkCameras = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-        throw new Error('Câmera não suportada neste dispositivo/navegador')
+        // Fallback or just ignore if not supported, allow getUserMedia to fail naturally later
+        return
       }
 
       const devices = await navigator.mediaDevices.enumerateDevices()
@@ -84,12 +85,18 @@ export function WebcamCapture({
         err.name === 'NotAllowedError' ||
         err.name === 'PermissionDeniedError'
       ) {
-        msg = 'Permissão da câmera negada. Verifique as configurações.'
+        msg =
+          'Permissão da câmera negada. Verifique as configurações do navegador.'
       } else if (
         err.name === 'NotFoundError' ||
         err.name === 'DevicesNotFoundError'
       ) {
         msg = 'Nenhuma câmera encontrada.'
+      } else if (
+        err.name === 'NotReadableError' ||
+        err.name === 'TrackStartError'
+      ) {
+        msg = 'A câmera já está em uso por outro aplicativo.'
       }
       setError(msg)
       toast.error(msg)
@@ -125,16 +132,14 @@ export function WebcamCapture({
       const video = videoRef.current
       const canvas = canvasRef.current
 
+      // Set canvas dimensions to match the video stream
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
 
       const context = canvas.getContext('2d')
       if (context) {
-        if (facingMode === 'user') {
-          context.translate(canvas.width, 0)
-          context.scale(-1, 1)
-        }
-
+        // NOTE: We do NOT mirror the capture for documents even if using front camera
+        // to ensure text is readable. Mirroring is only for preview comfort in 'user' mode.
         context.drawImage(video, 0, 0, canvas.width, canvas.height)
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
@@ -145,7 +150,11 @@ export function WebcamCapture({
 
   const handleRetake = () => {
     setCapturedImage(null)
-    if (!stream || !stream.active) {
+    // Restart camera logic is handled by useEffect when capturedImage is cleared,
+    // but we might need to ensure the video plays again if it was paused
+    if (videoRef.current && stream) {
+      videoRef.current.play().catch(console.error)
+    } else {
       startCamera()
     }
   }
@@ -155,7 +164,7 @@ export function WebcamCapture({
       canvasRef.current.toBlob(
         (blob) => {
           if (blob) {
-            const file = new File([blob], `foto-doc-${Date.now()}.jpg`, {
+            const file = new File([blob], `foto-camera-${Date.now()}.jpg`, {
               type: 'image/jpeg',
               lastModified: Date.now(),
             })
@@ -210,8 +219,8 @@ export function WebcamCapture({
           <video
             ref={videoRef}
             className={cn(
-              'w-full h-full object-cover',
-              facingMode === 'user' && 'scale-x-[-1]',
+              'w-full h-full object-contain', // Changed to contain so user sees full frame for documents
+              facingMode === 'user' && 'scale-x-[-1]', // Mirror preview only for user comfort
             )}
             muted
             playsInline
@@ -255,7 +264,7 @@ export function WebcamCapture({
               className="bg-blue-600 hover:bg-blue-700"
             >
               <Camera className="w-4 h-4 mr-2" />
-              Tirar Foto
+              Capturar
             </Button>
           </>
         ) : (
@@ -270,7 +279,7 @@ export function WebcamCapture({
               className="bg-emerald-600 hover:bg-emerald-700"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
-              Confirmar
+              Usar Foto
             </Button>
           </>
         )}

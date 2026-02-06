@@ -24878,9 +24878,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$2 === y$1 && (0 !== x$2 || 1 / x$2 === 1 / y$1) || x$2 !== x$2 && y$1 !== y$1;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$13 = React$60.useRef, useEffect$29 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
+		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$14 = React$60.useRef, useEffect$29 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual$5) {
-			var instRef = useRef$13(null);
+			var instRef = useRef$14(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -39750,6 +39750,7 @@ const useProductStore = create((set, get$8) => ({
 	},
 	deleteZeroValueProducts: async (companyId) => {
 		try {
+			if (!companyId) throw new Error("Company ID is required");
 			const { data, error } = await supabase.rpc("delete_zero_value_products", { p_company_id: companyId });
 			if (error) throw error;
 			get$8().fetchProducts();
@@ -39758,7 +39759,6 @@ const useProductStore = create((set, get$8) => ({
 				count: data
 			};
 		} catch (error) {
-			console.error("Error deleting zero value products:", error);
 			return {
 				success: false,
 				error
@@ -42632,6 +42632,7 @@ function DashboardPage() {
 	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, deleteZeroValueProducts, setFilters, filters, draftItems } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
+	const hasRunCleanupRef = (0, import_react.useRef)(false);
 	(0, import_react.useEffect)(() => {
 		setSearchTerm(filters.search);
 	}, [filters.search]);
@@ -42644,13 +42645,23 @@ function DashboardPage() {
 		fetchFilterOptions();
 		fetchDraftItems();
 		const unsubscribe = subscribeToProducts();
+		if (currentUser?.companyId && !hasRunCleanupRef.current) {
+			hasRunCleanupRef.current = true;
+			deleteZeroValueProducts(currentUser.companyId).then((result) => {
+				if (!result.success) console.debug("Automatic cleanup warning:", result.error);
+			});
+		}
 		return () => unsubscribe();
-	}, []);
+	}, [currentUser?.companyId]);
 	const canCreateList = currentUser?.canCreateList || false;
 	const handleDeleteZeros = async () => {
+		if (!currentUser?.companyId) {
+			toast.error("Erro: Empresa não identificada.");
+			return;
+		}
 		setIsDeleting(true);
 		try {
-			if ((await deleteZeroValueProducts()).success) toast.success("Registros deletados com sucesso!");
+			if ((await deleteZeroValueProducts(currentUser.companyId)).success) toast.success("Registros deletados com sucesso!");
 			else toast.error("Erro ao deletar registros. Tente novamente.");
 		} catch (e) {
 			toast.error("Erro ao deletar registros. Tente novamente.");
@@ -76185,4 +76196,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BO18IHnp.js.map
+//# sourceMappingURL=index-DziOOVme.js.map

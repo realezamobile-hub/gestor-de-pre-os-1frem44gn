@@ -20,7 +20,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -39,6 +39,9 @@ export default function DashboardPage() {
   } = useProductStore()
   const [isDeleting, setIsDeleting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(filters.search)
+
+  // Ref to ensure automatic cleanup runs only once per session/mount
+  const hasRunCleanupRef = useRef(false)
 
   // Sync internal state with store state if it changes externally (e.g. Clear Filters)
   useEffect(() => {
@@ -61,15 +64,33 @@ export default function DashboardPage() {
     fetchFilterOptions()
     fetchDraftItems()
     const unsubscribe = subscribeToProducts()
+
+    // Automatic non-blocking cleanup for zero value products
+    if (currentUser?.companyId && !hasRunCleanupRef.current) {
+      hasRunCleanupRef.current = true
+      // Fire and forget - don't await
+      deleteZeroValueProducts(currentUser.companyId).then((result) => {
+        if (!result.success) {
+          // Silently fail for automatic cleanup, just log debug if needed
+          console.debug('Automatic cleanup warning:', result.error)
+        }
+      })
+    }
+
     return () => unsubscribe()
-  }, [])
+  }, [currentUser?.companyId])
 
   const canCreateList = currentUser?.canCreateList || false
 
   const handleDeleteZeros = async () => {
+    if (!currentUser?.companyId) {
+      toast.error('Erro: Empresa não identificada.')
+      return
+    }
+
     setIsDeleting(true)
     try {
-      const result = await deleteZeroValueProducts()
+      const result = await deleteZeroValueProducts(currentUser.companyId)
       if (result.success) {
         toast.success('Registros deletados com sucesso!')
       } else {

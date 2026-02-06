@@ -48277,6 +48277,7 @@ function EvaluationChecklist() {
 	const [showWebcam, setShowWebcam] = (0, import_react.useState)(false);
 	const [webcamMode, setWebcamMode] = (0, import_react.useState)("doc");
 	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
+	const [customPrice, setCustomPrice] = (0, import_react.useState)(null);
 	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
 	(0, import_react.useEffect)(() => {
 		if (searchCpf.length === 14 && validateCPF(searchCpf)) handleClientSearch();
@@ -48301,7 +48302,12 @@ function EvaluationChecklist() {
 	};
 	const detectedDefects = getDetectedDefects();
 	const totalDiscounts = detectedDefects.reduce((acc, def) => acc + def.value, 0);
-	const finalPrice = selectedModel ? Math.max(0, selectedModel.preco_base - totalDiscounts) : 0;
+	const calculatedPrice = selectedModel ? Math.max(0, selectedModel.preco_base - totalDiscounts) : 0;
+	(0, import_react.useEffect)(() => {
+		setCustomPrice(null);
+	}, [calculatedPrice]);
+	const displayPrice = customPrice !== null ? customPrice : calculatedPrice;
+	const finalPriceNumber = typeof displayPrice === "string" && displayPrice === "" ? 0 : Number(displayPrice);
 	const handleNext = () => {
 		if (step === 1) {
 			if (!selectedModelId || !serialNumber) {
@@ -48429,6 +48435,10 @@ function EvaluationChecklist() {
 			toast.error("Arquivos obrigatórios faltando (Print ou Documento).");
 			return;
 		}
+		if (displayPrice === "" || isNaN(finalPriceNumber) || finalPriceNumber < 0) {
+			toast.error("Por favor, informe um valor final válido.");
+			return;
+		}
 		setIsSaving(true);
 		const toastId = toast.loading("Processando uploads e salvando dados...");
 		try {
@@ -48467,7 +48477,7 @@ function EvaluationChecklist() {
 				modelo: selectedModel.modelo,
 				serialNumber,
 				checklistData: checklistStatus,
-				valorFinal: finalPrice,
+				valorFinal: finalPriceNumber,
 				descontos: detectedDefects.map((d) => ({
 					id: d.discount?.id || "unknown",
 					nome: d.item.nome,
@@ -48502,6 +48512,7 @@ function EvaluationChecklist() {
 				setDocFile(null);
 				setPaymentFile(null);
 				setConsultationFiles([]);
+				setCustomPrice(null);
 			} else toast.error(`Erro ao salvar no banco: ${result.error?.message}`, { id: toastId });
 		} catch (e) {
 			console.error(e);
@@ -49177,18 +49188,30 @@ function EvaluationChecklist() {
 															})]
 														}),
 														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-															className: "flex justify-between border-t pt-2",
-															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																className: "text-sm",
-																children: "Valor Final"
-															}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-																className: "font-bold text-emerald-600",
-																children: [
-																	"R$",
-																	" ",
-																	finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-																]
-															})]
+															className: "flex flex-col gap-2 border-t pt-4",
+															children: [
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+																	htmlFor: "finalPrice",
+																	children: "Valor Final (R$)"
+																}),
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																	id: "finalPrice",
+																	type: "number",
+																	step: "0.01",
+																	min: "0",
+																	value: displayPrice,
+																	onChange: (e) => setCustomPrice(e.target.value),
+																	className: "text-lg font-bold text-emerald-600"
+																}),
+																customPrice !== null && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+																	className: "text-xs text-muted-foreground text-right",
+																	children: [
+																		"Valor calculado originalmente: R$",
+																		" ",
+																		calculatedPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+																	]
+																})
+															]
 														})
 													]
 												})]
@@ -49272,15 +49295,18 @@ function EvaluationChecklist() {
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "border-t border-slate-700 pt-4",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 									className: "text-xs uppercase text-emerald-400 font-bold tracking-wider",
-									children: "Valor Final Sugerido"
+									children: ["Valor Final ", customPrice !== null ? "(Manual)" : "(Sugerido)"]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "text-4xl font-black text-emerald-400 mt-1",
 									children: [
 										"R$",
 										" ",
-										finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+										finalPriceNumber.toLocaleString("pt-BR", {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2
+										})
 									]
 								})]
 							}),
@@ -76094,4 +76120,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BNmW1U6R.js.map
+//# sourceMappingURL=index-DfInIo2U.js.map

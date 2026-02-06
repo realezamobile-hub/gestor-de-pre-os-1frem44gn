@@ -115,6 +115,9 @@ export function EvaluationChecklist() {
     name: string
   } | null>(null)
 
+  // New state for manual price override
+  const [customPrice, setCustomPrice] = useState<string | number | null>(null)
+
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
 
   // Auto-search CPF when complete
@@ -166,9 +169,21 @@ export function EvaluationChecklist() {
     (acc, def) => acc + def.value,
     0,
   )
-  const finalPrice = selectedModel
+
+  const calculatedPrice = selectedModel
     ? Math.max(0, selectedModel.preco_base - totalDiscounts)
     : 0
+
+  // Reset custom price when calculated price changes (e.g. model change or defects change)
+  useEffect(() => {
+    setCustomPrice(null)
+  }, [calculatedPrice])
+
+  const displayPrice = customPrice !== null ? customPrice : calculatedPrice
+  const finalPriceNumber =
+    typeof displayPrice === 'string' && displayPrice === ''
+      ? 0
+      : Number(displayPrice)
 
   const handleNext = () => {
     if (step === 1) {
@@ -337,6 +352,15 @@ export function EvaluationChecklist() {
       return
     }
 
+    if (
+      displayPrice === '' ||
+      isNaN(finalPriceNumber) ||
+      finalPriceNumber < 0
+    ) {
+      toast.error('Por favor, informe um valor final válido.')
+      return
+    }
+
     setIsSaving(true)
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
@@ -412,7 +436,7 @@ export function EvaluationChecklist() {
         modelo: selectedModel.modelo,
         serialNumber,
         checklistData: checklistStatus,
-        valorFinal: finalPrice,
+        valorFinal: finalPriceNumber,
         descontos: detectedDefects.map(
           (d) =>
             ({
@@ -448,6 +472,7 @@ export function EvaluationChecklist() {
         setDocFile(null)
         setPaymentFile(null)
         setConsultationFiles([])
+        setCustomPrice(null)
       } else {
         toast.error(`Erro ao salvar no banco: ${result.error?.message}`, {
           id: toastId,
@@ -1201,14 +1226,25 @@ export function EvaluationChecklist() {
                           )}
                         </div>
                       </div>
-                      <div className="flex justify-between border-t pt-2">
-                        <span className="text-sm">Valor Final</span>
-                        <span className="font-bold text-emerald-600">
-                          R${' '}
-                          {finalPrice.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                          })}
-                        </span>
+                      <div className="flex flex-col gap-2 border-t pt-4">
+                        <Label htmlFor="finalPrice">Valor Final (R$)</Label>
+                        <Input
+                          id="finalPrice"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={displayPrice}
+                          onChange={(e) => setCustomPrice(e.target.value)}
+                          className="text-lg font-bold text-emerald-600"
+                        />
+                        {customPrice !== null && (
+                          <p className="text-xs text-muted-foreground text-right">
+                            Valor calculado originalmente: R${' '}
+                            {calculatedPrice.toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                            })}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1297,12 +1333,13 @@ export function EvaluationChecklist() {
 
             <div className="border-t border-slate-700 pt-4">
               <span className="text-xs uppercase text-emerald-400 font-bold tracking-wider">
-                Valor Final Sugerido
+                Valor Final {customPrice !== null ? '(Manual)' : '(Sugerido)'}
               </span>
               <div className="text-4xl font-black text-emerald-400 mt-1">
                 R${' '}
-                {finalPrice.toLocaleString('pt-BR', {
+                {finalPriceNumber.toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })}
               </div>
             </div>

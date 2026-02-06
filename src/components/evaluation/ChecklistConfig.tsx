@@ -24,16 +24,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Trash2, ListChecks } from 'lucide-react'
+import { Plus, Trash2, ListChecks, Pencil, Save, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function ChecklistConfig() {
-  const { checklistItems, categories, addChecklistItem, deleteChecklistItem } =
-    useEvaluationStore()
+  const {
+    checklistItems,
+    categories,
+    addChecklistItem,
+    updateChecklistItem,
+    deleteChecklistItem,
+  } = useEvaluationStore()
   const [newCategoryId, setNewCategoryId] = useState('')
   const [newName, setNewName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
 
   const handleAdd = async () => {
     if (!newCategoryId || !newName) {
@@ -48,6 +55,29 @@ export function ChecklistConfig() {
       setNewName('')
     } else {
       toast.error('Erro ao adicionar')
+    }
+  }
+
+  const startEditing = (item: any) => {
+    setEditingId(item.id)
+    setEditName(item.nome)
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+    setEditName('')
+  }
+
+  const saveEditing = async () => {
+    if (!editingId || !editName.trim()) return
+
+    const result = await updateChecklistItem(editingId, editName.trim())
+    if (result.success) {
+      toast.success('Item atualizado')
+      setEditingId(null)
+      setEditName('')
+    } else {
+      toast.error('Erro ao atualizar item')
     }
   }
 
@@ -108,25 +138,71 @@ export function ChecklistConfig() {
               <TableRow className="bg-slate-50">
                 <TableHead>Categoria</TableHead>
                 <TableHead>Item</TableHead>
-                <TableHead className="w-[80px] text-right">Ação</TableHead>
+                <TableHead className="w-[120px] text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {checklistItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium text-muted-foreground">
+                  <TableCell className="font-medium text-muted-foreground w-1/3">
                     {getCategoryName(item.category_id)}
                   </TableCell>
-                  <TableCell>{item.nome}</TableCell>
+                  <TableCell>
+                    {editingId === item.id ? (
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="h-8"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveEditing()
+                          if (e.key === 'Escape') cancelEditing()
+                        }}
+                      />
+                    ) : (
+                      item.nome
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    {editingId === item.id ? (
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={saveEditing}
+                          className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                        >
+                          <Save className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={cancelEditing}
+                          className="h-8 w-8 text-slate-500 hover:text-slate-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => startEditing(item)}
+                          className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(item.id)}
+                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

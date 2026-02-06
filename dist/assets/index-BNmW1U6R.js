@@ -19662,6 +19662,20 @@ var Plus = createLucideIcon("plus", [["path", {
 	d: "M12 5v14",
 	key: "s699le"
 }]]);
+var Receipt = createLucideIcon("receipt", [
+	["path", {
+		d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z",
+		key: "q3az6g"
+	}],
+	["path", {
+		d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8",
+		key: "1h4pet"
+	}],
+	["path", {
+		d: "M12 17.5v-11",
+		key: "1jc1ny"
+	}]
+]);
 var RefreshCw = createLucideIcon("refresh-cw", [
 	["path", {
 		d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8",
@@ -47246,6 +47260,14 @@ const useEvaluationStore = create((set, get$8) => ({
 			error
 		};
 	},
+	updateChecklistItem: async (id, nome) => {
+		const { error } = await supabase.from("config_checklist_items").update({ nome }).eq("id", id);
+		if (!error) await get$8().fetchConfigs();
+		return {
+			success: !error,
+			error
+		};
+	},
 	deleteChecklistItem: async (id) => {
 		const { error } = await supabase.from("config_checklist_items").delete().eq("id", id);
 		if (!error) await get$8().fetchConfigs();
@@ -47302,6 +47324,7 @@ const useEvaluationStore = create((set, get$8) => ({
 			cliente_id: data.clienteId,
 			url_print_seguranca: data.urlPrint || null,
 			url_foto_documento: data.urlDoc || null,
+			url_comprovante_pagamento: data.urlComprovantePagamento || null,
 			arquivos_consulta: data.consultationFiles || [],
 			url_pesquisa_1,
 			url_pesquisa_2,
@@ -47350,6 +47373,41 @@ const useEvaluationStore = create((set, get$8) => ({
 				};
 			}
 			const { data: { publicUrl } } = supabase.storage.from("evaluation-evidence").getPublicUrl(fileName);
+			return {
+				url: publicUrl,
+				error: null
+			};
+		} catch (error) {
+			console.error("Upload exception:", error);
+			return {
+				url: null,
+				error
+			};
+		}
+	},
+	uploadPaymentProof: async (file) => {
+		try {
+			if (!file) return {
+				url: null,
+				error: "Arquivo inválido"
+			};
+			const fileExt = file.name.split(".").pop()?.toLowerCase() || "unknown";
+			const sanitizedBaseName = (file.name.substring(0, file.name.lastIndexOf(".")) || file.name).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s\-_]/g, "").replace(/\s+/g, "-").toLowerCase();
+			const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`;
+			const fileBuffer = await file.arrayBuffer();
+			const { error: uploadError } = await supabase.storage.from("evaluations").upload(fileName, fileBuffer, {
+				upsert: false,
+				contentType: file.type || "application/octet-stream",
+				cacheControl: "3600"
+			});
+			if (uploadError) {
+				console.error("Supabase upload error:", uploadError);
+				return {
+					url: null,
+					error: uploadError
+				};
+			}
+			const { data: { publicUrl } } = supabase.storage.from("evaluations").getPublicUrl(fileName);
 			return {
 				url: publicUrl,
 				error: null
@@ -48194,8 +48252,8 @@ function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType }) 
 	});
 }
 function EvaluationChecklist() {
-	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence } = useEvaluationStore();
-	const { currentClient, fetchClientByCpf, createClient: createClient$1, upsertClient, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
+	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence, uploadPaymentProof } = useEvaluationStore();
+	const { currentClient, fetchClientByCpf, upsertClient, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
 	const { currentUser, currentCompany } = useAuthStore();
 	const [step, setStep] = (0, import_react.useState)(1);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
@@ -48215,7 +48273,9 @@ function EvaluationChecklist() {
 	const [printFile, setPrintFile] = (0, import_react.useState)(null);
 	const [docFile, setDocFile] = (0, import_react.useState)(null);
 	const [consultationFiles, setConsultationFiles] = (0, import_react.useState)([]);
+	const [paymentFile, setPaymentFile] = (0, import_react.useState)(null);
 	const [showWebcam, setShowWebcam] = (0, import_react.useState)(false);
+	const [webcamMode, setWebcamMode] = (0, import_react.useState)("doc");
 	const [previewFile, setPreviewFile] = (0, import_react.useState)(null);
 	const selectedModel = basePrices.find((p$1) => p$1.id === selectedModelId);
 	(0, import_react.useEffect)(() => {
@@ -48320,12 +48380,29 @@ function EvaluationChecklist() {
 			});
 		}
 	};
-	const handleDocCapture = (file) => {
-		setDocFile({
+	const handlePaymentUpload = (e) => {
+		if (e.target.files?.[0]) {
+			const file = e.target.files[0];
+			setPaymentFile({
+				file,
+				preview: URL.createObjectURL(file)
+			});
+		}
+	};
+	const handleWebcamCapture = (file) => {
+		if (webcamMode === "doc") setDocFile({
+			file,
+			preview: URL.createObjectURL(file)
+		});
+		else setPaymentFile({
 			file,
 			preview: URL.createObjectURL(file)
 		});
 		setShowWebcam(false);
+	};
+	const openWebcam = (mode) => {
+		setWebcamMode(mode);
+		setShowWebcam(true);
 	};
 	const handleConsultationUpload = (e) => {
 		if (e.target.files) {
@@ -48370,6 +48447,12 @@ function EvaluationChecklist() {
 			if (printRes.error || !printRes.url) throw new Error(`Erro ao enviar Print: ${printRes.error?.message || "Falha no upload"}`);
 			const docRes = await uploadEvidence(docFile.file);
 			if (docRes.error || !docRes.url) throw new Error(`Erro ao enviar Documento: ${docRes.error?.message || "Falha no upload"}`);
+			let paymentUrl = null;
+			if (paymentFile) {
+				const payRes = await uploadPaymentProof(paymentFile.file);
+				if (payRes.error || !payRes.url) throw new Error(`Erro ao enviar Comprovante: ${payRes.error?.message || "Falha no upload"}`);
+				paymentUrl = payRes.url;
+			}
 			const consultationResults = [];
 			if (consultationFiles.length > 0) for (const f of consultationFiles) {
 				const res = await uploadEvidence(f.file);
@@ -48397,6 +48480,7 @@ function EvaluationChecklist() {
 				cpf_cliente: searchCpf,
 				urlPrint: printRes.url,
 				urlDoc: docRes.url,
+				urlComprovantePagamento: paymentUrl,
 				consultationFiles: consultationResults
 			});
 			if (result.success) {
@@ -48416,6 +48500,7 @@ function EvaluationChecklist() {
 				setManualPhone("");
 				setPrintFile(null);
 				setDocFile(null);
+				setPaymentFile(null);
 				setConsultationFiles([]);
 			} else toast.error(`Erro ao salvar no banco: ${result.error?.message}`, { id: toastId });
 		} catch (e) {
@@ -48484,7 +48569,7 @@ function EvaluationChecklist() {
 													className: "text-xs w-full flex items-center justify-center gap-1 text-muted-foreground hover:text-primary",
 													asChild: true,
 													children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-														href: "https://www.consultaserialaparelho.com.br/public-web/homeSiga",
+														href: "https://www.gov.br/anatel/pt-br/assuntos/celular-legal/consulte-sua-situacao",
 														target: "_blank",
 														rel: "noopener noreferrer",
 														children: ["Consultar no Siga ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-3 h-3" })]
@@ -48741,7 +48826,7 @@ function EvaluationChecklist() {
 																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 																	variant: "outline",
 																	className: "w-full",
-																	onClick: () => setShowWebcam(true),
+																	onClick: () => openWebcam("doc"),
 																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Usar Câmera"]
 																})]
 															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -48955,7 +49040,7 @@ function EvaluationChecklist() {
 								step === 5 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 									className: "space-y-6",
 									children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex flex-col items-center justify-center py-10 text-center space-y-4",
+										className: "flex flex-col items-center justify-center pt-6 text-center space-y-4",
 										children: [
 											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 												className: "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center",
@@ -48966,79 +49051,147 @@ function EvaluationChecklist() {
 												children: "Tudo Pronto!"
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 												className: "text-muted-foreground max-w-md mx-auto mt-2",
-												children: "Revise o resumo ao lado e confirme para gerar a avaliação. Os dados do cliente e as evidências serão salvos automaticamente."
+												children: "Revise o resumo ao lado e anexe o comprovante de pagamento se necessário."
 											})] }),
 											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "bg-slate-50 p-6 rounded-lg border w-full max-w-md text-left space-y-3",
-												children: [
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
-														className: "font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2",
-														children: "Resumo da Operação"
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex justify-between",
-														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "text-sm",
-															children: "Cliente"
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-															className: "text-right",
-															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																className: "font-medium block",
-																children: manualName
-															}), currentClient && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-																className: "text-xs text-emerald-600 flex items-center justify-end gap-1",
-																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link$1, { className: "w-3 h-3" }), " Vinculado"]
-															})]
-														})]
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex justify-between",
-														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "text-sm",
-															children: "CPF"
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "font-medium",
-															children: searchCpf
-														})]
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex justify-between",
-														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "text-sm",
-															children: "Evidências"
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-															className: "text-right text-sm",
-															children: [
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																	className: "block text-green-600",
-																	children: "1 Print de Segurança"
-																}),
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																	className: "block text-green-600",
-																	children: "1 Documento"
-																}),
-																consultationFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-																	className: "block text-blue-600",
-																	children: [consultationFiles.length, " Extra(s)"]
+												className: "w-full max-w-md space-y-4",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "bg-slate-50 p-4 rounded-lg border border-dashed border-slate-300",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
+														className: "font-bold text-slate-700 flex items-center gap-2 mb-3",
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Receipt, { className: "w-4 h-4" }), " Comprovante de Pagamento"]
+													}), !paymentFile ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "flex flex-col gap-2",
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "relative",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																type: "file",
+																accept: "image/*,application/pdf",
+																className: "hidden",
+																id: "payment-upload",
+																onChange: handlePaymentUpload
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+																htmlFor: "payment-upload",
+																className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
+																children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																	className: "flex flex-col items-center gap-1",
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																		className: "text-xs",
+																		children: "Upload Arquivo"
+																	})]
 																})
-															]
+															})]
+														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+															variant: "outline",
+															className: "w-full",
+															onClick: () => openWebcam("payment"),
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Usar Câmera"]
 														})]
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex justify-between border-t pt-2",
-														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-															className: "text-sm",
-															children: "Valor Final"
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-															className: "font-bold text-emerald-600",
-															children: [
-																"R$",
-																" ",
-																finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
-															]
-														})]
-													})
-												]
+													}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+														className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
+														children: [
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+																className: "w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer",
+																onClick: () => setPreviewFile({
+																	url: paymentFile.preview,
+																	name: paymentFile.file.name
+																}),
+																children: paymentFile.file.type.startsWith("image/") ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+																	src: paymentFile.preview,
+																	className: "w-full h-full object-cover"
+																}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(File$1, { className: "w-full h-full p-2 text-slate-500" })
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "flex-1 min-w-0 text-left",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+																	className: "text-sm font-medium truncate",
+																	children: paymentFile.file.name
+																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+																	className: "text-xs text-muted-foreground",
+																	children: [(paymentFile.file.size / 1024).toFixed(0), "kb"]
+																})]
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+																size: "icon",
+																variant: "ghost",
+																className: "text-red-500 hover:bg-red-50",
+																onClick: () => setPaymentFile(null),
+																children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+															})
+														]
+													})]
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "bg-slate-50 p-6 rounded-lg border text-left space-y-3",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+															className: "font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2",
+															children: "Resumo da Operação"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "flex justify-between",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-sm",
+																children: "Cliente"
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "text-right",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																	className: "font-medium block",
+																	children: manualName
+																}), currentClient && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																	className: "text-xs text-emerald-600 flex items-center justify-end gap-1",
+																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link$1, { className: "w-3 h-3" }), " Vinculado"]
+																})]
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "flex justify-between",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-sm",
+																children: "CPF"
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "font-medium",
+																children: searchCpf
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "flex justify-between",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-sm",
+																children: "Evidências"
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "text-right text-sm",
+																children: [
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																		className: "block text-green-600",
+																		children: "1 Print de Segurança"
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																		className: "block text-green-600",
+																		children: "1 Documento"
+																	}),
+																	consultationFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																		className: "block text-blue-600",
+																		children: [consultationFiles.length, " Extra(s)"]
+																	})
+																]
+															})]
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+															className: "flex justify-between border-t pt-2",
+															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																className: "text-sm",
+																children: "Valor Final"
+															}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																className: "font-bold text-emerald-600",
+																children: [
+																	"R$",
+																	" ",
+																	finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+																]
+															})]
+														})
+													]
+												})]
 											})
 										]
 									})
@@ -49154,6 +49307,14 @@ function EvaluationChecklist() {
 											"Arquivos: ",
 											printFile && docFile ? "OK" : "Pendente"
 										]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-2 text-sm text-slate-300",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Receipt, { className: cn("w-4 h-4", paymentFile ? "text-green-500" : "text-slate-600") }),
+											"Pagamento: ",
+											paymentFile ? "Anexado" : "Não anexado"
+										]
 									})
 								]
 							})
@@ -49179,8 +49340,12 @@ function EvaluationChecklist() {
 				onOpenChange: setShowWebcam,
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
 					className: "max-w-xl",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Capturar Foto do Documento" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WebcamCapture, {
-						onCapture: handleDocCapture,
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, { children: [
+						"Capturar",
+						" ",
+						webcamMode === "doc" ? "Foto do Documento" : "Comprovante"
+					] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WebcamCapture, {
+						onCapture: handleWebcamCapture,
 						onCancel: () => setShowWebcam(false)
 					})]
 				})
@@ -49976,10 +50141,12 @@ function BasePriceList() {
 	})] });
 }
 function ChecklistConfig() {
-	const { checklistItems, categories, addChecklistItem, deleteChecklistItem } = useEvaluationStore();
+	const { checklistItems, categories, addChecklistItem, updateChecklistItem, deleteChecklistItem } = useEvaluationStore();
 	const [newCategoryId, setNewCategoryId] = (0, import_react.useState)("");
 	const [newName, setNewName] = (0, import_react.useState)("");
 	const [isAdding, setIsAdding] = (0, import_react.useState)(false);
+	const [editingId, setEditingId] = (0, import_react.useState)(null);
+	const [editName, setEditName] = (0, import_react.useState)("");
 	const handleAdd = async () => {
 		if (!newCategoryId || !newName) {
 			toast.error("Selecione uma categoria e informe o nome");
@@ -49992,6 +50159,22 @@ function ChecklistConfig() {
 			toast.success("Item adicionado");
 			setNewName("");
 		} else toast.error("Erro ao adicionar");
+	};
+	const startEditing = (item) => {
+		setEditingId(item.id);
+		setEditName(item.nome);
+	};
+	const cancelEditing = () => {
+		setEditingId(null);
+		setEditName("");
+	};
+	const saveEditing = async () => {
+		if (!editingId || !editName.trim()) return;
+		if ((await updateChecklistItem(editingId, editName.trim())).success) {
+			toast.success("Item atualizado");
+			setEditingId(null);
+			setEditName("");
+		} else toast.error("Erro ao atualizar item");
 	};
 	const handleDelete = async (id) => {
 		if (confirm("Tem certeza? Isso pode afetar descontos configurados.")) await deleteChecklistItem(id);
@@ -50052,24 +50235,57 @@ function ChecklistConfig() {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Categoria" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Item" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "w-[80px] text-right",
-							children: "Ação"
+							className: "w-[120px] text-right",
+							children: "Ações"
 						})
 					]
 				}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: checklistItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "font-medium text-muted-foreground",
+						className: "font-medium text-muted-foreground w-1/3",
 						children: getCategoryName(item.category_id)
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: item.nome }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: editingId === item.id ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						value: editName,
+						onChange: (e) => setEditName(e.target.value),
+						className: "h-8",
+						autoFocus: true,
+						onKeyDown: (e) => {
+							if (e.key === "Enter") saveEditing();
+							if (e.key === "Escape") cancelEditing();
+						}
+					}) : item.nome }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "text-right",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							variant: "ghost",
-							size: "icon",
-							onClick: () => handleDelete(item.id),
-							className: "text-red-500 hover:text-red-700 hover:bg-red-50",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+						children: editingId === item.id ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-end gap-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								onClick: saveEditing,
+								className: "h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4" })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								onClick: cancelEditing,
+								className: "h-8 w-8 text-slate-500 hover:text-slate-700",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "w-4 h-4" })
+							})]
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-end gap-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								onClick: () => startEditing(item),
+								className: "h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Pencil, { className: "w-4 h-4" })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								variant: "ghost",
+								size: "icon",
+								onClick: () => handleDelete(item.id),
+								className: "h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+							})]
 						})
 					})
 				] }, item.id)) })] })
@@ -50081,26 +50297,73 @@ function ModelDiscountConfig() {
 	const { basePrices, checklistItems, peripheralDiscounts, categories, addDiscount, updateDiscount } = useEvaluationStore();
 	const [selectedModelId, setSelectedModelId] = (0, import_react.useState)("");
 	const [editingValues, setEditingValues] = (0, import_react.useState)({});
+	const [editingPercents, setEditingPercents] = (0, import_react.useState)({});
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	const basePrice = (0, import_react.useMemo)(() => basePrices.find((p$1) => p$1.id === selectedModelId), [basePrices, selectedModelId])?.preco_base || 0;
 	const modelDiscounts = (0, import_react.useMemo)(() => {
 		if (!selectedModelId) return [];
 		return peripheralDiscounts.filter((d) => d.modelo_id === selectedModelId);
 	}, [peripheralDiscounts, selectedModelId]);
-	const handleValueChange = (checklistItemId, value) => {
+	const getCurrentValue = (itemId) => {
+		if (editingValues[itemId] !== void 0) return editingValues[itemId];
+		const discount = modelDiscounts.find((d) => d.checklist_item_id === itemId);
+		return discount ? discount.valor_desconto.toFixed(2) : "";
+	};
+	const getCurrentPercent = (itemId) => {
+		if (editingPercents[itemId] !== void 0) return editingPercents[itemId];
+		const discount = modelDiscounts.find((d) => d.checklist_item_id === itemId);
+		if (discount && basePrice > 0) return (discount.valor_desconto / basePrice * 100).toFixed(2);
+		return "";
+	};
+	const handleAmountChange = (checklistItemId, value) => {
 		setEditingValues((prev) => ({
 			...prev,
 			[checklistItemId]: value
 		}));
+		if (basePrice > 0 && value) {
+			const val = parseFloat(value);
+			if (!isNaN(val)) {
+				const pct = val / basePrice * 100;
+				setEditingPercents((prev) => ({
+					...prev,
+					[checklistItemId]: pct.toFixed(2)
+				}));
+			} else setEditingPercents((prev) => ({
+				...prev,
+				[checklistItemId]: ""
+			}));
+		} else setEditingPercents((prev) => ({
+			...prev,
+			[checklistItemId]: ""
+		}));
 	};
-	const getCurrentValue = (itemId) => {
-		if (editingValues[itemId] !== void 0) return editingValues[itemId];
-		const discount = modelDiscounts.find((d) => d.checklist_item_id === itemId);
-		return discount ? discount.valor_desconto.toString() : "";
+	const handlePercentChange = (checklistItemId, percent) => {
+		setEditingPercents((prev) => ({
+			...prev,
+			[checklistItemId]: percent
+		}));
+		if (basePrice > 0 && percent) {
+			const pct = parseFloat(percent);
+			if (!isNaN(pct)) {
+				const val = pct / 100 * basePrice;
+				setEditingValues((prev) => ({
+					...prev,
+					[checklistItemId]: val.toFixed(2)
+				}));
+			} else setEditingValues((prev) => ({
+				...prev,
+				[checklistItemId]: ""
+			}));
+		} else setEditingValues((prev) => ({
+			...prev,
+			[checklistItemId]: ""
+		}));
 	};
 	const handleSave = async (item) => {
 		const valStr = editingValues[item.id];
-		if (valStr === void 0) return;
-		const val = parseFloat(valStr);
+		const finalValStr = valStr !== void 0 ? valStr : modelDiscounts.find((d) => d.checklist_item_id === item.id)?.valor_desconto.toString();
+		if (finalValStr === void 0) return;
+		const val = parseFloat(finalValStr);
 		if (isNaN(val)) return;
 		setIsSaving(true);
 		const existingDiscount = modelDiscounts.find((d) => d.checklist_item_id === item.id);
@@ -50115,6 +50378,11 @@ function ModelDiscountConfig() {
 				delete next[item.id];
 				return next;
 			});
+			setEditingPercents((prev) => {
+				const next = { ...prev };
+				delete next[item.id];
+				return next;
+			});
 		} else toast.error("Erro ao salvar");
 	};
 	const getCategoryName = (id) => {
@@ -50125,20 +50393,36 @@ function ModelDiscountConfig() {
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 			className: "flex items-center gap-2",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { className: "w-5 h-5 text-red-500" }), "Preços de Defeitos por Modelo"]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Configure o valor de dedução para cada defeito em cada modelo." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Configure o valor de dedução para cada defeito em cada modelo (R$ ou %)." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 			className: "flex-col gap-4 flex h-full min-h-0",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "space-y-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-					className: "text-sm font-medium",
-					children: "Selecione o Modelo"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-					value: selectedModelId,
-					onValueChange: setSelectedModelId,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Escolha um modelo..." }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-						value: p$1.id,
-						children: p$1.modelo
-					}, p$1.id)) })]
+				className: "flex gap-4 items-end",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2 flex-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-sm font-medium",
+						children: "Selecione o Modelo"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						value: selectedModelId,
+						onValueChange: setSelectedModelId,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Escolha um modelo..." }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectContent, { children: basePrices.map((p$1) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
+							value: p$1.id,
+							children: p$1.modelo
+						}, p$1.id)) })]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-2 flex-1",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-sm font-medium",
+						children: "Preço Base"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "h-10 px-3 py-2 border rounded-md bg-slate-50 text-slate-700 font-bold",
+						children: [
+							"R$",
+							" ",
+							basePrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+						]
+					})]
 				})]
 			}), selectedModelId ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
 				className: "flex-1 border rounded-md",
@@ -50148,8 +50432,12 @@ function ModelDiscountConfig() {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Item / Defeito" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Categoria" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
-							className: "w-[150px]",
+							className: "w-[140px]",
 							children: "Dedução (R$)"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+							className: "w-[140px]",
+							children: "Dedução (%)"
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { className: "w-[50px]" })
 					]
@@ -50164,14 +50452,36 @@ function ModelDiscountConfig() {
 							className: "text-muted-foreground text-xs",
 							children: getCategoryName(item.category_id)
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							type: "number",
-							min: "0",
-							step: "0.01",
-							placeholder: "0.00",
-							value: getCurrentValue(item.id),
-							onChange: (e) => handleValueChange(item.id, e.target.value),
-							className: cn("h-8 text-right", hasEdit && "border-amber-400 bg-amber-50")
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "relative",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "absolute left-2 top-2 text-xs text-muted-foreground",
+								children: "R$"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								type: "number",
+								min: "0",
+								step: "0.01",
+								placeholder: "0.00",
+								value: getCurrentValue(item.id),
+								onChange: (e) => handleAmountChange(item.id, e.target.value),
+								className: cn("h-9 pl-7 text-right", hasEdit && "border-amber-400 bg-amber-50")
+							})]
+						}) }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "relative",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								type: "number",
+								min: "0",
+								max: "100",
+								step: "0.1",
+								placeholder: "0.0",
+								value: getCurrentPercent(item.id),
+								onChange: (e) => handlePercentChange(item.id, e.target.value),
+								className: cn("h-9 pr-6 text-right", hasEdit && "border-amber-400 bg-amber-50")
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "absolute right-2 top-2 text-xs text-muted-foreground",
+								children: "%"
+							})]
 						}) }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: hasEdit && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							size: "icon",
@@ -75784,4 +76094,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Ch0lES60.js.map
+//# sourceMappingURL=index-BNmW1U6R.js.map

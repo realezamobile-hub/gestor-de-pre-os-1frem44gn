@@ -166,4 +166,6 @@ export interface Evaluation {
   url_pesquisa_2?: string | null
   url_pesquisa_3?: string | null
   url_pesquisa_4?: string | null
+  // New field for payment proof
+  url_comprovante_pagamento?: string | null
 }

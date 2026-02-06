@@ -39,6 +39,7 @@ import {
   ImageIcon,
   ExternalLink,
   Link as LinkIcon,
+  Receipt,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn, formatCPF, formatPhone, validateCPF } from '@/lib/utils'
@@ -62,11 +63,11 @@ export function EvaluationChecklist() {
     categories,
     saveEvaluation,
     uploadEvidence,
+    uploadPaymentProof,
   } = useEvaluationStore()
   const {
     currentClient,
     fetchClientByCpf,
-    createClient,
     upsertClient,
     clearCurrentClient,
     isLoading: isClientLoading,
@@ -102,7 +103,13 @@ export function EvaluationChecklist() {
   const [consultationFiles, setConsultationFiles] = useState<
     { file: File; preview: string }[]
   >([])
+  const [paymentFile, setPaymentFile] = useState<{
+    file: File
+    preview: string
+  } | null>(null)
+
   const [showWebcam, setShowWebcam] = useState(false)
+  const [webcamMode, setWebcamMode] = useState<'doc' | 'payment'>('doc')
   const [previewFile, setPreviewFile] = useState<{
     url: string
     name: string
@@ -220,7 +227,6 @@ export function EvaluationChecklist() {
       return false
     }
 
-    // Use upsert to handle duplicate CPFs gracefully
     const {
       success,
       data: client,
@@ -233,7 +239,6 @@ export function EvaluationChecklist() {
     if (success && client) {
       toast.success('Cliente cadastrado/atualizado!')
       setShowClientModal(false)
-      // Update manual fields with new client data
       setManualName(client.nome)
       setManualPhone(client.telefone)
       return true
@@ -265,12 +270,34 @@ export function EvaluationChecklist() {
     }
   }
 
-  const handleDocCapture = (file: File) => {
-    setDocFile({
-      file,
-      preview: URL.createObjectURL(file),
-    })
+  const handlePaymentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0]
+      setPaymentFile({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    }
+  }
+
+  const handleWebcamCapture = (file: File) => {
+    if (webcamMode === 'doc') {
+      setDocFile({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    } else {
+      setPaymentFile({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    }
     setShowWebcam(false)
+  }
+
+  const openWebcam = (mode: 'doc' | 'payment') => {
+    setWebcamMode(mode)
+    setShowWebcam(true)
   }
 
   const handleConsultationUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,15 +345,12 @@ export function EvaluationChecklist() {
       let clientIdToSave = currentClient?.id || null
 
       if (searchCpf && currentCompany.id) {
-        // Try to upsert to ensure we have the latest data and a valid ID
-        // This solves the issue of unique constraint violations on existing CPFs
         const { data: upsertedClient, error: upsertError } = await upsertClient(
           {
             nome: manualName,
             telefone: manualPhone,
             cpf: searchCpf,
             company_id: currentCompany.id,
-            // We use the store's upsertClient which handles onConflict: 'company_id,cpf'
           },
         )
 
@@ -334,7 +358,6 @@ export function EvaluationChecklist() {
           clientIdToSave = upsertedClient.id
         } else if (upsertError) {
           console.error('Upsert client failed:', upsertError)
-          // We continue, but we might fail to link the client id
         }
       }
 
@@ -354,7 +377,19 @@ export function EvaluationChecklist() {
         )
       }
 
-      // 3. Upload Additional Files
+      // 3. Upload Payment Proof (if any)
+      let paymentUrl = null
+      if (paymentFile) {
+        const payRes = await uploadPaymentProof(paymentFile.file)
+        if (payRes.error || !payRes.url) {
+          throw new Error(
+            `Erro ao enviar Comprovante: ${payRes.error?.message || 'Falha no upload'}`,
+          )
+        }
+        paymentUrl = payRes.url
+      }
+
+      // 4. Upload Additional Files
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
         for (const f of consultationFiles) {
@@ -372,7 +407,7 @@ export function EvaluationChecklist() {
         }
       }
 
-      // 4. Save to Database
+      // 5. Save to Database
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -387,12 +422,13 @@ export function EvaluationChecklist() {
             }) as PeripheralDiscountConfig,
         ),
         userId: currentUser.id,
-        clienteId: clientIdToSave, // Use the resolved client ID
+        clienteId: clientIdToSave,
         nomeCliente: manualName,
         telefoneCliente: manualPhone,
         cpf_cliente: searchCpf,
         urlPrint: printRes.url,
         urlDoc: docRes.url,
+        urlComprovantePagamento: paymentUrl,
         consultationFiles: consultationResults,
       })
 
@@ -410,6 +446,7 @@ export function EvaluationChecklist() {
         setManualPhone('')
         setPrintFile(null)
         setDocFile(null)
+        setPaymentFile(null)
         setConsultationFiles([])
       } else {
         toast.error(`Erro ao salvar no banco: ${result.error?.message}`, {
@@ -491,7 +528,7 @@ export function EvaluationChecklist() {
                       asChild
                     >
                       <a
-                        href="https://www.consultaserialaparelho.com.br/public-web/homeSiga"
+                        href="https://www.gov.br/anatel/pt-br/assuntos/celular-legal/consulte-sua-situacao"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -785,7 +822,7 @@ export function EvaluationChecklist() {
                           <Button
                             variant="outline"
                             className="w-full"
-                            onClick={() => setShowWebcam(true)}
+                            onClick={() => openWebcam('doc')}
                           >
                             <Camera className="w-4 h-4 mr-2" />
                             Usar Câmera
@@ -1038,7 +1075,7 @@ export function EvaluationChecklist() {
 
             {step === 5 && (
               <div className="space-y-6">
-                <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
+                <div className="flex flex-col items-center justify-center pt-6 text-center space-y-4">
                   <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
@@ -1047,55 +1084,132 @@ export function EvaluationChecklist() {
                       Tudo Pronto!
                     </h3>
                     <p className="text-muted-foreground max-w-md mx-auto mt-2">
-                      Revise o resumo ao lado e confirme para gerar a avaliação.
-                      Os dados do cliente e as evidências serão salvos
-                      automaticamente.
+                      Revise o resumo ao lado e anexe o comprovante de pagamento
+                      se necessário.
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 p-6 rounded-lg border w-full max-w-md text-left space-y-3">
-                    <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2">
-                      Resumo da Operação
-                    </h4>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Cliente</span>
-                      <div className="text-right">
-                        <span className="font-medium block">{manualName}</span>
-                        {currentClient && (
-                          <span className="text-xs text-emerald-600 flex items-center justify-end gap-1">
-                            <LinkIcon className="w-3 h-3" /> Vinculado
+                  <div className="w-full max-w-md space-y-4">
+                    <div className="bg-slate-50 p-4 rounded-lg border border-dashed border-slate-300">
+                      <Label className="font-bold text-slate-700 flex items-center gap-2 mb-3">
+                        <Receipt className="w-4 h-4" /> Comprovante de Pagamento
+                      </Label>
+
+                      {!paymentFile ? (
+                        <div className="flex flex-col gap-2">
+                          <div className="relative">
+                            <Input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              className="hidden"
+                              id="payment-upload"
+                              onChange={handlePaymentUpload}
+                            />
+                            <Label
+                              htmlFor="payment-upload"
+                              className="flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500"
+                            >
+                              <span className="flex flex-col items-center gap-1">
+                                <Upload className="w-5 h-5" />
+                                <span className="text-xs">Upload Arquivo</span>
+                              </span>
+                            </Label>
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => openWebcam('payment')}
+                          >
+                            <Camera className="w-4 h-4 mr-2" />
+                            Usar Câmera
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="relative group border rounded-md p-2 bg-white flex items-center gap-2">
+                          <div
+                            className="w-12 h-12 bg-slate-100 rounded overflow-hidden cursor-pointer"
+                            onClick={() =>
+                              setPreviewFile({
+                                url: paymentFile.preview,
+                                name: paymentFile.file.name,
+                              })
+                            }
+                          >
+                            {paymentFile.file.type.startsWith('image/') ? (
+                              <img
+                                src={paymentFile.preview}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <FileIcon className="w-full h-full p-2 text-slate-500" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-medium truncate">
+                              {paymentFile.file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(paymentFile.file.size / 1024).toFixed(0)}kb
+                            </p>
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-red-500 hover:bg-red-50"
+                            onClick={() => setPaymentFile(null)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-slate-50 p-6 rounded-lg border text-left space-y-3">
+                      <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b pb-2">
+                        Resumo da Operação
+                      </h4>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Cliente</span>
+                        <div className="text-right">
+                          <span className="font-medium block">
+                            {manualName}
                           </span>
-                        )}
+                          {currentClient && (
+                            <span className="text-xs text-emerald-600 flex items-center justify-end gap-1">
+                              <LinkIcon className="w-3 h-3" /> Vinculado
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">CPF</span>
-                      <span className="font-medium">{searchCpf}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Evidências</span>
-                      <div className="text-right text-sm">
-                        <span className="block text-green-600">
-                          1 Print de Segurança
-                        </span>
-                        <span className="block text-green-600">
-                          1 Documento
-                        </span>
-                        {consultationFiles.length > 0 && (
-                          <span className="block text-blue-600">
-                            {consultationFiles.length} Extra(s)
+                      <div className="flex justify-between">
+                        <span className="text-sm">CPF</span>
+                        <span className="font-medium">{searchCpf}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Evidências</span>
+                        <div className="text-right text-sm">
+                          <span className="block text-green-600">
+                            1 Print de Segurança
                           </span>
-                        )}
+                          <span className="block text-green-600">
+                            1 Documento
+                          </span>
+                          {consultationFiles.length > 0 && (
+                            <span className="block text-blue-600">
+                              {consultationFiles.length} Extra(s)
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex justify-between border-t pt-2">
-                      <span className="text-sm">Valor Final</span>
-                      <span className="font-bold text-emerald-600">
-                        R${' '}
-                        {finalPrice.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                        })}
-                      </span>
+                      <div className="flex justify-between border-t pt-2">
+                        <span className="text-sm">Valor Final</span>
+                        <span className="font-bold text-emerald-600">
+                          R${' '}
+                          {finalPrice.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1224,6 +1338,15 @@ export function EvaluationChecklist() {
                   />
                   Arquivos: {printFile && docFile ? 'OK' : 'Pendente'}
                 </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Receipt
+                    className={cn(
+                      'w-4 h-4',
+                      paymentFile ? 'text-green-500' : 'text-slate-600',
+                    )}
+                  />
+                  Pagamento: {paymentFile ? 'Anexado' : 'Não anexado'}
+                </div>
               </div>
             )}
           </CardContent>
@@ -1249,10 +1372,13 @@ export function EvaluationChecklist() {
       <Dialog open={showWebcam} onOpenChange={setShowWebcam}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Capturar Foto do Documento</DialogTitle>
+            <DialogTitle>
+              Capturar{' '}
+              {webcamMode === 'doc' ? 'Foto do Documento' : 'Comprovante'}
+            </DialogTitle>
           </DialogHeader>
           <WebcamCapture
-            onCapture={handleDocCapture}
+            onCapture={handleWebcamCapture}
             onCancel={() => setShowWebcam(false)}
           />
         </DialogContent>

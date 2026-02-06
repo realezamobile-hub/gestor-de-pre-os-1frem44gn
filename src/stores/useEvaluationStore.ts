@@ -37,6 +37,10 @@ interface EvaluationStore {
     categoryId: string,
     nome: string,
   ) => Promise<{ success: boolean; error?: any }>
+  updateChecklistItem: (
+    id: string,
+    nome: string,
+  ) => Promise<{ success: boolean; error?: any }>
   deleteChecklistItem: (
     id: string,
   ) => Promise<{ success: boolean; error?: any }>
@@ -54,6 +58,9 @@ interface EvaluationStore {
   saveEvaluation: (data: any) => Promise<{ success: boolean; error?: any }>
   fetchEvaluations: () => Promise<void>
   uploadEvidence: (file: File) => Promise<{ url: string | null; error: any }>
+  uploadPaymentProof: (
+    file: File,
+  ) => Promise<{ url: string | null; error: any }>
 }
 
 export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
@@ -154,6 +161,15 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     return { success: !error, error }
   },
 
+  updateChecklistItem: async (id, nome) => {
+    const { error } = await supabase
+      .from('config_checklist_items')
+      .update({ nome })
+      .eq('id', id)
+    if (!error) await get().fetchConfigs()
+    return { success: !error, error }
+  },
+
   deleteChecklistItem: async (id) => {
     const { error } = await supabase
       .from('config_checklist_items')
@@ -215,6 +231,7 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       cliente_id: data.clienteId,
       url_print_seguranca: data.urlPrint || null,
       url_foto_documento: data.urlDoc || null,
+      url_comprovante_pagamento: data.urlComprovantePagamento || null,
       arquivos_consulta: data.consultationFiles || [],
       // Save specific columns
       url_pesquisa_1,
@@ -238,8 +255,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
     const mappedData = data?.map((d) => ({
       ...d,
       client: d.clientes,
-      // Map profiles relationship to the correct property if needed,
-      // though supabase returns it in the object structure already.
     }))
 
     if (!error && data) {
@@ -265,8 +280,6 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
         .toLowerCase()
 
       const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
-
-      // CRITICAL FIX: Convert to ArrayBuffer to prevent "FormData object could not be cloned" error
       const fileBuffer = await file.arrayBuffer()
 
       const { error: uploadError } = await supabase.storage
@@ -285,6 +298,48 @@ export const useEvaluationStore = create<EvaluationStore>((set, get) => ({
       const {
         data: { publicUrl },
       } = supabase.storage.from('evaluation-evidence').getPublicUrl(fileName)
+
+      return { url: publicUrl, error: null }
+    } catch (error) {
+      console.error('Upload exception:', error)
+      return { url: null, error }
+    }
+  },
+
+  uploadPaymentProof: async (file) => {
+    try {
+      if (!file) return { url: null, error: 'Arquivo inválido' }
+
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'unknown'
+      const nameWithoutExt =
+        file.name.substring(0, file.name.lastIndexOf('.')) || file.name
+
+      const sanitizedBaseName = nameWithoutExt
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9\s\-_]/g, '')
+        .replace(/\s+/g, '-')
+        .toLowerCase()
+
+      const fileName = `${Date.now()}-${sanitizedBaseName}.${fileExt}`
+      const fileBuffer = await file.arrayBuffer()
+
+      const { error: uploadError } = await supabase.storage
+        .from('evaluations')
+        .upload(fileName, fileBuffer, {
+          upsert: false,
+          contentType: file.type || 'application/octet-stream',
+          cacheControl: '3600',
+        })
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError)
+        return { url: null, error: uploadError }
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('evaluations').getPublicUrl(fileName)
 
       return { url: publicUrl, error: null }
     } catch (error) {

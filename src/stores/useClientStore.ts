@@ -12,6 +12,14 @@ interface ClientStore {
   createClient: (
     data: Omit<Client, 'id' | 'created_at' | 'updated_at'>,
   ) => Promise<{ success: boolean; data?: Client; error?: any }>
+  upsertClient: (
+    data: Partial<Client> & {
+      cpf: string
+      company_id: string
+      nome: string
+      telefone: string
+    },
+  ) => Promise<{ success: boolean; data?: Client; error?: any }>
   updateClient: (
     id: string,
     data: Partial<Client>,
@@ -110,6 +118,55 @@ export const useClientStore = create<ClientStore>((set, get) => ({
     return { success: false, error: 'Unknown error' }
   },
 
+  upsertClient: async (clientData) => {
+    set({ isLoading: true })
+
+    if (!clientData.company_id) {
+      console.error('Missing company_id in upsertClient')
+      set({ isLoading: false })
+      return {
+        success: false,
+        error:
+          'Erro interno: Identificação da empresa ausente. Tente recarregar a página.',
+      }
+    }
+
+    let endereco = clientData.endereco
+    if (!endereco && clientData.rua) {
+      endereco = `${clientData.rua}, ${clientData.numero || 'S/N'}, ${clientData.bairro || ''}, ${clientData.municipio || ''} - ${clientData.estado || ''}`
+    }
+
+    const { data, error } = await supabase
+      .from('clientes')
+      .upsert({ ...clientData, endereco }, { onConflict: 'company_id,cpf' })
+      .select()
+      .single()
+
+    set({ isLoading: false })
+
+    if (error) {
+      console.error('Error upserting client:', error)
+      return { success: false, error }
+    }
+
+    if (data) {
+      set((state) => {
+        const exists = state.clients.some((c) => c.id === data.id)
+        return {
+          currentClient: data as Client,
+          clients: exists
+            ? state.clients.map((c) =>
+                c.id === data.id ? (data as Client) : c,
+              )
+            : [data as Client, ...state.clients],
+        }
+      })
+      return { success: true, data: data as Client }
+    }
+
+    return { success: false, error: 'Unknown error' }
+  },
+
   updateClient: async (id, clientData) => {
     set({ isLoading: true })
 
@@ -143,7 +200,6 @@ export const useClientStore = create<ClientStore>((set, get) => ({
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, '')
       const fileName = `${Date.now()}-${sanitizedName}.${fileExt}`
 
-      // Fix for "FormData object could not be cloned" error
       const cleanFile = new File([file], fileName, { type: file.type })
 
       const { error: uploadError } = await supabase.storage

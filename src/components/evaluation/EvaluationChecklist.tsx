@@ -67,6 +67,7 @@ export function EvaluationChecklist() {
     currentClient,
     fetchClientByCpf,
     createClient,
+    upsertClient,
     clearCurrentClient,
     isLoading: isClientLoading,
   } = useClientStore()
@@ -219,17 +220,18 @@ export function EvaluationChecklist() {
       return false
     }
 
+    // Use upsert to handle duplicate CPFs gracefully
     const {
       success,
       data: client,
       error,
-    } = await createClient({
+    } = await upsertClient({
       ...data,
       company_id: currentCompany.id,
     })
 
     if (success && client) {
-      toast.success('Cliente cadastrado!')
+      toast.success('Cliente cadastrado/atualizado!')
       setShowClientModal(false)
       // Update manual fields with new client data
       setManualName(client.nome)
@@ -312,6 +314,30 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
+      // 0. Ensure Client Exists / Upsert Client
+      let clientIdToSave = currentClient?.id || null
+
+      if (searchCpf && currentCompany.id) {
+        // Try to upsert to ensure we have the latest data and a valid ID
+        // This solves the issue of unique constraint violations on existing CPFs
+        const { data: upsertedClient, error: upsertError } = await upsertClient(
+          {
+            nome: manualName,
+            telefone: manualPhone,
+            cpf: searchCpf,
+            company_id: currentCompany.id,
+            // We use the store's upsertClient which handles onConflict: 'company_id,cpf'
+          },
+        )
+
+        if (upsertedClient) {
+          clientIdToSave = upsertedClient.id
+        } else if (upsertError) {
+          console.error('Upsert client failed:', upsertError)
+          // We continue, but we might fail to link the client id
+        }
+      }
+
       // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
@@ -361,7 +387,7 @@ export function EvaluationChecklist() {
             }) as PeripheralDiscountConfig,
         ),
         userId: currentUser.id,
-        clienteId: currentClient?.id || null, // Link if exists, otherwise null
+        clienteId: clientIdToSave, // Use the resolved client ID
         nomeCliente: manualName,
         telefoneCliente: manualPhone,
         cpf_cliente: searchCpf,

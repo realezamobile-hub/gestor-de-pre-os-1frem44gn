@@ -47424,6 +47424,47 @@ const useClientStore = create((set, get$8) => ({
 			error: "Unknown error"
 		};
 	},
+	upsertClient: async (clientData) => {
+		set({ isLoading: true });
+		if (!clientData.company_id) {
+			console.error("Missing company_id in upsertClient");
+			set({ isLoading: false });
+			return {
+				success: false,
+				error: "Erro interno: Identificação da empresa ausente. Tente recarregar a página."
+			};
+		}
+		let endereco = clientData.endereco;
+		if (!endereco && clientData.rua) endereco = `${clientData.rua}, ${clientData.numero || "S/N"}, ${clientData.bairro || ""}, ${clientData.municipio || ""} - ${clientData.estado || ""}`;
+		const { data, error } = await supabase.from("clientes").upsert({
+			...clientData,
+			endereco
+		}, { onConflict: "company_id,cpf" }).select().single();
+		set({ isLoading: false });
+		if (error) {
+			console.error("Error upserting client:", error);
+			return {
+				success: false,
+				error
+			};
+		}
+		if (data) {
+			set((state) => {
+				return {
+					currentClient: data,
+					clients: state.clients.some((c$1) => c$1.id === data.id) ? state.clients.map((c$1) => c$1.id === data.id ? data : c$1) : [data, ...state.clients]
+				};
+			});
+			return {
+				success: true,
+				data
+			};
+		}
+		return {
+			success: false,
+			error: "Unknown error"
+		};
+	},
 	updateClient: async (id, clientData) => {
 		set({ isLoading: true });
 		const { error } = await supabase.from("clientes").update({
@@ -48154,7 +48195,7 @@ function FilePreviewDialog({ open, onOpenChange, fileUrl, fileName, fileType }) 
 }
 function EvaluationChecklist() {
 	const { basePrices, peripheralDiscounts, checklistItems, categories, saveEvaluation, uploadEvidence } = useEvaluationStore();
-	const { currentClient, fetchClientByCpf, createClient: createClient$1, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
+	const { currentClient, fetchClientByCpf, createClient: createClient$1, upsertClient, clearCurrentClient, isLoading: isClientLoading } = useClientStore();
 	const { currentUser, currentCompany } = useAuthStore();
 	const [step, setStep] = (0, import_react.useState)(1);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
@@ -48246,12 +48287,12 @@ function EvaluationChecklist() {
 			toast.error("Sessão inválida ou empresa não identificada.");
 			return false;
 		}
-		const { success, data: client, error } = await createClient$1({
+		const { success, data: client, error } = await upsertClient({
 			...data,
 			company_id: currentCompany.id
 		});
 		if (success && client) {
-			toast.success("Cliente cadastrado!");
+			toast.success("Cliente cadastrado/atualizado!");
 			setShowClientModal(false);
 			setManualName(client.nome);
 			setManualPhone(client.telefone);
@@ -48314,6 +48355,17 @@ function EvaluationChecklist() {
 		setIsSaving(true);
 		const toastId = toast.loading("Processando uploads e salvando dados...");
 		try {
+			let clientIdToSave = currentClient?.id || null;
+			if (searchCpf && currentCompany.id) {
+				const { data: upsertedClient, error: upsertError } = await upsertClient({
+					nome: manualName,
+					telefone: manualPhone,
+					cpf: searchCpf,
+					company_id: currentCompany.id
+				});
+				if (upsertedClient) clientIdToSave = upsertedClient.id;
+				else if (upsertError) console.error("Upsert client failed:", upsertError);
+			}
 			const printRes = await uploadEvidence(printFile.file);
 			if (printRes.error || !printRes.url) throw new Error(`Erro ao enviar Print: ${printRes.error?.message || "Falha no upload"}`);
 			const docRes = await uploadEvidence(docFile.file);
@@ -48339,7 +48391,7 @@ function EvaluationChecklist() {
 					valor_desconto: d.value
 				})),
 				userId: currentUser.id,
-				clienteId: currentClient?.id || null,
+				clienteId: clientIdToSave,
 				nomeCliente: manualName,
 				telefoneCliente: manualPhone,
 				cpf_cliente: searchCpf,
@@ -75732,4 +75784,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D9glu3jn.js.map
+//# sourceMappingURL=index-Ch0lES60.js.map

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useProductStore } from '@/stores/useProductStore'
 import { useDebounce } from '@/hooks/use-debounce'
-import { Trash2, Search, ListChecks } from 'lucide-react'
+import { Trash2, Search, ListChecks, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertDialog,
@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import { useState, useEffect, useRef } from 'react'
+import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -39,6 +41,7 @@ export default function DashboardPage() {
   } = useProductStore()
   const [isDeleting, setIsDeleting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(filters.search)
+  const isMobile = useIsMobile()
 
   // Ref to ensure automatic cleanup runs only once per session/mount
   const hasRunCleanupRef = useRef(false)
@@ -68,7 +71,7 @@ export default function DashboardPage() {
     // Automatic non-blocking cleanup for zero value products
     if (currentUser?.companyId && !hasRunCleanupRef.current) {
       hasRunCleanupRef.current = true
-      // Fire and forget - don't await
+      // Fire and forget - don't await to avoid blocking UI
       deleteZeroValueProducts(currentUser.companyId).then((result) => {
         if (!result.success) {
           // Silently fail for automatic cleanup, just log debug if needed
@@ -92,7 +95,9 @@ export default function DashboardPage() {
     try {
       const result = await deleteZeroValueProducts(currentUser.companyId)
       if (result.success) {
-        toast.success('Registros deletados com sucesso!')
+        toast.success('Limpeza realizada com sucesso!', {
+          description: `${result.count} produtos com valor zero ou nulo removidos da base.`,
+        })
       } else {
         toast.error('Erro ao deletar registros. Tente novamente.')
       }
@@ -152,21 +157,29 @@ export default function DashboardPage() {
               <AlertDialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  size="icon"
-                  className="h-9 w-9"
+                  size={isMobile ? 'icon' : 'sm'}
+                  className={cn('h-9', !isMobile && 'w-auto px-3')}
                   title="Deletar registros com valor <= 0,00"
                   disabled={isDeleting}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  {isDeleting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  <span className="hidden sm:inline ml-2">Limpar Zerados</span>
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Excluir Produtos Zerados?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Tem certeza que deseja excluir permanentemente todos os
-                    produtos com valor zero ou nulo? Esta ação não pode ser
-                    desfeita.
+                    Esta ação irá remover permanentemente <strong>todos</strong>{' '}
+                    os produtos da sua empresa com valor R$ 0,00 ou nulo.
+                    <br />
+                    <br />
+                    Isso inclui produtos que podem estar em outras páginas ou
+                    listas. A ação não pode ser desfeita.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -174,8 +187,9 @@ export default function DashboardPage() {
                   <AlertDialogAction
                     onClick={handleDeleteZeros}
                     className="bg-destructive hover:bg-destructive/90"
+                    disabled={isDeleting}
                   >
-                    {isDeleting ? 'Excluindo...' : 'Confirmar Limpeza'}
+                    {isDeleting ? 'Processando...' : 'Confirmar Limpeza'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

@@ -9,8 +9,8 @@ CREATE OR REPLACE FUNCTION delete_zero_value_products(p_company_id uuid)
 RETURNS integer
 LANGUAGE plpgsql
 SECURITY DEFINER
--- Increase statement timeout to 2 minutes for this specific function to handle large datasets
-SET statement_timeout = '120s' 
+-- Increase statement timeout to 5 minutes (300s) to handle large datasets globally
+SET statement_timeout = '300s' 
 AS $$
 DECLARE
   deleted_count integer;

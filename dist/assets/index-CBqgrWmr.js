@@ -39753,7 +39753,7 @@ const useProductStore = create((set, get$8) => ({
 			if (!companyId) throw new Error("Company ID is required");
 			const { data, error } = await supabase.rpc("delete_zero_value_products", { p_company_id: companyId });
 			if (error) throw error;
-			get$8().fetchProducts();
+			await Promise.all([get$8().fetchProducts(), get$8().fetchPriceMonitor()]);
 			return {
 				success: true,
 				count: data
@@ -42633,6 +42633,7 @@ function DashboardPage() {
 	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, deleteZeroValueProducts, setFilters, filters, draftItems } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
+	const isMobile = useIsMobile();
 	const hasRunCleanupRef = (0, import_react.useRef)(false);
 	(0, import_react.useEffect)(() => {
 		setSearchTerm(filters.search);
@@ -42662,7 +42663,8 @@ function DashboardPage() {
 		}
 		setIsDeleting(true);
 		try {
-			if ((await deleteZeroValueProducts(currentUser.companyId)).success) toast.success("Registros deletados com sucesso!");
+			const result = await deleteZeroValueProducts(currentUser.companyId);
+			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo removidos da base.` });
 			else toast.error("Erro ao deletar registros. Tente novamente.");
 		} catch (e) {
 			toast.error("Erro ao deletar registros. Tente novamente.");
@@ -42717,18 +42719,30 @@ function DashboardPage() {
 							]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
 							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 								variant: "destructive",
-								size: "icon",
-								className: "h-9 w-9",
+								size: isMobile ? "icon" : "sm",
+								className: cn("h-9", !isMobile && "w-auto px-3"),
 								title: "Deletar registros com valor <= 0,00",
 								disabled: isDeleting,
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" })
+								children: [isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "hidden sm:inline ml-2",
+									children: "Limpar Zerados"
+								})]
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo? Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+							"Esta ação irá remover permanentemente ",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "todos" }),
+							" ",
+							"os produtos da sua empresa com valor R$ 0,00 ou nulo.",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							"Isso inclui produtos que podem estar em outras páginas ou listas. A ação não pode ser desfeita."
+						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
 							onClick: handleDeleteZeros,
 							className: "bg-destructive hover:bg-destructive/90",
-							children: isDeleting ? "Excluindo..." : "Confirmar Limpeza"
+							disabled: isDeleting,
+							children: isDeleting ? "Processando..." : "Confirmar Limpeza"
 						})] })] })] })]
 					})]
 				})
@@ -46687,10 +46701,10 @@ function BulkCleanup() {
 		setZeroValueLoading(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo foram removidos.` });
+			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo foram removidos permanentemente.` });
 			else {
 				console.error("Zero cleanup error:", result.error);
-				if (result.error?.code === "57014") toast.error("A operação demorou muito e foi interrompida (Timeout). Alguns registros podem não ter sido excluídos.");
+				if (result.error?.code === "57014") toast.error("A operação demorou muito, mas o processo foi otimizado. Tente novamente se o erro persistir.");
 				else toast.error("Erro ao deletar registros. Tente novamente.");
 			}
 		} catch (error) {
@@ -76234,4 +76248,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-7fwuQMtS.js.map
+//# sourceMappingURL=index-CBqgrWmr.js.map

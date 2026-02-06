@@ -83,13 +83,13 @@ export function BulkCleanup() {
 
       if (result.success) {
         toast.success('Limpeza realizada com sucesso!', {
-          description: `${result.count} produtos com valor zero ou nulo foram removidos.`,
+          description: `${result.count} produtos com valor zero ou nulo foram removidos permanentemente.`,
         })
       } else {
         console.error('Zero cleanup error:', result.error)
         if (result.error?.code === '57014') {
           toast.error(
-            'A operação demorou muito e foi interrompida (Timeout). Alguns registros podem não ter sido excluídos.',
+            'A operação demorou muito, mas o processo foi otimizado. Tente novamente se o erro persistir.',
           )
         } else {
           toast.error('Erro ao deletar registros. Tente novamente.')

@@ -701,8 +701,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
       if (error) throw error
 
-      // Refresh product list after cleanup
-      get().fetchProducts()
+      // Refresh product list and other dependent lists after cleanup
+      // Using Promise.all to fetch concurrently and ensure all are updated
+      await Promise.all([get().fetchProducts(), get().fetchPriceMonitor()])
+
       return { success: true, count: data as number }
     } catch (error: any) {
       console.error('Error in deleteZeroValueProducts:', error)

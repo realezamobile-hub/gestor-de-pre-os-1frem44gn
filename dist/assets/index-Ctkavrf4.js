@@ -47579,23 +47579,27 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 	const canvasRef = (0, import_react.useRef)(null);
 	const [capturedImage, setCapturedImage] = (0, import_react.useState)(null);
 	const [stream, setStream] = (0, import_react.useState)(null);
-	const [facingMode, setFacingMode] = (0, import_react.useState)("user");
+	const [facingMode, setFacingMode] = (0, import_react.useState)("environment");
 	const [hasMultipleCameras, setHasMultipleCameras] = (0, import_react.useState)(false);
+	const [error, setError] = (0, import_react.useState)(null);
 	const checkCameras = async () => {
 		try {
+			if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) throw new Error("Câmera não suportada neste dispositivo/navegador");
 			setHasMultipleCameras((await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === "videoinput").length > 1);
-		} catch (error) {
-			console.error("Error checking cameras:", error);
+		} catch (error$1) {
+			console.error("Error checking cameras:", error$1);
 		}
 	};
 	const startCamera = async () => {
+		setError(null);
 		if (stream) stream.getTracks().forEach((track) => track.stop());
 		try {
+			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Câmera não suportada neste dispositivo/navegador");
 			const mediaStream = await navigator.mediaDevices.getUserMedia({
 				video: {
 					facingMode,
-					width: { ideal: 1280 },
-					height: { ideal: 720 }
+					width: { ideal: 1920 },
+					height: { ideal: 1080 }
 				},
 				audio: false
 			});
@@ -47610,7 +47614,11 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 			}
 		} catch (err) {
 			console.error("Error accessing camera:", err);
-			toast.error("Não foi possível acessar a câmera. Verifique as permissões.");
+			let msg = "Não foi possível acessar a câmera.";
+			if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") msg = "Permissão da câmera negada. Verifique as configurações.";
+			else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") msg = "Nenhuma câmera encontrada.";
+			setError(msg);
+			toast.error(msg);
 		}
 	};
 	(0, import_react.useEffect)(() => {
@@ -47644,7 +47652,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 					context.scale(-1, 1);
 				}
 				context.drawImage(video, 0, 0, canvas.width, canvas.height);
-				setCapturedImage(canvas.toDataURL("image/jpeg", .85));
+				setCapturedImage(canvas.toDataURL("image/jpeg", .9));
 			}
 		}
 	};
@@ -47661,12 +47669,43 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 				}));
 				stopCamera();
 			}
-		}, "image/jpeg", .85);
+		}, "image/jpeg", .9);
 	};
+	if (error) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: cn("flex flex-col items-center justify-center p-8 text-center bg-slate-50 rounded-lg border border-slate-200 gap-4", className),
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-6 h-6" })
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-1",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "font-medium text-slate-900",
+					children: "Erro na Câmera"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-sm text-slate-500 max-w-[250px] mx-auto",
+					children: error
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					variant: "outline",
+					onClick: startCamera,
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-4 h-4 mr-2" }), " Tentar Novamente"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					variant: "secondary",
+					onClick: onCancel,
+					children: "Fechar"
+				})]
+			})
+		]
+	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: cn("flex flex-col items-center gap-4 bg-slate-100 p-4 rounded-lg", className),
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner",
+			className: "relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner flex items-center justify-center",
 			children: [!capturedImage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("video", {
 				ref: videoRef,
 				className: cn("w-full h-full object-cover", facingMode === "user" && "scale-x-[-1]"),
@@ -47676,7 +47715,7 @@ function WebcamCapture({ onCapture, onCancel, className }) {
 			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 				src: capturedImage,
 				alt: "Captured",
-				className: "w-full h-full object-cover"
+				className: "w-full h-full object-contain"
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("canvas", {
 				ref: canvasRef,
 				className: "hidden"
@@ -48814,32 +48853,46 @@ function EvaluationChecklist() {
 																children: "RG, CNH ou documento oficial com foto do cliente"
 															}),
 															!docFile ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-																className: "flex flex-col gap-2",
-																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-																	className: "relative",
-																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-																		type: "file",
-																		accept: "image/*",
-																		className: "hidden",
-																		id: "doc-upload",
-																		onChange: handleDocUpload
-																	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-																		htmlFor: "doc-upload",
-																		className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
-																		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-																			className: "flex flex-col items-center gap-1",
-																			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																				className: "text-xs",
-																				children: "Upload Arquivo"
-																			})]
-																		})
-																	})]
-																}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-																	variant: "outline",
-																	className: "w-full",
-																	onClick: () => openWebcam("doc"),
-																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Usar Câmera"]
-																})]
+																className: "flex flex-col gap-4",
+																children: [
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																		className: "relative",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																			type: "file",
+																			accept: "image/*",
+																			className: "hidden",
+																			id: "doc-upload",
+																			onChange: handleDocUpload
+																		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+																			htmlFor: "doc-upload",
+																			className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
+																			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																				className: "flex flex-col items-center gap-1",
+																				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																					className: "text-xs",
+																					children: "Upload Arquivo"
+																				})]
+																			})
+																		})]
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																		className: "flex items-center gap-3",
+																		children: [
+																			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-px bg-slate-200 flex-1" }),
+																			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																				className: "text-[10px] font-medium text-slate-400 uppercase",
+																				children: "Ou"
+																			}),
+																			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-px bg-slate-200 flex-1" })
+																		]
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+																		variant: "outline",
+																		className: "w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800",
+																		onClick: () => openWebcam("doc"),
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto com Câmera"]
+																	})
+																]
 															}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 																className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
 																children: [
@@ -49072,32 +49125,46 @@ function EvaluationChecklist() {
 														className: "font-bold text-slate-700 flex items-center gap-2 mb-3",
 														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Receipt, { className: "w-4 h-4" }), " Comprovante de Pagamento"]
 													}), !paymentFile ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-														className: "flex flex-col gap-2",
-														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-															className: "relative",
-															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-																type: "file",
-																accept: "image/*,application/pdf",
-																className: "hidden",
-																id: "payment-upload",
-																onChange: handlePaymentUpload
-															}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-																htmlFor: "payment-upload",
-																className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
-																children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-																	className: "flex flex-col items-center gap-1",
-																	children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-																		className: "text-xs",
-																		children: "Upload Arquivo"
-																	})]
-																})
-															})]
-														}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-															variant: "outline",
-															className: "w-full",
-															onClick: () => openWebcam("payment"),
-															children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Usar Câmera"]
-														})]
+														className: "flex flex-col gap-4",
+														children: [
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "relative",
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+																	type: "file",
+																	accept: "image/*,application/pdf",
+																	className: "hidden",
+																	id: "payment-upload",
+																	onChange: handlePaymentUpload
+																}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+																	htmlFor: "payment-upload",
+																	className: "flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 rounded hover:bg-white cursor-pointer transition-colors text-slate-500",
+																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+																		className: "flex flex-col items-center gap-1",
+																		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { className: "w-5 h-5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																			className: "text-xs",
+																			children: "Upload Arquivo"
+																		})]
+																	})
+																})]
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+																className: "flex items-center gap-3",
+																children: [
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-px bg-slate-200 flex-1" }),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+																		className: "text-[10px] font-medium text-slate-400 uppercase",
+																		children: "Ou"
+																	}),
+																	/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-px bg-slate-200 flex-1" })
+																]
+															}),
+															/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+																variant: "outline",
+																className: "w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800",
+																onClick: () => openWebcam("payment"),
+																children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Camera, { className: "w-4 h-4 mr-2" }), "Tirar Foto com Câmera"]
+															})
+														]
 													}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 														className: "relative group border rounded-md p-2 bg-white flex items-center gap-2",
 														children: [
@@ -76120,4 +76187,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DfInIo2U.js.map
+//# sourceMappingURL=index-Ctkavrf4.js.map

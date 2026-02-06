@@ -115,19 +115,16 @@ export function EvaluationChecklist() {
     name: string
   } | null>(null)
 
-  // New state for manual price override
   const [customPrice, setCustomPrice] = useState<string | number | null>(null)
 
   const selectedModel = basePrices.find((p) => p.id === selectedModelId)
 
-  // Auto-search CPF when complete
   useEffect(() => {
     if (searchCpf.length === 14 && validateCPF(searchCpf)) {
       handleClientSearch()
     }
   }, [searchCpf])
 
-  // Update manual fields when currentClient changes
   useEffect(() => {
     if (currentClient) {
       setManualName(currentClient.nome)
@@ -174,7 +171,6 @@ export function EvaluationChecklist() {
     ? Math.max(0, selectedModel.preco_base - totalDiscounts)
     : 0
 
-  // Reset custom price when calculated price changes (e.g. model change or defects change)
   useEffect(() => {
     setCustomPrice(null)
   }, [calculatedPrice])
@@ -365,7 +361,6 @@ export function EvaluationChecklist() {
     const toastId = toast.loading('Processando uploads e salvando dados...')
 
     try {
-      // 0. Ensure Client Exists / Upsert Client
       let clientIdToSave = currentClient?.id || null
 
       if (searchCpf && currentCompany.id) {
@@ -385,7 +380,6 @@ export function EvaluationChecklist() {
         }
       }
 
-      // 1. Upload Print
       const printRes = await uploadEvidence(printFile.file)
       if (printRes.error || !printRes.url) {
         throw new Error(
@@ -393,7 +387,6 @@ export function EvaluationChecklist() {
         )
       }
 
-      // 2. Upload Document
       const docRes = await uploadEvidence(docFile.file)
       if (docRes.error || !docRes.url) {
         throw new Error(
@@ -401,7 +394,6 @@ export function EvaluationChecklist() {
         )
       }
 
-      // 3. Upload Payment Proof (if any)
       let paymentUrl = null
       if (paymentFile) {
         const payRes = await uploadPaymentProof(paymentFile.file)
@@ -413,7 +405,6 @@ export function EvaluationChecklist() {
         paymentUrl = payRes.url
       }
 
-      // 4. Upload Additional Files
       const consultationResults: ConsultationFile[] = []
       if (consultationFiles.length > 0) {
         for (const f of consultationFiles) {
@@ -431,7 +422,6 @@ export function EvaluationChecklist() {
         }
       }
 
-      // 5. Save to Database
       const result = await saveEvaluation({
         modelo: selectedModel.modelo,
         serialNumber,
@@ -458,7 +448,6 @@ export function EvaluationChecklist() {
 
       if (result.success) {
         toast.success('Avaliação concluída com sucesso!', { id: toastId })
-        // Reset form
         setStep(1)
         setSelectedModelId('')
         setSerialNumber('')
@@ -825,7 +814,7 @@ export function EvaluationChecklist() {
                       </p>
 
                       {!docFile ? (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-4">
                           <div className="relative">
                             <Input
                               type="file"
@@ -844,13 +833,22 @@ export function EvaluationChecklist() {
                               </span>
                             </Label>
                           </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="h-px bg-slate-200 flex-1" />
+                            <span className="text-[10px] font-medium text-slate-400 uppercase">
+                              Ou
+                            </span>
+                            <div className="h-px bg-slate-200 flex-1" />
+                          </div>
+
                           <Button
                             variant="outline"
-                            className="w-full"
+                            className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
                             onClick={() => openWebcam('doc')}
                           >
                             <Camera className="w-4 h-4 mr-2" />
-                            Usar Câmera
+                            Tirar Foto com Câmera
                           </Button>
                         </div>
                       ) : (
@@ -1121,7 +1119,7 @@ export function EvaluationChecklist() {
                       </Label>
 
                       {!paymentFile ? (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-4">
                           <div className="relative">
                             <Input
                               type="file"
@@ -1140,13 +1138,22 @@ export function EvaluationChecklist() {
                               </span>
                             </Label>
                           </div>
+
+                          <div className="flex items-center gap-3">
+                            <div className="h-px bg-slate-200 flex-1" />
+                            <span className="text-[10px] font-medium text-slate-400 uppercase">
+                              Ou
+                            </span>
+                            <div className="h-px bg-slate-200 flex-1" />
+                          </div>
+
                           <Button
                             variant="outline"
-                            className="w-full"
+                            className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
                             onClick={() => openWebcam('payment')}
                           >
                             <Camera className="w-4 h-4 mr-2" />
-                            Usar Câmera
+                            Tirar Foto com Câmera
                           </Button>
                         </div>
                       ) : (

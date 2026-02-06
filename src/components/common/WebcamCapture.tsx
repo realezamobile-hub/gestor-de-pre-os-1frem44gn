@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   XCircle,
   FlipHorizontal,
+  AlertCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -25,11 +26,18 @@ export function WebcamCapture({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>(
+    'environment',
+  )
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const checkCameras = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        throw new Error('Câmera não suportada neste dispositivo/navegador')
+      }
+
       const devices = await navigator.mediaDevices.enumerateDevices()
       const videoDevices = devices.filter(
         (device) => device.kind === 'videoinput',
@@ -41,16 +49,21 @@ export function WebcamCapture({
   }
 
   const startCamera = async () => {
+    setError(null)
     if (stream) {
       stream.getTracks().forEach((track) => track.stop())
     }
 
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Câmera não suportada neste dispositivo/navegador')
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
         audio: false,
       })
@@ -64,9 +77,22 @@ export function WebcamCapture({
           console.error('Error playing video:', playError)
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error accessing camera:', err)
-      toast.error('Não foi possível acessar a câmera. Verifique as permissões.')
+      let msg = 'Não foi possível acessar a câmera.'
+      if (
+        err.name === 'NotAllowedError' ||
+        err.name === 'PermissionDeniedError'
+      ) {
+        msg = 'Permissão da câmera negada. Verifique as configurações.'
+      } else if (
+        err.name === 'NotFoundError' ||
+        err.name === 'DevicesNotFoundError'
+      ) {
+        msg = 'Nenhuma câmera encontrada.'
+      }
+      setError(msg)
+      toast.error(msg)
     }
   }
 
@@ -111,7 +137,7 @@ export function WebcamCapture({
 
         context.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
         setCapturedImage(dataUrl)
       }
     }
@@ -138,9 +164,38 @@ export function WebcamCapture({
           }
         },
         'image/jpeg',
-        0.85,
+        0.9,
       )
     }
+  }
+
+  if (error) {
+    return (
+      <div
+        className={cn(
+          'flex flex-col items-center justify-center p-8 text-center bg-slate-50 rounded-lg border border-slate-200 gap-4',
+          className,
+        )}
+      >
+        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+          <AlertCircle className="w-6 h-6" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-medium text-slate-900">Erro na Câmera</p>
+          <p className="text-sm text-slate-500 max-w-[250px] mx-auto">
+            {error}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={startCamera}>
+            <RefreshCw className="w-4 h-4 mr-2" /> Tentar Novamente
+          </Button>
+          <Button variant="secondary" onClick={onCancel}>
+            Fechar
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -150,7 +205,7 @@ export function WebcamCapture({
         className,
       )}
     >
-      <div className="relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner">
+      <div className="relative overflow-hidden rounded-lg bg-black aspect-[4/3] w-full max-w-[400px] shadow-inner flex items-center justify-center">
         {!capturedImage ? (
           <video
             ref={videoRef}
@@ -166,7 +221,7 @@ export function WebcamCapture({
           <img
             src={capturedImage}
             alt="Captured"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         )}
         <canvas ref={canvasRef} className="hidden" />

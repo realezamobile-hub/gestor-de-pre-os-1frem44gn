@@ -81,7 +81,7 @@ interface ProductStore {
   fetchPriceMonitor: () => Promise<void>
   clearAllProducts: () => Promise<{ success: boolean; error?: any }>
 
-  // Maintenance Features (Simplified)
+  // Maintenance Features
   cleanupOldRecords: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
@@ -694,10 +694,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         throw new Error('Company ID is required')
       }
 
-      // Ensure that we handle potential timeouts by checking return
+      // Call the optimized RPC function
       const { data, error } = await supabase.rpc('delete_zero_value_products', {
         p_company_id: companyId,
-      } as any)
+      })
 
       if (error) throw error
 

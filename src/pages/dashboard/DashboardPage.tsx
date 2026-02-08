@@ -20,7 +20,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
 
@@ -42,9 +42,6 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const isMobile = useIsMobile()
-
-  // Ref to ensure automatic cleanup runs only once per session/mount
-  const hasRunCleanupRef = useRef(false)
 
   // Sync internal state with store state if it changes externally (e.g. Clear Filters)
   useEffect(() => {
@@ -68,18 +65,6 @@ export default function DashboardPage() {
     fetchDraftItems()
     const unsubscribe = subscribeToProducts()
 
-    // Automatic non-blocking cleanup for zero value products
-    if (currentUser?.companyId && !hasRunCleanupRef.current) {
-      hasRunCleanupRef.current = true
-      // Fire and forget - don't await to avoid blocking UI
-      deleteZeroValueProducts(currentUser.companyId).then((result) => {
-        if (!result.success) {
-          // Silently fail for automatic cleanup, just log debug if needed
-          console.debug('Automatic cleanup warning:', result.error)
-        }
-      })
-    }
-
     return () => unsubscribe()
   }, [currentUser?.companyId])
 
@@ -99,7 +84,11 @@ export default function DashboardPage() {
           description: `${result.count} produtos com valor zero ou nulo removidos da base.`,
         })
       } else {
-        toast.error('Erro ao deletar registros. Tente novamente.')
+        toast.error('Erro ao deletar registros. Tente novamente.', {
+          description:
+            result.error?.message ||
+            'Houve um problema ao processar a exclusão.',
+        })
       }
     } catch (e) {
       toast.error('Erro ao deletar registros. Tente novamente.')
@@ -183,13 +172,25 @@ export default function DashboardPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel disabled={isDeleting}>
+                    Cancelar
+                  </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleDeleteZeros}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleDeleteZeros()
+                    }}
                     className="bg-destructive hover:bg-destructive/90"
                     disabled={isDeleting}
                   >
-                    {isDeleting ? 'Processando...' : 'Confirmar Limpeza'}
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Processando...
+                      </>
+                    ) : (
+                      'Confirmar Limpeza'
+                    )}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

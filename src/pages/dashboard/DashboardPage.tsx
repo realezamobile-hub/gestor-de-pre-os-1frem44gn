@@ -40,6 +40,7 @@ export default function DashboardPage() {
     draftItems,
   } = useProductStore()
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const isMobile = useIsMobile()
 
@@ -82,6 +83,7 @@ export default function DashboardPage() {
         toast.success('Limpeza realizada com sucesso!', {
           description: `${result.count} produtos com valor zero ou nulo removidos da base.`,
         })
+        setIsDeleteDialogOpen(false)
       } else {
         toast.error('Erro ao deletar registros. Tente novamente.', {
           description:
@@ -141,7 +143,10 @@ export default function DashboardPage() {
               </Button>
             )}
 
-            <AlertDialog>
+            <AlertDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+            >
               <AlertDialogTrigger asChild>
                 <Button
                   variant="destructive"

@@ -42632,6 +42632,7 @@ function DashboardPage() {
 	const { currentUser } = useAuthStore();
 	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, deleteZeroValueProducts, setFilters, filters, draftItems } = useProductStore();
 	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = (0, import_react.useState)(false);
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
 	const isMobile = useIsMobile();
 	(0, import_react.useEffect)(() => {
@@ -42657,8 +42658,10 @@ function DashboardPage() {
 		setIsDeleting(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo removidos da base.` });
-			else toast.error("Erro ao deletar registros. Tente novamente.", { description: result.error?.message || "Houve um problema ao processar a exclusão." });
+			if (result.success) {
+				toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo removidos da base.` });
+				setIsDeleteDialogOpen(false);
+			} else toast.error("Erro ao deletar registros. Tente novamente.", { description: result.error?.message || "Houve um problema ao processar a exclusão." });
 		} catch (e) {
 			toast.error("Erro ao deletar registros. Tente novamente.");
 		} finally {
@@ -42710,39 +42713,43 @@ function DashboardPage() {
 									children: draftItems.length
 								})
 							]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-								variant: "destructive",
-								size: isMobile ? "icon" : "sm",
-								className: cn("h-9", !isMobile && "w-auto px-3"),
-								title: "Deletar registros com valor <= 0,00",
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, {
+							open: isDeleteDialogOpen,
+							onOpenChange: setIsDeleteDialogOpen,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+								asChild: true,
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+									variant: "destructive",
+									size: isMobile ? "icon" : "sm",
+									className: cn("h-9", !isMobile && "w-auto px-3"),
+									title: "Deletar registros com valor <= 0,00",
+									disabled: isDeleting,
+									children: [isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "hidden sm:inline ml-2",
+										children: "Limpar Zerados"
+									})]
+								})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+								"Esta ação irá remover permanentemente ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "todos" }),
+								" ",
+								"os produtos da sua empresa com valor R$ 0,00 ou nulo.",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+								"Isso inclui produtos que podem estar em outras páginas ou listas. A ação não pode ser desfeita."
+							] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, {
 								disabled: isDeleting,
-								children: [isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "hidden sm:inline ml-2",
-									children: "Limpar Zerados"
-								})]
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-							"Esta ação irá remover permanentemente ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "todos" }),
-							" ",
-							"os produtos da sua empresa com valor R$ 0,00 ou nulo.",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-							"Isso inclui produtos que podem estar em outras páginas ou listas. A ação não pode ser desfeita."
-						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, {
-							disabled: isDeleting,
-							children: "Cancelar"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-							onClick: (e) => {
-								e.preventDefault();
-								handleDeleteZeros();
-							},
-							className: "bg-destructive hover:bg-destructive/90",
-							disabled: isDeleting,
-							children: isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }), "Processando..."] }) : "Confirmar Limpeza"
-						})] })] })] })]
+								children: "Cancelar"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+								onClick: (e) => {
+									e.preventDefault();
+									handleDeleteZeros();
+								},
+								className: "bg-destructive hover:bg-destructive/90",
+								disabled: isDeleting,
+								children: isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }), "Processando..."] }) : "Confirmar Limpeza"
+							})] })] })]
+						})]
 					})]
 				})
 			}),
@@ -76247,4 +76254,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-du77uyL4.js.map
+//# sourceMappingURL=index-P0GLS76f.js.map

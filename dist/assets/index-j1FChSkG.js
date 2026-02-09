@@ -19065,6 +19065,13 @@ var ChartColumn = createLucideIcon("chart-column", [
 		key: "17ska0"
 	}]
 ]);
+var CheckCheck = createLucideIcon("check-check", [["path", {
+	d: "M18 6 7 17l-5-5",
+	key: "116fxf"
+}], ["path", {
+	d: "m22 10-7.5 7.5L13 16",
+	key: "ke71qq"
+}]]);
 var Check = createLucideIcon("check", [["path", {
 	d: "M20 6 9 17l-5-5",
 	key: "1gmf2c"
@@ -19279,6 +19286,26 @@ var DollarSign = createLucideIcon("dollar-sign", [["line", {
 	d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
 	key: "1b0p4s"
 }]]);
+var EllipsisVertical = createLucideIcon("ellipsis-vertical", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "1",
+		key: "41hilf"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "5",
+		r: "1",
+		key: "gxeob9"
+	}],
+	["circle", {
+		cx: "12",
+		cy: "19",
+		r: "1",
+		key: "lyex9k"
+	}]
+]);
 var Ellipsis = createLucideIcon("ellipsis", [
 	["circle", {
 		cx: "12",
@@ -19626,6 +19653,20 @@ var MessageCircle = createLucideIcon("message-circle", [["path", {
 	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
 	key: "1sd12s"
 }]]);
+var MessageSquarePlus = createLucideIcon("message-square-plus", [
+	["path", {
+		d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+		key: "18887p"
+	}],
+	["path", {
+		d: "M12 8v6",
+		key: "1ib9pf"
+	}],
+	["path", {
+		d: "M9 11h6",
+		key: "1fldmi"
+	}]
+]);
 var Package = createLucideIcon("package", [
 	["path", {
 		d: "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z",
@@ -19662,6 +19703,68 @@ var Plus = createLucideIcon("plus", [["path", {
 	d: "M12 5v14",
 	key: "s699le"
 }]]);
+var QrCode = createLucideIcon("qr-code", [
+	["rect", {
+		width: "5",
+		height: "5",
+		x: "3",
+		y: "3",
+		rx: "1",
+		key: "1tu5fj"
+	}],
+	["rect", {
+		width: "5",
+		height: "5",
+		x: "16",
+		y: "3",
+		rx: "1",
+		key: "1v8r4q"
+	}],
+	["rect", {
+		width: "5",
+		height: "5",
+		x: "3",
+		y: "16",
+		rx: "1",
+		key: "1x03jg"
+	}],
+	["path", {
+		d: "M21 16h-3a2 2 0 0 0-2 2v3",
+		key: "177gqh"
+	}],
+	["path", {
+		d: "M21 21v.01",
+		key: "ents32"
+	}],
+	["path", {
+		d: "M12 7v3a2 2 0 0 1-2 2H7",
+		key: "8crl2c"
+	}],
+	["path", {
+		d: "M3 12h.01",
+		key: "nlz23k"
+	}],
+	["path", {
+		d: "M12 3h.01",
+		key: "n36tog"
+	}],
+	["path", {
+		d: "M12 16v.01",
+		key: "133mhm"
+	}],
+	["path", {
+		d: "M16 12h1",
+		key: "1slzba"
+	}],
+	["path", {
+		d: "M21 12v.01",
+		key: "1lwtk9"
+	}],
+	["path", {
+		d: "M12 21v-1",
+		key: "1880an"
+	}]
+]);
 var Receipt = createLucideIcon("receipt", [
 	["path", {
 		d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z",
@@ -19716,6 +19819,13 @@ var Search = createLucideIcon("search", [["path", {
 	cy: "11",
 	r: "8",
 	key: "4ej97u"
+}]]);
+var Send = createLucideIcon("send", [["path", {
+	d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
+	key: "1ffxy3"
+}], ["path", {
+	d: "m21.854 2.147-10.94 10.939",
+	key: "12cjpa"
 }]]);
 var Server = createLucideIcon("server", [
 	["rect", {
@@ -24818,7 +24928,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				var cachedValue = getSnapshot();
 				objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = !0);
 			}
-			cachedValue = useState$41({ inst: {
+			cachedValue = useState$44({ inst: {
 				value,
 				getSnapshot
 			} });
@@ -24832,7 +24942,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 				value,
 				getSnapshot
 			]);
-			useEffect$29(function() {
+			useEffect$32(function() {
 				checkIfSnapshotChanged(inst) && forceUpdate({ inst });
 				return subscribe$1(function() {
 					checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -24855,7 +24965,7 @@ var require_use_sync_external_store_shim_development = /* @__PURE__ */ __commonJ
 			return getSnapshot();
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$41 = React$60.useState, useEffect$29 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+		var React$60 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState$44 = React$60.useState, useEffect$32 = React$60.useEffect, useLayoutEffect$2 = React$60.useLayoutEffect, useDebugValue$1 = React$60.useDebugValue, didWarnOld18Alpha = !1, didWarnUncachedGetSnapshot = !1, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
 		exports.useSyncExternalStore = void 0 !== React$60.useSyncExternalStore ? React$60.useSyncExternalStore : shim;
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
 	})();
@@ -24878,9 +24988,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$2 === y$1 && (0 !== x$2 || 1 / x$2 === 1 / y$1) || x$2 !== x$2 && y$1 !== y$1;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$13 = React$60.useRef, useEffect$29 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
+		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$14 = React$60.useRef, useEffect$32 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual$5) {
-			var instRef = useRef$13(null);
+			var instRef = useRef$14(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -24920,7 +25030,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				isEqual$5
 			]);
 			var value = useSyncExternalStore$1(subscribe$1, instRef[0], instRef[1]);
-			useEffect$29(function() {
+			useEffect$32(function() {
 				inst.hasValue = !0;
 				inst.value = value;
 			}, [value]);
@@ -33464,6 +33574,12 @@ function Sidebar({ mode = "desktop" }) {
 			visible: true
 		},
 		{
+			label: "WhatsApp",
+			icon: MessageCircle,
+			path: "/whatsapp",
+			visible: true
+		},
+		{
 			label: "Gerador de Lista",
 			icon: ListChecks,
 			path: "/generator",
@@ -37873,6 +37989,8 @@ const daysInYear = 365.2425;
 Math.pow(10, 8) * 24 * 60 * 60 * 1e3;
 const millisecondsInWeek = 6048e5;
 const millisecondsInDay = 864e5;
+const minutesInMonth = 43200;
+const minutesInDay = 1440;
 const secondsInDay = 3600 * 24;
 secondsInDay * 7;
 secondsInDay * daysInYear / 12 * 3;
@@ -37997,6 +38115,15 @@ function min$3(dates, options$1) {
 	});
 	return constructFrom(context, result || NaN);
 }
+function compareAsc(dateLeft, dateRight) {
+	const diff = +toDate(dateLeft) - +toDate(dateRight);
+	if (diff < 0) return -1;
+	else if (diff > 0) return 1;
+	return diff;
+}
+function constructNow(date$1) {
+	return constructFrom(date$1, Date.now());
+}
 function isSameDay(laterDate, earlierDate, options$1) {
 	const [dateLeft_, dateRight_] = normalizeDates(options$1?.in, laterDate, earlierDate);
 	return +startOfDay(dateLeft_) === +startOfDay(dateRight_);
@@ -38013,6 +38140,15 @@ function differenceInCalendarMonths(laterDate, earlierDate, options$1) {
 	const monthsDiff = laterDate_.getMonth() - earlierDate_.getMonth();
 	return yearsDiff * 12 + monthsDiff;
 }
+function getRoundingMethod(method) {
+	return (number$3) => {
+		const result = (method ? Math[method] : Math.trunc)(number$3);
+		return result === 0 ? 0 : result;
+	};
+}
+function differenceInMilliseconds(laterDate, earlierDate) {
+	return +toDate(laterDate) - +toDate(earlierDate);
+}
 function endOfDay(date$1, options$1) {
 	const _date = toDate(date$1, options$1?.in);
 	_date.setHours(23, 59, 59, 999);
@@ -38024,6 +38160,26 @@ function endOfMonth(date$1, options$1) {
 	_date.setFullYear(_date.getFullYear(), month + 1, 0);
 	_date.setHours(23, 59, 59, 999);
 	return _date;
+}
+function isLastDayOfMonth(date$1, options$1) {
+	const _date = toDate(date$1, options$1?.in);
+	return +endOfDay(_date, options$1) === +endOfMonth(_date, options$1);
+}
+function differenceInMonths(laterDate, earlierDate, options$1) {
+	const [laterDate_, workingLaterDate, earlierDate_] = normalizeDates(options$1?.in, laterDate, laterDate, earlierDate);
+	const sign$1 = compareAsc(workingLaterDate, earlierDate_);
+	const difference = Math.abs(differenceInCalendarMonths(workingLaterDate, earlierDate_));
+	if (difference < 1) return 0;
+	if (workingLaterDate.getMonth() === 1 && workingLaterDate.getDate() > 27) workingLaterDate.setDate(30);
+	workingLaterDate.setMonth(workingLaterDate.getMonth() - sign$1 * difference);
+	let isLastMonthNotFull = compareAsc(workingLaterDate, earlierDate_) === -sign$1;
+	if (isLastDayOfMonth(laterDate_) && difference === 1 && compareAsc(laterDate_, earlierDate_) === 1) isLastMonthNotFull = false;
+	const result = sign$1 * (difference - +isLastMonthNotFull);
+	return result === 0 ? 0 : result;
+}
+function differenceInSeconds(laterDate, earlierDate, options$1) {
+	const diff = differenceInMilliseconds(laterDate, earlierDate) / 1e3;
+	return getRoundingMethod(options$1?.roundingMethod)(diff);
 }
 function normalizeInterval(context, interval) {
 	const [start, end] = normalizeDates(context, interval.start, interval.end);
@@ -38170,7 +38326,7 @@ var formatDistanceLocale$1 = {
 		other: "almost {{count}} years"
 	}
 };
-const formatDistance$1 = (token, count$3, options$1) => {
+const formatDistance$2 = (token, count$3, options$1) => {
 	let result;
 	const tokenValue = formatDistanceLocale$1[token];
 	if (typeof tokenValue === "string") result = tokenValue;
@@ -38491,7 +38647,7 @@ function buildMatchPatternFn(args) {
 }
 const enUS$1 = {
 	code: "en-US",
-	formatDistance: formatDistance$1,
+	formatDistance: formatDistance$2,
 	formatLong: formatLong$1,
 	formatRelative: formatRelative$1,
 	localize: localize$1,
@@ -39204,7 +39360,7 @@ var longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
 var escapedStringRegExp = /^'([^]*?)'?$/;
 var doubleQuoteRegExp = /''/g;
 var unescapedLatinCharacterRegExp = /[a-zA-Z]/;
-function format$1(date$1, formatStr, options$1) {
+function format(date$1, formatStr, options$1) {
 	const defaultOptions$1 = getDefaultOptions();
 	const locale$2 = options$1?.locale ?? defaultOptions$1.locale ?? enUS$1;
 	const firstWeekContainsDate = options$1?.firstWeekContainsDate ?? options$1?.locale?.options?.firstWeekContainsDate ?? defaultOptions$1.firstWeekContainsDate ?? defaultOptions$1.locale?.options?.firstWeekContainsDate ?? 1;
@@ -39256,6 +39412,57 @@ function cleanEscapedString(input) {
 	const matched = input.match(escapedStringRegExp);
 	if (!matched) return input;
 	return matched[1].replace(doubleQuoteRegExp, "'");
+}
+function formatDistance$1(laterDate, earlierDate, options$1) {
+	const defaultOptions$1 = getDefaultOptions();
+	const locale$2 = options$1?.locale ?? defaultOptions$1.locale ?? enUS$1;
+	const minutesInAlmostTwoDays = 2520;
+	const comparison = compareAsc(laterDate, earlierDate);
+	if (isNaN(comparison)) throw new RangeError("Invalid time value");
+	const localizeOptions = Object.assign({}, options$1, {
+		addSuffix: options$1?.addSuffix,
+		comparison
+	});
+	const [laterDate_, earlierDate_] = normalizeDates(options$1?.in, ...comparison > 0 ? [earlierDate, laterDate] : [laterDate, earlierDate]);
+	const seconds$1 = differenceInSeconds(earlierDate_, laterDate_);
+	const offsetInSeconds = (getTimezoneOffsetInMilliseconds(earlierDate_) - getTimezoneOffsetInMilliseconds(laterDate_)) / 1e3;
+	const minutes = Math.round((seconds$1 - offsetInSeconds) / 60);
+	let months;
+	if (minutes < 2) if (options$1?.includeSeconds) if (seconds$1 < 5) return locale$2.formatDistance("lessThanXSeconds", 5, localizeOptions);
+	else if (seconds$1 < 10) return locale$2.formatDistance("lessThanXSeconds", 10, localizeOptions);
+	else if (seconds$1 < 20) return locale$2.formatDistance("lessThanXSeconds", 20, localizeOptions);
+	else if (seconds$1 < 40) return locale$2.formatDistance("halfAMinute", 0, localizeOptions);
+	else if (seconds$1 < 60) return locale$2.formatDistance("lessThanXMinutes", 1, localizeOptions);
+	else return locale$2.formatDistance("xMinutes", 1, localizeOptions);
+	else if (minutes === 0) return locale$2.formatDistance("lessThanXMinutes", 1, localizeOptions);
+	else return locale$2.formatDistance("xMinutes", minutes, localizeOptions);
+	else if (minutes < 45) return locale$2.formatDistance("xMinutes", minutes, localizeOptions);
+	else if (minutes < 90) return locale$2.formatDistance("aboutXHours", 1, localizeOptions);
+	else if (minutes < 1440) {
+		const hours = Math.round(minutes / 60);
+		return locale$2.formatDistance("aboutXHours", hours, localizeOptions);
+	} else if (minutes < minutesInAlmostTwoDays) return locale$2.formatDistance("xDays", 1, localizeOptions);
+	else if (minutes < 43200) {
+		const days = Math.round(minutes / minutesInDay);
+		return locale$2.formatDistance("xDays", days, localizeOptions);
+	} else if (minutes < 43200 * 2) {
+		months = Math.round(minutes / minutesInMonth);
+		return locale$2.formatDistance("aboutXMonths", months, localizeOptions);
+	}
+	months = differenceInMonths(earlierDate_, laterDate_);
+	if (months < 12) {
+		const nearestMonth = Math.round(minutes / minutesInMonth);
+		return locale$2.formatDistance("xMonths", nearestMonth, localizeOptions);
+	} else {
+		const monthsSinceStartOfYear = months % 12;
+		const years = Math.trunc(months / 12);
+		if (monthsSinceStartOfYear < 3) return locale$2.formatDistance("aboutXYears", years, localizeOptions);
+		else if (monthsSinceStartOfYear < 9) return locale$2.formatDistance("overXYears", years, localizeOptions);
+		else return locale$2.formatDistance("almostXYears", years + 1, localizeOptions);
+	}
+}
+function formatDistanceToNow(date$1, options$1) {
+	return formatDistance$1(date$1, constructNow(date$1), options$1);
 }
 function getDaysInMonth(date$1, options$1) {
 	const _date = toDate(date$1, options$1?.in);
@@ -46153,7 +46360,7 @@ function GeneratorHistory() {
 							children: [
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 									className: "font-medium",
-									children: format$1(new Date(list.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })
+									children: format(new Date(list.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 									className: "text-xs text-muted-foreground truncate max-w-[150px]",
@@ -46215,7 +46422,7 @@ function GeneratorHistory() {
 					})]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "text-sm font-normal text-muted-foreground",
-					children: selectedList && format$1(new Date(selectedList.created_at), "PPP 'às' HH:mm", { locale: ptBR })
+					children: selectedList && format(new Date(selectedList.created_at), "PPP 'às' HH:mm", { locale: ptBR })
 				})]
 			}) }), selectedList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-2",
@@ -46788,7 +46995,7 @@ function BulkCleanup() {
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Exclusão em Massa" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
 						"Você está prestes a excluir permanentemente dados do sistema até o dia",
 						" ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [" ", date$1 && format$1(/* @__PURE__ */ new Date(date$1 + "T00:00:00"), "dd/MM/yyyy")] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [" ", date$1 && format(/* @__PURE__ */ new Date(date$1 + "T00:00:00"), "dd/MM/yyyy")] }),
 						".",
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
@@ -49745,7 +49952,7 @@ function EvaluationDetailsDialog({ open, onOpenChange, evaluation, checklistItem
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, { className: "w-3 h-3" }), " Data"]
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 												className: "text-sm font-medium",
-												children: format$1(new Date(evaluation.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+												children: format(new Date(evaluation.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 											})]
 										}),
 										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -49999,7 +50206,7 @@ function EvaluationHistory() {
 			}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: evaluations.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "text-muted-foreground whitespace-nowrap",
-					children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+					children: format(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "font-medium",
@@ -51330,7 +51537,7 @@ function ClientHistory({ clientId }) {
 		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: history.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 				className: "text-muted-foreground",
-				children: format$1(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
+				children: format(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableCell, {
 				className: "font-medium flex items-center gap-2",
@@ -52082,7 +52289,7 @@ const enUS = {
 		labelDayButton: (date$1, modifiers, options$1, dateLib) => {
 			let formatDate;
 			if (dateLib && typeof dateLib.format === "function") formatDate = dateLib.format.bind(dateLib);
-			else formatDate = (d, pattern) => format$1(d, pattern, {
+			else formatDate = (d, pattern) => format(d, pattern, {
 				locale: enUS$1,
 				...options$1
 			});
@@ -52099,7 +52306,7 @@ const enUS = {
 		labelGrid: (date$1, options$1, dateLib) => {
 			let formatDate;
 			if (dateLib && typeof dateLib.format === "function") formatDate = dateLib.format.bind(dateLib);
-			else formatDate = (d, pattern) => format$1(d, pattern, {
+			else formatDate = (d, pattern) => format(d, pattern, {
 				locale: enUS$1,
 				...options$1
 			});
@@ -52108,7 +52315,7 @@ const enUS = {
 		labelGridcell: (date$1, modifiers, options$1, dateLib) => {
 			let formatDate;
 			if (dateLib && typeof dateLib.format === "function") formatDate = dateLib.format.bind(dateLib);
-			else formatDate = (d, pattern) => format$1(d, pattern, {
+			else formatDate = (d, pattern) => format(d, pattern, {
 				locale: enUS$1,
 				...options$1
 			});
@@ -52121,7 +52328,7 @@ const enUS = {
 		labelWeekday: (date$1, options$1, dateLib) => {
 			let formatDate;
 			if (dateLib && typeof dateLib.format === "function") formatDate = dateLib.format.bind(dateLib);
-			else formatDate = (d, pattern) => format$1(d, pattern, {
+			else formatDate = (d, pattern) => format(d, pattern, {
 				locale: enUS$1,
 				...options$1
 			});
@@ -52189,7 +52396,7 @@ var DateLib = class DateLib {
 			return this.overrides?.endOfYear ? this.overrides.endOfYear(date$1) : endOfYear(date$1);
 		};
 		this.format = (date$1, formatStr, _options) => {
-			const formatted = this.overrides?.format ? this.overrides.format(date$1, formatStr, this.options) : format$1(date$1, formatStr, this.options);
+			const formatted = this.overrides?.format ? this.overrides.format(date$1, formatStr, this.options) : format(date$1, formatStr, this.options);
 			if (this.options.numerals && this.options.numerals !== "latn") return this.replaceDigits(formatted);
 			return formatted;
 		};
@@ -54185,11 +54392,11 @@ function ReportFilters() {
 								variant: "outline",
 								className: cn("w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground"),
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, { className: "mr-2 h-4 w-4" }), dateRange?.from ? dateRange.to ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-									format$1(dateRange.from, "dd/MM/yyyy"),
+									format(dateRange.from, "dd/MM/yyyy"),
 									" -",
 									" ",
-									format$1(dateRange.to, "dd/MM/yyyy")
-								] }) : format$1(dateRange.from, "dd/MM/yyyy") : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Selecione o período" })]
+									format(dateRange.to, "dd/MM/yyyy")
+								] }) : format(dateRange.from, "dd/MM/yyyy") : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Selecione o período" })]
 							})
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PopoverContent, {
 							className: "w-auto p-0",
@@ -61375,7 +61582,7 @@ function locale_default(locale$2) {
 	};
 }
 var locale$1;
-var format;
+var format$1;
 var formatPrefix;
 defaultLocale$1({
 	thousands: ",",
@@ -61384,7 +61591,7 @@ defaultLocale$1({
 });
 function defaultLocale$1(definition) {
 	locale$1 = locale_default(definition);
-	format = locale$1.format;
+	format$1 = locale$1.format;
 	formatPrefix = locale$1.formatPrefix;
 	return locale$1;
 }
@@ -61418,7 +61625,7 @@ function tickFormat(start, stop, count$3, specifier) {
 			if (specifier.precision == null && !isNaN(precision = precisionFixed_default(step))) specifier.precision = precision - (specifier.type === "%") * 2;
 			break;
 	}
-	return format(specifier);
+	return format$1(specifier);
 }
 function linearish(scale) {
 	var domain = scale.domain;
@@ -61579,7 +61786,7 @@ function loggish(transform) {
 		if (specifier == null) specifier = base === 10 ? "s" : ",";
 		if (typeof specifier !== "function") {
 			if (!(base % 1) && (specifier = formatSpecifier(specifier)).precision == null) specifier.trim = true;
-			specifier = format(specifier);
+			specifier = format$1(specifier);
 		}
 		if (count$3 === Infinity) return specifier;
 		const k$3 = Math.max(1, base * count$3 / scale.ticks().length);
@@ -76149,6 +76356,536 @@ function UsersPage() {
 		]
 	});
 }
+var MOCK_CONVERSATIONS = [
+	{
+		id: "1",
+		contactName: "Cliente João Silva",
+		contactNumber: "+55 11 99999-1111",
+		unreadCount: 2,
+		isOnline: true,
+		lastMessage: {
+			id: "m1",
+			text: "Olá, gostaria de saber o preço do iPhone 13.",
+			sender: "other",
+			timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 30),
+			status: "read"
+		}
+	},
+	{
+		id: "2",
+		contactName: "Maria Oliveira",
+		contactNumber: "+55 11 98888-2222",
+		unreadCount: 0,
+		lastMessage: {
+			id: "m2",
+			text: "Obrigado pelo atendimento!",
+			sender: "other",
+			timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 60 * 5),
+			status: "read"
+		}
+	},
+	{
+		id: "3",
+		contactName: "Fornecedor Tech",
+		contactNumber: "+55 11 97777-3333",
+		unreadCount: 0,
+		lastMessage: {
+			id: "m3",
+			text: "Pedido confirmado. Enviaremos amanhã.",
+			sender: "me",
+			timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 60 * 60),
+			status: "read",
+			agentName: "Admin"
+		}
+	},
+	{
+		id: "4",
+		contactName: "Pedro Souza",
+		contactNumber: "+55 11 96666-4444",
+		unreadCount: 1,
+		lastMessage: {
+			id: "m4",
+			text: "Tem garantia de quanto tempo?",
+			sender: "other",
+			timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 120),
+			status: "delivered"
+		}
+	}
+];
+var MOCK_MESSAGES = {
+	"1": [{
+		id: "msg-1-1",
+		text: "Bom dia! Vocês tem iPhone 13?",
+		sender: "other",
+		timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 120),
+		status: "read"
+	}, {
+		id: "msg-1-2",
+		text: "Olá, gostaria de saber o preço do iPhone 13.",
+		sender: "other",
+		timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 30),
+		status: "read"
+	}],
+	"2": [{
+		id: "msg-2-1",
+		text: "Obrigado pelo atendimento!",
+		sender: "other",
+		timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 60 * 5),
+		status: "read"
+	}],
+	"3": [],
+	"4": [{
+		id: "msg-4-1",
+		text: "Tem garantia de quanto tempo?",
+		sender: "other",
+		timestamp: /* @__PURE__ */ new Date(Date.now() - 1e3 * 120),
+		status: "delivered"
+	}]
+};
+const useWhatsAppStore = create((set, get$8) => ({
+	isConnected: false,
+	isConnecting: false,
+	conversations: MOCK_CONVERSATIONS,
+	activeConversationId: null,
+	messages: MOCK_MESSAGES,
+	connect: async () => {
+		set({ isConnecting: true });
+		await new Promise((resolve) => setTimeout(resolve, 2e3));
+		set({
+			isConnected: true,
+			isConnecting: false
+		});
+	},
+	disconnect: () => {
+		set({
+			isConnected: false,
+			activeConversationId: null
+		});
+	},
+	selectConversation: (id) => {
+		set({ activeConversationId: id });
+		get$8().markAsRead(id);
+	},
+	markAsRead: (conversationId) => {
+		set((state) => ({ conversations: state.conversations.map((c$1) => c$1.id === conversationId ? {
+			...c$1,
+			unreadCount: 0
+		} : c$1) }));
+	},
+	sendMessage: (text, agentName) => {
+		const { activeConversationId, messages, conversations } = get$8();
+		if (!activeConversationId) return;
+		const fullText = `${text}${`\n\nAttended by: ${agentName}`}`;
+		const newMessage = {
+			id: Date.now().toString(),
+			text: fullText,
+			sender: "me",
+			timestamp: /* @__PURE__ */ new Date(),
+			status: "sent",
+			agentName
+		};
+		set({
+			messages: {
+				...messages,
+				[activeConversationId]: [...messages[activeConversationId] || [], newMessage]
+			},
+			conversations: conversations.map((c$1) => {
+				if (c$1.id === activeConversationId) return {
+					...c$1,
+					lastMessage: newMessage,
+					unreadCount: 0
+				};
+				return c$1;
+			}).sort((a$1, b$1) => {
+				if (a$1.id === activeConversationId) return -1;
+				if (b$1.id === activeConversationId) return 1;
+				return 0;
+			})
+		});
+		setTimeout(() => {
+			set((state) => ({ messages: {
+				...state.messages,
+				[activeConversationId]: state.messages[activeConversationId].map((m$1) => m$1.id === newMessage.id ? {
+					...m$1,
+					status: "delivered"
+				} : m$1)
+			} }));
+		}, 1e3);
+	},
+	simulateIncomingMessage: () => {
+		const { conversations, messages } = get$8();
+		const targetId = conversations[0].id;
+		const newMessage = {
+			id: Date.now().toString(),
+			text: "Olá? Alguém pode me ajudar?",
+			sender: "other",
+			timestamp: /* @__PURE__ */ new Date(),
+			status: "delivered"
+		};
+		set({
+			messages: {
+				...messages,
+				[targetId]: [...messages[targetId] || [], newMessage]
+			},
+			conversations: conversations.map((c$1) => {
+				if (c$1.id === targetId) return {
+					...c$1,
+					lastMessage: newMessage,
+					unreadCount: c$1.unreadCount + 1
+				};
+				return c$1;
+			}).sort((a$1, b$1) => {
+				if (a$1.id === targetId) return -1;
+				if (b$1.id === targetId) return 1;
+				return 0;
+			})
+		});
+	}
+}));
+function ChatSidebar() {
+	const { conversations, activeConversationId, selectConversation } = useWhatsAppStore();
+	const [search, setSearch] = (0, import_react.useState)("");
+	const [now$2, setNow] = (0, import_react.useState)(Date.now());
+	(0, import_react.useEffect)(() => {
+		const interval = setInterval(() => setNow(Date.now()), 1e4);
+		return () => clearInterval(interval);
+	}, []);
+	const filteredConversations = conversations.filter((c$1) => c$1.contactName.toLowerCase().includes(search.toLowerCase()) || c$1.contactNumber.includes(search));
+	const isSlaBreached = (timestamp, sender) => {
+		if (sender === "me") return false;
+		return now$2 - new Date(timestamp).getTime() > 6e4;
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "w-full md:w-80 lg:w-96 border-r flex flex-col bg-white h-full",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "p-3 border-b bg-slate-50",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+					placeholder: "Buscar conversa...",
+					className: "pl-8 bg-white",
+					value: search,
+					onChange: (e) => setSearch(e.target.value)
+				})]
+			})
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+			className: "flex-1",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-col",
+				children: filteredConversations.map((conversation) => {
+					const lastMsg = conversation.lastMessage;
+					const slaBreached = lastMsg && isSlaBreached(lastMsg.timestamp, lastMsg.sender);
+					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+						onClick: () => selectConversation(conversation.id),
+						className: cn("flex items-start gap-3 p-3 text-left transition-colors border-b hover:bg-slate-50", activeConversationId === conversation.id && "bg-slate-100 hover:bg-slate-100 border-l-4 border-l-emerald-600"),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "relative",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+								className: "w-12 h-12",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: conversation.avatarUrl }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+									className: "bg-emerald-100 text-emerald-700 font-medium",
+									children: conversation.contactName[0]
+								})]
+							}), conversation.isOnline && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" })]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex-1 min-w-0",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex justify-between items-start mb-1",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-semibold text-sm truncate pr-2 text-slate-900",
+									children: conversation.contactName
+								}), lastMsg && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: cn("text-[10px] whitespace-nowrap", slaBreached ? "text-red-600 font-bold" : "text-muted-foreground"),
+									children: formatDistanceToNow(new Date(lastMsg.timestamp), {
+										addSuffix: false,
+										locale: ptBR
+									})
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex justify-between items-center",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+									className: "text-xs text-muted-foreground truncate max-w-[140px] lg:max-w-[180px]",
+									children: [lastMsg?.sender === "me" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-emerald-600 mr-1",
+										children: "Você:"
+									}), lastMsg?.text || "Nova conversa"]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex gap-1.5 items-center",
+									children: [slaBreached && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+										className: "animate-pulse flex items-center",
+										title: "Sem resposta há +1min",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "w-4 h-4 text-red-500 fill-red-100" })
+									}), conversation.unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+										className: "h-5 min-w-5 px-1.5 flex items-center justify-center bg-emerald-600 hover:bg-emerald-600 rounded-full",
+										children: conversation.unreadCount
+									})]
+								})]
+							})]
+						})]
+					}, conversation.id);
+				})
+			})
+		})]
+	});
+}
+function ChatWindow() {
+	const { activeConversationId, conversations, messages, sendMessage, isConnected } = useWhatsAppStore();
+	const { currentUser } = useAuthStore();
+	const [inputText, setInputText] = (0, import_react.useState)("");
+	const bottomRef = (0, import_react.useRef)(null);
+	const activeConversation = conversations.find((c$1) => c$1.id === activeConversationId);
+	const activeMessages = activeConversationId ? messages[activeConversationId] || [] : [];
+	(0, import_react.useEffect)(() => {
+		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [activeMessages, activeConversationId]);
+	const handleSend = (e) => {
+		e?.preventDefault();
+		if (!inputText.trim() || !activeConversationId || !currentUser) return;
+		sendMessage(inputText, currentUser.name);
+		setInputText("");
+	};
+	if (!activeConversation) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex-1 flex items-center justify-center bg-slate-50 flex-col gap-4 text-center p-8",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleUser, { className: "w-10 h-10 text-slate-400" })
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+			className: "text-xl font-semibold text-slate-800",
+			children: "Nenhuma conversa selecionada"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+			className: "text-slate-500 mt-1",
+			children: "Selecione um contato para iniciar o atendimento."
+		})] })]
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex-1 flex flex-col bg-[#efeae2] h-full relative",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "h-16 bg-white border-b flex items-center justify-between px-4 shrink-0 shadow-sm z-10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
+						className: "cursor-pointer",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarImage, { src: activeConversation.avatarUrl }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+							className: "bg-emerald-100 text-emerald-700",
+							children: activeConversation.contactName[0]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+						className: "font-semibold text-slate-800 leading-tight",
+						children: activeConversation.contactName
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-xs text-slate-500",
+						children: activeConversation.contactNumber
+					})] })]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2 text-slate-500",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "ghost",
+						size: "icon",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, { className: "w-5 h-5" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "ghost",
+						size: "icon",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EllipsisVertical, { className: "w-5 h-5" })
+					})]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollArea, {
+				className: "flex-1 p-4 bg-opacity-10",
+				style: {
+					backgroundImage: "url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)",
+					backgroundRepeat: "repeat"
+				},
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col gap-3 min-h-full justify-end pb-2",
+					children: [activeMessages.map((msg) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: cn("max-w-[80%] rounded-lg p-2.5 px-3 relative shadow-sm text-sm leading-relaxed", msg.sender === "me" ? "self-end bg-[#d9fdd3] rounded-tr-none" : "self-start bg-white rounded-tl-none"),
+						children: [
+							msg.agentName && msg.sender === "me" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "text-[10px] font-bold text-emerald-700 mb-1 opacity-80 uppercase tracking-wider",
+								children: msg.agentName
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "whitespace-pre-wrap text-slate-900",
+								children: msg.text.split("\n\nAttended by:")[0]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center justify-end gap-1 mt-1 select-none",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-[10px] text-slate-500",
+									children: format(new Date(msg.timestamp), "HH:mm")
+								}), msg.sender === "me" && (msg.status === "read" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckCheck, { className: "w-3.5 h-3.5 text-blue-500" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckCheck, { className: "w-3.5 h-3.5 text-slate-400" }))]
+							})
+						]
+					}, msg.id)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref: bottomRef })]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "bg-[#f0f2f5] p-3 px-4 shrink-0 flex gap-3 items-end",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+					className: "flex-1 flex gap-3 items-end bg-white rounded-lg border shadow-sm p-1 pl-3",
+					onSubmit: handleSend,
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						className: "flex-1 border-none shadow-none focus-visible:ring-0 bg-transparent px-0 py-3 min-h-[44px] max-h-32",
+						placeholder: "Digite uma mensagem...",
+						value: inputText,
+						onChange: (e) => setInputText(e.target.value)
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "pb-1 pr-1",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							type: "submit",
+							size: "icon",
+							className: "h-9 w-9 bg-emerald-600 hover:bg-emerald-700 rounded-full transition-all",
+							disabled: !inputText.trim(),
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Send, { className: "w-4 h-4 ml-0.5" })
+						})
+					})]
+				})
+			})
+		]
+	});
+}
+function WhatsAppConnect() {
+	const { connect, isConnecting } = useWhatsAppStore();
+	const [step, setStep] = (0, import_react.useState)("intro");
+	const handleConnect = async () => {
+		await connect();
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "flex items-center justify-center h-full min-h-[500px] bg-slate-50/50 p-6",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+			className: "w-full max-w-md shadow-xl border-t-4 border-t-emerald-600",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+				className: "text-center",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-8 h-8 text-emerald-600" })
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+						className: "text-2xl font-bold text-slate-800",
+						children: "WhatsApp Business"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Conecte sua conta raiz para habilitar o atendimento compartilhado." })
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+				className: "space-y-6",
+				children: step === "intro" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "bg-slate-50 p-4 rounded-lg space-y-3 text-sm text-slate-600",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-start gap-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5 text-emerald-500 shrink-0 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Centralize todas as mensagens em um único painel." })]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-start gap-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5 text-emerald-500 shrink-0 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Identificação automática do vendedor nas respostas." })]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-start gap-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-5 h-5 text-emerald-500 shrink-0 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Alertas de SLA para mensagens não respondidas." })]
+							})
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						className: "w-full bg-emerald-600 hover:bg-emerald-700 h-12 text-base",
+						onClick: () => setStep("qr"),
+						children: "Conectar Conta"
+					})]
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "relative w-64 h-64 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden group",
+							children: isConnecting ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex flex-col items-center gap-2 text-emerald-600",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-10 h-10 animate-spin" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-sm font-medium",
+									children: "Conectando..."
+								})]
+							}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(QrCode, { className: "w-48 h-48 text-slate-800 opacity-20" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "absolute inset-0 flex items-center justify-center bg-black/5 backdrop-blur-[1px]",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									onClick: handleConnect,
+									className: "shadow-lg bg-emerald-600 hover:bg-emerald-700",
+									children: "Simular Leitura do QR Code"
+								})
+							})] })
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+							className: "text-center text-sm text-muted-foreground",
+							children: [
+								"Abra o WhatsApp no seu celular, vá em ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [
+									"Aparelhos Conectados ",
+									">",
+									" Conectar Aparelho"
+								] })
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "ghost",
+							onClick: () => setStep("intro"),
+							disabled: isConnecting,
+							children: "Cancelar"
+						})
+					]
+				})
+			})]
+		})
+	});
+}
+function WhatsAppPage() {
+	const { isConnected, simulateIncomingMessage, disconnect } = useWhatsAppStore();
+	(0, import_react.useEffect)(() => {
+		let timeout;
+		if (isConnected) timeout = setTimeout(() => {
+			simulateIncomingMessage();
+			toast("Nova mensagem recebida", { description: "Cliente João Silva enviou uma mensagem." });
+		}, 3e4);
+		return () => clearTimeout(timeout);
+	}, [isConnected, simulateIncomingMessage]);
+	if (!isConnected) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-[calc(100vh-4rem)] flex flex-col",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "p-6 pb-0",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+				className: "text-3xl font-bold tracking-tight text-gray-900",
+				children: "Módulo WhatsApp"
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-muted-foreground mt-1",
+				children: "Conecte a conta da empresa para iniciar o atendimento centralizado."
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "flex-1 flex items-center justify-center p-4",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WhatsAppConnect, {})
+		})]
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-slate-100 rounded-lg border shadow-sm my-1 mx-1 lg:mx-0 lg:my-0 lg:h-full lg:rounded-none lg:border-none lg:shadow-none",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "h-full flex overflow-hidden",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChatSidebar, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChatWindow, {})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "fixed bottom-4 left-24 z-50 flex gap-2",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+				variant: "secondary",
+				size: "sm",
+				onClick: simulateIncomingMessage,
+				className: "shadow-lg bg-white/90 backdrop-blur border text-xs h-7",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageSquarePlus, { className: "w-3 h-3 mr-1.5 text-blue-500" }), "Simular msg (+1)"]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				variant: "secondary",
+				size: "sm",
+				onClick: disconnect,
+				className: "shadow-lg bg-white/90 backdrop-blur border text-xs h-7 hover:bg-red-50 hover:text-red-600",
+				children: "Desconectar"
+			})]
+		})]
+	});
+}
 var NotFound = () => {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4",
@@ -76214,6 +76951,10 @@ var App = () => {
 							element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DashboardPage, {})
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+							path: "/whatsapp",
+							element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WhatsAppPage, {})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
 							path: "/generator",
 							element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListGeneratorPage, {})
 						}),
@@ -76254,4 +76995,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-P0GLS76f.js.map
+//# sourceMappingURL=index-j1FChSkG.js.map

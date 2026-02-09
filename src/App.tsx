@@ -16,6 +16,7 @@ import ProfilePage from './pages/profile/ProfilePage'
 import ClientsPage from './pages/clients/ClientsPage'
 import ReportsPage from './pages/reports/ReportsPage'
 import UsersPage from './pages/users/UsersPage'
+import WhatsAppPage from './pages/whatsapp/WhatsAppPage'
 import NotFound from './pages/NotFound'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -48,6 +49,7 @@ const App = () => {
           {/* Protected Routes */}
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/whatsapp" element={<WhatsAppPage />} />
             <Route path="/generator" element={<ListGeneratorPage />} />
             <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/clients" element={<ClientsPage />} />

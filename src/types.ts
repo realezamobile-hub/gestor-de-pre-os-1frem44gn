@@ -215,3 +215,23 @@ export interface GeneratedList {
   header_footer_data?: any
   items_snapshot?: any
 }
+
+/* WhatsApp Module Types */
+export interface WhatsAppMessage {
+  id: string
+  text: string
+  sender: 'me' | 'other'
+  timestamp: Date
+  status: 'sent' | 'delivered' | 'read'
+  agentName?: string
+}
+
+export interface WhatsAppConversation {
+  id: string
+  contactName: string
+  contactNumber: string
+  avatarUrl?: string
+  lastMessage?: WhatsAppMessage
+  unreadCount: number
+  isOnline?: boolean
+}

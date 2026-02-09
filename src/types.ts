@@ -43,7 +43,7 @@ export interface Product {
   categoria: string
   memoria: string | null
   cor: string | null
-  valor: number
+  valor: number | null
   fornecedor: string | null
   em_estoque: boolean
   estado: string | null
@@ -161,11 +161,57 @@ export interface Evaluation {
   url_print_seguranca?: string | null
   url_foto_documento?: string | null
   arquivos_consulta?: ConsultationFile[] | null
-  // New fields for specific research files
   url_pesquisa_1?: string | null
   url_pesquisa_2?: string | null
   url_pesquisa_3?: string | null
   url_pesquisa_4?: string | null
-  // New field for payment proof
   url_comprovante_pagamento?: string | null
+}
+
+export interface FilterState {
+  search: string
+  memory: string
+  ram: string
+  color: string
+  dateRange: string
+  supplier: string
+  categories: string[]
+}
+
+export interface FilterOptions {
+  memories: string[]
+  rams: string[]
+  colors: string[]
+  categories: string[]
+}
+
+export interface ExcludedSupplier {
+  id: string
+  nome: string | null
+  telefone: string | null
+  criado_em: string | null
+  company_id?: string | null
+}
+
+export interface PriceMonitorItem {
+  id: number
+  modelo: string | null
+  valor: number | null
+  fornecedor: string | null
+  telefone: string | null
+  categoria: string | null
+  criado_em: string | null
+}
+
+export interface GeneratedList {
+  id: string
+  title: string | null
+  content: string | null
+  type: string | null
+  created_at: string
+  user_id: string
+  company_id?: string | null
+  profiles?: { name: string | null } | null
+  header_footer_data?: any
+  items_snapshot?: any
 }

@@ -23,14 +23,11 @@ interface ProductStore {
   filters: FilterState
   categories: string[]
 
-  // Dynamic options based on search
   filterOptions: FilterOptions
   fetchFilterOptions: () => Promise<void>
 
-  // Derived state helper
   selectedProductIds: Set<number>
 
-  // Pagination
   page: number
   pageSize: number
   total: number
@@ -41,7 +38,6 @@ interface ProductStore {
   fetchProducts: () => Promise<void>
   fetchCategories: () => Promise<void>
 
-  // Draft Actions
   fetchDraftItems: () => Promise<void>
   toggleDraftItem: (product: Product) => Promise<void>
   addToDraft: (products: Product[]) => Promise<void>
@@ -50,7 +46,6 @@ interface ProductStore {
   clearDraft: () => Promise<void>
   applyMarkupToAll: (markup: number) => Promise<void>
 
-  // Generated Lists
   fetchGeneratedLists: () => Promise<void>
   deleteGeneratedList: (id: string) => Promise<void>
   saveGeneratedList: (
@@ -61,7 +56,6 @@ interface ProductStore {
     itemsSnapshot: DraftItem[],
   ) => Promise<{ success: boolean; error?: any }>
 
-  // Legacy/Auto-Generator using Draft
   generateListFromFilters: (
     date: Date | null,
     categories: string[],
@@ -69,7 +63,6 @@ interface ProductStore {
 
   subscribeToProducts: () => () => void
 
-  // Admin Features
   fetchExcludedSuppliers: () => Promise<void>
   addExcludedSupplier: (
     name: string | null,
@@ -81,7 +74,6 @@ interface ProductStore {
   fetchPriceMonitor: () => Promise<void>
   clearAllProducts: () => Promise<{ success: boolean; error?: any }>
 
-  // Maintenance Features
   cleanupOldRecords: (
     date: string,
   ) => Promise<{ success: boolean; data?: any; error?: any }>
@@ -89,11 +81,10 @@ interface ProductStore {
     companyId: string,
   ) => Promise<{ success: boolean; count?: number; error?: any }>
 
-  // Helper
   getBestPrice: (
     product: Product,
   ) => { price: number; supplierId: string } | null
-  selectedProducts: Product[] // Helper to get full objects
+  selectedProducts: Product[]
   toggleProductSelection: (product: Product | number) => void
 }
 
@@ -114,11 +105,9 @@ const INITIAL_FILTER_OPTIONS: FilterOptions = {
   categories: [],
 }
 
-// Helper to cast table name for views since they are not in Database types
 const VIEW_PRODUCTS = 'v_produtos_visiveis' as any
 const VIEW_MONITOR = 'v_monitor_precos' as any
 
-// Helper to format full product description
 const formatProductDescription = (p: Product) => {
   return [p.modelo, p.memoria, p.ram ? `${p.ram} RAM` : null, p.cor]
     .filter(Boolean)
@@ -139,7 +128,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   page: 0,
   pageSize: 20,
   total: 0,
-  selectedProducts: [], // Placeholder, derived actually
+  selectedProducts: [],
 
   getBestPrice: (product) => {
     if (product.valor) return { price: product.valor, supplierId: 'default' }
@@ -494,7 +483,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return
 
-    // Get user profile first to check permissions and company
     const { data: profile } = await supabase
       .from('profiles')
       .select('can_view_all_lists, company_id')
@@ -506,7 +494,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .select('*, profiles(name)')
       .order('created_at', { ascending: false })
 
-    // Apply filtering logic
     if (profile?.can_view_all_lists && profile.company_id) {
       query = query.eq('company_id', profile.company_id)
     } else {
@@ -542,7 +529,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'User not found' }
 
-    // Fetch company_id for the user
     const { data: profile } = await supabase
       .from('profiles')
       .select('company_id')
@@ -694,15 +680,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         throw new Error('Company ID is required')
       }
 
-      // Call the optimized RPC function
       const { data, error } = await supabase.rpc('delete_zero_value_products', {
         p_company_id: companyId,
       })
 
       if (error) throw error
 
-      // Refresh product list and other dependent lists after cleanup
-      // Using Promise.all to fetch concurrently and ensure all are updated
       await Promise.all([get().fetchProducts(), get().fetchPriceMonitor()])
 
       return { success: true, count: data as number }

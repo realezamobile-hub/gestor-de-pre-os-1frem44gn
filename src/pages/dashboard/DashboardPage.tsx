@@ -52,7 +52,6 @@ export default function DashboardPage() {
 
   // Sync store when debounced value changes
   useEffect(() => {
-    // Only update if value is different to avoid loops/unnecessary fetches
     if (debouncedSearch !== filters.search) {
       setFilters({ search: debouncedSearch })
     }

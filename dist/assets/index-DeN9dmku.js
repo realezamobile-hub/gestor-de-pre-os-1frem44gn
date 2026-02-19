@@ -76468,7 +76468,7 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 					variant: "outline",
-					className: lead.status_atendimento === "Pendente" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200",
+					className: lead.status_atendimento === "Pendente" ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-red-100 text-red-800 border-red-200",
 					children: lead.status_atendimento
 				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -76491,7 +76491,7 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 								size: "sm",
 								variant: lead.status_atendimento === "Pendente" ? "default" : "secondary",
-								className: "h-8 w-8 p-0",
+								className: cn("h-8 w-8 p-0", lead.status_atendimento === "Pendente" && "bg-green-600 hover:bg-green-700 text-white"),
 								onClick: () => onActionClick(lead),
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 									src: lead.status_atendimento === "Pendente" ? "https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill" : "https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill",
@@ -76726,4 +76726,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DKlfL_UP.js.map
+//# sourceMappingURL=index-DeN9dmku.js.map

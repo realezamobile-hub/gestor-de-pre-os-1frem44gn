@@ -60,7 +60,7 @@ export default function LeadsPage() {
     }
 
     // 2. Update status and attendant if pending
-    // This ensures we don't create new records, but update existing ones in place
+    // This edits the record to set status to 'Atendido' and records the user name
     if (lead.status_atendimento === 'Pendente' && currentUser?.name) {
       await markAsHandled(lead, currentUser.name)
     }

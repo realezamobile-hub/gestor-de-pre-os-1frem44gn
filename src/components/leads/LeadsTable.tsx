@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface LeadsTableProps {
   leads: Lead[]
@@ -72,8 +73,8 @@ export function LeadsTable({
                   variant="outline"
                   className={
                     lead.status_atendimento === 'Pendente'
-                      ? 'bg-amber-50 text-amber-700 border-amber-200'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200' // Green for Pending
+                      : 'bg-red-100 text-red-800 border-red-200' // Red for Attended
                   }
                 >
                   {lead.status_atendimento}
@@ -106,7 +107,11 @@ export function LeadsTable({
                               ? 'default'
                               : 'secondary'
                           }
-                          className="h-8 w-8 p-0"
+                          className={cn(
+                            'h-8 w-8 p-0',
+                            lead.status_atendimento === 'Pendente' &&
+                              'bg-green-600 hover:bg-green-700 text-white',
+                          )}
                           onClick={() => onActionClick(lead)}
                         >
                           <img

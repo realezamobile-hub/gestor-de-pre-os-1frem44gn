@@ -81,6 +81,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       set({ leads: updatedLeads })
 
       // Update existing record in database
+      // Using 'usuario_atendimento' which maps to the attendant field in DB
       const { error } = await supabase
         .from('leads_realeza' as any)
         .update({
@@ -146,6 +147,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     }
 
     // 4. Deduplication Logic (15 min window)
+    // Sort by date ascending to process timeline correctly
     const sortedForDedup = [...processed].sort(
       (a, b) =>
         new Date(a.data_recebimento).getTime() -
@@ -156,6 +158,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     const lastSeenMap: Record<string, Date> = {}
 
     sortedForDedup.forEach((lead) => {
+      // Key includes contact name and message content to identify duplicates
       const key = `${lead.nome_contato}|${lead.mensagem_cliente}`.trim()
       const leadDate = parseISO(lead.data_recebimento)
 
@@ -163,6 +166,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
         const lastDate = lastSeenMap[key]
         const diffMinutes = differenceInMinutes(leadDate, lastDate)
 
+        // Hide duplicate messages if within 15 minutes of the last accepted one
         if (diffMinutes < 15) {
           return
         }
@@ -177,9 +181,11 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       const isAPending = a.status_atendimento === 'Pendente'
       const isBPending = b.status_atendimento === 'Pendente'
 
+      // Prioritize "Pendente" at the top
       if (isAPending && !isBPending) return -1
       if (!isAPending && isBPending) return 1
 
+      // Then sort by date descending (newest first)
       return (
         new Date(b.data_recebimento).getTime() -
         new Date(a.data_recebimento).getTime()

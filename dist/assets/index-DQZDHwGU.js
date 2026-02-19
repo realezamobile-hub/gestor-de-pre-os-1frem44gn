@@ -76473,7 +76473,7 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "text-xs text-muted-foreground whitespace-nowrap",
-					children: format(new Date(lead.data_recebimento), "dd/MM 'às' HH:mm", { locale: ptBR })
+					children: format(new Date(lead.data_recebimento), "dd/MM/yyyy HH:mm", { locale: ptBR })
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "text-xs text-muted-foreground",
@@ -76493,9 +76493,13 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 								variant: lead.status_atendimento === "Pendente" ? "default" : "secondary",
 								className: "h-8 w-8 p-0",
 								onClick: () => onActionClick(lead),
-								children: lead.status_atendimento === "Pendente" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ExternalLink, { className: "w-4 h-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-4 h-4 text-emerald-600" })
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+									src: lead.status_atendimento === "Pendente" ? "https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill" : "https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill",
+									alt: "WhatsApp",
+									className: "w-4 h-4"
+								})
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Atender / Abrir Link" }) })] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: lead.status_atendimento === "Pendente" ? "Atender no WhatsApp" : "Abrir Conversa" }) })] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
 							asChild: true,
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 								size: "sm",
@@ -76722,4 +76726,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-COwMNDnl.js.map
+//# sourceMappingURL=index-DQZDHwGU.js.map

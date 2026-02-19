@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Ban, ExternalLink, CheckCircle2, User } from 'lucide-react'
+import { Ban, User } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
@@ -80,7 +80,7 @@ export function LeadsTable({
                 </Badge>
               </TableCell>
               <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                {format(new Date(lead.data_recebimento), "dd/MM 'às' HH:mm", {
+                {format(new Date(lead.data_recebimento), 'dd/MM/yyyy HH:mm', {
                   locale: ptBR,
                 })}
               </TableCell>
@@ -109,15 +109,23 @@ export function LeadsTable({
                           className="h-8 w-8 p-0"
                           onClick={() => onActionClick(lead)}
                         >
-                          {lead.status_atendimento === 'Pendente' ? (
-                            <ExternalLink className="w-4 h-4" />
-                          ) : (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          )}
+                          <img
+                            src={
+                              lead.status_atendimento === 'Pendente'
+                                ? 'https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill'
+                                : 'https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill'
+                            }
+                            alt="WhatsApp"
+                            className="w-4 h-4"
+                          />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Atender / Abrir Link</p>
+                        <p>
+                          {lead.status_atendimento === 'Pendente'
+                            ? 'Atender no WhatsApp'
+                            : 'Abrir Conversa'}
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

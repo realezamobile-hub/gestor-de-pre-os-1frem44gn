@@ -54,12 +54,14 @@ export default function LeadsPage() {
   }, [debouncedSearch])
 
   const handleActionClick = async (lead: Lead) => {
+    // 1. Open WhatsApp link if available
     if (lead.link_acao) {
       window.open(lead.link_acao, '_blank')
     }
 
-    // Only update status if pending
-    if (lead.status_atendimento === 'Pendente' && currentUser) {
+    // 2. Update status and attendant if pending
+    // This ensures we don't create new records, but update existing ones in place
+    if (lead.status_atendimento === 'Pendente' && currentUser?.name) {
       await markAsHandled(lead, currentUser.name)
     }
   }

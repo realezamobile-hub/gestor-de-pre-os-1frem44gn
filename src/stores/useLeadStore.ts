@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Lead, BlacklistedContact } from '@/types'
+import { Lead } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { differenceInMinutes, parseISO } from 'date-fns'
 import { toast } from 'sonner'
@@ -9,11 +9,11 @@ interface LeadStore {
   isLoading: boolean
   filterStatus: string
   searchTerm: string
-  blacklist: string[] // List of blocked names/groups
+  blacklist: string[]
 
   fetchLeads: () => Promise<void>
   fetchBlacklist: () => Promise<void>
-  markAsHandled: (lead: Lead, userId: string) => Promise<void>
+  markAsHandled: (lead: Lead, attendantName: string) => Promise<void>
   addToBlacklist: (contactName: string) => Promise<void>
   setFilterStatus: (status: string) => void
   setSearchTerm: (term: string) => void
@@ -31,14 +31,13 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
   fetchBlacklist: async () => {
     try {
       const { data, error } = await supabase
-        .from('leads_blacklist')
+        .from('leads_blacklist' as any)
         .select('nome_contato')
 
       if (!error && data) {
-        set({ blacklist: data.map((item) => item.nome_contato) })
+        set({ blacklist: data.map((item: any) => item.nome_contato) })
       }
     } catch (e) {
-      // Fail silently if table doesn't exist yet
       console.warn('Blacklist table might not exist')
     }
   },
@@ -46,14 +45,13 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
   fetchLeads: async () => {
     set({ isLoading: true })
     try {
-      // Fetch blacklist first
       await get().fetchBlacklist()
 
       const { data, error } = await supabase
-        .from('leads_realeza')
+        .from('leads_realeza' as any)
         .select('*')
         .order('data_recebimento', { ascending: false })
-        .limit(500) // Limit to recent leads for performance
+        .limit(500)
 
       if (error) throw error
 
@@ -68,25 +66,26 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     }
   },
 
-  markAsHandled: async (lead, userId) => {
+  markAsHandled: async (lead, attendantName) => {
     try {
-      // Optimistic update
+      // Optimistic update for immediate UI reflection
       const updatedLeads = get().leads.map((l) =>
         l.id === lead.id
           ? {
               ...l,
               status_atendimento: 'Atendido',
-              usuario_atendimento: userId,
+              usuario_atendimento: attendantName,
             }
           : l,
       )
       set({ leads: updatedLeads })
 
+      // Update existing record in database
       const { error } = await supabase
-        .from('leads_realeza')
+        .from('leads_realeza' as any)
         .update({
           status_atendimento: 'Atendido',
-          usuario_atendimento: userId,
+          usuario_atendimento: attendantName,
         })
         .eq('id', lead.id)
 
@@ -94,18 +93,17 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     } catch (error) {
       console.error('Error updating lead status:', error)
       toast.error('Erro ao atualizar status do lead')
-      // Revert optimistic update if needed, but for now we keep it simple
+      // Revert optimistic update on failure
       get().fetchLeads()
     }
   },
 
   addToBlacklist: async (contactName) => {
     try {
-      // Optimistic update
       set((state) => ({ blacklist: [...state.blacklist, contactName] }))
 
       const { error } = await supabase
-        .from('leads_blacklist')
+        .from('leads_blacklist' as any)
         .insert({ nome_contato: contactName })
 
       if (error) throw error
@@ -128,15 +126,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       (lead) => !blacklist.includes(lead.nome_contato),
     )
 
-    // 2. Filter by Status (Optional, if we want to force filtering)
-    // The requirement says "default view prioritizes Pendente", which implies sorting,
-    // but usually "Search and Filtering" implies filtering out.
-    // "Default Sorting and Filtering: Table must load with Pendente status appearing at the top"
-    // "Search bar to filter records by status" -> This is ambiguous.
-    // I will filter by status if filterStatus is set, but if it is 'all', I show all.
-    // The requirement "default view that prioritizes Pendente" is usually a sort.
-    // But "Search and filtering... filter out duplicate".
-
+    // 2. Filter by Status
     if (filterStatus && filterStatus !== 'all') {
       processed = processed.filter(
         (lead) =>
@@ -155,12 +145,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       )
     }
 
-    // 4. Deduplication Logic
-    // "Hide duplicate messages from the same contact with the same content if sent within a 15-minute window."
-    // We need to process from oldest to newest to check the window correctly,
-    // but the list is usually displayed newest first.
-    // Let's sort by date asc temporarily to process, then reverse back.
-
+    // 4. Deduplication Logic (15 min window)
     const sortedForDedup = [...processed].sort(
       (a, b) =>
         new Date(a.data_recebimento).getTime() -
@@ -168,7 +153,7 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     )
 
     const uniqueLeads: Lead[] = []
-    const lastSeenMap: Record<string, Date> = {} // Key: `${nome_contato}|${mensagem}`
+    const lastSeenMap: Record<string, Date> = {}
 
     sortedForDedup.forEach((lead) => {
       const key = `${lead.nome_contato}|${lead.mensagem_cliente}`.trim()
@@ -179,19 +164,15 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
         const diffMinutes = differenceInMinutes(leadDate, lastDate)
 
         if (diffMinutes < 15) {
-          // It's a duplicate within 15 mins, skip it
           return
         }
       }
 
-      // Not a duplicate or > 15 mins
       lastSeenMap[key] = leadDate
       uniqueLeads.push(lead)
     })
 
-    // 5. Default Sorting
-    // "Pendente" records appearing at the top by default.
-    // Then by date descending.
+    // 5. Default Sorting (Pendente first, then date desc)
     return uniqueLeads.sort((a, b) => {
       const isAPending = a.status_atendimento === 'Pendente'
       const isBPending = b.status_atendimento === 'Pendente'
@@ -199,7 +180,6 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       if (isAPending && !isBPending) return -1
       if (!isAPending && isBPending) return 1
 
-      // If status is same, sort by date desc
       return (
         new Date(b.data_recebimento).getTime() -
         new Date(a.data_recebimento).getTime()

@@ -76362,16 +76362,16 @@ const useLeadStore = create((set, get$8) => ({
 			set({ isLoading: false });
 		}
 	},
-	markAsHandled: async (lead, userId) => {
+	markAsHandled: async (lead, attendantName) => {
 		try {
 			set({ leads: get$8().leads.map((l) => l.id === lead.id ? {
 				...l,
 				status_atendimento: "Atendido",
-				usuario_atendimento: userId
+				usuario_atendimento: attendantName
 			} : l) });
 			const { error } = await supabase.from("leads_realeza").update({
 				status_atendimento: "Atendido",
-				usuario_atendimento: userId
+				usuario_atendimento: attendantName
 			}).eq("id", lead.id);
 			if (error) throw error;
 		} catch (error) {
@@ -76531,7 +76531,7 @@ function LeadsPage() {
 	}, [debouncedSearch]);
 	const handleActionClick = async (lead) => {
 		if (lead.link_acao) window.open(lead.link_acao, "_blank");
-		if (lead.status_atendimento === "Pendente" && currentUser) await markAsHandled(lead, currentUser.name);
+		if (lead.status_atendimento === "Pendente" && currentUser?.name) await markAsHandled(lead, currentUser.name);
 	};
 	const handleBlockConfirm = async () => {
 		if (leadToBlock) {
@@ -76726,4 +76726,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DQZDHwGU.js.map
+//# sourceMappingURL=index-DKlfL_UP.js.map

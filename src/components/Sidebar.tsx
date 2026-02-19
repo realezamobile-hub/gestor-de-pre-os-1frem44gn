@@ -11,7 +11,7 @@ import {
   LogOut,
   ChevronDown,
   UserPlus,
-  MessageCircle,
+  MessageSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -46,10 +46,10 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       visible: true,
     },
     {
-      label: 'WhatsApp',
-      icon: MessageCircle,
-      path: '/whatsapp',
-      visible: true, // Visible to all authorized users
+      label: 'Leads Realeza',
+      icon: MessageSquare,
+      path: '/leads',
+      visible: true, // Access to Leads module
     },
     {
       label: 'Gerador de Lista',

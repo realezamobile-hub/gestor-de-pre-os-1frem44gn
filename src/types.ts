@@ -216,22 +216,20 @@ export interface GeneratedList {
   items_snapshot?: any
 }
 
-/* WhatsApp Module Types */
-export interface WhatsAppMessage {
-  id: string
-  text: string
-  sender: 'me' | 'other'
-  timestamp: Date
-  status: 'sent' | 'delivered' | 'read'
-  agentName?: string
+/* Leads Module Types */
+export interface Lead {
+  id: number
+  nome_contato: string
+  numero_contato: string
+  mensagem_cliente: string
+  link_acao: string
+  status_atendimento: string // 'Pendente' | 'Atendido'
+  data_recebimento: string
+  usuario_atendimento?: string | null
 }
 
-export interface WhatsAppConversation {
+export interface BlacklistedContact {
   id: string
-  contactName: string
-  contactNumber: string
-  avatarUrl?: string
-  lastMessage?: WhatsAppMessage
-  unreadCount: number
-  isOnline?: boolean
+  nome_contato: string
+  created_at: string
 }

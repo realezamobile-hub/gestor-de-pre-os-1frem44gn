@@ -94,7 +94,7 @@ export function BulkCleanup() {
 
       if (result.success) {
         toast.success('Limpeza realizada com sucesso!', {
-          description: `${result.count} produtos com valor zero ou nulo foram removidos permanentemente.`,
+          description: `${result.count} produtos com valor menor ou igual a zero foram removidos permanentemente.`,
         })
       } else {
         console.error('Zero cleanup error:', result.error)
@@ -285,16 +285,16 @@ export function BulkCleanup() {
             Limpeza de Produtos Inválidos
           </CardTitle>
           <CardDescription>
-            Remover produtos que não possuem valor definido (zero, negativo ou
-            nulo) da sua empresa.
+            Remover produtos que possuem valor menor ou igual a zero da sua
+            empresa.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
             <p className="text-sm text-orange-800">
-              Isso removerá todos os produtos com <strong>valor R$ 0,00</strong>{' '}
-              ou sem preço cadastrado (nulo). Útil para limpar importações
-              incorretas ou produtos incompletos.
+              Isso removerá todos os produtos com{' '}
+              <strong>valor menor ou igual a R$ 0,00</strong>. Útil para limpar
+              importações incorretas ou produtos incompletos.
             </p>
           </div>
 
@@ -323,7 +323,7 @@ export function BulkCleanup() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     Tem certeza que deseja excluir permanentemente todos os
-                    produtos com valor zero ou nulo da sua empresa?
+                    produtos com valor menor ou igual a zero da sua empresa?
                     <br />
                     Esta ação não pode ser desfeita.
                   </AlertDialogDescription>

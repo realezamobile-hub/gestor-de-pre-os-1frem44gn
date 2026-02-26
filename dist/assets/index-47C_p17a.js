@@ -39952,7 +39952,7 @@ const useProductStore = create((set, get$8) => ({
 	deleteZeroValueProducts: async (companyId) => {
 		try {
 			if (!companyId) throw new Error("Company ID is required");
-			const { error, count: count$3 } = await supabase.from("produtos").delete({ count: "exact" }).eq("company_id", companyId).or("valor.lte.0,valor.is.null");
+			const { error, count: count$3 } = await supabase.from("produtos").delete({ count: "exact" }).eq("company_id", companyId).lte("valor", 0);
 			if (error) throw error;
 			await Promise.all([get$8().fetchProducts(), get$8().fetchPriceMonitor()]);
 			return {
@@ -46852,7 +46852,7 @@ function BulkCleanup() {
 		setZeroValueLoading(true);
 		try {
 			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo foram removidos permanentemente.` });
+			if (result.success) toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor menor ou igual a zero foram removidos permanentemente.` });
 			else {
 				console.error("Zero cleanup error:", result.error);
 				if (result.error?.code === "57014") toast.error("A operação demorou muito, mas o processo foi otimizado. Tente novamente se o erro persistir.");
@@ -46999,17 +46999,17 @@ function BulkCleanup() {
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
 					className: "flex items-center gap-2 text-orange-900",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-5 h-5 text-orange-600" }), "Limpeza de Produtos Inválidos"]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo) da sua empresa." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que possuem valor menor ou igual a zero da sua empresa." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 					className: "space-y-4",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "rounded-lg border border-orange-200 bg-orange-50 p-4",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 							className: "text-sm text-orange-800",
 							children: [
-								"Isso removerá todos os produtos com ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor R$ 0,00" }),
+								"Isso removerá todos os produtos com",
 								" ",
-								"ou sem preço cadastrado (nulo). Útil para limpar importações incorretas ou produtos incompletos."
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor menor ou igual a R$ 0,00" }),
+								". Útil para limpar importações incorretas ou produtos incompletos."
 							]
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -47023,7 +47023,7 @@ function BulkCleanup() {
 								children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <=0,00"]
 							})
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-							"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
+							"Tem certeza que deseja excluir permanentemente todos os produtos com valor menor ou igual a zero da sua empresa?",
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
 							"Esta ação não pode ser desfeita."
 						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
@@ -76745,4 +76745,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-8Sx2M93f.js.map
+//# sourceMappingURL=index-47C_p17a.js.map

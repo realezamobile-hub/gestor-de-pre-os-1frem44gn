@@ -715,12 +715,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         throw new Error('Company ID is required')
       }
 
-      // Execute a direct deletion on the products table to strictly enforce removal of <= 0 or null records
+      // Execute a direct deletion on the products table to strictly enforce removal of <= 0 records
       const { error, count } = await supabase
         .from('produtos')
         .delete({ count: 'exact' })
         .eq('company_id', companyId)
-        .or('valor.lte.0,valor.is.null')
+        .lte('valor', 0)
 
       if (error) {
         throw error

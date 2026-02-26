@@ -234,9 +234,17 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         min_date: minDate,
       }
 
-      const { data, error, count } = await supabase
-        .rpc('search_products', rpcArgs, { count: 'exact' })
-        .range(page * pageSize, (page + 1) * pageSize - 1)
+      let query = supabase.rpc('search_products', rpcArgs, { count: 'exact' })
+
+      // Explicitly enforce filtering out zero-stock (false or null) when the toggle is off
+      if (!showZeroStock) {
+        query = query.eq('em_estoque', true)
+      }
+
+      const { data, error, count } = await query.range(
+        page * pageSize,
+        (page + 1) * pageSize - 1,
+      )
 
       if (!error && data) {
         set({ products: data as any, total: count || 0, isLoading: false })
@@ -673,7 +681,6 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   cleanupOldRecords: async (date) => {
     try {
-      // Manual explicit deletion to ensure it successfully identifies and deletes old records
       const { error: pErr, count: pCount } = await supabase
         .from('produtos')
         .delete({ count: 'exact' })
@@ -709,15 +716,20 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         throw new Error('Company ID is required')
       }
 
-      const { data, error } = await supabase.rpc('delete_zero_value_products', {
-        p_company_id: companyId,
-      })
+      // Execute a direct deletion on the products table to strictly enforce removal of <= 0 or null records
+      const { error, count } = await supabase
+        .from('produtos')
+        .delete({ count: 'exact' })
+        .eq('company_id', companyId)
+        .or('valor.lte.0,valor.is.null')
 
-      if (error) throw error
+      if (error) {
+        throw error
+      }
 
       await Promise.all([get().fetchProducts(), get().fetchPriceMonitor()])
 
-      return { success: true, count: data as number }
+      return { success: true, count: count || 0 }
     } catch (error: any) {
       console.error('Error in deleteZeroValueProducts:', error)
       return { success: false, error }

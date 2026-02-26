@@ -39614,7 +39614,9 @@ const useProductStore = create((set, get$8) => ({
 				in_stock_only: !showZeroStock,
 				min_date: minDate
 			};
-			const { data, error, count: count$3 } = await supabase.rpc("search_products", rpcArgs, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
+			let query = supabase.rpc("search_products", rpcArgs, { count: "exact" });
+			if (!showZeroStock) query = query.eq("em_estoque", true);
+			const { data, error, count: count$3 } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
 			if (!error && data) set({
 				products: data,
 				total: count$3 || 0,
@@ -39950,12 +39952,12 @@ const useProductStore = create((set, get$8) => ({
 	deleteZeroValueProducts: async (companyId) => {
 		try {
 			if (!companyId) throw new Error("Company ID is required");
-			const { data, error } = await supabase.rpc("delete_zero_value_products", { p_company_id: companyId });
+			const { error, count: count$3 } = await supabase.from("produtos").delete({ count: "exact" }).eq("company_id", companyId).or("valor.lte.0,valor.is.null");
 			if (error) throw error;
 			await Promise.all([get$8().fetchProducts(), get$8().fetchPriceMonitor()]);
 			return {
 				success: true,
-				count: data
+				count: count$3 || 0
 			};
 		} catch (error) {
 			console.error("Error in deleteZeroValueProducts:", error);
@@ -76743,4 +76745,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CdSrzoWt.js.map
+//# sourceMappingURL=index-Btwvh4rl.js.map

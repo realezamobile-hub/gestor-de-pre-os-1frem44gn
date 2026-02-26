@@ -32,8 +32,8 @@ interface ProductStore {
   pageSize: number
   total: number
 
-  showZeroStock: boolean
-  setShowZeroStock: (show: boolean) => void
+  hideZeroPrices: boolean
+  setHideZeroPrices: (hide: boolean) => void
 
   setFilters: (filters: Partial<FilterState>) => void
   resetFilters: () => void
@@ -133,11 +133,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   total: 0,
   selectedProducts: [],
 
-  showZeroStock: localStorage.getItem('showZeroStock') !== 'false',
+  hideZeroPrices: localStorage.getItem('hideZeroPrices') === 'true',
 
-  setShowZeroStock: (show) => {
-    localStorage.setItem('showZeroStock', show.toString())
-    set({ showZeroStock: show, page: 0 })
+  setHideZeroPrices: (hide) => {
+    localStorage.setItem('hideZeroPrices', hide.toString())
+    set({ hideZeroPrices: hide, page: 0 })
     get().fetchProducts()
   },
 
@@ -208,7 +208,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   fetchProducts: async () => {
     set({ isLoading: true })
-    const { filters, page, pageSize, showZeroStock } = get()
+    const { filters, page, pageSize, hideZeroPrices } = get()
 
     try {
       let minDate = null
@@ -230,15 +230,14 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         condition_filter: null,
         supplier_filter: filters.supplier.trim() || null,
         battery_filter: null,
-        in_stock_only: !showZeroStock,
+        in_stock_only: false,
         min_date: minDate,
       }
 
       let query = supabase.rpc('search_products', rpcArgs, { count: 'exact' })
 
-      // Explicitly enforce filtering out zero-stock (false or null) when the toggle is off
-      if (!showZeroStock) {
-        query = query.eq('em_estoque', true)
+      if (hideZeroPrices) {
+        query = query.gt('valor', 0)
       }
 
       const { data, error, count } = await query.range(

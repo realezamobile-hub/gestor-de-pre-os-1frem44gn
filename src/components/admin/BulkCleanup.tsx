@@ -46,8 +46,8 @@ export function BulkCleanup() {
   const {
     cleanupOldRecords,
     deleteZeroValueProducts,
-    showZeroStock,
-    setShowZeroStock,
+    hideZeroPrices,
+    setHideZeroPrices,
   } = useProductStore()
   const { currentUser } = useAuthStore()
 
@@ -150,19 +150,19 @@ export function BulkCleanup() {
         <CardContent>
           <div className="flex items-center justify-between space-x-2">
             <Label
-              htmlFor="show-zero-stock"
+              htmlFor="hide-zero-prices"
               className="flex flex-col space-y-1"
             >
-              <span>Exibir produtos zerados na aba Melhor Preço</span>
+              <span>Exibir produtos zerados na aba melhor preço</span>
               <span className="font-normal text-sm text-muted-foreground">
-                Quando desativado, produtos com quantidade zerada não aparecerão
-                no catálogo.
+                Quando marcado, produtos com valor menor ou igual a zero serão
+                ocultados do catálogo.
               </span>
             </Label>
             <Switch
-              id="show-zero-stock"
-              checked={showZeroStock}
-              onCheckedChange={setShowZeroStock}
+              id="hide-zero-prices"
+              checked={hideZeroPrices}
+              onCheckedChange={setHideZeroPrices}
             />
           </div>
         </CardContent>
@@ -313,7 +313,7 @@ export function BulkCleanup() {
                   )}
                   {zeroValueLoading
                     ? 'Processando...'
-                    : 'Deletar registros com valor <= 0,00'}
+                    : 'Deletar registros com valor <=0,00'}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>

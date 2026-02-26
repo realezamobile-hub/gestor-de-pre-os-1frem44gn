@@ -39534,11 +39534,11 @@ const useProductStore = create((set, get$8) => ({
 	pageSize: 20,
 	total: 0,
 	selectedProducts: [],
-	showZeroStock: localStorage.getItem("showZeroStock") !== "false",
-	setShowZeroStock: (show) => {
-		localStorage.setItem("showZeroStock", show.toString());
+	hideZeroPrices: localStorage.getItem("hideZeroPrices") === "true",
+	setHideZeroPrices: (hide$3) => {
+		localStorage.setItem("hideZeroPrices", hide$3.toString());
 		set({
-			showZeroStock: show,
+			hideZeroPrices: hide$3,
 			page: 0
 		});
 		get$8().fetchProducts();
@@ -39596,7 +39596,7 @@ const useProductStore = create((set, get$8) => ({
 	},
 	fetchProducts: async () => {
 		set({ isLoading: true });
-		const { filters, page, pageSize, showZeroStock } = get$8();
+		const { filters, page, pageSize, hideZeroPrices } = get$8();
 		try {
 			let minDate = null;
 			const today = startOfDay(/* @__PURE__ */ new Date());
@@ -39611,11 +39611,11 @@ const useProductStore = create((set, get$8) => ({
 				condition_filter: null,
 				supplier_filter: filters.supplier.trim() || null,
 				battery_filter: null,
-				in_stock_only: !showZeroStock,
+				in_stock_only: false,
 				min_date: minDate
 			};
 			let query = supabase.rpc("search_products", rpcArgs, { count: "exact" });
-			if (!showZeroStock) query = query.eq("em_estoque", true);
+			if (hideZeroPrices) query = query.gt("valor", 0);
 			const { data, error, count: count$3 } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
 			if (!error && data) set({
 				products: data,
@@ -46825,7 +46825,7 @@ function BulkCleanup() {
 	const [loading, setLoading] = (0, import_react.useState)(false);
 	const [zeroValueLoading, setZeroValueLoading] = (0, import_react.useState)(false);
 	const [leadsLoading, setLeadsLoading] = (0, import_react.useState)(false);
-	const { cleanupOldRecords, deleteZeroValueProducts, showZeroStock, setShowZeroStock } = useProductStore();
+	const { cleanupOldRecords, deleteZeroValueProducts, hideZeroPrices, setHideZeroPrices } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const canDeleteHistory = currentUser?.canDeleteRecords || false;
 	const handleCleanup = async () => {
@@ -46889,16 +46889,16 @@ function BulkCleanup() {
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Controle a visibilidade de produtos nas listagens do painel." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex items-center justify-between space-x-2",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
-						htmlFor: "show-zero-stock",
+						htmlFor: "hide-zero-prices",
 						className: "flex flex-col space-y-1",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Exibir produtos zerados na aba Melhor Preço" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Exibir produtos zerados na aba melhor preço" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "font-normal text-sm text-muted-foreground",
-							children: "Quando desativado, produtos com quantidade zerada não aparecerão no catálogo."
+							children: "Quando marcado, produtos com valor menor ou igual a zero serão ocultados do catálogo."
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-						id: "show-zero-stock",
-						checked: showZeroStock,
-						onCheckedChange: setShowZeroStock
+						id: "hide-zero-prices",
+						checked: hideZeroPrices,
+						onCheckedChange: setHideZeroPrices
 					})]
 				}) })]
 			}),
@@ -47020,7 +47020,7 @@ function BulkCleanup() {
 								variant: "destructive",
 								className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
 								disabled: zeroValueLoading || !currentUser?.companyId,
-								children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
+								children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <=0,00"]
 							})
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
 							"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
@@ -76745,4 +76745,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Btwvh4rl.js.map
+//# sourceMappingURL=index-8Sx2M93f.js.map

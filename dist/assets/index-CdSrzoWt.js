@@ -39534,6 +39534,15 @@ const useProductStore = create((set, get$8) => ({
 	pageSize: 20,
 	total: 0,
 	selectedProducts: [],
+	showZeroStock: localStorage.getItem("showZeroStock") !== "false",
+	setShowZeroStock: (show) => {
+		localStorage.setItem("showZeroStock", show.toString());
+		set({
+			showZeroStock: show,
+			page: 0
+		});
+		get$8().fetchProducts();
+	},
 	getBestPrice: (product) => {
 		if (product.valor) return {
 			price: product.valor,
@@ -39587,7 +39596,7 @@ const useProductStore = create((set, get$8) => ({
 	},
 	fetchProducts: async () => {
 		set({ isLoading: true });
-		const { filters, page, pageSize } = get$8();
+		const { filters, page, pageSize, showZeroStock } = get$8();
 		try {
 			let minDate = null;
 			const today = startOfDay(/* @__PURE__ */ new Date());
@@ -39602,7 +39611,7 @@ const useProductStore = create((set, get$8) => ({
 				condition_filter: null,
 				supplier_filter: filters.supplier.trim() || null,
 				battery_filter: null,
-				in_stock_only: false,
+				in_stock_only: !showZeroStock,
 				min_date: minDate
 			};
 			const { data, error, count: count$3 } = await supabase.rpc("search_products", rpcArgs, { count: "exact" }).range(page * pageSize, (page + 1) * pageSize - 1);
@@ -39918,12 +39927,17 @@ const useProductStore = create((set, get$8) => ({
 	},
 	cleanupOldRecords: async (date$1) => {
 		try {
-			const { data, error } = await supabase.rpc("cleanup_old_records", { p_target_date: date$1 });
-			if (error) throw error;
+			const { error: pErr, count: pCount } = await supabase.from("produtos").delete({ count: "exact" }).lte("criado_em", date$1);
+			if (pErr) throw pErr;
+			const { error: mErr, count: mCount } = await supabase.from("mensagens_processadas").delete({ count: "exact" }).lte("created_at", date$1);
+			if (mErr) throw mErr;
 			get$8().fetchProducts();
 			return {
 				success: true,
-				data
+				data: {
+					products_deleted: pCount || 0,
+					messages_deleted: mCount || 0
+				}
 			};
 		} catch (error) {
 			console.error("Cleanup old records error:", error);
@@ -42617,209 +42631,11 @@ function ProductPagination() {
 		})]
 	});
 }
-var ROOT_NAME = "AlertDialog";
-var [createAlertDialogContext, createAlertDialogScope] = createContextScope(ROOT_NAME, [createDialogScope]);
-var useDialogScope = createDialogScope();
-var AlertDialog$1 = (props) => {
-	const { __scopeAlertDialog, ...alertDialogProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
-		...dialogScope,
-		...alertDialogProps,
-		modal: true
-	});
-};
-AlertDialog$1.displayName = ROOT_NAME;
-var TRIGGER_NAME$2 = "AlertDialogTrigger";
-var AlertDialogTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...triggerProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger$3, {
-		...dialogScope,
-		...triggerProps,
-		ref: forwardedRef
-	});
-});
-AlertDialogTrigger$1.displayName = TRIGGER_NAME$2;
-var PORTAL_NAME = "AlertDialogPortal";
-var AlertDialogPortal$1 = (props) => {
-	const { __scopeAlertDialog, ...portalProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal$3, {
-		...dialogScope,
-		...portalProps
-	});
-};
-AlertDialogPortal$1.displayName = PORTAL_NAME;
-var OVERLAY_NAME = "AlertDialogOverlay";
-var AlertDialogOverlay$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...overlayProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
-		...dialogScope,
-		...overlayProps,
-		ref: forwardedRef
-	});
-});
-AlertDialogOverlay$1.displayName = OVERLAY_NAME;
-var CONTENT_NAME$2 = "AlertDialogContent";
-var [AlertDialogContentProvider, useAlertDialogContentContext] = createAlertDialogContext(CONTENT_NAME$2);
-var Slottable = /* @__PURE__ */ createSlottable("AlertDialogContent");
-var AlertDialogContent$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, children, ...contentProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	const contentRef = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, contentRef);
-	const cancelRef = import_react.useRef(null);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WarningProvider, {
-		contentName: CONTENT_NAME$2,
-		titleName: TITLE_NAME,
-		docsSlug: "alert-dialog",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogContentProvider, {
-			scope: __scopeAlertDialog,
-			cancelRef,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$1, {
-				role: "alertdialog",
-				...dialogScope,
-				...contentProps,
-				ref: composedRefs,
-				onOpenAutoFocus: composeEventHandlers(contentProps.onOpenAutoFocus, (event) => {
-					event.preventDefault();
-					cancelRef.current?.focus({ preventScroll: true });
-				}),
-				onPointerDownOutside: (event) => event.preventDefault(),
-				onInteractOutside: (event) => event.preventDefault(),
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slottable, { children }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DescriptionWarning, { contentRef })]
-			})
-		})
-	});
-});
-AlertDialogContent$1.displayName = CONTENT_NAME$2;
-var TITLE_NAME = "AlertDialogTitle";
-var AlertDialogTitle$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...titleProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
-		...dialogScope,
-		...titleProps,
-		ref: forwardedRef
-	});
-});
-AlertDialogTitle$1.displayName = TITLE_NAME;
-var DESCRIPTION_NAME = "AlertDialogDescription";
-var AlertDialogDescription$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...descriptionProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
-		...dialogScope,
-		...descriptionProps,
-		ref: forwardedRef
-	});
-});
-AlertDialogDescription$1.displayName = DESCRIPTION_NAME;
-var ACTION_NAME = "AlertDialogAction";
-var AlertDialogAction$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...actionProps } = props;
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close, {
-		...dialogScope,
-		...actionProps,
-		ref: forwardedRef
-	});
-});
-AlertDialogAction$1.displayName = ACTION_NAME;
-var CANCEL_NAME = "AlertDialogCancel";
-var AlertDialogCancel$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeAlertDialog, ...cancelProps } = props;
-	const { cancelRef } = useAlertDialogContentContext(CANCEL_NAME, __scopeAlertDialog);
-	const dialogScope = useDialogScope(__scopeAlertDialog);
-	const ref = useComposedRefs(forwardedRef, cancelRef);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close, {
-		...dialogScope,
-		...cancelProps,
-		ref
-	});
-});
-AlertDialogCancel$1.displayName = CANCEL_NAME;
-var DescriptionWarning = ({ contentRef }) => {
-	const MESSAGE = `\`${CONTENT_NAME$2}\` requires a description for the component to be accessible for screen reader users.
-
-You can add a description to the \`${CONTENT_NAME$2}\` by passing a \`${DESCRIPTION_NAME}\` component as a child, which also benefits sighted users by adding visible context to the dialog.
-
-Alternatively, you can use your own component as a description by assigning it an \`id\` and passing the same value to the \`aria-describedby\` prop in \`${CONTENT_NAME$2}\`. If the description is confusing or duplicative for sighted users, you can use the \`@radix-ui/react-visually-hidden\` primitive as a wrapper around your description component.
-
-For more information, see https://radix-ui.com/primitives/docs/components/alert-dialog`;
-	import_react.useEffect(() => {
-		if (!document.getElementById(contentRef.current?.getAttribute("aria-describedby"))) console.warn(MESSAGE);
-	}, [MESSAGE, contentRef]);
-	return null;
-};
-var Root2$2 = AlertDialog$1;
-var Trigger2$1 = AlertDialogTrigger$1;
-var Portal2 = AlertDialogPortal$1;
-var Overlay2 = AlertDialogOverlay$1;
-var Content2$1 = AlertDialogContent$1;
-var Action = AlertDialogAction$1;
-var Cancel = AlertDialogCancel$1;
-var Title2 = AlertDialogTitle$1;
-var Description2 = AlertDialogDescription$1;
-var AlertDialog = Root2$2;
-var AlertDialogTrigger = Trigger2$1;
-var AlertDialogPortal = Portal2;
-var AlertDialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay2, {
-	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
-	...props,
-	ref
-}));
-AlertDialogOverlay.displayName = Overlay2.displayName;
-var AlertDialogContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$1, {
-	ref,
-	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
-	...props
-})] }));
-AlertDialogContent.displayName = Content2$1.displayName;
-var AlertDialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
-	...props
-});
-AlertDialogHeader.displayName = "AlertDialogHeader";
-var AlertDialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
-	...props
-});
-AlertDialogFooter.displayName = "AlertDialogFooter";
-var AlertDialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title2, {
-	ref,
-	className: cn("text-lg font-semibold", className),
-	...props
-}));
-AlertDialogTitle.displayName = Title2.displayName;
-var AlertDialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description2, {
-	ref,
-	className: cn("text-sm text-muted-foreground", className),
-	...props
-}));
-AlertDialogDescription.displayName = Description2.displayName;
-var AlertDialogAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
-	ref,
-	className: cn(buttonVariants(), className),
-	...props
-}));
-AlertDialogAction.displayName = Action.displayName;
-var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Cancel, {
-	ref,
-	className: cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
-	...props
-}));
-AlertDialogCancel.displayName = Cancel.displayName;
 function DashboardPage() {
 	const navigate = useNavigate();
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, deleteZeroValueProducts, setFilters, filters, draftItems } = useProductStore();
-	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = (0, import_react.useState)(false);
+	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, setFilters, filters, draftItems } = useProductStore();
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
-	const isMobile = useIsMobile();
 	(0, import_react.useEffect)(() => {
 		setSearchTerm(filters.search);
 	}, [filters.search]);
@@ -42835,24 +42651,6 @@ function DashboardPage() {
 		return () => unsubscribe();
 	}, [currentUser?.companyId]);
 	const canCreateList = currentUser?.canCreateList || false;
-	const handleDeleteZeros = async () => {
-		if (!currentUser?.companyId) {
-			toast.error("Erro: Empresa não identificada.");
-			return;
-		}
-		setIsDeleting(true);
-		try {
-			const result = await deleteZeroValueProducts(currentUser.companyId);
-			if (result.success) {
-				toast.success("Limpeza realizada com sucesso!", { description: `${result.count} produtos com valor zero ou nulo removidos da base.` });
-				setIsDeleteDialogOpen(false);
-			} else toast.error("Erro ao deletar registros. Tente novamente.", { description: result.error?.message || "Houve um problema ao processar a exclusão." });
-		} catch (e) {
-			toast.error("Erro ao deletar registros. Tente novamente.");
-		} finally {
-			setIsDeleting(false);
-		}
-	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]",
 		children: [
@@ -42881,9 +42679,9 @@ function DashboardPage() {
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductFilters, {})
 							})]
 						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "flex items-center gap-2 justify-end shrink-0",
-						children: [canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						children: canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							size: "sm",
 							onClick: () => navigate("/generator"),
 							className: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9",
@@ -42898,43 +42696,7 @@ function DashboardPage() {
 									children: draftItems.length
 								})
 							]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, {
-							open: isDeleteDialogOpen,
-							onOpenChange: setIsDeleteDialogOpen,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-								asChild: true,
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									variant: "destructive",
-									size: isMobile ? "icon" : "sm",
-									className: cn("h-9", !isMobile && "w-auto px-3"),
-									title: "Deletar registros com valor <= 0,00",
-									disabled: isDeleting,
-									children: [isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "hidden sm:inline ml-2",
-										children: "Limpar Zerados"
-									})]
-								})
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Excluir Produtos Zerados?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-								"Esta ação irá remover permanentemente ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "todos" }),
-								" ",
-								"os produtos da sua empresa com valor R$ 0,00 ou nulo.",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-								"Isso inclui produtos que podem estar em outras páginas ou listas. A ação não pode ser desfeita."
-							] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, {
-								disabled: isDeleting,
-								children: "Cancelar"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-								onClick: (e) => {
-									e.preventDefault();
-									handleDeleteZeros();
-								},
-								className: "bg-destructive hover:bg-destructive/90",
-								disabled: isDeleting,
-								children: isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }), "Processando..."] }) : "Confirmar Limpeza"
-							})] })] })]
-						})]
+						})
 					})]
 				})
 			}),
@@ -43002,10 +42764,10 @@ var TabsList$1 = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 TabsList$1.displayName = TAB_LIST_NAME;
-var TRIGGER_NAME$1 = "TabsTrigger";
+var TRIGGER_NAME$2 = "TabsTrigger";
 var TabsTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeTabs, value, disabled = false, ...triggerProps } = props;
-	const context = useTabsContext(TRIGGER_NAME$1, __scopeTabs);
+	const context = useTabsContext(TRIGGER_NAME$2, __scopeTabs);
 	const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
 	const triggerId = makeTriggerId(context.baseId, value);
 	const contentId = makeContentId(context.baseId, value);
@@ -43040,11 +42802,11 @@ var TabsTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-TabsTrigger$1.displayName = TRIGGER_NAME$1;
-var CONTENT_NAME$1 = "TabsContent";
+TabsTrigger$1.displayName = TRIGGER_NAME$2;
+var CONTENT_NAME$2 = "TabsContent";
 var TabsContent$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeTabs, value, forceMount, children, ...contentProps } = props;
-	const context = useTabsContext(CONTENT_NAME$1, __scopeTabs);
+	const context = useTabsContext(CONTENT_NAME$2, __scopeTabs);
 	const triggerId = makeTriggerId(context.baseId, value);
 	const contentId = makeContentId(context.baseId, value);
 	const isSelected = value === context.value;
@@ -43073,18 +42835,18 @@ var TabsContent$1 = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-TabsContent$1.displayName = CONTENT_NAME$1;
+TabsContent$1.displayName = CONTENT_NAME$2;
 function makeTriggerId(baseId, value) {
 	return `${baseId}-trigger-${value}`;
 }
 function makeContentId(baseId, value) {
 	return `${baseId}-content-${value}`;
 }
-var Root2$1 = Tabs$1;
+var Root2$2 = Tabs$1;
 var List = TabsList$1;
 var Trigger = TabsTrigger$1;
 var Content = TabsContent$1;
-var Tabs = Root2$1;
+var Tabs = Root2$2;
 var TabsList = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(List, {
 	ref,
 	className: cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className),
@@ -45292,12 +45054,12 @@ var AccordionHeader = import_react.forwardRef((props, forwardedRef) => {
 	});
 });
 AccordionHeader.displayName = HEADER_NAME;
-var TRIGGER_NAME = "AccordionTrigger";
+var TRIGGER_NAME$1 = "AccordionTrigger";
 var AccordionTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeAccordion, ...triggerProps } = props;
 	const accordionContext = useAccordionContext(ACCORDION_NAME, __scopeAccordion);
-	const itemContext = useAccordionItemContext(TRIGGER_NAME, __scopeAccordion);
-	const collapsibleContext = useAccordionCollapsibleContext(TRIGGER_NAME, __scopeAccordion);
+	const itemContext = useAccordionItemContext(TRIGGER_NAME$1, __scopeAccordion);
+	const collapsibleContext = useAccordionCollapsibleContext(TRIGGER_NAME$1, __scopeAccordion);
 	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.ItemSlot, {
 		scope: __scopeAccordion,
@@ -45311,12 +45073,12 @@ var AccordionTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 		})
 	});
 });
-AccordionTrigger$1.displayName = TRIGGER_NAME;
-var CONTENT_NAME = "AccordionContent";
+AccordionTrigger$1.displayName = TRIGGER_NAME$1;
+var CONTENT_NAME$1 = "AccordionContent";
 var AccordionContent$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeAccordion, ...contentProps } = props;
 	const accordionContext = useAccordionContext(ACCORDION_NAME, __scopeAccordion);
-	const itemContext = useAccordionItemContext(CONTENT_NAME, __scopeAccordion);
+	const itemContext = useAccordionItemContext(CONTENT_NAME$1, __scopeAccordion);
 	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content$2, {
 		role: "region",
@@ -45332,16 +45094,16 @@ var AccordionContent$1 = import_react.forwardRef((props, forwardedRef) => {
 		}
 	});
 });
-AccordionContent$1.displayName = CONTENT_NAME;
+AccordionContent$1.displayName = CONTENT_NAME$1;
 function getState$1(open) {
 	return open ? "open" : "closed";
 }
-var Root2 = Accordion$1;
+var Root2$1 = Accordion$1;
 var Item = AccordionItem$1;
 var Header = AccordionHeader;
-var Trigger2 = AccordionTrigger$1;
-var Content2 = AccordionContent$1;
-var Accordion = Root2;
+var Trigger2$1 = AccordionTrigger$1;
+var Content2$1 = AccordionContent$1;
+var Accordion = Root2$1;
 var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Item, {
 	ref,
 	className: cn("border-b", className),
@@ -45350,15 +45112,15 @@ var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /*
 AccordionItem.displayName = "AccordionItem";
 var AccordionTrigger = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header, {
 	className: "flex",
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger2, {
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger2$1, {
 		ref,
 		className: cn("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
 		...props,
 		children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "h-4 w-4 shrink-0 transition-transform duration-200" })]
 	})
 }));
-AccordionTrigger.displayName = Trigger2.displayName;
-var AccordionContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2, {
+AccordionTrigger.displayName = Trigger2$1.displayName;
+var AccordionContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2$1, {
 	ref,
 	className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
 	...props,
@@ -45367,7 +45129,7 @@ var AccordionContent = import_react.forwardRef(({ className, children, ...props 
 		children
 	})
 }));
-AccordionContent.displayName = Content2.displayName;
+AccordionContent.displayName = Content2$1.displayName;
 function DraftItemCard({ item, onUpdate, onRemove }) {
 	const { categories } = useProductStore();
 	const [model, setModel] = (0, import_react.useState)("");
@@ -46861,11 +46623,207 @@ function ListGeneratorPage() {
 		})]
 	});
 }
+var ROOT_NAME = "AlertDialog";
+var [createAlertDialogContext, createAlertDialogScope] = createContextScope(ROOT_NAME, [createDialogScope]);
+var useDialogScope = createDialogScope();
+var AlertDialog$1 = (props) => {
+	const { __scopeAlertDialog, ...alertDialogProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$5, {
+		...dialogScope,
+		...alertDialogProps,
+		modal: true
+	});
+};
+AlertDialog$1.displayName = ROOT_NAME;
+var TRIGGER_NAME = "AlertDialogTrigger";
+var AlertDialogTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...triggerProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger$3, {
+		...dialogScope,
+		...triggerProps,
+		ref: forwardedRef
+	});
+});
+AlertDialogTrigger$1.displayName = TRIGGER_NAME;
+var PORTAL_NAME = "AlertDialogPortal";
+var AlertDialogPortal$1 = (props) => {
+	const { __scopeAlertDialog, ...portalProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal$3, {
+		...dialogScope,
+		...portalProps
+	});
+};
+AlertDialogPortal$1.displayName = PORTAL_NAME;
+var OVERLAY_NAME = "AlertDialogOverlay";
+var AlertDialogOverlay$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...overlayProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay, {
+		...dialogScope,
+		...overlayProps,
+		ref: forwardedRef
+	});
+});
+AlertDialogOverlay$1.displayName = OVERLAY_NAME;
+var CONTENT_NAME = "AlertDialogContent";
+var [AlertDialogContentProvider, useAlertDialogContentContext] = createAlertDialogContext(CONTENT_NAME);
+var Slottable = /* @__PURE__ */ createSlottable("AlertDialogContent");
+var AlertDialogContent$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, children, ...contentProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	const contentRef = import_react.useRef(null);
+	const composedRefs = useComposedRefs(forwardedRef, contentRef);
+	const cancelRef = import_react.useRef(null);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(WarningProvider, {
+		contentName: CONTENT_NAME,
+		titleName: TITLE_NAME,
+		docsSlug: "alert-dialog",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogContentProvider, {
+			scope: __scopeAlertDialog,
+			cancelRef,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content$1, {
+				role: "alertdialog",
+				...dialogScope,
+				...contentProps,
+				ref: composedRefs,
+				onOpenAutoFocus: composeEventHandlers(contentProps.onOpenAutoFocus, (event) => {
+					event.preventDefault();
+					cancelRef.current?.focus({ preventScroll: true });
+				}),
+				onPointerDownOutside: (event) => event.preventDefault(),
+				onInteractOutside: (event) => event.preventDefault(),
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slottable, { children }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DescriptionWarning, { contentRef })]
+			})
+		})
+	});
+});
+AlertDialogContent$1.displayName = CONTENT_NAME;
+var TITLE_NAME = "AlertDialogTitle";
+var AlertDialogTitle$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...titleProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
+		...dialogScope,
+		...titleProps,
+		ref: forwardedRef
+	});
+});
+AlertDialogTitle$1.displayName = TITLE_NAME;
+var DESCRIPTION_NAME = "AlertDialogDescription";
+var AlertDialogDescription$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...descriptionProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
+		...dialogScope,
+		...descriptionProps,
+		ref: forwardedRef
+	});
+});
+AlertDialogDescription$1.displayName = DESCRIPTION_NAME;
+var ACTION_NAME = "AlertDialogAction";
+var AlertDialogAction$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...actionProps } = props;
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close, {
+		...dialogScope,
+		...actionProps,
+		ref: forwardedRef
+	});
+});
+AlertDialogAction$1.displayName = ACTION_NAME;
+var CANCEL_NAME = "AlertDialogCancel";
+var AlertDialogCancel$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAlertDialog, ...cancelProps } = props;
+	const { cancelRef } = useAlertDialogContentContext(CANCEL_NAME, __scopeAlertDialog);
+	const dialogScope = useDialogScope(__scopeAlertDialog);
+	const ref = useComposedRefs(forwardedRef, cancelRef);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close, {
+		...dialogScope,
+		...cancelProps,
+		ref
+	});
+});
+AlertDialogCancel$1.displayName = CANCEL_NAME;
+var DescriptionWarning = ({ contentRef }) => {
+	const MESSAGE = `\`${CONTENT_NAME}\` requires a description for the component to be accessible for screen reader users.
+
+You can add a description to the \`${CONTENT_NAME}\` by passing a \`${DESCRIPTION_NAME}\` component as a child, which also benefits sighted users by adding visible context to the dialog.
+
+Alternatively, you can use your own component as a description by assigning it an \`id\` and passing the same value to the \`aria-describedby\` prop in \`${CONTENT_NAME}\`. If the description is confusing or duplicative for sighted users, you can use the \`@radix-ui/react-visually-hidden\` primitive as a wrapper around your description component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/alert-dialog`;
+	import_react.useEffect(() => {
+		if (!document.getElementById(contentRef.current?.getAttribute("aria-describedby"))) console.warn(MESSAGE);
+	}, [MESSAGE, contentRef]);
+	return null;
+};
+var Root2 = AlertDialog$1;
+var Trigger2 = AlertDialogTrigger$1;
+var Portal2 = AlertDialogPortal$1;
+var Overlay2 = AlertDialogOverlay$1;
+var Content2 = AlertDialogContent$1;
+var Action = AlertDialogAction$1;
+var Cancel = AlertDialogCancel$1;
+var Title2 = AlertDialogTitle$1;
+var Description2 = AlertDialogDescription$1;
+var AlertDialog = Root2;
+var AlertDialogTrigger = Trigger2;
+var AlertDialogPortal = Portal2;
+var AlertDialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Overlay2, {
+	className: cn("fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className),
+	...props,
+	ref
+}));
+AlertDialogOverlay.displayName = Overlay2.displayName;
+var AlertDialogContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2, {
+	ref,
+	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className),
+	...props
+})] }));
+AlertDialogContent.displayName = Content2.displayName;
+var AlertDialogHeader = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn("flex flex-col space-y-2 text-center sm:text-left", className),
+	...props
+});
+AlertDialogHeader.displayName = "AlertDialogHeader";
+var AlertDialogFooter = ({ className, ...props }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+	...props
+});
+AlertDialogFooter.displayName = "AlertDialogFooter";
+var AlertDialogTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title2, {
+	ref,
+	className: cn("text-lg font-semibold", className),
+	...props
+}));
+AlertDialogTitle.displayName = Title2.displayName;
+var AlertDialogDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description2, {
+	ref,
+	className: cn("text-sm text-muted-foreground", className),
+	...props
+}));
+AlertDialogDescription.displayName = Description2.displayName;
+var AlertDialogAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
+	ref,
+	className: cn(buttonVariants(), className),
+	...props
+}));
+AlertDialogAction.displayName = Action.displayName;
+var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Cancel, {
+	ref,
+	className: cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
+	...props
+}));
+AlertDialogCancel.displayName = Cancel.displayName;
 function BulkCleanup() {
 	const [date$1, setDate] = (0, import_react.useState)("");
 	const [loading, setLoading] = (0, import_react.useState)(false);
 	const [zeroValueLoading, setZeroValueLoading] = (0, import_react.useState)(false);
-	const { cleanupOldRecords, deleteZeroValueProducts } = useProductStore();
+	const [leadsLoading, setLeadsLoading] = (0, import_react.useState)(false);
+	const { cleanupOldRecords, deleteZeroValueProducts, showZeroStock, setShowZeroStock } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const canDeleteHistory = currentUser?.canDeleteRecords || false;
 	const handleCleanup = async () => {
@@ -46905,139 +46863,198 @@ function BulkCleanup() {
 			setZeroValueLoading(false);
 		}
 	};
+	const handleLeadsCleanup = async () => {
+		setLeadsLoading(true);
+		try {
+			const { error, count: count$3 } = await supabase.from("leads_realeza").delete({ count: "exact" }).neq("id", 0);
+			if (error) throw error;
+			toast.success("Leads apagados com sucesso!", { description: `${count$3 || "Todos os"} registros foram removidos.` });
+		} catch (error) {
+			console.error("Leads cleanup error:", error);
+			toast.error("Erro ao apagar registros de leads.");
+		} finally {
+			setLeadsLoading(false);
+		}
+	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "grid gap-6",
-		children: [canDeleteHistory ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-			className: "border-red-100 bg-red-50/10",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-				className: "flex items-center gap-2 text-red-900",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarClock, { className: "w-5 h-5 text-red-600" }), "Limpeza de Histórico Antigo"]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ferramenta para remover registros antigos do banco de dados para liberar espaço e manter a performance." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-				className: "space-y-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "rounded-lg border border-amber-200 bg-amber-50 p-4",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-start gap-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, { className: "h-5 w-5 text-amber-600 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "text-sm text-amber-800",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "border-blue-100 bg-blue-50/10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "flex items-center gap-2 text-blue-900",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Settings, { className: "w-5 h-5 text-blue-600" }), "Configurações de Exibição"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Controle a visibilidade de produtos nas listagens do painel." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center justify-between space-x-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label, {
+						htmlFor: "show-zero-stock",
+						className: "flex flex-col space-y-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Exibir produtos zerados na aba Melhor Preço" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "font-normal text-sm text-muted-foreground",
+							children: "Quando desativado, produtos com quantidade zerada não aparecerão no catálogo."
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+						id: "show-zero-stock",
+						checked: showZeroStock,
+						onCheckedChange: setShowZeroStock
+					})]
+				}) })]
+			}),
+			canDeleteHistory ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "border-red-100 bg-red-50/10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "flex items-center gap-2 text-red-900",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarClock, { className: "w-5 h-5 text-red-600" }), "Limpeza de Histórico Antigo"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Ferramenta para remover registros antigos do banco de dados para liberar espaço e manter a performance." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "rounded-lg border border-amber-200 bg-amber-50 p-4",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-start gap-3",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, { className: "h-5 w-5 text-amber-600 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "text-sm text-amber-800",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+										className: "font-medium mb-1",
+										children: "Atenção: Ação Irreversível"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Esta ação excluirá permanentemente:" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+										className: "list-disc pl-5 mt-1 space-y-1",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+											"Todos os ",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "produtos" }),
+											" criados até a data selecionada (inclusive)."
+										] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+											"Todas as ",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "mensagens processadas" }),
+											" recebidas até a data selecionada (inclusive)."
+										] })]
+									})
+								]
+							})]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "grid w-full items-end gap-4 md:grid-cols-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "space-y-2",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-									className: "font-medium mb-1",
-									children: "Atenção: Ação Irreversível"
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									htmlFor: "cleanup-date",
+									children: "Selecionar Data Limite"
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Esta ação excluirá permanentemente:" }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-									className: "list-disc pl-5 mt-1 space-y-1",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
-										"Todos os ",
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "produtos" }),
-										" criados até a data selecionada (inclusive)."
-									] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
-										"Todas as ",
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "mensagens processadas" }),
-										" recebidas até a data selecionada (inclusive)."
-									] })]
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									id: "cleanup-date",
+									type: "date",
+									value: date$1,
+									onChange: (e) => setDate(e.target.value),
+									className: "bg-white"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									className: "text-xs text-muted-foreground",
+									children: "Registros desta data e anteriores serão apagados."
 								})
 							]
-						})]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "grid w-full items-end gap-4 md:grid-cols-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-2",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								htmlFor: "cleanup-date",
-								children: "Selecionar Data Limite"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-								id: "cleanup-date",
-								type: "date",
-								value: date$1,
-								onChange: (e) => setDate(e.target.value),
-								className: "bg-white"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								className: "text-xs text-muted-foreground",
-								children: "Registros desta data e anteriores serão apagados."
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "destructive",
+								className: "w-full",
+								disabled: !date$1 || loading,
+								children: [loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Registros Antigos"]
 							})
-						]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
-						asChild: true,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							variant: "destructive",
-							className: "w-full",
-							disabled: !date$1 || loading,
-							children: [loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), loading ? "Processando..." : "Excluir Registros Antigos"]
-						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Exclusão em Massa" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Você está prestes a excluir permanentemente dados do sistema até o dia",
-						" ",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [" ", date$1 && format(/* @__PURE__ */ new Date(date$1 + "T00:00:00"), "dd/MM/yyyy")] }),
-						".",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						"Esta ação não pode ser desfeita. Tem certeza que deseja continuar?"
-					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleCleanup,
-						className: "bg-red-600 hover:bg-red-700",
-						children: "Sim, excluir tudo"
-					})] })] })] })]
-				})]
-			})]
-		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
-			className: "border-red-200 bg-red-50 opacity-60",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-				className: "pt-6 text-center text-red-800",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-12 h-12 mx-auto mb-2 text-red-500" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-						className: "text-lg font-semibold",
-						children: "Limpeza de Histórico Restrita"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Você não tem permissão para remover registros antigos." })
-				]
-			})
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-			className: "border-orange-100 bg-orange-50/10",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-				className: "flex items-center gap-2 text-orange-900",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-5 h-5 text-orange-600" }), "Limpeza de Produtos Inválidos"]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo) da sua empresa." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-				className: "space-y-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "rounded-lg border border-orange-200 bg-orange-50 p-4",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-						className: "text-sm text-orange-800",
-						children: [
-							"Isso removerá todos os produtos com ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor R$ 0,00" }),
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Exclusão em Massa" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+							"Você está prestes a excluir permanentemente dados do sistema até o dia",
 							" ",
-							"ou sem preço cadastrado (nulo). Útil para limpar importações incorretas ou produtos incompletos."
-						]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("strong", { children: [" ", date$1 && format(/* @__PURE__ */ new Date(date$1 + "T00:00:00"), "dd/MM/yyyy")] }),
+							".",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							"Esta ação não pode ser desfeita. Tem certeza que deseja continuar?"
+						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+							onClick: handleCleanup,
+							className: "bg-red-600 hover:bg-red-700",
+							children: "Sim, excluir tudo"
+						})] })] })] })]
+					})]
+				})]
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+				className: "border-red-200 bg-red-50 opacity-60",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "pt-6 text-center text-red-800",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldAlert, { className: "w-12 h-12 mx-auto mb-2 text-red-500" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							className: "text-lg font-semibold",
+							children: "Limpeza de Histórico Restrita"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Você não tem permissão para remover registros antigos." })
+					]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "border-orange-100 bg-orange-50/10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "flex items-center gap-2 text-orange-900",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Banknote, { className: "w-5 h-5 text-orange-600" }), "Limpeza de Produtos Inválidos"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remover produtos que não possuem valor definido (zero, negativo ou nulo) da sua empresa." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+					className: "space-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "rounded-lg border border-orange-200 bg-orange-50 p-4",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+							className: "text-sm text-orange-800",
+							children: [
+								"Isso removerá todos os produtos com ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "valor R$ 0,00" }),
+								" ",
+								"ou sem preço cadastrado (nulo). Útil para limpar importações incorretas ou produtos incompletos."
+							]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "flex justify-end",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
+							asChild: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: "destructive",
+								className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
+								disabled: zeroValueLoading || !currentUser?.companyId,
+								children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
+							"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							"Esta ação não pode ser desfeita."
+						] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+							onClick: handleZeroValueCleanup,
+							className: "bg-orange-600 hover:bg-orange-700",
+							children: "Confirmar Limpeza"
+						})] })] })] })
+					})]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "border-purple-100 bg-purple-50/10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "flex items-center gap-2 text-purple-900",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Users, { className: "w-5 h-5 text-purple-600" }), "Limpeza de Leads Realeza"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, { children: "Remove todos os registros da tabela de leads para reiniciar o atendimento." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex justify-end",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTrigger, {
 						asChild: true,
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							variant: "destructive",
-							className: "w-full md:w-auto bg-orange-600 hover:bg-orange-700",
-							disabled: zeroValueLoading || !currentUser?.companyId,
-							children: [zeroValueLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), zeroValueLoading ? "Processando..." : "Deletar registros com valor <= 0,00"]
+							className: "w-full md:w-auto bg-purple-600 hover:bg-purple-700",
+							disabled: leadsLoading,
+							children: [leadsLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Apagar todos os registros do leads realeza"]
 						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Confirmar Limpeza de Produtos" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogDescription, { children: [
-						"Tem certeza que deseja excluir permanentemente todos os produtos com valor zero ou nulo da sua empresa?",
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
-						"Esta ação não pode ser desfeita."
-					] })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
-						onClick: handleZeroValueCleanup,
-						className: "bg-orange-600 hover:bg-orange-700",
-						children: "Confirmar Limpeza"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogContent, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogTitle, { children: "Apagar todos os leads?" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogDescription, { children: "Tem certeza de que deseja apagar todos os registros de leads? Esta ação não pode ser desfeita." })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogCancel, { children: "Cancelar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDialogAction, {
+						onClick: handleLeadsCleanup,
+						className: "bg-purple-600 hover:bg-purple-700",
+						children: "Sim, apagar tudo"
 					})] })] })] })
-				})]
-			})]
-		})]
+				}) })]
+			})
+		]
 	});
 }
 function DomainSettings() {
@@ -76726,4 +76743,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DeN9dmku.js.map
+//# sourceMappingURL=index-CdSrzoWt.js.map

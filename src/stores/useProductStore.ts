@@ -32,6 +32,9 @@ interface ProductStore {
   pageSize: number
   total: number
 
+  showZeroStock: boolean
+  setShowZeroStock: (show: boolean) => void
+
   setFilters: (filters: Partial<FilterState>) => void
   resetFilters: () => void
   setPage: (page: number) => void
@@ -130,6 +133,14 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   total: 0,
   selectedProducts: [],
 
+  showZeroStock: localStorage.getItem('showZeroStock') !== 'false',
+
+  setShowZeroStock: (show) => {
+    localStorage.setItem('showZeroStock', show.toString())
+    set({ showZeroStock: show, page: 0 })
+    get().fetchProducts()
+  },
+
   getBestPrice: (product) => {
     if (product.valor) return { price: product.valor, supplierId: 'default' }
     return null
@@ -197,7 +208,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   fetchProducts: async () => {
     set({ isLoading: true })
-    const { filters, page, pageSize } = get()
+    const { filters, page, pageSize, showZeroStock } = get()
 
     try {
       let minDate = null
@@ -219,7 +230,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         condition_filter: null,
         supplier_filter: filters.supplier.trim() || null,
         battery_filter: null,
-        in_stock_only: false,
+        in_stock_only: !showZeroStock,
         min_date: minDate,
       }
 
@@ -662,12 +673,30 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   cleanupOldRecords: async (date) => {
     try {
-      const { data, error } = await supabase.rpc('cleanup_old_records', {
-        p_target_date: date,
-      })
-      if (error) throw error
+      // Manual explicit deletion to ensure it successfully identifies and deletes old records
+      const { error: pErr, count: pCount } = await supabase
+        .from('produtos')
+        .delete({ count: 'exact' })
+        .lte('criado_em', date)
+
+      if (pErr) throw pErr
+
+      const { error: mErr, count: mCount } = await supabase
+        .from('mensagens_processadas')
+        .delete({ count: 'exact' })
+        .lte('created_at', date)
+
+      if (mErr) throw mErr
+
       get().fetchProducts()
-      return { success: true, data }
+
+      return {
+        success: true,
+        data: {
+          products_deleted: pCount || 0,
+          messages_deleted: mCount || 0,
+        },
+      }
     } catch (error) {
       console.error('Cleanup old records error:', error)
       return { success: false, error }

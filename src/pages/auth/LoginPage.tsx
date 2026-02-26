@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Smartphone } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -76,8 +76,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-primary">
-            PriceApp
+          <CardTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
+            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white">
+              <Smartphone className="w-5 h-5" />
+            </div>
+            RMcell
           </CardTitle>
           <CardDescription className="text-center">
             Entre com seu email para acessar o painel

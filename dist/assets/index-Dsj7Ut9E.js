@@ -33512,11 +33512,11 @@ function Sidebar({ mode = "desktop" }) {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "p-6 border-b border-slate-800 flex items-center gap-3 h-[70px] whitespace-nowrap",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center font-bold text-white",
-					children: "P"
+					className: "w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center text-white",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5" })
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: cn("font-bold text-lg tracking-tight transition-opacity duration-300", isDesktop ? "opacity-0 group-hover:opacity-100" : "opacity-100"),
-					children: "PriceApp"
+					children: "RMcell"
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -36520,9 +36520,12 @@ function LoginPage() {
 			className: "w-full max-w-md shadow-lg",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
 				className: "space-y-1",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
-					className: "text-2xl font-bold text-center text-primary",
-					children: "PriceApp"
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+					className: "text-2xl font-bold text-center text-primary flex items-center justify-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "w-8 h-8 rounded bg-primary flex items-center justify-center text-white",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5" })
+					}), "RMcell"]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
 					className: "text-center",
 					children: "Entre com seu email para acessar o painel"
@@ -76745,4 +76748,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-47C_p17a.js.map
+//# sourceMappingURL=index-Dsj7Ut9E.js.map

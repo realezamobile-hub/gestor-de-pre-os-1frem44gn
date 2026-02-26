@@ -12,6 +12,7 @@ import {
   ChevronDown,
   UserPlus,
   MessageSquare,
+  Smartphone,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -106,8 +107,8 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       )}
     >
       <div className="p-6 border-b border-slate-800 flex items-center gap-3 h-[70px] whitespace-nowrap">
-        <div className="w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center font-bold text-white">
-          P
+        <div className="w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center text-white">
+          <Smartphone className="w-5 h-5" />
         </div>
         <span
           className={cn(
@@ -115,7 +116,7 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
             isDesktop ? 'opacity-0 group-hover:opacity-100' : 'opacity-100',
           )}
         >
-          PriceApp
+          RMcell
         </span>
       </div>
 

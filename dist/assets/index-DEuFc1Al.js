@@ -76359,12 +76359,12 @@ function UsersPage() {
 const useLeadStore = create((set, get$8) => ({
 	leads: [],
 	isLoading: false,
-	filterStatus: "Pendente",
+	filterStatus: "pendente",
 	searchTerm: "",
 	blacklist: [],
 	fetchBlacklist: async () => {
 		try {
-			const { data, error } = await supabase.from("leads_realeza").select("nome_contato").eq("status_atendimento", "Bloqueado");
+			const { data, error } = await supabase.from("leads_realeza").select("nome_contato").ilike("status_atendimento", "bloqueado");
 			if (!error && data) set({ blacklist: Array.from(new Set(data.map((item) => item.nome_contato))) });
 		} catch (e) {
 			console.error("Error fetching blacklist:", e);
@@ -76388,12 +76388,12 @@ const useLeadStore = create((set, get$8) => ({
 		try {
 			set({ leads: get$8().leads.map((l) => l.id === lead.id ? {
 				...l,
-				status_atendimento: "Atendido",
-				usuario_atendimento: attendantName
+				status_atendimento: "atendido",
+				atendido_por: attendantName
 			} : l) });
 			const { error } = await supabase.from("leads_realeza").update({
-				status_atendimento: "Atendido",
-				usuario_atendimento: attendantName
+				status_atendimento: "atendido",
+				atendido_por: attendantName
 			}).eq("id", lead.id);
 			if (error) throw error;
 		} catch (error) {
@@ -76405,7 +76405,7 @@ const useLeadStore = create((set, get$8) => ({
 	addToBlacklist: async (contactName) => {
 		try {
 			set((state) => ({ blacklist: [...state.blacklist, contactName] }));
-			const { error } = await supabase.from("leads_realeza").update({ status_atendimento: "Bloqueado" }).eq("nome_contato", contactName);
+			const { error } = await supabase.from("leads_realeza").update({ status_atendimento: "bloqueado" }).eq("nome_contato", contactName);
 			if (error) throw error;
 			toast.success(`${contactName} adicionado à lista de bloqueio`);
 			get$8().fetchLeads();
@@ -76438,8 +76438,8 @@ const useLeadStore = create((set, get$8) => ({
 			uniqueLeads.push(lead);
 		});
 		return uniqueLeads.sort((a$1, b$1) => {
-			const isAPending = a$1.status_atendimento === "Pendente";
-			const isBPending = b$1.status_atendimento === "Pendente";
+			const isAPending = a$1.status_atendimento?.toLowerCase() === "pendente";
+			const isBPending = b$1.status_atendimento?.toLowerCase() === "pendente";
 			if (isAPending && !isBPending) return -1;
 			if (!isAPending && isBPending) return 1;
 			return new Date(b$1.data_recebimento).getTime() - new Date(a$1.data_recebimento).getTime();
@@ -76491,8 +76491,11 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 					variant: "outline",
-					className: lead.status_atendimento === "Pendente" ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-red-100 text-red-800 border-red-200",
-					children: lead.status_atendimento
+					className: lead.status_atendimento?.toLowerCase() === "pendente" ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-red-100 text-red-800 border-red-200",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "capitalize",
+						children: lead.status_atendimento?.toLowerCase()
+					})
 				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "text-xs text-muted-foreground whitespace-nowrap",
@@ -76500,9 +76503,9 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 					className: "text-xs text-muted-foreground",
-					children: lead.usuario_atendimento ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					children: lead.atendido_por ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "flex items-center gap-1.5",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: lead.usuario_atendimento })]
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "w-3 h-3" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: lead.atendido_por })]
 					}) : "-"
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
@@ -76513,16 +76516,16 @@ function LeadsTable({ leads, onActionClick, onBlockClick }) {
 							asChild: true,
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 								size: "sm",
-								variant: lead.status_atendimento === "Pendente" ? "default" : "secondary",
-								className: cn("h-8 w-8 p-0", lead.status_atendimento === "Pendente" && "bg-green-600 hover:bg-green-700 text-white"),
+								variant: lead.status_atendimento?.toLowerCase() === "pendente" ? "default" : "secondary",
+								className: cn("h-8 w-8 p-0", lead.status_atendimento?.toLowerCase() === "pendente" && "bg-green-600 hover:bg-green-700 text-white"),
 								onClick: () => onActionClick(lead),
 								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-									src: lead.status_atendimento === "Pendente" ? "https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill" : "https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill",
+									src: lead.status_atendimento?.toLowerCase() === "pendente" ? "https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill" : "https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill",
 									alt: "WhatsApp",
 									className: "w-4 h-4"
 								})
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: lead.status_atendimento === "Pendente" ? "Atender no WhatsApp" : "Abrir Conversa" }) })] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: lead.status_atendimento?.toLowerCase() === "pendente" ? "Atender no WhatsApp" : "Abrir Conversa" }) })] }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
 							asChild: true,
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 								size: "sm",
@@ -76554,7 +76557,7 @@ function LeadsPage() {
 	}, [debouncedSearch]);
 	const handleActionClick = async (lead) => {
 		if (lead.link_acao) window.open(lead.link_acao, "_blank");
-		if (lead.status_atendimento === "Pendente" && currentUser?.name) await markAsHandled(lead, currentUser.name);
+		if (lead.status_atendimento?.toLowerCase() === "pendente" && currentUser?.name) await markAsHandled(lead, currentUser.name);
 	};
 	const handleBlockConfirm = async () => {
 		if (leadToBlock) {
@@ -76594,15 +76597,15 @@ function LeadsPage() {
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "w-full md:w-[200px]",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-						defaultValue: "Pendente",
+						defaultValue: "pendente",
 						onValueChange: (val) => setFilterStatus(val),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectTrigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectValue, { placeholder: "Status" }) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SelectContent, { children: [
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "Pendente",
+								value: "pendente",
 								children: "Pendentes"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
-								value: "Atendido",
+								value: "atendido",
 								children: "Atendidos"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectItem, {
@@ -76749,4 +76752,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BKGJeQl8.js.map
+//# sourceMappingURL=index-DEuFc1Al.js.map

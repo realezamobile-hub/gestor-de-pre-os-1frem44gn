@@ -223,9 +223,9 @@ export interface Lead {
   numero_contato: string
   mensagem_cliente: string
   link_acao: string
-  status_atendimento: string // 'Pendente' | 'Atendido'
+  status_atendimento: string // 'pendente' | 'atendido'
   data_recebimento: string
-  usuario_atendimento?: string | null
+  atendido_por?: string | null
 }
 
 export interface BlacklistedContact {

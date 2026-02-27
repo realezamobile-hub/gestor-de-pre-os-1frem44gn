@@ -72,12 +72,14 @@ export function LeadsTable({
                 <Badge
                   variant="outline"
                   className={
-                    lead.status_atendimento === 'Pendente'
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200' // Green for Pending
-                      : 'bg-red-100 text-red-800 border-red-200' // Red for Attended
+                    lead.status_atendimento?.toLowerCase() === 'pendente'
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : 'bg-red-100 text-red-800 border-red-200'
                   }
                 >
-                  {lead.status_atendimento}
+                  <span className="capitalize">
+                    {lead.status_atendimento?.toLowerCase()}
+                  </span>
                 </Badge>
               </TableCell>
               <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
@@ -86,10 +88,10 @@ export function LeadsTable({
                 })}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">
-                {lead.usuario_atendimento ? (
+                {lead.atendido_por ? (
                   <div className="flex items-center gap-1.5">
                     <User className="w-3 h-3" />
-                    <span>{lead.usuario_atendimento}</span>
+                    <span>{lead.atendido_por}</span>
                   </div>
                 ) : (
                   '-'
@@ -103,20 +105,23 @@ export function LeadsTable({
                         <Button
                           size="sm"
                           variant={
-                            lead.status_atendimento === 'Pendente'
+                            lead.status_atendimento?.toLowerCase() ===
+                            'pendente'
                               ? 'default'
                               : 'secondary'
                           }
                           className={cn(
                             'h-8 w-8 p-0',
-                            lead.status_atendimento === 'Pendente' &&
+                            lead.status_atendimento?.toLowerCase() ===
+                              'pendente' &&
                               'bg-green-600 hover:bg-green-700 text-white',
                           )}
                           onClick={() => onActionClick(lead)}
                         >
                           <img
                             src={
-                              lead.status_atendimento === 'Pendente'
+                              lead.status_atendimento?.toLowerCase() ===
+                              'pendente'
                                 ? 'https://img.usecurling.com/i?q=whatsapp&color=white&shape=fill'
                                 : 'https://img.usecurling.com/i?q=whatsapp&color=green&shape=fill'
                             }
@@ -127,7 +132,7 @@ export function LeadsTable({
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>
-                          {lead.status_atendimento === 'Pendente'
+                          {lead.status_atendimento?.toLowerCase() === 'pendente'
                             ? 'Atender no WhatsApp'
                             : 'Abrir Conversa'}
                         </p>

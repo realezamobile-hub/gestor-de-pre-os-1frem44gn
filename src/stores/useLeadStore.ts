@@ -24,17 +24,16 @@ interface LeadStore {
 export const useLeadStore = create<LeadStore>((set, get) => ({
   leads: [],
   isLoading: false,
-  filterStatus: 'Pendente',
+  filterStatus: 'pendente',
   searchTerm: '',
   blacklist: [],
 
   fetchBlacklist: async () => {
     try {
-      // Use leads_realeza to derive the blacklist by finding contacts marked as 'Bloqueado'
       const { data, error } = await supabase
         .from('leads_realeza' as any)
         .select('nome_contato')
-        .eq('status_atendimento', 'Bloqueado')
+        .ilike('status_atendimento', 'bloqueado')
 
       if (!error && data) {
         const uniqueNames = Array.from(
@@ -78,8 +77,8 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
         l.id === lead.id
           ? {
               ...l,
-              status_atendimento: 'Atendido',
-              usuario_atendimento: attendantName,
+              status_atendimento: 'atendido',
+              atendido_por: attendantName,
             }
           : l,
       )
@@ -89,8 +88,8 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       const { error } = await supabase
         .from('leads_realeza' as any)
         .update({
-          status_atendimento: 'Atendido',
-          usuario_atendimento: attendantName,
+          status_atendimento: 'atendido',
+          atendido_por: attendantName,
         })
         .eq('id', lead.id)
 
@@ -107,10 +106,9 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     try {
       set((state) => ({ blacklist: [...state.blacklist, contactName] }))
 
-      // Update the status of existing messages from this contact to 'Bloqueado'
       const { error } = await supabase
         .from('leads_realeza' as any)
-        .update({ status_atendimento: 'Bloqueado' })
+        .update({ status_atendimento: 'bloqueado' })
         .eq('nome_contato', contactName)
 
       if (error) throw error
@@ -156,7 +154,6 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     }
 
     // 4. Deduplication Logic (15 min window)
-    // Sort by date ascending to process timeline correctly
     const sortedForDedup = [...processed].sort(
       (a, b) =>
         new Date(a.data_recebimento).getTime() -
@@ -167,7 +164,6 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     const lastSeenMap: Record<string, Date> = {}
 
     sortedForDedup.forEach((lead) => {
-      // Key includes contact name and message content to identify duplicates
       const key = `${lead.nome_contato}|${lead.mensagem_cliente}`.trim()
       const leadDate = parseISO(lead.data_recebimento)
 
@@ -175,7 +171,6 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
         const lastDate = lastSeenMap[key]
         const diffMinutes = differenceInMinutes(leadDate, lastDate)
 
-        // Hide duplicate messages if within 15 minutes of the last accepted one
         if (diffMinutes < 15) {
           return
         }
@@ -187,14 +182,12 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
 
     // 5. Default Sorting (Pendente first, then date desc)
     return uniqueLeads.sort((a, b) => {
-      const isAPending = a.status_atendimento === 'Pendente'
-      const isBPending = b.status_atendimento === 'Pendente'
+      const isAPending = a.status_atendimento?.toLowerCase() === 'pendente'
+      const isBPending = b.status_atendimento?.toLowerCase() === 'pendente'
 
-      // Prioritize "Pendente" at the top
       if (isAPending && !isBPending) return -1
       if (!isAPending && isBPending) return 1
 
-      // Then sort by date descending (newest first)
       return (
         new Date(b.data_recebimento).getTime() -
         new Date(a.data_recebimento).getTime()

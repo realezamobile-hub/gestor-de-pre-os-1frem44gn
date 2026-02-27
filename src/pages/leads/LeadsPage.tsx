@@ -44,7 +44,6 @@ export default function LeadsPage() {
 
   useEffect(() => {
     fetchLeads()
-    // Poll for new leads every 60 seconds
     const interval = setInterval(fetchLeads, 60000)
     return () => clearInterval(interval)
   }, [])
@@ -54,14 +53,14 @@ export default function LeadsPage() {
   }, [debouncedSearch])
 
   const handleActionClick = async (lead: Lead) => {
-    // 1. Open WhatsApp link if available
     if (lead.link_acao) {
       window.open(lead.link_acao, '_blank')
     }
 
-    // 2. Update status and attendant if pending
-    // This edits the record to set status to 'Atendido' and records the user name
-    if (lead.status_atendimento === 'Pendente' && currentUser?.name) {
+    if (
+      lead.status_atendimento?.toLowerCase() === 'pendente' &&
+      currentUser?.name
+    ) {
       await markAsHandled(lead, currentUser.name)
     }
   }
@@ -107,15 +106,15 @@ export default function LeadsPage() {
         </div>
         <div className="w-full md:w-[200px]">
           <Select
-            defaultValue="Pendente"
+            defaultValue="pendente"
             onValueChange={(val) => setFilterStatus(val)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Pendente">Pendentes</SelectItem>
-              <SelectItem value="Atendido">Atendidos</SelectItem>
+              <SelectItem value="pendente">Pendentes</SelectItem>
+              <SelectItem value="atendido">Atendidos</SelectItem>
               <SelectItem value="all">Todos</SelectItem>
             </SelectContent>
           </Select>

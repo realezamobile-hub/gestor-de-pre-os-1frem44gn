@@ -76364,10 +76364,10 @@ const useLeadStore = create((set, get$8) => ({
 	blacklist: [],
 	fetchBlacklist: async () => {
 		try {
-			const { data, error } = await supabase.from("leads_blacklist").select("nome_contato");
-			if (!error && data) set({ blacklist: data.map((item) => item.nome_contato) });
+			const { data, error } = await supabase.from("leads_realeza").select("nome_contato").eq("status_atendimento", "Bloqueado");
+			if (!error && data) set({ blacklist: Array.from(new Set(data.map((item) => item.nome_contato))) });
 		} catch (e) {
-			console.warn("Blacklist table might not exist");
+			console.error("Error fetching blacklist:", e);
 		}
 	},
 	fetchLeads: async () => {
@@ -76405,9 +76405,10 @@ const useLeadStore = create((set, get$8) => ({
 	addToBlacklist: async (contactName) => {
 		try {
 			set((state) => ({ blacklist: [...state.blacklist, contactName] }));
-			const { error } = await supabase.from("leads_blacklist").insert({ nome_contato: contactName });
+			const { error } = await supabase.from("leads_realeza").update({ status_atendimento: "Bloqueado" }).eq("nome_contato", contactName);
 			if (error) throw error;
 			toast.success(`${contactName} adicionado à lista de bloqueio`);
+			get$8().fetchLeads();
 		} catch (error) {
 			console.error("Error adding to blacklist:", error);
 			toast.error("Erro ao bloquear contato");
@@ -76748,4 +76749,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Dsj7Ut9E.js.map
+//# sourceMappingURL=index-BKGJeQl8.js.map

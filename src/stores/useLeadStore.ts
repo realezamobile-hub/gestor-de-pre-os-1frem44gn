@@ -30,15 +30,20 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
 
   fetchBlacklist: async () => {
     try {
+      // Use leads_realeza to derive the blacklist by finding contacts marked as 'Bloqueado'
       const { data, error } = await supabase
-        .from('leads_blacklist' as any)
+        .from('leads_realeza' as any)
         .select('nome_contato')
+        .eq('status_atendimento', 'Bloqueado')
 
       if (!error && data) {
-        set({ blacklist: data.map((item: any) => item.nome_contato) })
+        const uniqueNames = Array.from(
+          new Set(data.map((item: any) => item.nome_contato)),
+        )
+        set({ blacklist: uniqueNames as string[] })
       }
     } catch (e) {
-      console.warn('Blacklist table might not exist')
+      console.error('Error fetching blacklist:', e)
     }
   },
 
@@ -81,7 +86,6 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
       set({ leads: updatedLeads })
 
       // Update existing record in database
-      // Using 'usuario_atendimento' which maps to the attendant field in DB
       const { error } = await supabase
         .from('leads_realeza' as any)
         .update({
@@ -103,13 +107,18 @@ export const useLeadStore = create<LeadStore>((set, get) => ({
     try {
       set((state) => ({ blacklist: [...state.blacklist, contactName] }))
 
+      // Update the status of existing messages from this contact to 'Bloqueado'
       const { error } = await supabase
-        .from('leads_blacklist' as any)
-        .insert({ nome_contato: contactName })
+        .from('leads_realeza' as any)
+        .update({ status_atendimento: 'Bloqueado' })
+        .eq('nome_contato', contactName)
 
       if (error) throw error
 
       toast.success(`${contactName} adicionado à lista de bloqueio`)
+
+      // Refetch to apply the changes to the UI completely
+      get().fetchLeads()
     } catch (error) {
       console.error('Error adding to blacklist:', error)
       toast.error('Erro ao bloquear contato')

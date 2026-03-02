@@ -46352,6 +46352,8 @@ function ListGeneratorPage() {
 	const [isInternal, setIsInternal] = (0, import_react.useState)(false);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
 	const previewTextareaRef = (0, import_react.useRef)(null);
+	const [isSaveDialogOpen, setIsSaveDialogOpen] = (0, import_react.useState)(false);
+	const [listName, setListName] = (0, import_react.useState)("");
 	const [triggerRefresh, setTriggerRefresh] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		const savedCustomer = localStorage.getItem("generator_customerText");
@@ -46498,14 +46500,22 @@ function ListGeneratorPage() {
 		navigator.clipboard.writeText(textToCopy);
 		toast.success("Lista copiada para a área de transferência!");
 	};
-	const handleSaveList = async () => {
+	const handleOpenSaveDialog = () => {
+		if (!(isInternal ? internalText : customerText) || draftItems.length === 0) return;
+		setListName(`${isInternal ? "Lista Interna" : "Lista Clientes"} - ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}`);
+		setIsSaveDialogOpen(true);
+	};
+	const handleConfirmSaveList = async () => {
 		const textToSave = isInternal ? internalText : customerText;
 		if (!textToSave || draftItems.length === 0) return;
 		setIsSaving(true);
-		const result = await saveGeneratedList(isInternal ? "Lista Interna" : "Lista Clientes", textToSave, isInternal ? "supplier" : "posting", config, draftItems);
+		const type = isInternal ? "supplier" : "posting";
+		const result = await saveGeneratedList(listName.trim() || (isInternal ? "Lista Interna" : "Lista Clientes"), textToSave, type, config, draftItems);
 		setIsSaving(false);
-		if (result.success) toast.success("Lista salva no histórico!");
-		else toast.error("Erro ao salvar lista");
+		if (result.success) {
+			toast.success("Lista salva no histórico!");
+			setIsSaveDialogOpen(false);
+		} else toast.error("Erro ao salvar lista");
 	};
 	const insertEmojiInPreview = (emoji) => {
 		const el = previewTextareaRef.current;
@@ -46524,173 +46534,215 @@ function ListGeneratorPage() {
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-[calc(100vh-8rem)] flex flex-col gap-6",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-col md:flex-row md:items-center justify-between gap-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex items-center gap-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-					variant: "ghost",
-					size: "icon",
-					asChild: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-						to: "/",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-5 h-5" })
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-					className: "text-3xl font-bold tracking-tight text-gray-900",
-					children: "Gerador de Lista WhatsApp"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					className: "text-muted-foreground",
-					children: "Edite seus itens, organize e gere a prévia antes de exportar."
-				})] })]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "flex gap-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorHistory, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					variant: "outline",
-					onClick: handleClear,
-					disabled: draftItems.length === 0,
-					className: "text-destructive hover:bg-destructive/10 hover:text-destructive",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Limpar Lista"]
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col md:flex-row md:items-center justify-between gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "ghost",
+						size: "icon",
+						asChild: true,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+							to: "/",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowLeft, { className: "w-5 h-5" })
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+						className: "text-3xl font-bold tracking-tight text-gray-900",
+						children: "Gerador de Lista WhatsApp"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-muted-foreground",
+						children: "Edite seus itens, organize e gere a prévia antes de exportar."
+					})] })]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorHistory, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "outline",
+						onClick: handleClear,
+						disabled: draftItems.length === 0,
+						className: "text-destructive hover:bg-destructive/10 hover:text-destructive",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "w-4 h-4 mr-2" }), "Limpar Lista"]
+					})]
 				})]
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorConfig, {
-						config,
-						onChange: setConfig,
-						onApplyMarkup: handleGlobalIncrease
-					})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-5 flex flex-col h-full min-h-0",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-						className: "flex-1 flex flex-col min-h-0 border-2 shadow-sm",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-							className: "bg-gray-50 border-b py-3 flex flex-row items-center justify-between space-y-0",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-								className: "text-sm font-medium flex items-center gap-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Itens da Lista (Rascunho)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-									className: "text-xs bg-white px-2 py-1 rounded border font-normal",
-									children: [draftItems.length, " itens"]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GeneratorConfig, {
+							config,
+							onChange: setConfig,
+							onApplyMarkup: handleGlobalIncrease
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "xl:col-span-5 flex flex-col h-full min-h-0",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+							className: "flex-1 flex flex-col min-h-0 border-2 shadow-sm",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+								className: "bg-gray-50 border-b py-3 flex flex-row items-center justify-between space-y-0",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+									className: "text-sm font-medium flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Itens da Lista (Rascunho)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										className: "text-xs bg-white px-2 py-1 rounded border font-normal",
+										children: [draftItems.length, " itens"]
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+									variant: isSorted ? "default" : "outline",
+									size: "sm",
+									onClick: () => {
+										setIsSorted(!isSorted);
+										setTriggerRefresh(true);
+									},
+									className: "h-7 text-xs",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownAZ, { className: "w-3 h-3 mr-1.5" }), isSorted ? "Ordenado" : "Ordenar AZ"]
 								})]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-								variant: isSorted ? "default" : "outline",
-								size: "sm",
-								onClick: () => {
-									setIsSorted(!isSorted);
-									setTriggerRefresh(true);
-								},
-								className: "h-7 text-xs",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownAZ, { className: "w-3 h-3 mr-1.5" }), isSorted ? "Ordenado" : "Ordenar AZ"]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+								className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftListGrouped, {
+									items: draftItems,
+									onRemove: removeFromDraft,
+									onUpdate: updateDraftItem,
+									isSorted,
+									markup: config.markup
+								})
 							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-							className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftListGrouped, {
-								items: draftItems,
-								onRemove: removeFromDraft,
-								onUpdate: updateDraftItem,
-								isSorted,
-								markup: config.markup
-							})
-						})]
-					})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "xl:col-span-4 h-full",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
-						value: isInternal ? "internal" : "customer",
-						onValueChange: (v) => setIsInternal(v === "internal"),
-						className: "h-full flex flex-col",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
-							className: "w-full justify-start mb-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-								value: "customer",
-								className: "flex-1",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente"]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
-								value: "internal",
-								className: "flex-1",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							className: "flex-1 relative flex flex-col",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-								className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-									className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-2",
-										children: [
-											!isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "flex gap-1.5",
-												children: [
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-red-500" }),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-yellow-500" }),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-green-500" })
-												]
-											}),
-											isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
-												children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
-											})
-										]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
-											asChild: true,
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmojiPicker, {
-												onEmojiSelect: insertEmojiInPreview,
-												trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-													size: "sm",
-													variant: "ghost",
-													className: cn("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
-													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-4 h-4" })
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "xl:col-span-4 h-full",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs, {
+							value: isInternal ? "internal" : "customer",
+							onValueChange: (v) => setIsInternal(v === "internal"),
+							className: "h-full flex flex-col",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsList, {
+								className: "w-full justify-start mb-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+									value: "customer",
+									className: "flex-1",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-4 h-4 mr-2" }), "Lista Cliente"]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabsTrigger, {
+									value: "internal",
+									className: "flex-1",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 mr-2" }), "Lista Interna"]
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "flex-1 relative flex flex-col",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+									className: cn("flex flex-col h-full overflow-hidden shadow-xl transition-all", isInternal ? "bg-white border-slate-200" : "bg-slate-950 border-slate-800"),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+										className: cn("py-3 px-4 flex flex-row items-center justify-between space-y-0 border-b", isInternal ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-800"),
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-2",
+											children: [
+												!isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex gap-1.5",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-red-500" }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-yellow-500" }),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-3 h-3 rounded-full bg-green-500" })
+													]
 												}),
-												side: "left"
-											}) })
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Inserir Emoji" })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-											onClick: handleGenerate,
-											size: "sm",
-											variant: isInternal ? "outline" : "secondary",
-											className: "h-7 text-xs",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévias"]
+												isInternal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Lock, { className: "w-4 h-4 text-slate-500" }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: cn("text-xs font-mono", isInternal ? "text-slate-600" : "text-slate-400 ml-3"),
+													children: isInternal ? "internal_preview.txt" : "whatsapp_preview.txt"
+												})
+											]
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipTrigger, {
+												asChild: true,
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmojiPicker, {
+													onEmojiSelect: insertEmojiInPreview,
+													trigger: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+														size: "sm",
+														variant: "ghost",
+														className: cn("h-7 px-2", isInternal ? "text-slate-600 hover:bg-slate-200" : "text-slate-400 hover:bg-slate-800"),
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smile, { className: "w-4 h-4" })
+													}),
+													side: "left"
+												}) })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContent, { children: "Inserir Emoji" })] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+												onClick: handleGenerate,
+												size: "sm",
+												variant: isInternal ? "outline" : "secondary",
+												className: "h-7 text-xs",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { className: "w-3 h-3 mr-1.5" }), "Gerar Prévias"]
+											})]
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+										className: "p-0 flex-1 overflow-hidden relative group",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
+											ref: previewTextareaRef,
+											value: isInternal ? internalText : customerText,
+											onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
+											className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
+											placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévias' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
+										}), (isInternal ? internalText : customerText) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "absolute bottom-6 right-6 flex flex-col gap-2",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+												onClick: handleOpenSaveDialog,
+												disabled: isSaving,
+												size: "sm",
+												className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+												onClick: handleCopy,
+												size: "sm",
+												variant: "outline",
+												className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
+											})]
 										})]
 									})]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-									className: "p-0 flex-1 overflow-hidden relative group",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-										ref: previewTextareaRef,
-										value: isInternal ? internalText : customerText,
-										onChange: (e) => isInternal ? setInternalText(e.target.value) : setCustomerText(e.target.value),
-										className: cn("w-full h-full bg-transparent font-mono text-xs p-4 resize-none focus:outline-none leading-relaxed", isInternal ? "text-slate-800" : "text-slate-300", !customerText && !internalText && "opacity-50 italic text-center pt-20"),
-										placeholder: draftItems.length > 0 ? "Clique em 'Gerar Prévias' para visualizar o resultado..." : "Adicione produtos para gerar o texto..."
-									}), (isInternal ? internalText : customerText) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "absolute bottom-6 right-6 flex flex-col gap-2",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-											onClick: handleSaveList,
-											disabled: isSaving,
-											size: "sm",
-											className: cn("shadow-lg", isInternal ? "bg-slate-800 text-white hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700 text-white"),
-											children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 animate-spin mr-2" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "w-4 h-4 mr-2" }), "Salvar"]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-											onClick: handleCopy,
-											size: "sm",
-											variant: "outline",
-											className: cn("shadow-lg", isInternal ? "bg-white" : "bg-white text-slate-900 hover:bg-slate-100 border-none"),
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { className: "w-4 h-4 mr-2" }), "Copiar"]
-										})]
-									})]
+								})
+							})]
+						})
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+				open: isSaveDialogOpen,
+				onOpenChange: setIsSaveDialogOpen,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+					className: "sm:max-w-[425px]",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogHeader, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Salvar Lista" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Dê um nome para esta lista para facilitar a identificação no histórico." })] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "grid gap-4 py-4",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "grid gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									htmlFor: "list-name",
+									children: "Nome da Lista"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+									id: "list-name",
+									value: listName,
+									onChange: (e) => setListName(e.target.value),
+									placeholder: "Ex: Promoção de Outubro",
+									onKeyDown: (e) => {
+										if (e.key === "Enter") handleConfirmSaveList();
+									},
+									autoFocus: true
 								})]
 							})
-						})]
-					})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							variant: "outline",
+							onClick: () => setIsSaveDialogOpen(false),
+							disabled: isSaving,
+							children: "Cancelar"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							onClick: handleConfirmSaveList,
+							disabled: isSaving || !listName.trim(),
+							children: [isSaving && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, { className: "w-4 h-4 mr-2 animate-spin" }), "Salvar Lista"]
+						})] })
+					]
 				})
-			]
-		})]
+			})
+		]
 	});
 }
 var ROOT_NAME = "AlertDialog";
@@ -76817,4 +76869,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-By3Av4X_.js.map
+//# sourceMappingURL=index-D-FNeQcb.js.map

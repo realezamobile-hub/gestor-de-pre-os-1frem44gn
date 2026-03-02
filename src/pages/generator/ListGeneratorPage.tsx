@@ -29,6 +29,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export default function ListGeneratorPage() {
   const {
@@ -84,6 +94,10 @@ export default function ListGeneratorPage() {
   const [isInternal, setIsInternal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const previewTextareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Save Dialog States
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [listName, setListName] = useState('')
 
   // Trigger to auto-refresh previews after global operations
   const [triggerRefresh, setTriggerRefresh] = useState(false)
@@ -291,16 +305,26 @@ export default function ListGeneratorPage() {
     toast.success('Lista copiada para a área de transferência!')
   }
 
-  const handleSaveList = async () => {
+  const handleOpenSaveDialog = () => {
+    const textToSave = isInternal ? internalText : customerText
+    if (!textToSave || draftItems.length === 0) return
+
+    const defaultName = isInternal ? 'Lista Interna' : 'Lista Clientes'
+    setListName(`${defaultName} - ${new Date().toLocaleDateString('pt-BR')}`)
+    setIsSaveDialogOpen(true)
+  }
+
+  const handleConfirmSaveList = async () => {
     const textToSave = isInternal ? internalText : customerText
     if (!textToSave || draftItems.length === 0) return
 
     setIsSaving(true)
-    const title = isInternal ? 'Lista Interna' : 'Lista Clientes'
     const type = isInternal ? 'supplier' : 'posting'
+    const finalTitle =
+      listName.trim() || (isInternal ? 'Lista Interna' : 'Lista Clientes')
 
     const result = await saveGeneratedList(
-      title,
+      finalTitle,
       textToSave,
       type,
       config,
@@ -310,6 +334,7 @@ export default function ListGeneratorPage() {
     setIsSaving(false)
     if (result.success) {
       toast.success('Lista salva no histórico!')
+      setIsSaveDialogOpen(false)
     } else {
       toast.error('Erro ao salvar lista')
     }
@@ -537,7 +562,7 @@ export default function ListGeneratorPage() {
                   {(isInternal ? internalText : customerText) && (
                     <div className="absolute bottom-6 right-6 flex flex-col gap-2">
                       <Button
-                        onClick={handleSaveList}
+                        onClick={handleOpenSaveDialog}
                         disabled={isSaving}
                         size="sm"
                         className={cn(
@@ -547,11 +572,7 @@ export default function ListGeneratorPage() {
                             : 'bg-blue-600 hover:bg-blue-700 text-white',
                         )}
                       >
-                        {isSaving ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        ) : (
-                          <Save className="w-4 h-4 mr-2" />
-                        )}
+                        <Save className="w-4 h-4 mr-2" />
                         Salvar
                       </Button>
                       <Button
@@ -576,6 +597,49 @@ export default function ListGeneratorPage() {
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Salvar Lista</DialogTitle>
+            <DialogDescription>
+              Dê um nome para esta lista para facilitar a identificação no
+              histórico.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="list-name">Nome da Lista</Label>
+              <Input
+                id="list-name"
+                value={listName}
+                onChange={(e) => setListName(e.target.value)}
+                placeholder="Ex: Promoção de Outubro"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleConfirmSaveList()
+                }}
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsSaveDialogOpen(false)}
+              disabled={isSaving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirmSaveList}
+              disabled={isSaving || !listName.trim()}
+            >
+              {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Salvar Lista
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   Loader2,
   RefreshCw,
   Smile,
+  ArrowDownAZ,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -53,6 +54,9 @@ export default function ListGeneratorPage() {
     contactNumber: '',
     markup: 0,
   })
+
+  // Sorting State
+  const [isSorted, setIsSorted] = useState(false)
 
   // Persistence for config
   useEffect(() => {
@@ -131,8 +135,43 @@ export default function ListGeneratorPage() {
 
     // 2. Groups and Items
     sortedKeys.forEach((groupName) => {
-      const items = grouped[groupName]
+      let items = grouped[groupName]
       if (items.length === 0) return
+
+      if (isSorted) {
+        items = [...items].sort((a, b) => {
+          let priceA = 0
+          let priceB = 0
+
+          if (internal) {
+            priceA = a.product?.valor ?? a.custom_price ?? 0
+            priceB = b.product?.valor ?? b.custom_price ?? 0
+          } else {
+            priceA =
+              a.custom_price !== null && a.custom_price !== undefined
+                ? a.custom_price
+                : (a.product?.valor || 0) + config.markup
+            priceB =
+              b.custom_price !== null && b.custom_price !== undefined
+                ? b.custom_price
+                : (b.product?.valor || 0) + config.markup
+          }
+
+          if (priceA !== priceB) return priceA - priceB
+
+          const modelA = (
+            a.custom_model ||
+            a.product?.modelo ||
+            ''
+          ).toLowerCase()
+          const modelB = (
+            b.custom_model ||
+            b.product?.modelo ||
+            ''
+          ).toLowerCase()
+          return modelA.localeCompare(modelB)
+        })
+      }
 
       text += `*${groupName}*\n`
 
@@ -203,7 +242,7 @@ export default function ListGeneratorPage() {
       setInternalText(generateContent(true))
       setTriggerRefresh(false)
     }
-  }, [triggerRefresh, draftItems, config])
+  }, [triggerRefresh, draftItems, config, isSorted])
 
   // Permission check
   if (!currentUser?.canCreateList) {
@@ -347,19 +386,33 @@ export default function ListGeneratorPage() {
         {/* Middle Column: Draft Items (Expanded) */}
         <div className="xl:col-span-5 flex flex-col h-full min-h-0">
           <Card className="flex-1 flex flex-col min-h-0 border-2 shadow-sm">
-            <CardHeader className="bg-gray-50 border-b py-3">
-              <CardTitle className="text-sm font-medium flex items-center justify-between">
+            <CardHeader className="bg-gray-50 border-b py-3 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <span>Itens da Lista (Rascunho)</span>
-                <span className="text-xs bg-white px-2 py-1 rounded border">
+                <span className="text-xs bg-white px-2 py-1 rounded border font-normal">
                   {draftItems.length} itens
                 </span>
               </CardTitle>
+              <Button
+                variant={isSorted ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setIsSorted(!isSorted)
+                  setTriggerRefresh(true)
+                }}
+                className="h-7 text-xs"
+              >
+                <ArrowDownAZ className="w-3 h-3 mr-1.5" />
+                {isSorted ? 'Ordenado' : 'Ordenar AZ'}
+              </Button>
             </CardHeader>
             <CardContent className="p-4 flex-1 overflow-hidden bg-gray-50/30">
               <DraftListGrouped
                 items={draftItems}
                 onRemove={removeFromDraft}
                 onUpdate={updateDraftItem}
+                isSorted={isSorted}
+                markup={config.markup}
               />
             </CardContent>
           </Card>

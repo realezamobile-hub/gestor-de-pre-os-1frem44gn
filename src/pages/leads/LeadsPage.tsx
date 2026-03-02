@@ -57,11 +57,9 @@ export default function LeadsPage() {
       window.open(lead.link_acao, '_blank')
     }
 
-    if (
-      lead.status_atendimento?.toLowerCase() === 'pendente' &&
-      currentUser?.name
-    ) {
-      await markAsHandled(lead, currentUser.name)
+    if (lead.status_atendimento?.trim().toLowerCase() === 'pendente') {
+      const attendantName = currentUser?.name || currentUser?.email || 'Usuário'
+      await markAsHandled(lead, attendantName)
     }
   }
 

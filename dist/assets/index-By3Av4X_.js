@@ -18894,6 +18894,28 @@ var Activity = createLucideIcon("activity", [["path", {
 	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
 	key: "169zse"
 }]]);
+var ArrowDownAZ = createLucideIcon("arrow-down-a-z", [
+	["path", {
+		d: "m3 16 4 4 4-4",
+		key: "1co6wj"
+	}],
+	["path", {
+		d: "M7 20V4",
+		key: "1yoxec"
+	}],
+	["path", {
+		d: "M20 8h-5",
+		key: "1vsyxs"
+	}],
+	["path", {
+		d: "M15 10V6.5a2.5 2.5 0 0 1 5 0V10",
+		key: "ag13bf"
+	}],
+	["path", {
+		d: "M15 14h5l-5 6h5",
+		key: "ur5jdg"
+	}]
+]);
 var ArrowLeft = createLucideIcon("arrow-left", [["path", {
 	d: "m12 19-7-7 7-7",
 	key: "1l729n"
@@ -33512,8 +33534,12 @@ function Sidebar({ mode = "desktop" }) {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "p-6 border-b border-slate-800 flex items-center gap-3 h-[70px] whitespace-nowrap",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center text-white",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Smartphone, { className: "w-5 h-5" })
+					className: "w-8 h-8 flex-shrink-0 flex items-center justify-center",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						src: "/favicon.ico",
+						alt: "RMcell Logo",
+						className: "w-full h-full object-contain rounded"
+					})
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: cn("font-bold text-lg tracking-tight transition-opacity duration-300", isDesktop ? "opacity-0 group-hover:opacity-100" : "opacity-100"),
 					children: "RMcell"
@@ -45403,7 +45429,7 @@ function DraftItemCard({ item, onUpdate, onRemove }) {
 		]
 	});
 }
-function DraftListGrouped({ items, onRemove, onUpdate }) {
+function DraftListGrouped({ items, onRemove, onUpdate, isSorted = false, markup = 0 }) {
 	const grouped = items.reduce((acc, item) => {
 		const groupName = (item.group_name || item.product?.categoria || "Outros").trim() || "Outros";
 		if (!acc[groupName]) acc[groupName] = [];
@@ -45424,34 +45450,45 @@ function DraftListGrouped({ items, onRemove, onUpdate }) {
 			type: "multiple",
 			defaultValue: sortedGroups,
 			className: "w-full space-y-4",
-			children: sortedGroups.map((group) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
-				value: group,
-				className: "border rounded-lg bg-slate-50/50 shadow-sm overflow-hidden px-0",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
-					className: "px-4 py-3 hover:bg-slate-100/50 hover:no-underline sticky top-0 bg-white/80 backdrop-blur-sm z-10 border-b",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "font-semibold text-gray-900",
-							children: group
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-							variant: "secondary",
-							className: "text-xs",
-							children: grouped[group].length
-						})]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
-					className: "p-3 pt-3 bg-white",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						className: "flex flex-col gap-3",
-						children: grouped[group].map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftItemCard, {
-							item,
-							onUpdate,
-							onRemove
-						}, item.id))
-					})
-				})]
-			}, group))
+			children: sortedGroups.map((group) => {
+				let groupItems = grouped[group];
+				if (isSorted) groupItems = [...groupItems].sort((a$1, b$1) => {
+					const priceA = a$1.custom_price !== null && a$1.custom_price !== void 0 ? a$1.custom_price : (a$1.product?.valor || 0) + markup;
+					const priceB = b$1.custom_price !== null && b$1.custom_price !== void 0 ? b$1.custom_price : (b$1.product?.valor || 0) + markup;
+					if (priceA !== priceB) return priceA - priceB;
+					const modelA = (a$1.custom_model || a$1.product?.modelo || "").toLowerCase();
+					const modelB = (b$1.custom_model || b$1.product?.modelo || "").toLowerCase();
+					return modelA.localeCompare(modelB);
+				});
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
+					value: group,
+					className: "border rounded-lg bg-slate-50/50 shadow-sm overflow-hidden px-0",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
+						className: "px-4 py-3 hover:bg-slate-100/50 hover:no-underline sticky top-0 bg-white/80 backdrop-blur-sm z-10 border-b",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-3",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-semibold text-gray-900",
+								children: group
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+								variant: "secondary",
+								className: "text-xs",
+								children: groupItems.length
+							})]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
+						className: "p-3 pt-3 bg-white",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex flex-col gap-3",
+							children: groupItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftItemCard, {
+								item,
+								onUpdate,
+								onRemove
+							}, item.id))
+						})
+					})]
+				}, group);
+			})
 		})
 	});
 }
@@ -46289,6 +46326,7 @@ function ListGeneratorPage() {
 		contactNumber: "",
 		markup: 0
 	});
+	const [isSorted, setIsSorted] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		const savedContact = localStorage.getItem("generator_contactNumber");
 		const savedCommunity = localStorage.getItem("generator_communityLink");
@@ -46347,8 +46385,23 @@ function ListGeneratorPage() {
 			if (!config.header.endsWith("\n\n")) text += "\n\n";
 		}
 		sortedKeys.forEach((groupName) => {
-			const items = grouped[groupName];
+			let items = grouped[groupName];
 			if (items.length === 0) return;
+			if (isSorted) items = [...items].sort((a$1, b$1) => {
+				let priceA = 0;
+				let priceB = 0;
+				if (internal) {
+					priceA = a$1.product?.valor ?? a$1.custom_price ?? 0;
+					priceB = b$1.product?.valor ?? b$1.custom_price ?? 0;
+				} else {
+					priceA = a$1.custom_price !== null && a$1.custom_price !== void 0 ? a$1.custom_price : (a$1.product?.valor || 0) + config.markup;
+					priceB = b$1.custom_price !== null && b$1.custom_price !== void 0 ? b$1.custom_price : (b$1.product?.valor || 0) + config.markup;
+				}
+				if (priceA !== priceB) return priceA - priceB;
+				const modelA = (a$1.custom_model || a$1.product?.modelo || "").toLowerCase();
+				const modelB = (b$1.custom_model || b$1.product?.modelo || "").toLowerCase();
+				return modelA.localeCompare(modelB);
+			});
 			text += `*${groupName}*\n`;
 			items.forEach((item) => {
 				let model = item.custom_model;
@@ -46395,7 +46448,8 @@ function ListGeneratorPage() {
 	}, [
 		triggerRefresh,
 		draftItems,
-		config
+		config,
+		isSorted
 	]);
 	if (!currentUser?.canCreateList) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "h-full flex flex-col items-center justify-center space-y-4",
@@ -46514,21 +46568,32 @@ function ListGeneratorPage() {
 					className: "xl:col-span-5 flex flex-col h-full min-h-0",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 						className: "flex-1 flex flex-col min-h-0 border-2 shadow-sm",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardHeader, {
-							className: "bg-gray-50 border-b py-3",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
-								className: "text-sm font-medium flex items-center justify-between",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+							className: "bg-gray-50 border-b py-3 flex flex-row items-center justify-between space-y-0",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardTitle, {
+								className: "text-sm font-medium flex items-center gap-2",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Itens da Lista (Rascunho)" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-									className: "text-xs bg-white px-2 py-1 rounded border",
+									className: "text-xs bg-white px-2 py-1 rounded border font-normal",
 									children: [draftItems.length, " itens"]
 								})]
-							})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								variant: isSorted ? "default" : "outline",
+								size: "sm",
+								onClick: () => {
+									setIsSorted(!isSorted);
+									setTriggerRefresh(true);
+								},
+								className: "h-7 text-xs",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownAZ, { className: "w-3 h-3 mr-1.5" }), isSorted ? "Ordenado" : "Ordenar AZ"]
+							})]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
 							className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DraftListGrouped, {
 								items: draftItems,
 								onRemove: removeFromDraft,
-								onUpdate: updateDraftItem
+								onUpdate: updateDraftItem,
+								isSorted,
+								markup: config.markup
 							})
 						})]
 					})
@@ -76557,7 +76622,7 @@ function LeadsPage() {
 	}, [debouncedSearch]);
 	const handleActionClick = async (lead) => {
 		if (lead.link_acao) window.open(lead.link_acao, "_blank");
-		if (lead.status_atendimento?.toLowerCase() === "pendente" && currentUser?.name) await markAsHandled(lead, currentUser.name);
+		if (lead.status_atendimento?.trim().toLowerCase() === "pendente") await markAsHandled(lead, currentUser?.name || currentUser?.email || "Usuário");
 	};
 	const handleBlockConfirm = async () => {
 		if (leadToBlock) {
@@ -76752,4 +76817,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DEuFc1Al.js.map
+//# sourceMappingURL=index-By3Av4X_.js.map

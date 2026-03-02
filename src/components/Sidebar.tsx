@@ -12,7 +12,6 @@ import {
   ChevronDown,
   UserPlus,
   MessageSquare,
-  Smartphone,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -107,8 +106,12 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       )}
     >
       <div className="p-6 border-b border-slate-800 flex items-center gap-3 h-[70px] whitespace-nowrap">
-        <div className="w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center text-white">
-          <Smartphone className="w-5 h-5" />
+        <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+          <img
+            src="/favicon.ico"
+            alt="RMcell Logo"
+            className="w-full h-full object-contain rounded"
+          />
         </div>
         <span
           className={cn(

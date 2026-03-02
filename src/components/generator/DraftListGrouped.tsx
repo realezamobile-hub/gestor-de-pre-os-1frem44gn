@@ -13,12 +13,16 @@ interface DraftListGroupedProps {
   items: DraftItem[]
   onRemove: (id: string) => Promise<void>
   onUpdate: (id: string, updates: Partial<DraftItem>) => Promise<void>
+  isSorted?: boolean
+  markup?: number
 }
 
 export function DraftListGrouped({
   items,
   onRemove,
   onUpdate,
+  isSorted = false,
+  markup = 0,
 }: DraftListGroupedProps) {
   // Group items by group_name
   const grouped = items.reduce(
@@ -55,34 +59,65 @@ export function DraftListGrouped({
         defaultValue={sortedGroups}
         className="w-full space-y-4"
       >
-        {sortedGroups.map((group) => (
-          <AccordionItem
-            key={group}
-            value={group}
-            className="border rounded-lg bg-slate-50/50 shadow-sm overflow-hidden px-0"
-          >
-            <AccordionTrigger className="px-4 py-3 hover:bg-slate-100/50 hover:no-underline sticky top-0 bg-white/80 backdrop-blur-sm z-10 border-b">
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-gray-900">{group}</span>
-                <Badge variant="secondary" className="text-xs">
-                  {grouped[group].length}
-                </Badge>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="p-3 pt-3 bg-white">
-              <div className="flex flex-col gap-3">
-                {grouped[group].map((item) => (
-                  <DraftItemCard
-                    key={item.id}
-                    item={item}
-                    onUpdate={onUpdate}
-                    onRemove={onRemove}
-                  />
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+        {sortedGroups.map((group) => {
+          let groupItems = grouped[group]
+
+          if (isSorted) {
+            groupItems = [...groupItems].sort((a, b) => {
+              const priceA =
+                a.custom_price !== null && a.custom_price !== undefined
+                  ? a.custom_price
+                  : (a.product?.valor || 0) + markup
+              const priceB =
+                b.custom_price !== null && b.custom_price !== undefined
+                  ? b.custom_price
+                  : (b.product?.valor || 0) + markup
+
+              if (priceA !== priceB) return priceA - priceB
+
+              const modelA = (
+                a.custom_model ||
+                a.product?.modelo ||
+                ''
+              ).toLowerCase()
+              const modelB = (
+                b.custom_model ||
+                b.product?.modelo ||
+                ''
+              ).toLowerCase()
+              return modelA.localeCompare(modelB)
+            })
+          }
+
+          return (
+            <AccordionItem
+              key={group}
+              value={group}
+              className="border rounded-lg bg-slate-50/50 shadow-sm overflow-hidden px-0"
+            >
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-100/50 hover:no-underline sticky top-0 bg-white/80 backdrop-blur-sm z-10 border-b">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-gray-900">{group}</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {groupItems.length}
+                  </Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="p-3 pt-3 bg-white">
+                <div className="flex flex-col gap-3">
+                  {groupItems.map((item) => (
+                    <DraftItemCard
+                      key={item.id}
+                      item={item}
+                      onUpdate={onUpdate}
+                      onRemove={onRemove}
+                    />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )
+        })}
       </Accordion>
     </ScrollArea>
   )

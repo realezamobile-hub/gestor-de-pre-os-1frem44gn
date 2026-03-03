@@ -1,5 +1,4 @@
 import { Product } from '@/types'
-import { useProductStore } from '@/stores/useProductStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -9,10 +8,18 @@ import { ProductMobileList } from './ProductMobileList'
 interface ProductListProps {
   products: Product[]
   isLoading?: boolean
+  localSelectedIds: Set<number>
+  onToggleSelection: (id: number) => void
+  onSelectAll: (checked: boolean) => void
 }
 
-export function ProductList({ products, isLoading = false }: ProductListProps) {
-  const { toggleDraftItem } = useProductStore()
+export function ProductList({
+  products,
+  isLoading = false,
+  localSelectedIds,
+  onToggleSelection,
+  onSelectAll,
+}: ProductListProps) {
   const { currentUser } = useAuthStore()
   const isMobile = useIsMobile()
 
@@ -41,6 +48,9 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
       window.open(`https://wa.me/${cleanPhone}`, '_blank')
     }
   }
+
+  const isAllSelected =
+    products.length > 0 && localSelectedIds.size === products.length
 
   if (isLoading) {
     return (
@@ -74,10 +84,10 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
         formatPrice={formatPrice}
         onWhatsAppClick={handleWhatsAppClick}
         canCreateList={canCreateList}
-        toggleProductSelection={(id) => {
-          const product = products.find((p) => p.id === id)
-          if (product) toggleDraftItem(product)
-        }}
+        localSelectedIds={localSelectedIds}
+        onToggleSelection={onToggleSelection}
+        onSelectAll={onSelectAll}
+        isAllSelected={isAllSelected}
       />
     )
   }
@@ -89,10 +99,10 @@ export function ProductList({ products, isLoading = false }: ProductListProps) {
       formatPrice={formatPrice}
       onWhatsAppClick={handleWhatsAppClick}
       canCreateList={canCreateList}
-      toggleProductSelection={(id) => {
-        const product = products.find((p) => p.id === id)
-        if (product) toggleDraftItem(product)
-      }}
+      localSelectedIds={localSelectedIds}
+      onToggleSelection={onToggleSelection}
+      onSelectAll={onSelectAll}
+      isAllSelected={isAllSelected}
     />
   )
 }

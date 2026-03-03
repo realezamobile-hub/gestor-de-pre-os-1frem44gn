@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useProductStore } from '@/stores/useProductStore'
 import { useDebounce } from '@/hooks/use-debounce'
-import { Search, ListChecks } from 'lucide-react'
+import { Search, ListChecks, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
@@ -23,8 +23,43 @@ export default function DashboardPage() {
     setFilters,
     filters,
     draftItems,
+    addToDraft,
   } = useProductStore()
   const [searchTerm, setSearchTerm] = useState(filters.search)
+
+  const [localSelectedIds, setLocalSelectedIds] = useState<Set<number>>(
+    new Set(),
+  )
+
+  // Clear local selection when products change (e.g. search/pagination changes)
+  useEffect(() => {
+    setLocalSelectedIds(new Set())
+  }, [products])
+
+  const handleToggleSelection = (id: number) => {
+    setLocalSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setLocalSelectedIds(new Set(products.map((p) => p.id)))
+    } else {
+      setLocalSelectedIds(new Set())
+    }
+  }
+
+  const handleAddSelected = async () => {
+    const productsToAdd = products.filter((p) => localSelectedIds.has(p.id))
+    if (productsToAdd.length > 0) {
+      await addToDraft(productsToAdd)
+      setLocalSelectedIds(new Set())
+    }
+  }
 
   // Sync internal state with store state if it changes externally (e.g. Clear Filters)
   useEffect(() => {
@@ -54,7 +89,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]">
-      <div className="shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-10">
+      <div className="shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1">
             <h2 className="text-xl font-bold tracking-tight hidden lg:block text-nowrap">
@@ -100,8 +135,33 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {localSelectedIds.size > 0 && (
+        <div className="shrink-0 bg-blue-50 border-b border-blue-100 px-4 py-2 flex items-center justify-between z-10 animate-in fade-in slide-in-from-top-2 duration-300">
+          <span className="text-sm font-medium text-blue-800">
+            {localSelectedIds.size}{' '}
+            {localSelectedIds.size === 1
+              ? 'produto selecionado'
+              : 'produtos selecionados'}
+          </span>
+          <Button
+            size="sm"
+            onClick={handleAddSelected}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Selecionados
+          </Button>
+        </div>
+      )}
+
       <div className="flex-1 min-h-0 overflow-y-auto p-1">
-        <ProductList products={products} isLoading={isLoading} />
+        <ProductList
+          products={products}
+          isLoading={isLoading}
+          localSelectedIds={localSelectedIds}
+          onToggleSelection={handleToggleSelection}
+          onSelectAll={handleSelectAll}
+        />
       </div>
 
       <div className="shrink-0 border-t bg-background p-2">

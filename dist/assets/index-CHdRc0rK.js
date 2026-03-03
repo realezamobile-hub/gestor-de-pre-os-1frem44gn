@@ -37942,6 +37942,273 @@ function PendingApprovalPage() {
 		})
 	});
 }
+function Skeleton({ className, ...props }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: cn("animate-pulse rounded-md bg-muted", className),
+		...props
+	});
+}
+var MOBILE_BREAKPOINT = 768;
+function useIsMobile() {
+	const [isMobile, setIsMobile] = import_react.useState(void 0);
+	import_react.useEffect(() => {
+		const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+		const onChange = () => {
+			setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+		};
+		mql.addEventListener("change", onChange);
+		setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+		return () => mql.removeEventListener("change", onChange);
+	}, []);
+	return !!isMobile;
+}
+var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: "relative w-full overflow-auto",
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", {
+		ref,
+		className: cn("w-full caption-bottom text-sm", className),
+		...props
+	})
+}));
+Table.displayName = "Table";
+var TableHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
+	ref,
+	className: cn("[&_tr]:border-b", className),
+	...props
+}));
+TableHeader.displayName = "TableHeader";
+var TableBody = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
+	ref,
+	className: cn("[&_tr:last-child]:border-0", className),
+	...props
+}));
+TableBody.displayName = "TableBody";
+var TableFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tfoot", {
+	ref,
+	className: cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
+	...props
+}));
+TableFooter.displayName = "TableFooter";
+var TableRow = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
+	ref,
+	className: cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
+	...props
+}));
+TableRow.displayName = "TableRow";
+var TableHead = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+	ref,
+	className: cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
+	...props
+}));
+TableHead.displayName = "TableHead";
+var TableCell = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+	ref,
+	className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
+	...props
+}));
+TableCell.displayName = "TableCell";
+var TableCaption = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
+	ref,
+	className: cn("mt-4 text-sm text-muted-foreground", className),
+	...props
+}));
+TableCaption.displayName = "TableCaption";
+var CHECKBOX_NAME = "Checkbox";
+var [createCheckboxContext, createCheckboxScope] = createContextScope(CHECKBOX_NAME);
+var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
+function CheckboxProvider(props) {
+	const { __scopeCheckbox, checked: checkedProp, children, defaultChecked, disabled, form, name, onCheckedChange, required, value = "on", internal_do_not_use_render } = props;
+	const [checked, setChecked] = useControllableState({
+		prop: checkedProp,
+		defaultProp: defaultChecked ?? false,
+		onChange: onCheckedChange,
+		caller: CHECKBOX_NAME
+	});
+	const [control, setControl] = import_react.useState(null);
+	const [bubbleInput, setBubbleInput] = import_react.useState(null);
+	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
+	const isFormControl = control ? !!form || !!control.closest("form") : true;
+	const context = {
+		checked,
+		disabled,
+		setChecked,
+		control,
+		setControl,
+		name,
+		form,
+		value,
+		hasConsumerStoppedPropagationRef,
+		required,
+		defaultChecked: isIndeterminate(defaultChecked) ? false : defaultChecked,
+		isFormControl,
+		bubbleInput,
+		setBubbleInput
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProviderImpl, {
+		scope: __scopeCheckbox,
+		...context,
+		children: isFunction$21(internal_do_not_use_render) ? internal_do_not_use_render(context) : children
+	});
+}
+var TRIGGER_NAME$5 = "CheckboxTrigger";
+var CheckboxTrigger = import_react.forwardRef(({ __scopeCheckbox, onKeyDown, onClick, ...checkboxProps }, forwardedRef) => {
+	const { control, value, disabled, checked, required, setControl, setChecked, hasConsumerStoppedPropagationRef, isFormControl, bubbleInput } = useCheckboxContext(TRIGGER_NAME$5, __scopeCheckbox);
+	const composedRefs = useComposedRefs(forwardedRef, setControl);
+	const initialCheckedStateRef = import_react.useRef(checked);
+	import_react.useEffect(() => {
+		const form = control?.form;
+		if (form) {
+			const reset = () => setChecked(initialCheckedStateRef.current);
+			form.addEventListener("reset", reset);
+			return () => form.removeEventListener("reset", reset);
+		}
+	}, [control, setChecked]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+		type: "button",
+		role: "checkbox",
+		"aria-checked": isIndeterminate(checked) ? "mixed" : checked,
+		"aria-required": required,
+		"data-state": getState$3(checked),
+		"data-disabled": disabled ? "" : void 0,
+		disabled,
+		value,
+		...checkboxProps,
+		ref: composedRefs,
+		onKeyDown: composeEventHandlers(onKeyDown, (event) => {
+			if (event.key === "Enter") event.preventDefault();
+		}),
+		onClick: composeEventHandlers(onClick, (event) => {
+			setChecked((prevChecked) => isIndeterminate(prevChecked) ? true : !prevChecked);
+			if (bubbleInput && isFormControl) {
+				hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+				if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+			}
+		})
+	});
+});
+CheckboxTrigger.displayName = TRIGGER_NAME$5;
+var Checkbox$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCheckbox, name, checked, defaultChecked, required, disabled, value, onCheckedChange, form, ...checkboxProps } = props;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProvider, {
+		__scopeCheckbox,
+		checked,
+		defaultChecked,
+		disabled,
+		required,
+		onCheckedChange,
+		name,
+		form,
+		value,
+		internal_do_not_use_render: ({ isFormControl }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxTrigger, {
+			...checkboxProps,
+			ref: forwardedRef,
+			__scopeCheckbox
+		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxBubbleInput, { __scopeCheckbox })] })
+	});
+});
+Checkbox$1.displayName = CHECKBOX_NAME;
+var INDICATOR_NAME = "CheckboxIndicator";
+var CheckboxIndicator = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
+	const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
+		present: forceMount || isIndeterminate(context.checked) || context.checked === true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+			"data-state": getState$3(context.checked),
+			"data-disabled": context.disabled ? "" : void 0,
+			...indicatorProps,
+			ref: forwardedRef,
+			style: {
+				pointerEvents: "none",
+				...props.style
+			}
+		})
+	});
+});
+CheckboxIndicator.displayName = INDICATOR_NAME;
+var BUBBLE_INPUT_NAME$2 = "CheckboxBubbleInput";
+var CheckboxBubbleInput = import_react.forwardRef(({ __scopeCheckbox, ...props }, forwardedRef) => {
+	const { control, hasConsumerStoppedPropagationRef, checked, defaultChecked, required, disabled, name, value, form, bubbleInput, setBubbleInput } = useCheckboxContext(BUBBLE_INPUT_NAME$2, __scopeCheckbox);
+	const composedRefs = useComposedRefs(forwardedRef, setBubbleInput);
+	const prevChecked = usePrevious(checked);
+	const controlSize = useSize(control);
+	import_react.useEffect(() => {
+		const input = bubbleInput;
+		if (!input) return;
+		const inputProto = window.HTMLInputElement.prototype;
+		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
+		const bubbles = !hasConsumerStoppedPropagationRef.current;
+		if (prevChecked !== checked && setChecked) {
+			const event = new Event("click", { bubbles });
+			input.indeterminate = isIndeterminate(checked);
+			setChecked.call(input, isIndeterminate(checked) ? false : checked);
+			input.dispatchEvent(event);
+		}
+	}, [
+		bubbleInput,
+		prevChecked,
+		checked,
+		hasConsumerStoppedPropagationRef
+	]);
+	const defaultCheckedRef = import_react.useRef(isIndeterminate(checked) ? false : checked);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.input, {
+		type: "checkbox",
+		"aria-hidden": true,
+		defaultChecked: defaultChecked ?? defaultCheckedRef.current,
+		required,
+		disabled,
+		name,
+		value,
+		form,
+		...props,
+		tabIndex: -1,
+		ref: composedRefs,
+		style: {
+			...props.style,
+			...controlSize,
+			position: "absolute",
+			pointerEvents: "none",
+			opacity: 0,
+			margin: 0,
+			transform: "translateX(-100%)"
+		}
+	});
+});
+CheckboxBubbleInput.displayName = BUBBLE_INPUT_NAME$2;
+function isFunction$21(value) {
+	return typeof value === "function";
+}
+function isIndeterminate(checked) {
+	return checked === "indeterminate";
+}
+function getState$3(checked) {
+	return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+}
+var Checkbox = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
+	ref,
+	className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
+	...props,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxIndicator, {
+		className: cn("flex items-center justify-center text-current"),
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "h-4 w-4" })
+	})
+}));
+Checkbox.displayName = Checkbox$1.displayName;
+var badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", {
+	variants: { variant: {
+		default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+		secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+		destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+		outline: "text-foreground"
+	} },
+	defaultVariants: { variant: "default" }
+});
+function Badge({ className, variant, ...props }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: cn(badgeVariants({ variant }), className),
+		...props
+	});
+}
 const daysInYear = 365.2425;
 Math.pow(10, 8) * 24 * 60 * 60 * 1e3;
 const millisecondsInWeek = 6048e5;
@@ -40079,281 +40346,21 @@ const useProductStore = create((set, get$8) => ({
 		}
 	}
 }));
-function Skeleton({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn("animate-pulse rounded-md bg-muted", className),
-		...props
-	});
-}
-var MOBILE_BREAKPOINT = 768;
-function useIsMobile() {
-	const [isMobile, setIsMobile] = import_react.useState(void 0);
-	import_react.useEffect(() => {
-		const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-		const onChange = () => {
-			setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-		};
-		mql.addEventListener("change", onChange);
-		setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-		return () => mql.removeEventListener("change", onChange);
-	}, []);
-	return !!isMobile;
-}
-var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: "relative w-full overflow-auto",
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", {
-		ref,
-		className: cn("w-full caption-bottom text-sm", className),
-		...props
-	})
-}));
-Table.displayName = "Table";
-var TableHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
-	ref,
-	className: cn("[&_tr]:border-b", className),
-	...props
-}));
-TableHeader.displayName = "TableHeader";
-var TableBody = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
-	ref,
-	className: cn("[&_tr:last-child]:border-0", className),
-	...props
-}));
-TableBody.displayName = "TableBody";
-var TableFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tfoot", {
-	ref,
-	className: cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className),
-	...props
-}));
-TableFooter.displayName = "TableFooter";
-var TableRow = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
-	ref,
-	className: cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
-	...props
-}));
-TableRow.displayName = "TableRow";
-var TableHead = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-	ref,
-	className: cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0", className),
-	...props
-}));
-TableHead.displayName = "TableHead";
-var TableCell = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
-	ref,
-	className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
-	...props
-}));
-TableCell.displayName = "TableCell";
-var TableCaption = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
-	ref,
-	className: cn("mt-4 text-sm text-muted-foreground", className),
-	...props
-}));
-TableCaption.displayName = "TableCaption";
-var CHECKBOX_NAME = "Checkbox";
-var [createCheckboxContext, createCheckboxScope] = createContextScope(CHECKBOX_NAME);
-var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
-function CheckboxProvider(props) {
-	const { __scopeCheckbox, checked: checkedProp, children, defaultChecked, disabled, form, name, onCheckedChange, required, value = "on", internal_do_not_use_render } = props;
-	const [checked, setChecked] = useControllableState({
-		prop: checkedProp,
-		defaultProp: defaultChecked ?? false,
-		onChange: onCheckedChange,
-		caller: CHECKBOX_NAME
-	});
-	const [control, setControl] = import_react.useState(null);
-	const [bubbleInput, setBubbleInput] = import_react.useState(null);
-	const hasConsumerStoppedPropagationRef = import_react.useRef(false);
-	const isFormControl = control ? !!form || !!control.closest("form") : true;
-	const context = {
-		checked,
-		disabled,
-		setChecked,
-		control,
-		setControl,
-		name,
-		form,
-		value,
-		hasConsumerStoppedPropagationRef,
-		required,
-		defaultChecked: isIndeterminate(defaultChecked) ? false : defaultChecked,
-		isFormControl,
-		bubbleInput,
-		setBubbleInput
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProviderImpl, {
-		scope: __scopeCheckbox,
-		...context,
-		children: isFunction$21(internal_do_not_use_render) ? internal_do_not_use_render(context) : children
-	});
-}
-var TRIGGER_NAME$5 = "CheckboxTrigger";
-var CheckboxTrigger = import_react.forwardRef(({ __scopeCheckbox, onKeyDown, onClick, ...checkboxProps }, forwardedRef) => {
-	const { control, value, disabled, checked, required, setControl, setChecked, hasConsumerStoppedPropagationRef, isFormControl, bubbleInput } = useCheckboxContext(TRIGGER_NAME$5, __scopeCheckbox);
-	const composedRefs = useComposedRefs(forwardedRef, setControl);
-	const initialCheckedStateRef = import_react.useRef(checked);
-	import_react.useEffect(() => {
-		const form = control?.form;
-		if (form) {
-			const reset = () => setChecked(initialCheckedStateRef.current);
-			form.addEventListener("reset", reset);
-			return () => form.removeEventListener("reset", reset);
-		}
-	}, [control, setChecked]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
-		type: "button",
-		role: "checkbox",
-		"aria-checked": isIndeterminate(checked) ? "mixed" : checked,
-		"aria-required": required,
-		"data-state": getState$3(checked),
-		"data-disabled": disabled ? "" : void 0,
-		disabled,
-		value,
-		...checkboxProps,
-		ref: composedRefs,
-		onKeyDown: composeEventHandlers(onKeyDown, (event) => {
-			if (event.key === "Enter") event.preventDefault();
-		}),
-		onClick: composeEventHandlers(onClick, (event) => {
-			setChecked((prevChecked) => isIndeterminate(prevChecked) ? true : !prevChecked);
-			if (bubbleInput && isFormControl) {
-				hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
-				if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
-			}
-		})
-	});
-});
-CheckboxTrigger.displayName = TRIGGER_NAME$5;
-var Checkbox$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeCheckbox, name, checked, defaultChecked, required, disabled, value, onCheckedChange, form, ...checkboxProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxProvider, {
-		__scopeCheckbox,
-		checked,
-		defaultChecked,
-		disabled,
-		required,
-		onCheckedChange,
-		name,
-		form,
-		value,
-		internal_do_not_use_render: ({ isFormControl }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxTrigger, {
-			...checkboxProps,
-			ref: forwardedRef,
-			__scopeCheckbox
-		}), isFormControl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxBubbleInput, { __scopeCheckbox })] })
-	});
-});
-Checkbox$1.displayName = CHECKBOX_NAME;
-var INDICATOR_NAME = "CheckboxIndicator";
-var CheckboxIndicator = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
-	const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
-		present: forceMount || isIndeterminate(context.checked) || context.checked === true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
-			"data-state": getState$3(context.checked),
-			"data-disabled": context.disabled ? "" : void 0,
-			...indicatorProps,
-			ref: forwardedRef,
-			style: {
-				pointerEvents: "none",
-				...props.style
-			}
-		})
-	});
-});
-CheckboxIndicator.displayName = INDICATOR_NAME;
-var BUBBLE_INPUT_NAME$2 = "CheckboxBubbleInput";
-var CheckboxBubbleInput = import_react.forwardRef(({ __scopeCheckbox, ...props }, forwardedRef) => {
-	const { control, hasConsumerStoppedPropagationRef, checked, defaultChecked, required, disabled, name, value, form, bubbleInput, setBubbleInput } = useCheckboxContext(BUBBLE_INPUT_NAME$2, __scopeCheckbox);
-	const composedRefs = useComposedRefs(forwardedRef, setBubbleInput);
-	const prevChecked = usePrevious(checked);
-	const controlSize = useSize(control);
-	import_react.useEffect(() => {
-		const input = bubbleInput;
-		if (!input) return;
-		const inputProto = window.HTMLInputElement.prototype;
-		const setChecked = Object.getOwnPropertyDescriptor(inputProto, "checked").set;
-		const bubbles = !hasConsumerStoppedPropagationRef.current;
-		if (prevChecked !== checked && setChecked) {
-			const event = new Event("click", { bubbles });
-			input.indeterminate = isIndeterminate(checked);
-			setChecked.call(input, isIndeterminate(checked) ? false : checked);
-			input.dispatchEvent(event);
-		}
-	}, [
-		bubbleInput,
-		prevChecked,
-		checked,
-		hasConsumerStoppedPropagationRef
-	]);
-	const defaultCheckedRef = import_react.useRef(isIndeterminate(checked) ? false : checked);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.input, {
-		type: "checkbox",
-		"aria-hidden": true,
-		defaultChecked: defaultChecked ?? defaultCheckedRef.current,
-		required,
-		disabled,
-		name,
-		value,
-		form,
-		...props,
-		tabIndex: -1,
-		ref: composedRefs,
-		style: {
-			...props.style,
-			...controlSize,
-			position: "absolute",
-			pointerEvents: "none",
-			opacity: 0,
-			margin: 0,
-			transform: "translateX(-100%)"
-		}
-	});
-});
-CheckboxBubbleInput.displayName = BUBBLE_INPUT_NAME$2;
-function isFunction$21(value) {
-	return typeof value === "function";
-}
-function isIndeterminate(checked) {
-	return checked === "indeterminate";
-}
-function getState$3(checked) {
-	return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
-}
-var Checkbox = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
-	ref,
-	className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground", className),
-	...props,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CheckboxIndicator, {
-		className: cn("flex items-center justify-center text-current"),
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "h-4 w-4" })
-	})
-}));
-Checkbox.displayName = Checkbox$1.displayName;
-var badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", {
-	variants: { variant: {
-		default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-		secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-		destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-		outline: "text-foreground"
-	} },
-	defaultVariants: { variant: "default" }
-});
-function Badge({ className, variant, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: cn(badgeVariants({ variant }), className),
-		...props
-	});
-}
-function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, canCreateList, toggleProductSelection }) {
+function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, canCreateList, localSelectedIds, onToggleSelection, onSelectAll, isAllSelected }) {
 	const { selectedProductIds } = useProductStore();
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "rounded-md border bg-white shadow-sm overflow-hidden",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
 			className: "bg-gray-50/50 hover:bg-gray-50/50",
 			children: [
-				canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { className: "w-[40px] px-2" }),
+				canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+					className: "w-[40px] px-2 text-center",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						checked: isAllSelected ? true : localSelectedIds.size > 0 ? "indeterminate" : false,
+						onCheckedChange: (c$1) => onSelectAll(!!c$1),
+						"aria-label": "Selecionar todos"
+					})
+				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 					className: "h-10 py-2",
 					children: "Modelo"
@@ -40400,26 +40407,34 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 				})
 			]
 		}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: products.map((product) => {
-			const isSelected = selectedProductIds.has(product.id);
+			const isLocalSelected = localSelectedIds.has(product.id);
+			const isInDraft = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, {
-				className: cn("hover:bg-gray-50 transition-colors", isSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
+				className: cn("hover:bg-gray-50 transition-colors", isLocalSelected && "bg-blue-50/40 hover:bg-blue-50/60", isLowestPrice && "bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500"),
 				children: [
 					canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-						className: "px-2 py-2",
+						className: "px-2 py-2 text-center",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-							checked: isSelected,
-							onCheckedChange: () => toggleProductSelection(product.id),
-							"aria-label": `Select ${product.modelo}`
+							checked: isLocalSelected,
+							onCheckedChange: () => onToggleSelection(product.id),
+							"aria-label": `Selecionar ${product.modelo}`
 						})
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 						className: "font-medium py-2",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex flex-col",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "text-sm",
-								children: product.modelo
+							className: "flex flex-col gap-0.5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-1.5",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-sm",
+									children: product.modelo
+								}), isInDraft && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									title: "No Rascunho",
+									className: "text-emerald-600 bg-emerald-50 rounded-full p-0.5 flex-shrink-0",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-3 h-3" })
+								})]
 							}), isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 								className: "text-[9px] text-emerald-600 font-bold leading-none mt-0.5",
 								children: "★ Melhor Preço"
@@ -40488,15 +40503,30 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 		}) })] })
 	});
 }
-function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick, canCreateList, toggleProductSelection }) {
+function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick, canCreateList, localSelectedIds, onToggleSelection, onSelectAll, isAllSelected }) {
 	const { selectedProductIds } = useProductStore();
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-4 pb-20",
-		children: products.map((product) => {
-			const isSelected = selectedProductIds.has(product.id);
+		children: [canCreateList && products.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "flex items-center justify-between bg-white p-3 rounded-xl border shadow-sm",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-3",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+					checked: isAllSelected ? true : localSelectedIds.size > 0 ? "indeterminate" : false,
+					onCheckedChange: (c$1) => onSelectAll(!!c$1),
+					id: "select-all-mobile"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+					htmlFor: "select-all-mobile",
+					className: "text-sm font-medium cursor-pointer",
+					children: "Selecionar Todos"
+				})]
+			})
+		}), products.map((product) => {
+			const isLocalSelected = localSelectedIds.has(product.id);
+			const isInDraft = selectedProductIds.has(product.id);
 			const isLowestPrice = product.valor !== null && product.valor !== void 0 && product.valor === lowestPrice && lowestPrice !== Infinity;
 			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: cn("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
+				className: cn("bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden", isLocalSelected && "ring-2 ring-primary border-primary bg-blue-50/20", isLowestPrice && "border-l-4 border-l-emerald-500 bg-emerald-50/10"),
 				children: [isLowestPrice && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "absolute top-0 right-0 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold",
 					children: "MELHOR PREÇO"
@@ -40505,8 +40535,8 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 					children: [canCreateList && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "pt-1",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-							checked: isSelected,
-							onCheckedChange: () => toggleProductSelection(product.id),
+							checked: isLocalSelected,
+							onCheckedChange: () => onToggleSelection(product.id),
 							className: "h-5 w-5"
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40514,9 +40544,13 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 						children: [
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "flex justify-between items-start gap-2 mb-1",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-									className: "font-bold text-gray-900 truncate pr-16",
-									children: product.modelo
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+									className: "font-bold text-gray-900 truncate pr-16 flex items-center gap-1.5",
+									children: [product.modelo, isInDraft && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										title: "No Rascunho",
+										className: "text-emerald-600 bg-emerald-50 rounded-full p-0.5 flex-shrink-0",
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "w-3.5 h-3.5" })
+									})]
 								})
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40587,11 +40621,10 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 					})]
 				})]
 			}, product.id);
-		})
+		})]
 	});
 }
-function ProductList({ products, isLoading = false }) {
-	const { toggleDraftItem } = useProductStore();
+function ProductList({ products, isLoading = false, localSelectedIds, onToggleSelection, onSelectAll }) {
 	const { currentUser } = useAuthStore();
 	const isMobile = useIsMobile();
 	const canCreateList = currentUser?.canCreateList || false;
@@ -40613,6 +40646,7 @@ function ProductList({ products, isLoading = false }) {
 			window.open(`https://wa.me/${cleanPhone}`, "_blank");
 		}
 	};
+	const isAllSelected = products.length > 0 && localSelectedIds.size === products.length;
 	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "rounded-md border bg-white shadow-sm overflow-hidden p-4 space-y-4",
 		children: Array.from({ length: 10 }).map((_$1, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40636,10 +40670,10 @@ function ProductList({ products, isLoading = false }) {
 		formatPrice,
 		onWhatsAppClick: handleWhatsAppClick,
 		canCreateList,
-		toggleProductSelection: (id) => {
-			const product = products.find((p$1) => p$1.id === id);
-			if (product) toggleDraftItem(product);
-		}
+		localSelectedIds,
+		onToggleSelection,
+		onSelectAll,
+		isAllSelected
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductTable, {
 		products,
@@ -40647,10 +40681,10 @@ function ProductList({ products, isLoading = false }) {
 		formatPrice,
 		onWhatsAppClick: handleWhatsAppClick,
 		canCreateList,
-		toggleProductSelection: (id) => {
-			const product = products.find((p$1) => p$1.id === id);
-			if (product) toggleDraftItem(product);
-		}
+		localSelectedIds,
+		onToggleSelection,
+		onSelectAll,
+		isAllSelected
 	});
 }
 var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
@@ -42747,8 +42781,31 @@ function ProductPagination() {
 function DashboardPage() {
 	const navigate = useNavigate();
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, setFilters, filters, draftItems } = useProductStore();
+	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, setFilters, filters, draftItems, addToDraft } = useProductStore();
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
+	const [localSelectedIds, setLocalSelectedIds] = (0, import_react.useState)(/* @__PURE__ */ new Set());
+	(0, import_react.useEffect)(() => {
+		setLocalSelectedIds(/* @__PURE__ */ new Set());
+	}, [products]);
+	const handleToggleSelection = (id) => {
+		setLocalSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+	const handleSelectAll = (checked) => {
+		if (checked) setLocalSelectedIds(new Set(products.map((p$1) => p$1.id)));
+		else setLocalSelectedIds(/* @__PURE__ */ new Set());
+	};
+	const handleAddSelected = async () => {
+		const productsToAdd = products.filter((p$1) => localSelectedIds.has(p$1.id));
+		if (productsToAdd.length > 0) {
+			await addToDraft(productsToAdd);
+			setLocalSelectedIds(/* @__PURE__ */ new Set());
+		}
+	};
 	(0, import_react.useEffect)(() => {
 		setSearchTerm(filters.search);
 	}, [filters.search]);
@@ -42768,7 +42825,7 @@ function DashboardPage() {
 		className: "flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-10",
+				className: "shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 border-b space-y-3 px-1 z-20",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex flex-col md:flex-row md:items-center justify-between gap-3",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -42813,11 +42870,30 @@ function DashboardPage() {
 					})]
 				})
 			}),
+			localSelectedIds.size > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "shrink-0 bg-blue-50 border-b border-blue-100 px-4 py-2 flex items-center justify-between z-10 animate-in fade-in slide-in-from-top-2 duration-300",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+					className: "text-sm font-medium text-blue-800",
+					children: [
+						localSelectedIds.size,
+						" ",
+						localSelectedIds.size === 1 ? "produto selecionado" : "produtos selecionados"
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					size: "sm",
+					onClick: handleAddSelected,
+					className: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4 mr-2" }), "Adicionar Selecionados"]
+				})]
+			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				className: "flex-1 min-h-0 overflow-y-auto p-1",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductList, {
 					products,
-					isLoading
+					isLoading,
+					localSelectedIds,
+					onToggleSelection: handleToggleSelection,
+					onSelectAll: handleSelectAll
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -76965,4 +77041,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D9Kib3KY.js.map
+//# sourceMappingURL=index-CHdRc0rK.js.map

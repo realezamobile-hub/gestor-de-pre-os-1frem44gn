@@ -10,7 +10,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useProductStore } from '@/stores/useProductStore'
 
@@ -20,7 +20,10 @@ interface ProductTableProps {
   formatPrice: (value: number | null | undefined) => string
   onWhatsAppClick: (link?: string | null, phone?: string | null) => void
   canCreateList: boolean
-  toggleProductSelection: (id: number) => void
+  localSelectedIds: Set<number>
+  onToggleSelection: (id: number) => void
+  onSelectAll: (checked: boolean) => void
+  isAllSelected: boolean
 }
 
 export function ProductTable({
@@ -29,7 +32,10 @@ export function ProductTable({
   formatPrice,
   onWhatsAppClick,
   canCreateList,
-  toggleProductSelection,
+  localSelectedIds,
+  onToggleSelection,
+  onSelectAll,
+  isAllSelected,
 }: ProductTableProps) {
   const { selectedProductIds } = useProductStore()
 
@@ -38,7 +44,21 @@ export function ProductTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-            {canCreateList && <TableHead className="w-[40px] px-2"></TableHead>}
+            {canCreateList && (
+              <TableHead className="w-[40px] px-2 text-center">
+                <Checkbox
+                  checked={
+                    isAllSelected
+                      ? true
+                      : localSelectedIds.size > 0
+                        ? 'indeterminate'
+                        : false
+                  }
+                  onCheckedChange={(c) => onSelectAll(!!c)}
+                  aria-label="Selecionar todos"
+                />
+              </TableHead>
+            )}
             <TableHead className="h-10 py-2">Modelo</TableHead>
             <TableHead className="h-10 py-2">Categoria</TableHead>
             <TableHead className="h-10 py-2">RAM</TableHead>
@@ -56,7 +76,8 @@ export function ProductTable({
         </TableHeader>
         <TableBody>
           {products.map((product) => {
-            const isSelected = selectedProductIds.has(product.id)
+            const isLocalSelected = localSelectedIds.has(product.id)
+            const isInDraft = selectedProductIds.has(product.id)
             const isLowestPrice =
               product.valor !== null &&
               product.valor !== undefined &&
@@ -68,23 +89,33 @@ export function ProductTable({
                 key={product.id}
                 className={cn(
                   'hover:bg-gray-50 transition-colors',
-                  isSelected && 'bg-blue-50/40 hover:bg-blue-50/60',
+                  isLocalSelected && 'bg-blue-50/40 hover:bg-blue-50/60',
                   isLowestPrice &&
                     'bg-emerald-50/30 hover:bg-emerald-50/50 border-l-4 border-l-emerald-500',
                 )}
               >
                 {canCreateList && (
-                  <TableCell className="px-2 py-2">
+                  <TableCell className="px-2 py-2 text-center">
                     <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={() => toggleProductSelection(product.id)}
-                      aria-label={`Select ${product.modelo}`}
+                      checked={isLocalSelected}
+                      onCheckedChange={() => onToggleSelection(product.id)}
+                      aria-label={`Selecionar ${product.modelo}`}
                     />
                   </TableCell>
                 )}
                 <TableCell className="font-medium py-2">
-                  <div className="flex flex-col">
-                    <span className="text-sm">{product.modelo}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">{product.modelo}</span>
+                      {isInDraft && (
+                        <span
+                          title="No Rascunho"
+                          className="text-emerald-600 bg-emerald-50 rounded-full p-0.5 flex-shrink-0"
+                        >
+                          <CheckCircle2 className="w-3 h-3" />
+                        </span>
+                      )}
+                    </div>
                     {isLowestPrice && (
                       <span className="text-[9px] text-emerald-600 font-bold leading-none mt-0.5">
                         ★ Melhor Preço

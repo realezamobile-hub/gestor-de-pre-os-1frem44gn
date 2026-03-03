@@ -10,6 +10,7 @@ import {
   Truck,
   Phone,
   Tag,
+  CheckCircle2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useProductStore } from '@/stores/useProductStore'
@@ -20,7 +21,10 @@ interface ProductMobileListProps {
   formatPrice: (value: number | null | undefined) => string
   onWhatsAppClick: (link?: string | null, phone?: string | null) => void
   canCreateList: boolean
-  toggleProductSelection: (id: number) => void
+  localSelectedIds: Set<number>
+  onToggleSelection: (id: number) => void
+  onSelectAll: (checked: boolean) => void
+  isAllSelected: boolean
 }
 
 export function ProductMobileList({
@@ -29,14 +33,42 @@ export function ProductMobileList({
   formatPrice,
   onWhatsAppClick,
   canCreateList,
-  toggleProductSelection,
+  localSelectedIds,
+  onToggleSelection,
+  onSelectAll,
+  isAllSelected,
 }: ProductMobileListProps) {
   const { selectedProductIds } = useProductStore()
 
   return (
     <div className="space-y-4 pb-20">
+      {canCreateList && products.length > 0 && (
+        <div className="flex items-center justify-between bg-white p-3 rounded-xl border shadow-sm">
+          <div className="flex items-center gap-3">
+            <Checkbox
+              checked={
+                isAllSelected
+                  ? true
+                  : localSelectedIds.size > 0
+                    ? 'indeterminate'
+                    : false
+              }
+              onCheckedChange={(c) => onSelectAll(!!c)}
+              id="select-all-mobile"
+            />
+            <label
+              htmlFor="select-all-mobile"
+              className="text-sm font-medium cursor-pointer"
+            >
+              Selecionar Todos
+            </label>
+          </div>
+        </div>
+      )}
+
       {products.map((product) => {
-        const isSelected = selectedProductIds.has(product.id)
+        const isLocalSelected = localSelectedIds.has(product.id)
+        const isInDraft = selectedProductIds.has(product.id)
         const isLowestPrice =
           product.valor !== null &&
           product.valor !== undefined &&
@@ -48,7 +80,8 @@ export function ProductMobileList({
             key={product.id}
             className={cn(
               'bg-white rounded-xl shadow-sm border p-4 transition-all relative overflow-hidden',
-              isSelected && 'ring-2 ring-primary border-primary bg-blue-50/20',
+              isLocalSelected &&
+                'ring-2 ring-primary border-primary bg-blue-50/20',
               isLowestPrice &&
                 'border-l-4 border-l-emerald-500 bg-emerald-50/10',
             )}
@@ -63,8 +96,8 @@ export function ProductMobileList({
               {canCreateList && (
                 <div className="pt-1">
                   <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => toggleProductSelection(product.id)}
+                    checked={isLocalSelected}
+                    onCheckedChange={() => onToggleSelection(product.id)}
                     className="h-5 w-5"
                   />
                 </div>
@@ -72,8 +105,16 @@ export function ProductMobileList({
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start gap-2 mb-1">
-                  <h3 className="font-bold text-gray-900 truncate pr-16">
+                  <h3 className="font-bold text-gray-900 truncate pr-16 flex items-center gap-1.5">
                     {product.modelo}
+                    {isInDraft && (
+                      <span
+                        title="No Rascunho"
+                        className="text-emerald-600 bg-emerald-50 rounded-full p-0.5 flex-shrink-0"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </span>
+                    )}
                   </h3>
                 </div>
 

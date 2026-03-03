@@ -1742,6 +1742,9 @@ section[aria-label='Notifications alt+T'] {
   --tw-border-opacity: 1;
   border-color: rgb(191 219 254 / var(--tw-border-opacity, 1));
 }
+.border-blue-200\/60{
+  border-color: rgb(191 219 254 / 0.6);
+}
 .border-border\/50{
   border-color: hsl(var(--border) / 0.5);
 }
@@ -1899,6 +1902,9 @@ section[aria-label='Notifications alt+T'] {
 .bg-blue-100{
   --tw-bg-opacity: 1;
   background-color: rgb(219 234 254 / var(--tw-bg-opacity, 1));
+}
+.bg-blue-100\/60{
+  background-color: rgb(219 234 254 / 0.6);
 }
 .bg-blue-50{
   --tw-bg-opacity: 1;
@@ -3288,6 +3294,10 @@ section[aria-label='Notifications alt+T'] {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
 }
+.hover\:text-blue-900:hover{
+  --tw-text-opacity: 1;
+  color: rgb(30 58 138 / var(--tw-text-opacity, 1));
+}
 .hover\:text-destructive:hover{
   color: hsl(var(--destructive));
 }
@@ -3451,6 +3461,9 @@ section[aria-label='Notifications alt+T'] {
 }
 .disabled\:cursor-not-allowed:disabled{
   cursor: not-allowed;
+}
+.disabled\:no-underline:disabled{
+  text-decoration-line: none;
 }
 .disabled\:opacity-50:disabled{
   opacity: 0.5;

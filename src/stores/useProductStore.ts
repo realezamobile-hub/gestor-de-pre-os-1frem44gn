@@ -39,6 +39,7 @@ interface ProductStore {
   resetFilters: () => void
   setPage: (page: number) => void
   fetchProducts: () => Promise<void>
+  fetchAllFilteredProducts: () => Promise<Product[]>
   fetchCategories: () => Promise<void>
 
   fetchDraftItems: () => Promise<void>
@@ -253,6 +254,49 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     } catch (e) {
       set({ products: [], total: 0, isLoading: false })
+    }
+  },
+
+  fetchAllFilteredProducts: async () => {
+    const { filters, hideZeroPrices } = get()
+    try {
+      let minDate = null
+      const today = startOfDay(new Date())
+
+      if (filters.dateRange === 'today') {
+        minDate = today.toISOString()
+      } else if (filters.dateRange === 'yesterday') {
+        minDate = subDays(today, 1).toISOString()
+      }
+
+      const rpcArgs: any = {
+        search_query: filters.search.trim() || null,
+        category_filters:
+          filters.categories.length > 0 ? filters.categories : null,
+        memory_filter: filters.memory !== 'all' ? filters.memory : null,
+        ram_filter: filters.ram !== 'all' ? filters.ram : null,
+        color_filter: filters.color !== 'all' ? filters.color : null,
+        condition_filter: null,
+        supplier_filter: filters.supplier.trim() || null,
+        battery_filter: null,
+        in_stock_only: false,
+        min_date: minDate,
+      }
+
+      let query = supabase.rpc('search_products', rpcArgs)
+
+      if (hideZeroPrices) {
+        query = query.gt('valor', 0)
+      }
+
+      const { data, error } = await query
+
+      if (!error && data) {
+        return data as unknown as Product[]
+      }
+      return []
+    } catch (e) {
+      return []
     }
   },
 

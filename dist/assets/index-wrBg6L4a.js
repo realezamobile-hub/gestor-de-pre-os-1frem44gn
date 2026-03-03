@@ -24954,9 +24954,9 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 			return x$2 === y$1 && (0 !== x$2 || 1 / x$2 === 1 / y$1) || x$2 !== x$2 && y$1 !== y$1;
 		}
 		"undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$13 = React$60.useRef, useEffect$30 = React$60.useEffect, useMemo$5 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
+		var React$60 = require_react(), shim = require_shim(), objectIs = "function" === typeof Object.is ? Object.is : is, useSyncExternalStore$1 = shim.useSyncExternalStore, useRef$14 = React$60.useRef, useEffect$30 = React$60.useEffect, useMemo$6 = React$60.useMemo, useDebugValue$1 = React$60.useDebugValue;
 		exports.useSyncExternalStoreWithSelector = function(subscribe$1, getSnapshot, getServerSnapshot, selector, isEqual$5) {
-			var instRef = useRef$13(null);
+			var instRef = useRef$14(null);
 			if (null === instRef.current) {
 				var inst = {
 					hasValue: !1,
@@ -24964,7 +24964,7 @@ var require_with_selector_development = /* @__PURE__ */ __commonJSMin(((exports)
 				};
 				instRef.current = inst;
 			} else inst = instRef.current;
-			instRef = useMemo$5(function() {
+			instRef = useMemo$6(function() {
 				function memoizedSelector(nextSnapshot) {
 					if (!hasMemo) {
 						hasMemo = !0;
@@ -40045,6 +40045,34 @@ const useProductStore = create((set, get$8) => ({
 			});
 		}
 	},
+	fetchAllFilteredProducts: async () => {
+		const { filters, hideZeroPrices } = get$8();
+		try {
+			let minDate = null;
+			const today = startOfDay(/* @__PURE__ */ new Date());
+			if (filters.dateRange === "today") minDate = today.toISOString();
+			else if (filters.dateRange === "yesterday") minDate = subDays(today, 1).toISOString();
+			const rpcArgs = {
+				search_query: filters.search.trim() || null,
+				category_filters: filters.categories.length > 0 ? filters.categories : null,
+				memory_filter: filters.memory !== "all" ? filters.memory : null,
+				ram_filter: filters.ram !== "all" ? filters.ram : null,
+				color_filter: filters.color !== "all" ? filters.color : null,
+				condition_filter: null,
+				supplier_filter: filters.supplier.trim() || null,
+				battery_filter: null,
+				in_stock_only: false,
+				min_date: minDate
+			};
+			let query = supabase.rpc("search_products", rpcArgs);
+			if (hideZeroPrices) query = query.gt("valor", 0);
+			const { data, error } = await query;
+			if (!error && data) return data;
+			return [];
+		} catch (e) {
+			return [];
+		}
+	},
 	fetchCategories: async () => {
 		const { data } = await supabase.from(VIEW_PRODUCTS).select("categoria").not("categoria", "is", null);
 		if (data) set({ categories: Array.from(new Set(data.map((item) => item.categoria).filter(Boolean))).sort() });
@@ -40497,7 +40525,7 @@ function ProductTable({ products, lowestPrice, formatPrice, onWhatsAppClick, can
 						className: "px-2 py-2 text-center",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
 							checked: isLocalSelected,
-							onCheckedChange: () => onToggleSelection(product.id),
+							onCheckedChange: () => onToggleSelection(product),
 							"aria-label": `Selecionar ${product.modelo}`
 						})
 					}),
@@ -40616,7 +40644,7 @@ function ProductMobileList({ products, lowestPrice, formatPrice, onWhatsAppClick
 						className: "pt-1",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
 							checked: isLocalSelected,
-							onCheckedChange: () => onToggleSelection(product.id),
+							onCheckedChange: () => onToggleSelection(product),
 							className: "h-5 w-5"
 						})
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40726,7 +40754,7 @@ function ProductList({ products, isLoading = false, localSelectedIds, onToggleSe
 			window.open(`https://wa.me/${cleanPhone}`, "_blank");
 		}
 	};
-	const isAllSelected = products.length > 0 && localSelectedIds.size === products.length;
+	const isAllPageSelected = products.length > 0 && products.every((p$1) => localSelectedIds.has(p$1.id));
 	if (isLoading) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "rounded-md border bg-white shadow-sm overflow-hidden p-4 space-y-4",
 		children: Array.from({ length: 10 }).map((_$1, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -40753,7 +40781,7 @@ function ProductList({ products, isLoading = false, localSelectedIds, onToggleSe
 		localSelectedIds,
 		onToggleSelection,
 		onSelectAll,
-		isAllSelected
+		isAllSelected: isAllPageSelected
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProductTable, {
 		products,
@@ -40764,7 +40792,7 @@ function ProductList({ products, isLoading = false, localSelectedIds, onToggleSe
 		localSelectedIds,
 		onToggleSelection,
 		onSelectAll,
-		isAllSelected
+		isAllSelected: isAllPageSelected
 	});
 }
 var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
@@ -42861,31 +42889,70 @@ function ProductPagination() {
 function DashboardPage() {
 	const navigate = useNavigate();
 	const { currentUser } = useAuthStore();
-	const { products, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, subscribeToProducts, setFilters, filters, draftItems, addToDraft } = useProductStore();
+	const { products, total, isLoading, fetchProducts, fetchFilterOptions, fetchDraftItems, fetchAllFilteredProducts, subscribeToProducts, setFilters, filters, draftItems, addToDraft } = useProductStore();
 	const [searchTerm, setSearchTerm] = (0, import_react.useState)(filters.search);
-	const [localSelectedIds, setLocalSelectedIds] = (0, import_react.useState)(/* @__PURE__ */ new Set());
+	const [selectedProductsMap, setSelectedProductsMap] = (0, import_react.useState)({});
+	const [isFetchingAll, setIsFetchingAll] = (0, import_react.useState)(false);
+	const prevFiltersRef = (0, import_react.useRef)(filters);
 	(0, import_react.useEffect)(() => {
-		setLocalSelectedIds(/* @__PURE__ */ new Set());
-	}, [products]);
-	const handleToggleSelection = (id) => {
-		setLocalSelectedIds((prev) => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
+		if (JSON.stringify(prevFiltersRef.current) !== JSON.stringify(filters)) {
+			setSelectedProductsMap({});
+			prevFiltersRef.current = filters;
+		}
+	}, [filters]);
+	const handleToggleSelection = (product) => {
+		setSelectedProductsMap((prev) => {
+			const next = { ...prev };
+			if (next[product.id]) delete next[product.id];
+			else next[product.id] = product;
 			return next;
 		});
 	};
 	const handleSelectAll = (checked) => {
-		if (checked) setLocalSelectedIds(new Set(products.map((p$1) => p$1.id)));
-		else setLocalSelectedIds(/* @__PURE__ */ new Set());
+		if (checked) setSelectedProductsMap((prev) => {
+			const next = { ...prev };
+			products.forEach((p$1) => {
+				next[p$1.id] = p$1;
+			});
+			return next;
+		});
+		else setSelectedProductsMap((prev) => {
+			const next = { ...prev };
+			products.forEach((p$1) => {
+				delete next[p$1.id];
+			});
+			return next;
+		});
 	};
-	const handleAddSelected = async () => {
-		const productsToAdd = products.filter((p$1) => localSelectedIds.has(p$1.id));
-		if (productsToAdd.length > 0) {
-			await addToDraft(productsToAdd);
-			setLocalSelectedIds(/* @__PURE__ */ new Set());
+	const handleSelectAllSearch = async () => {
+		setIsFetchingAll(true);
+		try {
+			const allProducts = await fetchAllFilteredProducts();
+			const next = {};
+			allProducts.forEach((p$1) => {
+				next[p$1.id] = p$1;
+			});
+			setSelectedProductsMap(next);
+		} catch (error) {
+			toast.error("Erro ao selecionar todos os produtos da pesquisa");
+		} finally {
+			setIsFetchingAll(false);
 		}
 	};
+	const handleClearSelection = () => {
+		setSelectedProductsMap({});
+	};
+	const handleAddSelected = async () => {
+		const productsToAdd = Object.values(selectedProductsMap);
+		if (productsToAdd.length > 0) {
+			await addToDraft(productsToAdd);
+			setSelectedProductsMap({});
+		}
+	};
+	const localSelectedIds = (0, import_react.useMemo)(() => new Set(Object.keys(selectedProductsMap).map(Number)), [selectedProductsMap]);
+	const selectedCount = Object.keys(selectedProductsMap).length;
+	const isAllOnPageSelected = products.length > 0 && products.every((p$1) => selectedProductsMap[p$1.id]);
+	const isAllInSearchSelected = selectedCount === total && total > 0;
 	(0, import_react.useEffect)(() => {
 		setSearchTerm(filters.search);
 	}, [filters.search]);
@@ -42950,20 +43017,58 @@ function DashboardPage() {
 					})]
 				})
 			}),
-			localSelectedIds.size > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "shrink-0 bg-blue-50 border-b border-blue-100 px-4 py-2 flex items-center justify-between z-10 animate-in fade-in slide-in-from-top-2 duration-300",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-					className: "text-sm font-medium text-blue-800",
-					children: [
-						localSelectedIds.size,
-						" ",
-						localSelectedIds.size === 1 ? "produto selecionado" : "produtos selecionados"
-					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					size: "sm",
-					onClick: handleAddSelected,
-					className: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4 mr-2" }), "Adicionar Selecionados"]
+			selectedCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "shrink-0 bg-blue-50 border-b border-blue-100 flex flex-col z-10 animate-in fade-in slide-in-from-top-2 duration-300",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "px-4 py-2 flex items-center justify-between",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "text-sm font-medium text-blue-800",
+						children: [
+							selectedCount,
+							" ",
+							selectedCount === 1 ? "produto selecionado" : "produtos selecionados"
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						size: "sm",
+						onClick: handleAddSelected,
+						className: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "w-4 h-4 mr-2" }), "Adicionar Selecionados"]
+					})]
+				}), isAllOnPageSelected && total > products.length && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "bg-blue-100/60 px-4 py-2 flex items-center justify-center text-sm text-blue-900 border-t border-blue-200/60",
+					children: isAllInSearchSelected ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "text-center",
+						children: [
+							"Todos os ",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-bold",
+								children: total
+							}),
+							" produtos desta pesquisa estão selecionados.",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+								onClick: handleClearSelection,
+								className: "ml-2 font-semibold text-blue-700 hover:text-blue-900 hover:underline",
+								children: "Limpar seleção"
+							})
+						]
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "text-center",
+						children: [
+							"Todos os ",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-bold",
+								children: products.length
+							}),
+							" ",
+							"produtos desta página estão selecionados.",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+								onClick: handleSelectAllSearch,
+								disabled: isFetchingAll,
+								className: "ml-2 font-semibold text-blue-700 hover:text-blue-900 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed",
+								children: isFetchingAll ? "Selecionando..." : `Selecionar todos os ${total} produtos desta pesquisa`
+							})
+						]
+					})
 				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -77095,4 +77200,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-BdHopPol.js.map
+//# sourceMappingURL=index-wrBg6L4a.js.map

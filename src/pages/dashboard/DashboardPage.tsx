@@ -8,17 +8,21 @@ import { useProductStore } from '@/stores/useProductStore'
 import { useDebounce } from '@/hooks/use-debounce'
 import { Search, ListChecks, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { Product } from '@/types'
+import { toast } from 'sonner'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { currentUser } = useAuthStore()
   const {
     products,
+    total,
     isLoading,
     fetchProducts,
     fetchFilterOptions,
     fetchDraftItems,
+    fetchAllFilteredProducts,
     subscribeToProducts,
     setFilters,
     filters,
@@ -27,39 +31,90 @@ export default function DashboardPage() {
   } = useProductStore()
   const [searchTerm, setSearchTerm] = useState(filters.search)
 
-  const [localSelectedIds, setLocalSelectedIds] = useState<Set<number>>(
-    new Set(),
-  )
+  const [selectedProductsMap, setSelectedProductsMap] = useState<
+    Record<number, Product>
+  >({})
+  const [isFetchingAll, setIsFetchingAll] = useState(false)
 
-  // Clear local selection when products change (e.g. search/pagination changes)
+  const prevFiltersRef = useRef(filters)
+
+  // Clear local selection when filters actually change
   useEffect(() => {
-    setLocalSelectedIds(new Set())
-  }, [products])
+    if (JSON.stringify(prevFiltersRef.current) !== JSON.stringify(filters)) {
+      setSelectedProductsMap({})
+      prevFiltersRef.current = filters
+    }
+  }, [filters])
 
-  const handleToggleSelection = (id: number) => {
-    setLocalSelectedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+  const handleToggleSelection = (product: Product) => {
+    setSelectedProductsMap((prev) => {
+      const next = { ...prev }
+      if (next[product.id]) {
+        delete next[product.id]
+      } else {
+        next[product.id] = product
+      }
       return next
     })
   }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setLocalSelectedIds(new Set(products.map((p) => p.id)))
+      setSelectedProductsMap((prev) => {
+        const next = { ...prev }
+        products.forEach((p) => {
+          next[p.id] = p
+        })
+        return next
+      })
     } else {
-      setLocalSelectedIds(new Set())
+      setSelectedProductsMap((prev) => {
+        const next = { ...prev }
+        products.forEach((p) => {
+          delete next[p.id]
+        })
+        return next
+      })
     }
   }
 
-  const handleAddSelected = async () => {
-    const productsToAdd = products.filter((p) => localSelectedIds.has(p.id))
-    if (productsToAdd.length > 0) {
-      await addToDraft(productsToAdd)
-      setLocalSelectedIds(new Set())
+  const handleSelectAllSearch = async () => {
+    setIsFetchingAll(true)
+    try {
+      const allProducts = await fetchAllFilteredProducts()
+      const next: Record<number, Product> = {}
+      allProducts.forEach((p) => {
+        next[p.id] = p
+      })
+      setSelectedProductsMap(next)
+    } catch (error) {
+      toast.error('Erro ao selecionar todos os produtos da pesquisa')
+    } finally {
+      setIsFetchingAll(false)
     }
   }
+
+  const handleClearSelection = () => {
+    setSelectedProductsMap({})
+  }
+
+  const handleAddSelected = async () => {
+    const productsToAdd = Object.values(selectedProductsMap)
+    if (productsToAdd.length > 0) {
+      await addToDraft(productsToAdd)
+      setSelectedProductsMap({})
+    }
+  }
+
+  const localSelectedIds = useMemo(
+    () => new Set(Object.keys(selectedProductsMap).map(Number)),
+    [selectedProductsMap],
+  )
+
+  const selectedCount = Object.keys(selectedProductsMap).length
+  const isAllOnPageSelected =
+    products.length > 0 && products.every((p) => selectedProductsMap[p.id])
+  const isAllInSearchSelected = selectedCount === total && total > 0
 
   // Sync internal state with store state if it changes externally (e.g. Clear Filters)
   useEffect(() => {
@@ -135,22 +190,56 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {localSelectedIds.size > 0 && (
-        <div className="shrink-0 bg-blue-50 border-b border-blue-100 px-4 py-2 flex items-center justify-between z-10 animate-in fade-in slide-in-from-top-2 duration-300">
-          <span className="text-sm font-medium text-blue-800">
-            {localSelectedIds.size}{' '}
-            {localSelectedIds.size === 1
-              ? 'produto selecionado'
-              : 'produtos selecionados'}
-          </span>
-          <Button
-            size="sm"
-            onClick={handleAddSelected}
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Selecionados
-          </Button>
+      {selectedCount > 0 && (
+        <div className="shrink-0 bg-blue-50 border-b border-blue-100 flex flex-col z-10 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="px-4 py-2 flex items-center justify-between">
+            <span className="text-sm font-medium text-blue-800">
+              {selectedCount}{' '}
+              {selectedCount === 1
+                ? 'produto selecionado'
+                : 'produtos selecionados'}
+            </span>
+            <Button
+              size="sm"
+              onClick={handleAddSelected}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Selecionados
+            </Button>
+          </div>
+
+          {/* Global Selection Banner */}
+          {isAllOnPageSelected && total > products.length && (
+            <div className="bg-blue-100/60 px-4 py-2 flex items-center justify-center text-sm text-blue-900 border-t border-blue-200/60">
+              {isAllInSearchSelected ? (
+                <div className="text-center">
+                  Todos os <span className="font-bold">{total}</span> produtos
+                  desta pesquisa estão selecionados.
+                  <button
+                    onClick={handleClearSelection}
+                    className="ml-2 font-semibold text-blue-700 hover:text-blue-900 hover:underline"
+                  >
+                    Limpar seleção
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center">
+                  Todos os <span className="font-bold">{products.length}</span>{' '}
+                  produtos desta página estão selecionados.
+                  <button
+                    onClick={handleSelectAllSearch}
+                    disabled={isFetchingAll}
+                    className="ml-2 font-semibold text-blue-700 hover:text-blue-900 hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+                  >
+                    {isFetchingAll
+                      ? 'Selecionando...'
+                      : `Selecionar todos os ${total} produtos desta pesquisa`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

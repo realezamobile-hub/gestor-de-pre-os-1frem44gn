@@ -21,7 +21,7 @@ interface ProductTableProps {
   onWhatsAppClick: (link?: string | null, phone?: string | null) => void
   canCreateList: boolean
   localSelectedIds: Set<number>
-  onToggleSelection: (id: number) => void
+  onToggleSelection: (product: Product) => void
   onSelectAll: (checked: boolean) => void
   isAllSelected: boolean
 }
@@ -98,7 +98,7 @@ export function ProductTable({
                   <TableCell className="px-2 py-2 text-center">
                     <Checkbox
                       checked={isLocalSelected}
-                      onCheckedChange={() => onToggleSelection(product.id)}
+                      onCheckedChange={() => onToggleSelection(product)}
                       aria-label={`Selecionar ${product.modelo}`}
                     />
                   </TableCell>

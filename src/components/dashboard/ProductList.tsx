@@ -9,7 +9,7 @@ interface ProductListProps {
   products: Product[]
   isLoading?: boolean
   localSelectedIds: Set<number>
-  onToggleSelection: (id: number) => void
+  onToggleSelection: (product: Product) => void
   onSelectAll: (checked: boolean) => void
 }
 
@@ -49,8 +49,8 @@ export function ProductList({
     }
   }
 
-  const isAllSelected =
-    products.length > 0 && localSelectedIds.size === products.length
+  const isAllPageSelected =
+    products.length > 0 && products.every((p) => localSelectedIds.has(p.id))
 
   if (isLoading) {
     return (
@@ -87,7 +87,7 @@ export function ProductList({
         localSelectedIds={localSelectedIds}
         onToggleSelection={onToggleSelection}
         onSelectAll={onSelectAll}
-        isAllSelected={isAllSelected}
+        isAllSelected={isAllPageSelected}
       />
     )
   }
@@ -102,7 +102,7 @@ export function ProductList({
       localSelectedIds={localSelectedIds}
       onToggleSelection={onToggleSelection}
       onSelectAll={onSelectAll}
-      isAllSelected={isAllSelected}
+      isAllSelected={isAllPageSelected}
     />
   )
 }

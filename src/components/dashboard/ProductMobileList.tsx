@@ -22,7 +22,7 @@ interface ProductMobileListProps {
   onWhatsAppClick: (link?: string | null, phone?: string | null) => void
   canCreateList: boolean
   localSelectedIds: Set<number>
-  onToggleSelection: (id: number) => void
+  onToggleSelection: (product: Product) => void
   onSelectAll: (checked: boolean) => void
   isAllSelected: boolean
 }
@@ -97,7 +97,7 @@ export function ProductMobileList({
                 <div className="pt-1">
                   <Checkbox
                     checked={isLocalSelected}
-                    onCheckedChange={() => onToggleSelection(product.id)}
+                    onCheckedChange={() => onToggleSelection(product)}
                     className="h-5 w-5"
                   />
                 </div>

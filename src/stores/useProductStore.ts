@@ -48,6 +48,7 @@ interface ProductStore {
   updateDraftItem: (id: string, updates: Partial<DraftItem>) => Promise<void>
   clearDraft: () => Promise<void>
   applyMarkupToAll: (markup: number) => Promise<void>
+  optimizeDraftByLowestPrice: () => Promise<void>
 
   fetchGeneratedLists: () => Promise<void>
   deleteGeneratedList: (id: string) => Promise<void>
@@ -491,6 +492,82 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       await get().fetchDraftItems()
     } else {
       toast.success(`Adicionado R$${markup} ao preço de todos os itens`)
+    }
+    set({ isLoading: false })
+  },
+
+  optimizeDraftByLowestPrice: async () => {
+    const { draftItems } = get()
+    if (draftItems.length === 0) return
+
+    set({ isLoading: true })
+
+    const grouped = new Map<string, DraftItem[]>()
+    draftItems.forEach((item) => {
+      let model = item.custom_model
+      if (!model && item.product) {
+        model = [
+          item.product.modelo,
+          item.product.memoria,
+          item.product.ram ? `${item.product.ram} RAM` : null,
+          item.product.cor,
+        ]
+          .filter(Boolean)
+          .join(' ')
+      }
+      model = (model || 'Produto sem descrição').trim().toLowerCase()
+      const group = (item.group_name || item.product?.categoria || 'Outros')
+        .trim()
+        .toLowerCase()
+      const details = (item.custom_details || '').trim().toLowerCase()
+
+      const key = `${group}|${model}|${details}`
+
+      if (!grouped.has(key)) grouped.set(key, [])
+      grouped.get(key)!.push(item)
+    })
+
+    const itemsToRemove: string[] = []
+
+    grouped.forEach((items) => {
+      if (items.length > 1) {
+        items.sort((a, b) => {
+          const priceA =
+            a.custom_price !== null && a.custom_price !== undefined
+              ? a.custom_price
+              : (a.product?.valor ?? Infinity)
+          const priceB =
+            b.custom_price !== null && b.custom_price !== undefined
+              ? b.custom_price
+              : (b.product?.valor ?? Infinity)
+          return priceA - priceB
+        })
+
+        for (let i = 1; i < items.length; i++) {
+          itemsToRemove.push(items[i].id)
+        }
+      }
+    })
+
+    if (itemsToRemove.length === 0) {
+      toast.info('Nenhum item duplicado encontrado para otimização.')
+      set({ isLoading: false })
+      return
+    }
+
+    const { error } = await supabase
+      .from('whatsapp_draft_items')
+      .delete()
+      .in('id', itemsToRemove)
+
+    if (error) {
+      console.error('Error removing duplicates:', error)
+      toast.error('Erro ao otimizar a lista.')
+    } else {
+      const newItems = draftItems.filter((i) => !itemsToRemove.includes(i.id))
+      const newIds = new Set(newItems.map((i) => i.product_id).filter(Boolean))
+      set({ draftItems: newItems as any, selectedProductIds: newIds as any })
+      toast.success(`${itemsToRemove.length} iten(s) duplicado(s) removido(s)!`)
     }
     set({ isLoading: false })
   },

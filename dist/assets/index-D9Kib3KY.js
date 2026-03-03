@@ -20000,6 +20000,40 @@ var Users = createLucideIcon("users", [
 		key: "nufk8"
 	}]
 ]);
+var WandSparkles = createLucideIcon("wand-sparkles", [
+	["path", {
+		d: "m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72",
+		key: "ul74o6"
+	}],
+	["path", {
+		d: "m14 7 3 3",
+		key: "1r5n42"
+	}],
+	["path", {
+		d: "M5 6v4",
+		key: "ilb8ba"
+	}],
+	["path", {
+		d: "M19 14v4",
+		key: "blhpug"
+	}],
+	["path", {
+		d: "M10 2v2",
+		key: "7u0qdc"
+	}],
+	["path", {
+		d: "M7 8H3",
+		key: "zfb6yr"
+	}],
+	["path", {
+		d: "M21 16h-4",
+		key: "1cnmox"
+	}],
+	["path", {
+		d: "M11 3H9",
+		key: "1obp7u"
+	}]
+]);
 var Wrench = createLucideIcon("wrench", [["path", {
 	d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z",
 	key: "1ngwbx"
@@ -39835,6 +39869,54 @@ const useProductStore = create((set, get$8) => ({
 		} else toast.success(`Adicionado R$${markup} ao preço de todos os itens`);
 		set({ isLoading: false });
 	},
+	optimizeDraftByLowestPrice: async () => {
+		const { draftItems } = get$8();
+		if (draftItems.length === 0) return;
+		set({ isLoading: true });
+		const grouped = /* @__PURE__ */ new Map();
+		draftItems.forEach((item) => {
+			let model = item.custom_model;
+			if (!model && item.product) model = [
+				item.product.modelo,
+				item.product.memoria,
+				item.product.ram ? `${item.product.ram} RAM` : null,
+				item.product.cor
+			].filter(Boolean).join(" ");
+			model = (model || "Produto sem descrição").trim().toLowerCase();
+			const group = (item.group_name || item.product?.categoria || "Outros").trim().toLowerCase();
+			const details = (item.custom_details || "").trim().toLowerCase();
+			const key = `${group}|${model}|${details}`;
+			if (!grouped.has(key)) grouped.set(key, []);
+			grouped.get(key).push(item);
+		});
+		const itemsToRemove = [];
+		grouped.forEach((items) => {
+			if (items.length > 1) {
+				items.sort((a$1, b$1) => {
+					return (a$1.custom_price !== null && a$1.custom_price !== void 0 ? a$1.custom_price : a$1.product?.valor ?? Infinity) - (b$1.custom_price !== null && b$1.custom_price !== void 0 ? b$1.custom_price : b$1.product?.valor ?? Infinity);
+				});
+				for (let i = 1; i < items.length; i++) itemsToRemove.push(items[i].id);
+			}
+		});
+		if (itemsToRemove.length === 0) {
+			toast.info("Nenhum item duplicado encontrado para otimização.");
+			set({ isLoading: false });
+			return;
+		}
+		const { error } = await supabase.from("whatsapp_draft_items").delete().in("id", itemsToRemove);
+		if (error) {
+			console.error("Error removing duplicates:", error);
+			toast.error("Erro ao otimizar a lista.");
+		} else {
+			const newItems = draftItems.filter((i) => !itemsToRemove.includes(i.id));
+			set({
+				draftItems: newItems,
+				selectedProductIds: new Set(newItems.map((i) => i.product_id).filter(Boolean))
+			});
+			toast.success(`${itemsToRemove.length} iten(s) duplicado(s) removido(s)!`);
+		}
+		set({ isLoading: false });
+	},
 	fetchGeneratedLists: async () => {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
@@ -46317,7 +46399,7 @@ function GeneratorHistory() {
 	})] });
 }
 function ListGeneratorPage() {
-	const { draftItems, fetchDraftItems, removeFromDraft, updateDraftItem, clearDraft, fetchCategories, saveGeneratedList, applyMarkupToAll, fetchGeneratedLists } = useProductStore();
+	const { draftItems, fetchDraftItems, removeFromDraft, updateDraftItem, clearDraft, fetchCategories, saveGeneratedList, applyMarkupToAll, fetchGeneratedLists, optimizeDraftByLowestPrice } = useProductStore();
 	const { currentUser } = useAuthStore();
 	const [config, setConfig] = (0, import_react.useState)({
 		header: `🔥 *OFERTAS DO DIA - ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}* 🔥\n\n`,
@@ -46487,6 +46569,10 @@ function ListGeneratorPage() {
 		await applyMarkupToAll(markup);
 		setTriggerRefresh(true);
 	};
+	const handleOptimize = async () => {
+		await optimizeDraftByLowestPrice();
+		setTriggerRefresh(true);
+	};
 	const handleClear = async () => {
 		await clearDraft();
 		setCustomerText("");
@@ -46588,15 +46674,25 @@ function ListGeneratorPage() {
 										className: "text-xs bg-white px-2 py-1 rounded border font-normal",
 										children: [draftItems.length, " itens"]
 									})]
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									variant: isSorted ? "default" : "outline",
-									size: "sm",
-									onClick: () => {
-										setIsSorted(!isSorted);
-										setTriggerRefresh(true);
-									},
-									className: "h-7 text-xs",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownAZ, { className: "w-3 h-3 mr-1.5" }), isSorted ? "Ordenado" : "Ordenar AZ"]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex items-center gap-2",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+										variant: "outline",
+										size: "sm",
+										onClick: handleOptimize,
+										disabled: draftItems.length === 0 || isSaving,
+										className: "h-7 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(WandSparkles, { className: "w-3 h-3 mr-1.5" }), "Otimizar Menor Preço"]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+										variant: isSorted ? "default" : "outline",
+										size: "sm",
+										onClick: () => {
+											setIsSorted(!isSorted);
+											setTriggerRefresh(true);
+										},
+										className: "h-7 text-xs",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowDownAZ, { className: "w-3 h-3 mr-1.5" }), isSorted ? "Ordenado" : "Ordenar AZ"]
+									})]
 								})]
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
 								className: "p-4 flex-1 overflow-hidden bg-gray-50/30",
@@ -76869,4 +76965,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-D-FNeQcb.js.map
+//# sourceMappingURL=index-D9Kib3KY.js.map

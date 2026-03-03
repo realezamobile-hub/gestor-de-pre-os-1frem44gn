@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Smile,
   ArrowDownAZ,
+  Wand2,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -51,6 +52,7 @@ export default function ListGeneratorPage() {
     saveGeneratedList,
     applyMarkupToAll,
     fetchGeneratedLists,
+    optimizeDraftByLowestPrice,
   } = useProductStore()
 
   const { currentUser } = useAuthStore()
@@ -290,6 +292,11 @@ export default function ListGeneratorPage() {
     setTriggerRefresh(true)
   }
 
+  const handleOptimize = async () => {
+    await optimizeDraftByLowestPrice()
+    setTriggerRefresh(true)
+  }
+
   const handleClear = async () => {
     await clearDraft()
     setCustomerText('')
@@ -418,18 +425,30 @@ export default function ListGeneratorPage() {
                   {draftItems.length} itens
                 </span>
               </CardTitle>
-              <Button
-                variant={isSorted ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  setIsSorted(!isSorted)
-                  setTriggerRefresh(true)
-                }}
-                className="h-7 text-xs"
-              >
-                <ArrowDownAZ className="w-3 h-3 mr-1.5" />
-                {isSorted ? 'Ordenado' : 'Ordenar AZ'}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOptimize}
+                  disabled={draftItems.length === 0 || isSaving}
+                  className="h-7 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                >
+                  <Wand2 className="w-3 h-3 mr-1.5" />
+                  Otimizar Menor Preço
+                </Button>
+                <Button
+                  variant={isSorted ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setIsSorted(!isSorted)
+                    setTriggerRefresh(true)
+                  }}
+                  className="h-7 text-xs"
+                >
+                  <ArrowDownAZ className="w-3 h-3 mr-1.5" />
+                  {isSorted ? 'Ordenado' : 'Ordenar AZ'}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-4 flex-1 overflow-hidden bg-gray-50/30">
               <DraftListGrouped

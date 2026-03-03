@@ -29,6 +29,7 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     address: '',
     rg: '',
@@ -64,7 +65,6 @@ export default function RegisterPage() {
         setCropImage(reader.result as string)
       }
       reader.readAsDataURL(file)
-      // Reset input
       e.target.value = ''
     }
   }
@@ -72,13 +72,13 @@ export default function RegisterPage() {
   const handleCropComplete = (blob: Blob) => {
     const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
     setAvatarFile(file)
-    setFormData((prev) => ({ ...prev, avatarUrl: '' })) // Clear preset if custom file
+    setFormData((prev) => ({ ...prev, avatarUrl: '' }))
     setCropImage(null)
   }
 
   const handlePresetSelect = (url: string) => {
     setFormData((prev) => ({ ...prev, avatarUrl: url }))
-    setAvatarFile(null) // Clear custom file if preset
+    setAvatarFile(null)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +88,25 @@ export default function RegisterPage() {
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (step === 1) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(formData.email)) {
+        toast.error('Por favor, insira um email válido.')
+        return
+      }
+
+      if (formData.password.length < 6) {
+        toast.error('A senha deve ter pelo menos 6 caracteres.')
+        return
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        toast.error('As senhas não coincidem.')
+        return
+      }
+    }
+
     setStep((prev) => prev + 1)
   }
 
@@ -100,15 +119,21 @@ export default function RegisterPage() {
     setLocalLoading(true)
 
     try {
+      const { confirmPassword, ...submitData } = formData
       const result = await register({
-        ...formData,
+        ...submitData,
         avatarFile,
       })
+
       if (result.success) {
         toast.success('Cadastro realizado com sucesso!')
         navigate('/pending')
       } else {
-        toast.error(result.error?.message || 'Erro ao cadastrar')
+        let errorMsg = result.error?.message || 'Erro ao cadastrar'
+        if (errorMsg.toLowerCase().includes('already registered')) {
+          errorMsg = 'Este email já está cadastrado em nossa base.'
+        }
+        toast.error(errorMsg)
       }
     } catch (error) {
       toast.error('Erro ao realizar cadastro')
@@ -160,7 +185,6 @@ export default function RegisterPage() {
                 ? 'Documentação e Endereço'
                 : 'Foto de Perfil'}
           </CardDescription>
-          {/* Step Indicator */}
           <div className="flex justify-center gap-2 mt-4">
             {[1, 2, 3].map((i) => (
               <div
@@ -194,15 +218,27 @@ export default function RegisterPage() {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      required
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">WhatsApp</Label>

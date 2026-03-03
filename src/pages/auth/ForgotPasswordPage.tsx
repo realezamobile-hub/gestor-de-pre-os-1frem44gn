@@ -12,8 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
-import { Loader2, ArrowLeft, Mail } from 'lucide-react'
+import { Loader2, ArrowLeft, Mail, Info } from 'lucide-react'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -23,18 +24,22 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email) return
+
     setIsLoading(true)
 
     try {
       const result = await resetPasswordForEmail(email)
+      setIsSent(true)
+
       if (result.success) {
-        setIsSent(true)
-        toast.success('Email de recuperação enviado!')
+        toast.success('Solicitação processada com sucesso!')
       } else {
-        toast.error(result.error?.message || 'Erro ao enviar email')
+        // Prevent email enumeration attacks by silently logging the error
+        console.error('Password reset error:', result.error)
       }
     } catch (error) {
-      toast.error('Erro inesperado')
+      toast.error('Erro inesperado ao solicitar recuperação')
     } finally {
       setIsLoading(false)
     }
@@ -55,14 +60,18 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent>
           {isSent ? (
-            <div className="text-center space-y-4 py-4">
+            <div className="text-center space-y-6 py-4">
               <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                 <Mail className="w-8 h-8 text-blue-600" />
               </div>
-              <p className="text-sm text-gray-600">
-                Enviamos um email para <strong>{email}</strong> com instruções
-                para redefinir sua senha.
-              </p>
+              <Alert className="bg-blue-50 border-blue-200 text-blue-800 text-left flex items-start">
+                <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+                <AlertDescription className="ml-2 leading-relaxed text-sm">
+                  Se o e-mail <strong>{email}</strong> existir em nossa base, um
+                  link de recuperação será enviado com as instruções para
+                  redefinir sua senha.
+                </AlertDescription>
+              </Alert>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

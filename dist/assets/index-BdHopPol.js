@@ -19468,6 +19468,22 @@ var Image$1 = createLucideIcon("image", [
 		key: "1xmnt7"
 	}]
 ]);
+var Info = createLucideIcon("info", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M12 16v-4",
+		key: "1dtifu"
+	}],
+	["path", {
+		d: "M12 8h.01",
+		key: "e9boi3"
+	}]
+]);
 var Italic = createLucideIcon("italic", [
 	["line", {
 		x1: "19",
@@ -37358,6 +37374,7 @@ function RegisterPage() {
 		name: "",
 		email: "",
 		password: "",
+		confirmPassword: "",
 		phone: "",
 		address: "",
 		rg: "",
@@ -37422,6 +37439,20 @@ function RegisterPage() {
 	};
 	const handleNext = (e) => {
 		e.preventDefault();
+		if (step === 1) {
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+				toast.error("Por favor, insira um email válido.");
+				return;
+			}
+			if (formData.password.length < 6) {
+				toast.error("A senha deve ter pelo menos 6 caracteres.");
+				return;
+			}
+			if (formData.password !== formData.confirmPassword) {
+				toast.error("As senhas não coincidem.");
+				return;
+			}
+		}
 		setStep((prev) => prev + 1);
 	};
 	const handleBack = () => {
@@ -37431,14 +37462,19 @@ function RegisterPage() {
 		e.preventDefault();
 		setLocalLoading(true);
 		try {
+			const { confirmPassword, ...submitData } = formData;
 			const result = await register({
-				...formData,
+				...submitData,
 				avatarFile
 			});
 			if (result.success) {
 				toast.success("Cadastro realizado com sucesso!");
 				navigate("/pending");
-			} else toast.error(result.error?.message || "Erro ao cadastrar");
+			} else {
+				let errorMsg = result.error?.message || "Erro ao cadastrar";
+				if (errorMsg.toLowerCase().includes("already registered")) errorMsg = "Este email já está cadastrado em nossa base.";
+				toast.error(errorMsg);
+			}
 		} catch (error) {
 			toast.error("Erro ao realizar cadastro");
 		} finally {
@@ -37516,16 +37552,31 @@ function RegisterPage() {
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-2",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-										htmlFor: "password",
-										children: "Senha"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-										id: "password",
-										type: "password",
-										required: true,
-										value: formData.password,
-										onChange: handleChange
+									className: "grid grid-cols-1 sm:grid-cols-2 gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "password",
+											children: "Senha"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "password",
+											type: "password",
+											required: true,
+											value: formData.password,
+											onChange: handleChange
+										})]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "space-y-2",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+											htmlFor: "confirmPassword",
+											children: "Confirmar Senha"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+											id: "confirmPassword",
+											type: "password",
+											required: true,
+											value: formData.confirmPassword,
+											onChange: handleChange
+										})]
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -37725,6 +37776,32 @@ function RegisterPage() {
 		})]
 	});
 }
+var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
+	variants: { variant: {
+		default: "bg-background text-foreground",
+		destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
+	} },
+	defaultVariants: { variant: "default" }
+});
+var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	ref,
+	role: "alert",
+	className: cn(alertVariants({ variant }), className),
+	...props
+}));
+Alert.displayName = "Alert";
+var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
+	ref,
+	className: cn("mb-1 font-medium leading-none tracking-tight", className),
+	...props
+}));
+AlertTitle.displayName = "AlertTitle";
+var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	ref,
+	className: cn("text-sm [&_p]:leading-relaxed", className),
+	...props
+}));
+AlertDescription.displayName = "AlertDescription";
 function ForgotPasswordPage() {
 	const [email, setEmail] = (0, import_react.useState)("");
 	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
@@ -37732,15 +37809,15 @@ function ForgotPasswordPage() {
 	const { resetPasswordForEmail } = useAuthStore();
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!email) return;
 		setIsLoading(true);
 		try {
 			const result = await resetPasswordForEmail(email);
-			if (result.success) {
-				setIsSent(true);
-				toast.success("Email de recuperação enviado!");
-			} else toast.error(result.error?.message || "Erro ao enviar email");
+			setIsSent(true);
+			if (result.success) toast.success("Solicitação processada com sucesso!");
+			else console.error("Password reset error:", result.error);
 		} catch (error) {
-			toast.error("Erro inesperado");
+			toast.error("Erro inesperado ao solicitar recuperação");
 		} finally {
 			setIsLoading(false);
 		}
@@ -37761,17 +37838,20 @@ function ForgotPasswordPage() {
 					})]
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, { children: isSent ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "text-center space-y-4 py-4",
+					className: "text-center space-y-6 py-4",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center",
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, { className: "w-8 h-8 text-blue-600" })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-						className: "text-sm text-gray-600",
-						children: [
-							"Enviamos um email para ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: email }),
-							" com instruções para redefinir sua senha."
-						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Alert, {
+						className: "bg-blue-50 border-blue-200 text-blue-800 text-left flex items-start",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Info, { className: "w-4 h-4 text-blue-600 mt-0.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AlertDescription, {
+							className: "ml-2 leading-relaxed text-sm",
+							children: [
+								"Se o e-mail ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: email }),
+								" existir em nossa base, um link de recuperação será enviado com as instruções para redefinir sua senha."
+							]
+						})]
 					})]
 				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
 					onSubmit: handleSubmit,
@@ -47479,32 +47559,6 @@ function DomainSettings() {
 		})] })
 	});
 }
-var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
-	variants: { variant: {
-		default: "bg-background text-foreground",
-		destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
-	} },
-	defaultVariants: { variant: "default" }
-});
-var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	ref,
-	role: "alert",
-	className: cn(alertVariants({ variant }), className),
-	...props
-}));
-Alert.displayName = "Alert";
-var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
-	ref,
-	className: cn("mb-1 font-medium leading-none tracking-tight", className),
-	...props
-}));
-AlertTitle.displayName = "AlertTitle";
-var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	ref,
-	className: cn("text-sm [&_p]:leading-relaxed", className),
-	...props
-}));
-AlertDescription.displayName = "AlertDescription";
 function SupplierBlacklist() {
 	const { excludedSuppliers, fetchExcludedSuppliers, addExcludedSupplier, removeExcludedSupplier } = useProductStore();
 	const [newName, setNewName] = (0, import_react.useState)("");
@@ -77041,4 +77095,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-CHdRc0rK.js.map
+//# sourceMappingURL=index-BdHopPol.js.map

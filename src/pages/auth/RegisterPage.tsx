@@ -18,6 +18,38 @@ import { Loader2, Upload, Camera, ArrowRight, ArrowLeft } from 'lucide-react'
 import { ImageCropper } from '@/components/common/ImageCropper'
 import { AvatarSelection } from '@/components/common/AvatarSelection'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+const registerSchema = z
+  .object({
+    name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
+    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+    confirmPassword: z.string().min(1, 'Confirme sua senha'),
+    phone: z.string().min(10, 'Telefone inválido'),
+    address: z.string().min(5, 'Endereço obrigatório'),
+    rg: z.string().min(5, 'RG obrigatório'),
+    cpf: z.string().min(11, 'CPF obrigatório'),
+    emergencyContactName: z.string().min(2, 'Nome do contato obrigatório'),
+    emergencyContactPhone: z.string().min(10, 'Telefone do contato inválido'),
+    avatarUrl: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'As senhas não coincidem',
+    path: ['confirmPassword'],
+  })
+
+type RegisterFormValues = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -25,23 +57,27 @@ export default function RegisterPage() {
   const [localLoading, setLocalLoading] = useState(false)
   const [step, setStep] = useState(1)
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    address: '',
-    rg: '',
-    cpf: '',
-    emergencyContactName: '',
-    emergencyContactPhone: '',
-    avatarUrl: '',
-  })
-
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [cropImage, setCropImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      address: '',
+      rg: '',
+      cpf: '',
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      avatarUrl: '',
+    },
+    mode: 'onTouched',
+  })
 
   useEffect(() => {
     if (!isLoading && currentUser) {
@@ -72,54 +108,50 @@ export default function RegisterPage() {
   const handleCropComplete = (blob: Blob) => {
     const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' })
     setAvatarFile(file)
-    setFormData((prev) => ({ ...prev, avatarUrl: '' }))
+    form.setValue('avatarUrl', '')
     setCropImage(null)
   }
 
   const handlePresetSelect = (url: string) => {
-    setFormData((prev) => ({ ...prev, avatarUrl: url }))
+    form.setValue('avatarUrl', url)
     setAvatarFile(null)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
-
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleNext = async () => {
+    let fieldsToValidate: any[] = []
     if (step === 1) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email)) {
-        toast.error('Por favor, insira um email válido.')
-        return
-      }
-
-      if (formData.password.length < 6) {
-        toast.error('A senha deve ter pelo menos 6 caracteres.')
-        return
-      }
-
-      if (formData.password !== formData.confirmPassword) {
-        toast.error('As senhas não coincidem.')
-        return
-      }
+      fieldsToValidate = [
+        'name',
+        'email',
+        'password',
+        'confirmPassword',
+        'phone',
+      ]
+    } else if (step === 2) {
+      fieldsToValidate = [
+        'address',
+        'rg',
+        'cpf',
+        'emergencyContactName',
+        'emergencyContactPhone',
+      ]
     }
 
-    setStep((prev) => prev + 1)
+    const isValid = await form.trigger(fieldsToValidate)
+    if (isValid) {
+      setStep((prev) => prev + 1)
+    }
   }
 
   const handleBack = () => {
     setStep((prev) => prev - 1)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: RegisterFormValues) => {
     setLocalLoading(true)
 
     try {
-      const { confirmPassword, ...submitData } = formData
+      const { confirmPassword, ...submitData } = data
       const result = await register({
         ...submitData,
         avatarFile,
@@ -142,10 +174,12 @@ export default function RegisterPage() {
     }
   }
 
+  const avatarUrl = form.watch('avatarUrl')
+  const name = form.watch('name')
   const avatarPreview = avatarFile
     ? URL.createObjectURL(avatarFile)
-    : formData.avatarUrl
-      ? formData.avatarUrl
+    : avatarUrl
+      ? avatarUrl
       : null
 
   if (isLoading) {
@@ -195,234 +229,286 @@ export default function RegisterPage() {
           </div>
         </CardHeader>
 
-        <form onSubmit={step === 3 ? handleSubmit : handleNext}>
-          <CardContent className="space-y-4 pt-4">
-            {step === 1 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <Input
-                    id="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      required
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      required
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">WhatsApp</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(11) 99999-9999"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="space-y-2">
-                  <Label htmlFor="address">Endereço Completo</Label>
-                  <Input
-                    id="address"
-                    placeholder="Rua, Número, Bairro, Cidade - UF"
-                    required
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="rg">RG</Label>
-                    <Input
-                      id="rg"
-                      required
-                      value={formData.rg}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cpf">CPF</Label>
-                    <Input
-                      id="cpf"
-                      required
-                      value={formData.cpf}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <h4 className="text-sm font-medium mb-2 text-primary">
-                    Contato de Emergência
-                  </h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="space-y-1">
-                      <Label htmlFor="emergencyContactName">Nome</Label>
-                      <Input
-                        id="emergencyContactName"
-                        required
-                        value={formData.emergencyContactName}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="emergencyContactPhone">Telefone</Label>
-                      <Input
-                        id="emergencyContactPhone"
-                        type="tel"
-                        required
-                        value={formData.emergencyContactPhone}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div
-                    className="relative cursor-pointer group"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Avatar className="w-32 h-32 border-4 border-white shadow-md group-hover:ring-4 ring-primary/20 transition-all">
-                      <AvatarImage
-                        src={avatarPreview || ''}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gray-100 text-gray-400 group-hover:text-primary transition-colors text-4xl">
-                        {formData.name ? (
-                          formData.name[0].toUpperCase()
-                        ) : (
-                          <Camera className="w-10 h-10" />
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Upload className="w-8 h-8 text-white" />
-                    </div>
-                    {avatarFile && (
-                      <div className="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white shadow-sm">
-                        <Upload className="w-4 h-4" />
-                      </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4 pt-4">
+              {step === 1 && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome Completo</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Senha</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirmar Senha</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-
-                  <div className="text-center">
-                    <Label
-                      htmlFor="avatar-upload"
-                      className="text-sm font-medium text-primary cursor-pointer hover:underline"
-                    >
-                      Carregar Foto Personalizada
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Clique acima para upload e recorte
-                    </p>
-                  </div>
-
-                  <Input
-                    id="avatar-upload"
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept="image/png, image/jpeg, image/webp"
-                    onChange={handleFileChange}
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="(11) 99999-9999"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
+              )}
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+              {step === 2 && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Endereço Completo</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Rua, Número, Bairro, Cidade - UF"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="rg"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>RG</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="cpf"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>CPF</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-2 text-muted-foreground">
-                      Ou escolha um avatar
-                    </span>
+                  <div className="border-t pt-2 mt-2">
+                    <h4 className="text-sm font-medium mb-2 text-primary">
+                      Contato de Emergência
+                    </h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nome</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Telefone</FormLabel>
+                            <FormControl>
+                              <Input type="tel" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <AvatarSelection
-                  selectedAvatar={formData.avatarUrl}
-                  onSelect={handlePresetSelect}
-                />
-              </div>
-            )}
-          </CardContent>
-
-          <CardFooter className="flex flex-col gap-4">
-            <div className="flex w-full gap-3">
-              {step > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                  disabled={localLoading}
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Voltar
-                </Button>
               )}
-              <Button className="flex-1" type="submit" disabled={localLoading}>
-                {localLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : step === 3 ? (
-                  'Concluir Cadastro'
-                ) : (
-                  <>
-                    Próximo <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </div>
 
-            <div className="text-center text-sm">
-              Já tem conta?{' '}
-              <Link
-                to="/login"
-                className="text-primary hover:underline font-medium"
-              >
-                Fazer Login
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
+              {step === 3 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <div
+                      className="relative cursor-pointer group"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Avatar className="w-32 h-32 border-4 border-white shadow-md group-hover:ring-4 ring-primary/20 transition-all">
+                        <AvatarImage
+                          src={avatarPreview || ''}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="bg-gray-100 text-gray-400 group-hover:text-primary transition-colors text-4xl">
+                          {name ? (
+                            name[0].toUpperCase()
+                          ) : (
+                            <Camera className="w-10 h-10" />
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Upload className="w-8 h-8 text-white" />
+                      </div>
+                      {avatarFile && (
+                        <div className="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white shadow-sm">
+                          <Upload className="w-4 h-4" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="text-center">
+                      <Label
+                        htmlFor="avatar-upload"
+                        className="text-sm font-medium text-primary cursor-pointer hover:underline"
+                      >
+                        Carregar Foto Personalizada
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Clique acima para upload e recorte
+                      </p>
+                    </div>
+
+                    <Input
+                      id="avatar-upload"
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/webp"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-2 text-muted-foreground">
+                        Ou escolha um avatar
+                      </span>
+                    </div>
+                  </div>
+
+                  <AvatarSelection
+                    selectedAvatar={avatarUrl}
+                    onSelect={handlePresetSelect}
+                  />
+                </div>
+              )}
+            </CardContent>
+
+            <CardFooter className="flex flex-col gap-4">
+              <div className="flex w-full gap-3">
+                {step > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBack}
+                    disabled={localLoading}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar
+                  </Button>
+                )}
+                {step < 3 ? (
+                  <Button
+                    className="flex-1"
+                    type="button"
+                    onClick={handleNext}
+                    disabled={localLoading}
+                  >
+                    Próximo <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    className="flex-1"
+                    type="submit"
+                    disabled={localLoading}
+                  >
+                    {localLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Concluir Cadastro
+                  </Button>
+                )}
+              </div>
+
+              <div className="text-center text-sm">
+                Já tem conta?{' '}
+                <Link
+                  to="/login"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Fazer Login
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   )

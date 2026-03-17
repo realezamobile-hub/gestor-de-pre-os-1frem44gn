@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Card,
   CardContent,
@@ -14,17 +13,43 @@ import {
 } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Loader2, Smartphone } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email é obrigatório')
+    .email('Formato de email inválido'),
+  password: z.string().min(1, 'Senha é obrigatória'),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [localLoading, setLocalLoading] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { login, currentUser, isLoading, logout } = useAuthStore()
 
-  // Redirect if already logged in, ensuring stability
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
+
   useEffect(() => {
-    // Only redirect if NOT loading and user exists
     if (!isLoading && currentUser) {
       if (currentUser.status === 'blocked') {
         logout()
@@ -32,30 +57,35 @@ export default function LoginPage() {
         return
       }
 
+      const from = (location.state as any)?.from?.pathname || '/'
+
       if (currentUser.isSuperAdmin) {
         navigate('/admin', { replace: true })
       } else if (
         currentUser.status === 'active' ||
         currentUser.role === 'ADMIN'
       ) {
-        navigate('/', { replace: true })
+        navigate(from, { replace: true })
       } else if (currentUser.status === 'pending') {
         navigate('/pending', { replace: true })
       }
     }
-  }, [currentUser, isLoading, navigate, logout])
+  }, [currentUser, isLoading, navigate, logout, location])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: LoginFormValues) => {
     setLocalLoading(true)
 
     try {
-      const result = await login(email, password)
+      const result = await login(data.email, data.password)
       if (result.success) {
         toast.success('Login realizado com sucesso!')
-        // Navigation handled by useEffect
       } else {
-        toast.error(result.error?.message || 'Erro ao realizar login')
+        const msg = result.error?.message?.toLowerCase() || ''
+        if (msg.includes('invalid login credentials')) {
+          toast.error('Email ou senha inválidos')
+        } else {
+          toast.error(result.error?.message || 'Erro ao realizar login')
+        }
       }
     } catch (error) {
       toast.error('Erro inesperado')
@@ -86,57 +116,71 @@ export default function LoginPage() {
             Entre com seu email para acessar o painel
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="exemplo@email.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="exemplo@email.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Senha</Label>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Senha</FormLabel>
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm font-medium text-primary hover:underline"
+                      >
+                        Esqueci minha senha
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button className="w-full" type="submit" disabled={localLoading}>
+                {localLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Entrar
+              </Button>
+              <div className="text-center text-sm">
+                Não tem uma conta?{' '}
                 <Link
-                  to="/forgot-password"
-                  className="text-sm font-medium text-primary hover:underline"
+                  to="/register"
+                  className="text-primary hover:underline font-medium"
                 >
-                  Esqueci minha senha
+                  Registrar-se
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full" type="submit" disabled={localLoading}>
-              {localLoading && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Entrar
-            </Button>
-            <div className="text-center text-sm">
-              Não tem uma conta?{' '}
-              <Link
-                to="/register"
-                className="text-primary hover:underline font-medium"
-              >
-                Registrar-se
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   )

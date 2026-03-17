@@ -32993,14 +32993,18 @@ const useAuthStore = create((set$1, get$9) => ({
 					isLoading: false
 				});
 				await supabase.from("profiles").update({ last_active: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", profile.id);
-			} else set$1({
-				currentUser: null,
-				currentCompany: null,
-				session: null,
-				isLoading: false
-			});
+			} else {
+				await supabase.auth.signOut();
+				set$1({
+					currentUser: null,
+					currentCompany: null,
+					session: null,
+					isLoading: false
+				});
+			}
 		} catch (e) {
 			console.error("Exception fetching profile", e);
+			await supabase.auth.signOut();
 			set$1({
 				currentUser: null,
 				currentCompany: null,
@@ -33046,14 +33050,20 @@ const useAuthStore = create((set$1, get$9) => ({
 		});
 	},
 	login: async (email$1, password) => {
-		const { error } = await supabase.auth.signInWithPassword({
+		set$1({ isLoading: true });
+		const { data, error } = await supabase.auth.signInWithPassword({
 			email: email$1,
 			password
 		});
-		if (error) return {
-			success: false,
-			error
-		};
+		if (error) {
+			set$1({ isLoading: false });
+			return {
+				success: false,
+				error
+			};
+		}
+		if (data.session) await get$9().syncUser(data.session);
+		else set$1({ isLoading: false });
 		return { success: true };
 	},
 	register: async (data) => {
@@ -33105,11 +33115,13 @@ const useAuthStore = create((set$1, get$9) => ({
 		return { success: true };
 	},
 	logout: async () => {
+		set$1({ isLoading: true });
 		await supabase.auth.signOut();
 		set$1({
 			currentUser: null,
 			currentCompany: null,
-			session: null
+			session: null,
+			isLoading: false
 		});
 	},
 	resetPasswordForEmail: async (email$1) => {
@@ -36529,6 +36541,32 @@ var CardFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @_
 	...props
 }));
 CardFooter.displayName = "CardFooter";
+var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
+	variants: { variant: {
+		default: "bg-background text-foreground",
+		destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
+	} },
+	defaultVariants: { variant: "default" }
+});
+var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	ref,
+	role: "alert",
+	className: cn(alertVariants({ variant }), className),
+	...props
+}));
+Alert.displayName = "Alert";
+var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
+	ref,
+	className: cn("mb-1 font-medium leading-none tracking-tight", className),
+	...props
+}));
+AlertTitle.displayName = "AlertTitle";
+var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	ref,
+	className: cn("text-sm [&_p]:leading-relaxed", className),
+	...props
+}));
+AlertDescription.displayName = "AlertDescription";
 var isCheckBoxInput = (element) => element.type === "checkbox";
 var isDateObject = (value) => value instanceof Date;
 var isNullOrUndefined = (value) => value == null;
@@ -41554,8 +41592,7 @@ function LoginPage() {
 				return;
 			}
 			const from = location.state?.from?.pathname || "/";
-			if (currentUser.isSuperAdmin) navigate("/admin", { replace: true });
-			else if (currentUser.status === "active" || currentUser.role === "ADMIN") navigate(from, { replace: true });
+			if (currentUser.status === "active" || currentUser.role === "ADMIN" || currentUser.isSuperAdmin) navigate(from, { replace: true });
 			else if (currentUser.status === "pending") navigate("/pending", { replace: true });
 		}
 	}, [
@@ -41567,13 +41604,14 @@ function LoginPage() {
 	]);
 	const onSubmit = async (data) => {
 		setLocalLoading(true);
+		form.clearErrors("root");
 		try {
 			const result = await login(data.email, data.password);
 			if (result.success) toast.success("Login realizado com sucesso!");
-			else if ((result.error?.message?.toLowerCase() || "").includes("invalid login credentials")) toast.error("Email ou senha inválidos");
-			else toast.error(result.error?.message || "Erro ao realizar login");
+			else if ((result.error?.message?.toLowerCase() || "").includes("invalid login credentials")) form.setError("root", { message: "Email ou senha incorretos. Verifique suas credenciais." });
+			else form.setError("root", { message: "Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde." });
 		} catch (error) {
-			toast.error("Erro inesperado");
+			form.setError("root", { message: "Ocorreu um erro inesperado. Tente novamente." });
 		} finally {
 			setLocalLoading(false);
 		}
@@ -41604,38 +41642,49 @@ function LoginPage() {
 					onSubmit: form.handleSubmit(onSubmit),
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
 						className: "space-y-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormField, {
-							control: form.control,
-							name: "email",
-							render: ({ field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(FormItem, { children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormLabel, { children: "Email" }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormControl, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									type: "email",
-									placeholder: "exemplo@email.com",
-									...field
-								}) }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormMessage, {})
-							] })
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormField, {
-							control: form.control,
-							name: "password",
-							render: ({ field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(FormItem, { children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "flex items-center justify-between",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormLabel, { children: "Senha" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-										to: "/forgot-password",
-										className: "text-sm font-medium text-primary hover:underline",
-										children: "Esqueci minha senha"
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormControl, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									type: "password",
-									placeholder: "••••••••",
-									...field
-								}) }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormMessage, {})
-							] })
-						})]
+						children: [
+							form.formState.errors.root && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Alert, {
+								variant: "destructive",
+								className: "bg-red-50 text-red-900 border-red-200 flex items-start py-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, { className: "h-4 w-4 text-red-600 mt-0.5 shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AlertDescription, {
+									className: "ml-2 font-medium",
+									children: form.formState.errors.root.message
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormField, {
+								control: form.control,
+								name: "email",
+								render: ({ field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(FormItem, { children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormLabel, { children: "Email" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormControl, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										type: "email",
+										placeholder: "exemplo@email.com",
+										...field
+									}) }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormMessage, {})
+								] })
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormField, {
+								control: form.control,
+								name: "password",
+								render: ({ field }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(FormItem, { children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center justify-between",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormLabel, { children: "Senha" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+											to: "/forgot-password",
+											className: "text-sm font-medium text-primary hover:underline",
+											children: "Esqueci minha senha"
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormControl, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+										type: "password",
+										placeholder: "••••••••",
+										...field
+									}) }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FormMessage, {})
+								] })
+							})
+						]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardFooter, {
 						className: "flex flex-col space-y-4",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
@@ -42768,32 +42817,6 @@ function RegisterPage() {
 		})]
 	});
 }
-var alertVariants = cva("relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground", {
-	variants: { variant: {
-		default: "bg-background text-foreground",
-		destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
-	} },
-	defaultVariants: { variant: "default" }
-});
-var Alert = import_react.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	ref,
-	role: "alert",
-	className: cn(alertVariants({ variant }), className),
-	...props
-}));
-Alert.displayName = "Alert";
-var AlertTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h5", {
-	ref,
-	className: cn("mb-1 font-medium leading-none tracking-tight", className),
-	...props
-}));
-AlertTitle.displayName = "AlertTitle";
-var AlertDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	ref,
-	className: cn("text-sm [&_p]:leading-relaxed", className),
-	...props
-}));
-AlertDescription.displayName = "AlertDescription";
 function ForgotPasswordPage() {
 	const [email$1, setEmail] = (0, import_react.useState)("");
 	const [isLoading, setIsLoading] = (0, import_react.useState)(false);
@@ -82192,4 +82215,4 @@ var App = () => {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-EgcfakAx.js.map
+//# sourceMappingURL=index-C78afL1J.js.map

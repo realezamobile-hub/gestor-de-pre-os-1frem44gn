@@ -11,8 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
-import { Loader2, Smartphone } from 'lucide-react'
+import { Loader2, Smartphone, AlertCircle } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -59,11 +60,10 @@ export default function LoginPage() {
 
       const from = (location.state as any)?.from?.pathname || '/'
 
-      if (currentUser.isSuperAdmin) {
-        navigate('/admin', { replace: true })
-      } else if (
+      if (
         currentUser.status === 'active' ||
-        currentUser.role === 'ADMIN'
+        currentUser.role === 'ADMIN' ||
+        currentUser.isSuperAdmin
       ) {
         navigate(from, { replace: true })
       } else if (currentUser.status === 'pending') {
@@ -74,6 +74,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setLocalLoading(true)
+    form.clearErrors('root')
 
     try {
       const result = await login(data.email, data.password)
@@ -82,13 +83,20 @@ export default function LoginPage() {
       } else {
         const msg = result.error?.message?.toLowerCase() || ''
         if (msg.includes('invalid login credentials')) {
-          toast.error('Email ou senha inválidos')
+          form.setError('root', {
+            message: 'Email ou senha incorretos. Verifique suas credenciais.',
+          })
         } else {
-          toast.error(result.error?.message || 'Erro ao realizar login')
+          form.setError('root', {
+            message:
+              'Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde.',
+          })
         }
       }
     } catch (error) {
-      toast.error('Erro inesperado')
+      form.setError('root', {
+        message: 'Ocorreu um erro inesperado. Tente novamente.',
+      })
     } finally {
       setLocalLoading(false)
     }
@@ -119,6 +127,18 @@ export default function LoginPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
+              {form.formState.errors.root && (
+                <Alert
+                  variant="destructive"
+                  className="bg-red-50 text-red-900 border-red-200 flex items-start py-3"
+                >
+                  <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
+                  <AlertDescription className="ml-2 font-medium">
+                    {form.formState.errors.root.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <FormField
                 control={form.control}
                 name="email"

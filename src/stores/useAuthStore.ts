@@ -137,6 +137,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             .update({ last_active: new Date().toISOString() })
             .eq('id', profile.id)
         } else {
+          // If no profile exists for the user, sign out to prevent invalid states
+          await supabase.auth.signOut()
           set({
             currentUser: null,
             currentCompany: null,
@@ -146,6 +148,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       } catch (e) {
         console.error('Exception fetching profile', e)
+        await supabase.auth.signOut()
         set({
           currentUser: null,
           currentCompany: null,
@@ -180,6 +183,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Auth initialization error:', error)
       set({ isLoading: false })
     }
+
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
         const currentId = get().currentUser?.id
@@ -201,11 +205,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   login: async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    set({ isLoading: true })
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
-    if (error) return { success: false, error }
+    if (error) {
+      set({ isLoading: false })
+      return { success: false, error }
+    }
+    if (data.session) {
+      await get().syncUser(data.session)
+    } else {
+      set({ isLoading: false })
+    }
     return { success: true }
   },
 
@@ -280,8 +293,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    set({ isLoading: true })
     await supabase.auth.signOut()
-    set({ currentUser: null, currentCompany: null, session: null })
+    set({
+      currentUser: null,
+      currentCompany: null,
+      session: null,
+      isLoading: false,
+    })
   },
 
   resetPasswordForEmail: async (email) => {

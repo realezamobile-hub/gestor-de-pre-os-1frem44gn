@@ -64,17 +64,6 @@ export function DraftListGrouped({
 
           if (isSorted) {
             groupItems = [...groupItems].sort((a, b) => {
-              const priceA =
-                a.custom_price !== null && a.custom_price !== undefined
-                  ? a.custom_price
-                  : (a.product?.valor || 0) + markup
-              const priceB =
-                b.custom_price !== null && b.custom_price !== undefined
-                  ? b.custom_price
-                  : (b.product?.valor || 0) + markup
-
-              if (priceA !== priceB) return priceA - priceB
-
               const modelA = (
                 a.custom_model ||
                 a.product?.modelo ||
@@ -85,7 +74,19 @@ export function DraftListGrouped({
                 b.product?.modelo ||
                 ''
               ).toLowerCase()
-              return modelA.localeCompare(modelB)
+
+              if (modelA !== modelB) return modelA.localeCompare(modelB)
+
+              const priceA =
+                a.custom_price !== null && a.custom_price !== undefined
+                  ? a.custom_price
+                  : (a.product?.valor || 0) + markup
+              const priceB =
+                b.custom_price !== null && b.custom_price !== undefined
+                  ? b.custom_price
+                  : (b.product?.valor || 0) + markup
+
+              return priceA - priceB
             })
           }
 

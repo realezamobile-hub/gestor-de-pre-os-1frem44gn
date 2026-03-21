@@ -91,6 +91,15 @@ interface ProductStore {
   ) => { price: number; supplierId: string } | null
   selectedProducts: Product[]
   toggleProductSelection: (product: Product | number) => void
+
+  availableSuppliers: string[]
+  availableModels: string[]
+  fetchAvailableFilters: () => Promise<void>
+  generateAutoList: (filters: {
+    suppliers: string[]
+    models: string[]
+    groups: string[]
+  }) => Promise<{ success: boolean }>
 }
 
 const INITIAL_FILTERS: FilterState = {
@@ -134,6 +143,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   pageSize: 20,
   total: 0,
   selectedProducts: [],
+  availableSuppliers: [],
+  availableModels: [],
 
   hideZeroPrices: localStorage.getItem('hideZeroPrices') === 'true',
 
@@ -853,6 +864,99 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } catch (error: any) {
       console.error('Error in deleteZeroValueProducts:', error)
       return { success: false, error }
+    }
+  },
+
+  fetchAvailableFilters: async () => {
+    const { data } = await supabase
+      .from(VIEW_PRODUCTS)
+      .select('fornecedor, modelo')
+    if (data) {
+      const suppliers = Array.from(
+        new Set(data.map((d: any) => d.fornecedor).filter(Boolean)),
+      ).sort()
+      const models = Array.from(
+        new Set(data.map((d: any) => d.modelo).filter(Boolean)),
+      ).sort()
+      set({
+        availableSuppliers: suppliers as string[],
+        availableModels: models as string[],
+      })
+    }
+  },
+
+  generateAutoList: async (filters) => {
+    set({ isLoading: true })
+    try {
+      let query = supabase.from(VIEW_PRODUCTS).select('*').gt('valor', 0)
+
+      if (filters.suppliers.length > 0) {
+        query = query.in('fornecedor', filters.suppliers)
+      }
+      if (filters.models.length > 0) {
+        query = query.in('modelo', filters.models)
+      }
+      if (filters.groups.length > 0) {
+        query = query.in('categoria', filters.groups)
+      }
+
+      const { data, error } = await query
+      if (error) throw error
+
+      if (!data || data.length === 0) {
+        toast.info('Nenhum produto encontrado com estes filtros.')
+        set({ isLoading: false })
+        return { success: false }
+      }
+
+      const grouped = new Map<string, Product>()
+
+      data.forEach((p: any) => {
+        const sig = [p.categoria, p.modelo, p.memoria, p.ram, p.cor]
+          .map((s) => (s || '').toString().trim().toLowerCase())
+          .join('|')
+
+        const existing = grouped.get(sig)
+        if (!existing || (p.valor ?? Infinity) < (existing.valor ?? Infinity)) {
+          grouped.set(sig, p as Product)
+        }
+      })
+
+      const finalProducts = Array.from(grouped.values()).sort((a, b) => {
+        const descA = [
+          a.modelo,
+          a.memoria,
+          a.ram ? `${a.ram} RAM` : null,
+          a.cor,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+        const descB = [
+          b.modelo,
+          b.memoria,
+          b.ram ? `${b.ram} RAM` : null,
+          b.cor,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+        return descA.localeCompare(descB)
+      })
+
+      await get().clearDraft()
+      await get().addToDraft(finalProducts)
+
+      toast.success(
+        `Lista gerada com ${finalProducts.length} itens otimizados!`,
+      )
+      return { success: true }
+    } catch (error) {
+      console.error('Error generating auto list:', error)
+      toast.error('Erro ao gerar lista automática.')
+      return { success: false }
+    } finally {
+      set({ isLoading: false })
     }
   },
 }))

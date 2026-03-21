@@ -25,6 +25,7 @@ import { GeneratorConfig } from '@/components/generator/GeneratorConfig'
 import { DraftListGrouped } from '@/components/generator/DraftListGrouped'
 import { GeneratorHistory } from '@/components/generator/GeneratorHistory'
 import { EmojiPicker } from '@/components/common/EmojiPicker'
+import { AutoListGeneratorCard } from '@/components/generator/AutoListGeneratorCard'
 import {
   Tooltip,
   TooltipContent,
@@ -156,6 +157,18 @@ export default function ListGeneratorPage() {
 
       if (isSorted) {
         items = [...items].sort((a, b) => {
+          const modelA = (
+            a.custom_model ||
+            a.product?.modelo ||
+            ''
+          ).toLowerCase()
+          const modelB = (
+            b.custom_model ||
+            b.product?.modelo ||
+            ''
+          ).toLowerCase()
+          if (modelA !== modelB) return modelA.localeCompare(modelB)
+
           let priceA = 0
           let priceB = 0
 
@@ -173,19 +186,7 @@ export default function ListGeneratorPage() {
                 : (b.product?.valor || 0) + config.markup
           }
 
-          if (priceA !== priceB) return priceA - priceB
-
-          const modelA = (
-            a.custom_model ||
-            a.product?.modelo ||
-            ''
-          ).toLowerCase()
-          const modelB = (
-            b.custom_model ||
-            b.product?.modelo ||
-            ''
-          ).toLowerCase()
-          return modelA.localeCompare(modelB)
+          return priceA - priceB
         })
       }
 
@@ -408,6 +409,12 @@ export default function ListGeneratorPage() {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0">
         {/* Left Column: Configuration */}
         <div className="xl:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2">
+          <AutoListGeneratorCard
+            onGenerated={() => {
+              setIsSorted(true)
+              setTriggerRefresh(true)
+            }}
+          />
           <GeneratorConfig
             config={config}
             onChange={setConfig}
@@ -446,7 +453,7 @@ export default function ListGeneratorPage() {
                   className="h-7 text-xs"
                 >
                   <ArrowDownAZ className="w-3 h-3 mr-1.5" />
-                  {isSorted ? 'Ordenado' : 'Ordenar AZ'}
+                  {isSorted ? 'Ordenado A-Z' : 'Ordenar AZ'}
                 </Button>
               </div>
             </CardHeader>

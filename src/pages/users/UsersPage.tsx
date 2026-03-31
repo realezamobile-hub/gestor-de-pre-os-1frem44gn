@@ -17,6 +17,7 @@ import { Lock, Unlock, Pencil, Search, Users } from 'lucide-react'
 import { toast } from 'sonner'
 import { User } from '@/types'
 import { UserEditDialog } from '@/components/admin/UserEditDialog'
+import { UserInviteDialog } from '@/components/admin/UserInviteDialog'
 import { useDebounce } from '@/hooks/use-debounce'
 
 export default function UsersPage() {
@@ -33,6 +34,7 @@ export default function UsersPage() {
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -45,10 +47,9 @@ export default function UsersPage() {
     const matchesSearch =
       u.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       u.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      u.phone.includes(debouncedSearch)
+      (u.phone && u.phone.includes(debouncedSearch))
 
     if (!matchesSearch) return false
-    if (u.status === 'pending') return false
     if (isSuperAdmin) return true
     return u.companyId === currentUser?.companyId
   })
@@ -86,7 +87,7 @@ export default function UsersPage() {
         </p>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -96,6 +97,10 @@ export default function UsersPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <Button onClick={() => setIsInviteDialogOpen(true)}>
+          <Users className="w-4 h-4 mr-2" />
+          Novo Usuário
+        </Button>
       </div>
 
       <div className="border rounded-md bg-white flex-1 overflow-auto shadow-sm">
@@ -188,10 +193,16 @@ export default function UsersPage() {
                         className={
                           user.status === 'active'
                             ? 'bg-green-50 text-green-700 border-green-200'
-                            : 'bg-red-50 text-red-700 border-red-200'
+                            : user.status === 'pending'
+                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              : 'bg-red-50 text-red-700 border-red-200'
                         }
                       >
-                        {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
+                        {user.status === 'active'
+                          ? 'Ativo'
+                          : user.status === 'pending'
+                            ? 'Pendente'
+                            : 'Bloqueado'}
                       </Badge>
                     </TableCell>
 
@@ -248,6 +259,14 @@ export default function UsersPage() {
         onOpenChange={setIsEditDialogOpen}
         companies={companies}
         isSuperAdmin={isSuperAdmin}
+      />
+
+      <UserInviteDialog
+        open={isInviteDialogOpen}
+        onOpenChange={setIsInviteDialogOpen}
+        companies={companies}
+        isSuperAdmin={isSuperAdmin}
+        currentCompanyId={currentUser?.companyId}
       />
     </div>
   )

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { User, UserStatus, Role, Company } from '@/types'
 import { supabase } from '@/lib/supabase/client'
-import { Session } from '@supabase/supabase-js'
+import { Session, createClient } from '@supabase/supabase-js'
 
 interface AuthState {
   currentUser: User | null
@@ -60,6 +60,12 @@ interface AuthState {
     userId: string,
     permission: keyof User,
   ) => Promise<void>
+  inviteUser: (data: {
+    email: string
+    name: string
+    role: Role
+    companyId?: string
+  }) => Promise<{ success: boolean; error?: any }>
 }
 
 const mapProfileToUser = (profile: any): User => {
@@ -411,12 +417,86 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   deleteUser: async (userId) => {
-    const { error } = await supabase.from('profiles').delete().eq('id', userId)
-    if (error) return { success: false, error }
-    set((state) => ({
-      users: state.users.filter((u) => u.id !== userId),
-    }))
-    return { success: true }
+    try {
+      // Tenta chamar uma RPC caso exista no backend para deletar o usuário do auth.users
+      const { error: rpcError } = await supabase.rpc('delete_user_admin', {
+        target_user_id: userId,
+      })
+
+      // Sempre remove da tabela profiles para garantir a UI e persistência local
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId)
+
+      if (profileError && !rpcError) {
+        return { success: false, error: profileError }
+      }
+
+      set((state) => ({
+        users: state.users.filter((u) => u.id !== userId),
+      }))
+
+      return { success: true }
+    } catch (error) {
+      console.error('Delete user error:', error)
+      return { success: false, error }
+    }
+  },
+
+  inviteUser: async (data) => {
+    try {
+      // Usa um client temporário para não sobrescrever a sessão do admin atual
+      const tempClient = createClient(
+        import.meta.env.VITE_SUPABASE_URL as string,
+        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+        { auth: { persistSession: false, autoRefreshToken: false } },
+      )
+
+      const randomPassword = Math.random().toString(36).slice(-12) + 'Aa1@'
+
+      const { data: authData, error } = await tempClient.auth.signUp({
+        email: data.email,
+        password: randomPassword,
+        options: {
+          data: {
+            name: data.name,
+            role: data.role,
+            company_id: data.companyId,
+          },
+        },
+      })
+
+      if (error) return { success: false, error }
+
+      if (authData.user) {
+        // Garante que o usuário apareça imediatamente no banco de dados como pendente
+        await supabase.from('profiles').upsert(
+          {
+            id: authData.user.id,
+            email: data.email,
+            name: data.name,
+            role: data.role,
+            company_id: data.companyId,
+            status: 'pending',
+          },
+          { onConflict: 'id' },
+        )
+
+        // Envia um email de recuperação para que o usuário possa definir sua senha
+        await tempClient.auth.resetPasswordForEmail(data.email)
+
+        await get().fetchUsers()
+        return { success: true }
+      }
+      return {
+        success: false,
+        error: new Error('Erro desconhecido ao criar usuário'),
+      }
+    } catch (error) {
+      console.error('Invite user error:', error)
+      return { success: false, error }
+    }
   },
 
   adminUpdateUser: async (userId, data) => {

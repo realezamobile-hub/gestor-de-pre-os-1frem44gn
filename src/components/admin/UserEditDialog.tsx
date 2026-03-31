@@ -160,11 +160,14 @@ export function UserEditDialog({
         setShowDeleteDialog(false)
         onOpenChange(false)
       } else {
-        toast.error('Erro ao excluir usuário')
+        toast.error(
+          result.error?.message ||
+            'Erro ao excluir usuário. Verifique dependências ou restrições.',
+        )
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error)
-      toast.error('Erro ao excluir usuário')
+      toast.error(error?.message || 'Erro inesperado ao excluir usuário')
     } finally {
       setIsDeleting(false)
     }

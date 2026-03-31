@@ -52,6 +52,7 @@ interface AuthState {
     userId: string,
     data: Partial<User>,
   ) => Promise<{ success: boolean; error?: any }>
+  deleteUser: (userId: string) => Promise<{ success: boolean; error?: any }>
   updateUserStatus: (userId: string, status: UserStatus) => Promise<void>
   updateUserRole: (userId: string, role: Role) => Promise<void>
   updateUserCompany: (userId: string, companyId: string) => Promise<void>
@@ -407,6 +408,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const mappedUsers: User[] = profiles.map(mapProfileToUser)
       set({ users: mappedUsers })
     }
+  },
+
+  deleteUser: async (userId) => {
+    const { error } = await supabase.from('profiles').delete().eq('id', userId)
+    if (error) return { success: false, error }
+    set((state) => ({
+      users: state.users.filter((u) => u.id !== userId),
+    }))
+    return { success: true }
   },
 
   adminUpdateUser: async (userId, data) => {

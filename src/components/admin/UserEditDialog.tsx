@@ -3,10 +3,18 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,7 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Role, User, UserStatus, Company } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
-import { Loader2, Camera, Upload } from 'lucide-react'
+import { Loader2, Camera, Upload, Trash2 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AvatarSelection } from '@/components/common/AvatarSelection'
 import { ImageCropper } from '@/components/common/ImageCropper'
@@ -43,12 +51,14 @@ export function UserEditDialog({
   companies = [],
   isSuperAdmin = false,
 }: UserEditDialogProps) {
-  const { adminUpdateUser, adminUploadAvatar } = useAuthStore()
+  const { adminUpdateUser, adminUploadAvatar, deleteUser } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [showCropModal, setShowCropModal] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -113,16 +123,18 @@ export function UserEditDialog({
 
     setIsLoading(true)
     try {
-      // 1. Upload Avatar if changed via file
+      const updatedFormData = { ...formData }
+
       if (avatarFile) {
         const uploadResult = await adminUploadAvatar(user.id, avatarFile)
         if (!uploadResult.success) {
           toast.error('Erro ao atualizar foto, mas salvando dados...')
+        } else if (uploadResult.url) {
+          updatedFormData.avatarUrl = uploadResult.url
         }
       }
 
-      // 2. Update User Data (including avatarUrl if preset selected)
-      const result = await adminUpdateUser(user.id, formData)
+      const result = await adminUpdateUser(user.id, updatedFormData)
 
       if (result.success) {
         toast.success('Usuário atualizado com sucesso')
@@ -135,6 +147,26 @@ export function UserEditDialog({
       toast.error('Erro ao atualizar usuário')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!user) return
+    setIsDeleting(true)
+    try {
+      const result = await deleteUser(user.id)
+      if (result.success) {
+        toast.success('Usuário excluído com sucesso')
+        setShowDeleteDialog(false)
+        onOpenChange(false)
+      } else {
+        toast.error('Erro ao excluir usuário')
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      toast.error('Erro ao excluir usuário')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -158,6 +190,33 @@ export function UserEditDialog({
         </DialogContent>
       </Dialog>
 
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Usuário</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o usuário{' '}
+              <strong>{user.name}</strong>? Esta ação não pode ser desfeita e
+              todos os dados vinculados a este perfil serão permanentemente
+              removidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancelar
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Excluir Definitivamente
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -175,7 +234,6 @@ export function UserEditDialog({
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6 pt-4">
-              {/* Avatar Section */}
               <div className="flex flex-col sm:flex-row gap-6 items-start border-b pb-6">
                 <div className="flex flex-col items-center gap-3">
                   <div
@@ -426,15 +484,34 @@ export function UserEditDialog({
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-4 mt-6">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Excluir Usuário
             </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar Alterações
-            </Button>
-          </DialogFooter>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Salvar Alterações
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>

@@ -8,13 +8,15 @@ import {
   SubscriptionType,
   PaymentLog,
 } from '@/types'
-import { renewUserAccess } from '@/services/manage-user-access'
-import { supabase } from '@/lib/supabase/client'
-import { Session, createClient } from '@supabase/supabase-js'
 import {
+  createUser,
+  adminChangePassword,
   deleteUserPermanently,
   releaseUserAccess,
+  renewUserAccess,
 } from '@/services/manage-user-access'
+import { supabase } from '@/lib/supabase/client'
+import { Session } from '@supabase/supabase-js'
 
 let _skipSessionCheck = false
 
@@ -83,7 +85,12 @@ interface AuthState {
     companyId?: string
     subscriptionType: SubscriptionType
     monthlyFee?: number
+    activeModules: string[]
   }) => Promise<{ success: boolean; error?: any }>
+  changeUserPassword: (
+    userId: string,
+    newPassword: string,
+  ) => Promise<{ success: boolean; error?: any }>
   releaseUser: (
     userId: string,
     accessAllowed: boolean,
@@ -529,58 +536,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   inviteUser: async (data) => {
     try {
-      const tempClient = createClient(
-        import.meta.env.VITE_SUPABASE_URL as string,
-        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
-        { auth: { persistSession: false, autoRefreshToken: false } },
-      )
-
-      const { data: authData, error } = await tempClient.auth.signUp({
+      const { error } = await createUser({
         email: data.email,
         password: data.password,
-        options: {
-          data: {
-            name: data.name,
-            role: data.role,
-            company_id: data.companyId,
-          },
-          emailRedirectTo: window.location.origin,
-        },
+        name: data.name,
+        role: data.role,
+        companyId: data.companyId,
+        subscriptionType: data.subscriptionType,
+        monthlyFee: data.monthlyFee,
+        activeModules: data.activeModules,
       })
 
       if (error) return { success: false, error }
 
-      if (authData.user) {
-        const billingDate = new Date()
-        billingDate.setDate(
-          billingDate.getDate() + (data.subscriptionType === 'trial' ? 10 : 30),
-        )
-
-        await supabase.from('profiles').upsert(
-          {
-            id: authData.user.id,
-            email: data.email,
-            name: data.name,
-            role: data.role,
-            company_id: data.companyId,
-            status: 'pending',
-            subscription_status: 'pending',
-            access_allowed: false,
-            subscription_type: data.subscriptionType,
-            monthly_fee: data.monthlyFee || 0,
-            next_billing_date: billingDate.toISOString(),
-            active_modules: ['melhor_preco'],
-          },
-          { onConflict: 'id' },
-        )
-
-        await get().fetchUsers()
-        return { success: true }
-      }
-      return {
-        success: false,
-        error: new Error('Erro desconhecido ao criar usuário'),
-      }
+      await get().fetchUsers()
+      return { success: true }
     } catch (error) {
       console.error('Invite user error:', error)
       return { success: false, error }
@@ -755,6 +725,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { success: true }
     } catch (error) {
       console.error('Renew user error:', error)
+      return { success: false, error }
+    }
+  },
+
+  changeUserPassword: async (userId, newPassword) => {
+    try {
+      const { error } = await adminChangePassword(userId, newPassword)
+      if (error) return { success: false, error }
+      return { success: true }
+    } catch (error) {
+      console.error('Change password error:', error)
       return { success: false, error }
     }
   },

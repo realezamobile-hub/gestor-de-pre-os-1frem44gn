@@ -71,8 +71,13 @@ export function UserEditDialog({
   companies = [],
   isSuperAdmin = false,
 }: UserEditDialogProps) {
-  const { adminUpdateUser, adminUploadAvatar, deleteUser, renewUser } =
-    useAuthStore()
+  const {
+    adminUpdateUser,
+    adminUploadAvatar,
+    deleteUser,
+    renewUser,
+    changeUserPassword,
+  } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isRenewing, setIsRenewing] = useState(false)
@@ -81,6 +86,8 @@ export function UserEditDialog({
   const [cropImage, setCropImage] = useState<string | null>(null)
   const [showCropModal, setShowCropModal] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -215,6 +222,27 @@ export function UserEditDialog({
       toast.error(error?.message || 'Erro inesperado ao excluir usuário')
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handlePasswordChange = async () => {
+    if (!user || !newPassword || newPassword.length < 6) {
+      toast.error('A senha deve ter no mínimo 6 caracteres')
+      return
+    }
+    setIsChangingPassword(true)
+    try {
+      const result = await changeUserPassword(user.id, newPassword)
+      if (result.success) {
+        toast.success('Senha alterada com sucesso!')
+        setNewPassword('')
+      } else {
+        toast.error('Erro ao alterar senha')
+      }
+    } catch {
+      toast.error('Erro ao alterar senha')
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -396,6 +424,33 @@ export function UserEditDialog({
                   </Select>
                 </div>
               )}
+
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-3">Alterar Senha</h3>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="Nova senha (mín. 6 caracteres)"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePasswordChange}
+                    disabled={
+                      isChangingPassword ||
+                      !newPassword ||
+                      newPassword.length < 6
+                    }
+                  >
+                    {isChangingPassword && (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    )}
+                    Alterar
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="docs" className="space-y-4 pt-4">

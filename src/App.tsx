@@ -5,7 +5,6 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import DashboardLayout from './components/DashboardLayout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage'
 import PendingApprovalPage from './pages/auth/PendingApprovalPage'
 import AccessDeniedPage from './pages/auth/AccessDeniedPage'
@@ -40,7 +39,6 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path="/auth/update-password"
             element={<UpdatePasswordPage />}

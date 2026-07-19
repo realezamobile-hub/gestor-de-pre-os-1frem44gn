@@ -200,6 +200,7 @@ Deno.serve(async (req: Request) => {
           .update({
             access_allowed: true,
             subscription_status: 'active',
+            access_expires_at: newBillingDate.toISOString(),
             next_billing_date: newBillingDate.toISOString(),
             updated_at: new Date().toISOString(),
           })
@@ -272,6 +273,159 @@ Deno.serve(async (req: Request) => {
           }),
           { headers: { 'Content-Type': 'application/json', ...corsHeaders } },
         )
+      }
+
+      case 'create_user': {
+        const {
+          target_email,
+          target_password,
+          target_name,
+          target_role,
+          target_company_id,
+          subscription_type,
+          monthly_fee,
+          active_modules,
+        } = body
+        if (!target_email || !target_password || !target_name) {
+          return new Response(
+            JSON.stringify({
+              error:
+                'target_email, target_password, and target_name are required',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
+        }
+
+        const { data: authData, error: authError } =
+          await adminClient.auth.admin.createUser({
+            email: target_email,
+            password: target_password,
+            email_confirm: true,
+            user_metadata: {
+              name: target_name,
+              role: target_role || 'VENDEDOR',
+              company_id: target_company_id || null,
+            },
+          })
+
+        if (authError) {
+          return new Response(JSON.stringify({ error: authError.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          })
+        }
+
+        const now = new Date()
+        let accessExpiresAt: string
+        let nextBillingDate: string
+
+        if (subscription_type === 'trial') {
+          const expiry = new Date(now)
+          expiry.setDate(expiry.getDate() + 10)
+          accessExpiresAt = expiry.toISOString()
+          nextBillingDate = expiry.toISOString()
+        } else {
+          const expiry = new Date(now)
+          expiry.setMonth(expiry.getMonth() + 1)
+          accessExpiresAt = expiry.toISOString()
+          nextBillingDate = expiry.toISOString()
+        }
+
+        const { error: profileError } = await adminClient
+          .from('profiles')
+          .upsert(
+            {
+              id: authData.user.id,
+              email: target_email,
+              name: target_name,
+              role: target_role || 'VENDEDOR',
+              company_id: target_company_id || null,
+              status: 'active',
+              access_allowed: true,
+              subscription_status: 'active',
+              subscription_type: subscription_type || 'trial',
+              monthly_fee: monthly_fee || 0,
+              access_expires_at: accessExpiresAt,
+              next_billing_date: nextBillingDate,
+              active_modules: active_modules || ['melhor_preco'],
+              updated_at: now.toISOString(),
+            },
+            { onConflict: 'id' },
+          )
+
+        if (profileError) {
+          return new Response(JSON.stringify({ error: profileError.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          })
+        }
+
+        return new Response(
+          JSON.stringify({ success: true, user_id: authData.user.id }),
+          {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          },
+        )
+      }
+
+      case 'change_password': {
+        const { target_user_id, new_password } = body
+        if (!target_user_id || !new_password) {
+          return new Response(
+            JSON.stringify({
+              error: 'target_user_id and new_password required',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
+        }
+        if (new_password.length < 6) {
+          return new Response(
+            JSON.stringify({ error: 'Password must be at least 6 characters' }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
+        }
+
+        const { data: targetProfile } = await adminClient
+          .from('profiles')
+          .select('is_super_admin')
+          .eq('id', target_user_id)
+          .single()
+
+        if (
+          targetProfile?.is_super_admin &&
+          callerProfile?.id !== target_user_id
+        ) {
+          return new Response(
+            JSON.stringify({ error: 'Cannot change super admin password' }),
+            {
+              status: 403,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
+        }
+
+        const { error: updateError } =
+          await adminClient.auth.admin.updateUserById(target_user_id, {
+            password: new_password,
+          })
+        if (updateError) {
+          return new Response(JSON.stringify({ error: updateError.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          })
+        }
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        })
       }
 
       default:

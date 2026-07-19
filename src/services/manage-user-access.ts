@@ -52,3 +52,49 @@ export const validateSession = async (userId: string, sessionId: string) => {
   )
   return { data, error }
 }
+
+export const createUser = async (data: {
+  email: string
+  password: string
+  name: string
+  role: string
+  companyId?: string
+  subscriptionType: string
+  monthlyFee?: number
+  activeModules: string[]
+}) => {
+  const { data: result, error } = await supabase.functions.invoke(
+    'manage-user-access',
+    {
+      body: {
+        action: 'create_user',
+        target_email: data.email,
+        target_password: data.password,
+        target_name: data.name,
+        target_role: data.role,
+        target_company_id: data.companyId,
+        subscription_type: data.subscriptionType,
+        monthly_fee: data.monthlyFee,
+        active_modules: data.activeModules,
+      },
+    },
+  )
+  return { data: result, error }
+}
+
+export const adminChangePassword = async (
+  userId: string,
+  newPassword: string,
+) => {
+  const { data, error } = await supabase.functions.invoke(
+    'manage-user-access',
+    {
+      body: {
+        action: 'change_password',
+        target_user_id: userId,
+        new_password: newPassword,
+      },
+    },
+  )
+  return { data, error }
+}

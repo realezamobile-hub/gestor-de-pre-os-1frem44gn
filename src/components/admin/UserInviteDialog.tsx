@@ -20,6 +20,17 @@ import { Role, Company, SubscriptionType } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
 import { Loader2, UserPlus } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+
+const ALL_MODULES = [
+  { key: 'melhor_preco', label: 'Melhor Preço' },
+  { key: 'leads', label: 'Leads' },
+  { key: 'generator', label: 'Gerador de Lista' },
+  { key: 'evaluation', label: 'Avaliação Técnica' },
+  { key: 'cadastro', label: 'Cadastro' },
+  { key: 'reports', label: 'Relatórios' },
+  { key: 'admin', label: 'Configurações' },
+]
 
 interface UserInviteDialogProps {
   open: boolean
@@ -46,6 +57,7 @@ export function UserInviteDialog({
     companyId: currentCompanyId || '',
     subscriptionType: 'trial' as SubscriptionType,
     monthlyFee: '',
+    activeModules: ['melhor_preco'] as string[],
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,6 +88,7 @@ export function UserInviteDialog({
           formData.subscriptionType === 'monthly'
             ? Number(formData.monthlyFee)
             : undefined,
+        activeModules: formData.activeModules,
       })
       if (result.success) {
         toast.success('Usuário criado com sucesso!')
@@ -87,6 +100,7 @@ export function UserInviteDialog({
           companyId: currentCompanyId || '',
           subscriptionType: 'trial',
           monthlyFee: '',
+          activeModules: ['melhor_preco'],
         })
         onOpenChange(false)
       } else {
@@ -236,6 +250,36 @@ export function UserInviteDialog({
               </Select>
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label>Módulos de Acesso</Label>
+            <p className="text-xs text-muted-foreground">
+              Selecione os módulos que o usuário poderá acessar.
+            </p>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {ALL_MODULES.map((mod) => (
+                <div key={mod.key} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`invite-mod-${mod.key}`}
+                    checked={formData.activeModules.includes(mod.key)}
+                    onCheckedChange={() => {
+                      const current = formData.activeModules
+                      const updated = current.includes(mod.key)
+                        ? current.filter((m) => m !== mod.key)
+                        : [...current, mod.key]
+                      setFormData({ ...formData, activeModules: updated })
+                    }}
+                  />
+                  <Label
+                    htmlFor={`invite-mod-${mod.key}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {mod.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button

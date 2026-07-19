@@ -592,6 +592,41 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_logs: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by_admin_id: string | null
+          id: string
+          payment_date: string
+          profile_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by_admin_id?: string | null
+          id?: string
+          payment_date?: string
+          profile_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by_admin_id?: string | null
+          id?: string
+          payment_date?: string
+          profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'payment_logs_profile_id_fkey'
+            columns: ['profile_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       produtos: {
         Row: {
           bateria: string | null
@@ -700,6 +735,7 @@ export type Database = {
         Row: {
           access_allowed: boolean | null
           access_expires_at: string | null
+          active_modules: Json | null
           address: string | null
           avatar_url: string | null
           can_access_evaluation: boolean | null
@@ -717,17 +753,21 @@ export type Database = {
           is_super_admin: boolean | null
           last_active: string | null
           last_login_at: string | null
+          monthly_fee: number | null
           name: string | null
+          next_billing_date: string | null
           phone: string | null
           rg: string | null
           role: string | null
           status: string | null
           subscription_status: string | null
+          subscription_type: string | null
           updated_at: string | null
         }
         Insert: {
           access_allowed?: boolean | null
           access_expires_at?: string | null
+          active_modules?: Json | null
           address?: string | null
           avatar_url?: string | null
           can_access_evaluation?: boolean | null
@@ -745,17 +785,21 @@ export type Database = {
           is_super_admin?: boolean | null
           last_active?: string | null
           last_login_at?: string | null
+          monthly_fee?: number | null
           name?: string | null
+          next_billing_date?: string | null
           phone?: string | null
           rg?: string | null
           role?: string | null
           status?: string | null
           subscription_status?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
         }
         Update: {
           access_allowed?: boolean | null
           access_expires_at?: string | null
+          active_modules?: Json | null
           address?: string | null
           avatar_url?: string | null
           can_access_evaluation?: boolean | null
@@ -773,12 +817,15 @@ export type Database = {
           is_super_admin?: boolean | null
           last_active?: string | null
           last_login_at?: string | null
+          monthly_fee?: number | null
           name?: string | null
+          next_billing_date?: string | null
           phone?: string | null
           rg?: string | null
           role?: string | null
           status?: string | null
           subscription_status?: string | null
+          subscription_type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -986,6 +1033,7 @@ export type Database = {
       }
     }
     Functions: {
+      block_expired_users: { Args: never; Returns: undefined }
       cleanup_by_date: { Args: { target_date: string }; Returns: Json }
       cleanup_old_records: { Args: { p_target_date: string }; Returns: Json }
       delete_sold_items: { Args: never; Returns: number }

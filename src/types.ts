@@ -2,6 +2,7 @@ import { Database } from '@/lib/supabase/types'
 
 export type Role = 'ADMIN' | 'VENDEDOR' | 'TECNICO' | 'ADMINISTRATIVO'
 export type UserStatus = 'pending' | 'active' | 'blocked'
+export type SubscriptionStatus = 'pending' | 'active' | 'expired'
 
 export interface User {
   id: string
@@ -24,6 +25,11 @@ export interface User {
   canAccessEvaluation: boolean
   canDeleteRecords: boolean
   canViewAllLists: boolean
+  subscriptionStatus: SubscriptionStatus
+  accessAllowed: boolean
+  accessExpiresAt?: string | null
+  currentSessionId?: string | null
+  lastLoginAt?: string | null
 }
 
 export interface Company {

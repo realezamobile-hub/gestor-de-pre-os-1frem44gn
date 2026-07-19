@@ -15,6 +15,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      atendimento_realeza: {
+        Row: {
+          data_recebimento: string | null
+          id: number
+          link_resposta: string | null
+          mensagem_cliente: string | null
+          nome_contato: string | null
+          numero_contato: string | null
+        }
+        Insert: {
+          data_recebimento?: string | null
+          id?: number
+          link_resposta?: string | null
+          mensagem_cliente?: string | null
+          nome_contato?: string | null
+          numero_contato?: string | null
+        }
+        Update: {
+          data_recebimento?: string | null
+          id?: number
+          link_resposta?: string | null
+          mensagem_cliente?: string | null
+          nome_contato?: string | null
+          numero_contato?: string | null
+        }
+        Relationships: []
+      }
       avaliacoes_iphone: {
         Row: {
           arquivos_consulta: Json | null
@@ -350,6 +377,30 @@ export type Database = {
           },
         ]
       }
+      controle_duplicidade: {
+        Row: {
+          created_at: string | null
+          hash_msg: string
+          id: number
+          mensagem_original: string | null
+          telefone: string
+        }
+        Insert: {
+          created_at?: string | null
+          hash_msg: string
+          id?: number
+          mensagem_original?: string | null
+          telefone: string
+        }
+        Update: {
+          created_at?: string | null
+          hash_msg?: string
+          id?: number
+          mensagem_original?: string | null
+          telefone?: string
+        }
+        Relationships: []
+      }
       empresas: {
         Row: {
           cnpj: string | null
@@ -465,6 +516,42 @@ export type Database = {
             referencedColumns: ['id']
           },
         ]
+      }
+      leads_realeza: {
+        Row: {
+          atendido_por: string | null
+          data_recebimento: string | null
+          id: number
+          id_mensagem_whatsapp: string | null
+          link_acao: string | null
+          mensagem_cliente: string | null
+          nome_contato: string | null
+          numero_contato: string | null
+          status_atendimento: string | null
+        }
+        Insert: {
+          atendido_por?: string | null
+          data_recebimento?: string | null
+          id?: number
+          id_mensagem_whatsapp?: string | null
+          link_acao?: string | null
+          mensagem_cliente?: string | null
+          nome_contato?: string | null
+          numero_contato?: string | null
+          status_atendimento?: string | null
+        }
+        Update: {
+          atendido_por?: string | null
+          data_recebimento?: string | null
+          id?: number
+          id_mensagem_whatsapp?: string | null
+          link_acao?: string | null
+          mensagem_cliente?: string | null
+          nome_contato?: string | null
+          numero_contato?: string | null
+          status_atendimento?: string | null
+        }
+        Relationships: []
       }
       mensagens_processadas: {
         Row: {

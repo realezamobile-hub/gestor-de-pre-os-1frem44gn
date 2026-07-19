@@ -1,7 +1,13 @@
 import { create } from 'zustand'
-import { User, UserStatus, Role, Company } from '@/types'
+import { User, UserStatus, Role, Company, SubscriptionStatus } from '@/types'
 import { supabase } from '@/lib/supabase/client'
 import { Session, createClient } from '@supabase/supabase-js'
+import {
+  deleteUserPermanently,
+  releaseUserAccess,
+} from '@/services/manage-user-access'
+
+let _skipSessionCheck = false
 
 interface AuthState {
   currentUser: User | null
@@ -66,6 +72,12 @@ interface AuthState {
     role: Role
     companyId?: string
   }) => Promise<{ success: boolean; error?: any }>
+  releaseUser: (
+    userId: string,
+    accessAllowed: boolean,
+    subscriptionStatus: SubscriptionStatus,
+  ) => Promise<{ success: boolean; error?: any }>
+  checkSessionValidity: () => Promise<void>
 }
 
 const mapProfileToUser = (profile: any): User => {
@@ -83,7 +95,7 @@ const mapProfileToUser = (profile: any): User => {
     id: profile.id,
     name: profile.name || '',
     email: profile.email || '',
-    role: role,
+    role,
     status: (profile.status as UserStatus) || 'pending',
     phone: profile.phone || '',
     address: profile.address,
@@ -96,11 +108,18 @@ const mapProfileToUser = (profile: any): User => {
       profile.last_active || profile.created_at || new Date(0).toISOString(),
     createdAt: profile.created_at || new Date().toISOString(),
     companyId: profile.company_id,
-    isSuperAdmin: isSuperAdmin,
+    isSuperAdmin,
     canCreateList: profile.can_create_list || isSuperAdmin || false,
     canAccessEvaluation: profile.can_access_evaluation || isSuperAdmin || false,
     canDeleteRecords: profile.can_delete_records || isSuperAdmin || false,
     canViewAllLists: profile.can_view_all_lists || isSuperAdmin || false,
+    subscriptionStatus:
+      (profile.subscription_status as SubscriptionStatus) ||
+      (isSuperAdmin || role === 'ADMIN' ? 'active' : 'pending'),
+    accessAllowed: profile.access_allowed ?? (isSuperAdmin || role === 'ADMIN'),
+    accessExpiresAt: profile.access_expires_at,
+    currentSessionId: profile.current_session_id,
+    lastLoginAt: profile.last_login_at,
   }
 }
 
@@ -122,6 +141,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .single()
 
         if (profile && !error) {
+          if (!_skipSessionCheck) {
+            const localSessionId = localStorage.getItem('app_session_id')
+            const dbSessionId = profile.current_session_id
+            if (
+              localSessionId &&
+              dbSessionId &&
+              localSessionId !== dbSessionId
+            ) {
+              sessionStorage.setItem(
+                'session_invalidated_message',
+                'Este usuário já está conectado em outro dispositivo.',
+              )
+              await supabase.auth.signOut()
+              localStorage.removeItem('app_session_id')
+              set({
+                currentUser: null,
+                currentCompany: null,
+                session: null,
+                isLoading: false,
+              })
+              return
+            }
+          }
+
           const profileWithEmail = { ...profile, email: session.user.email }
           const user = mapProfileToUser(profileWithEmail)
           let company = null
@@ -144,7 +187,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             .update({ last_active: new Date().toISOString() })
             .eq('id', profile.id)
         } else {
-          // If no profile exists for the user, sign out to prevent invalid states
           await supabase.auth.signOut()
           set({
             currentUser: null,
@@ -209,21 +251,38 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ session })
       }
     })
+
+    setInterval(async () => {
+      await get().checkSessionValidity()
+    }, 30000)
   },
 
   login: async (email, password) => {
     set({ isLoading: true })
+    _skipSessionCheck = true
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
     if (error) {
+      _skipSessionCheck = false
       set({ isLoading: false })
       return { success: false, error }
     }
     if (data.session) {
+      const sessionId = crypto.randomUUID()
+      localStorage.setItem('app_session_id', sessionId)
+      await supabase
+        .from('profiles')
+        .update({
+          current_session_id: sessionId,
+          last_login_at: new Date().toISOString(),
+        })
+        .eq('id', data.user.id)
+      _skipSessionCheck = false
       await get().syncUser(data.session)
     } else {
+      _skipSessionCheck = false
       set({ isLoading: false })
     }
     return { success: true }
@@ -301,6 +360,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     set({ isLoading: true })
+    localStorage.removeItem('app_session_id')
     await supabase.auth.signOut()
     set({
       currentUser: null,
@@ -418,25 +478,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   deleteUser: async (userId) => {
     try {
-      // Tenta chamar uma RPC caso exista no backend para deletar o usuário do auth.users
-      const { error: rpcError } = await supabase.rpc('delete_user_admin', {
-        target_user_id: userId,
-      })
-
-      // Sempre remove da tabela profiles para garantir a UI e persistência local
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
-
-      if (profileError && !rpcError) {
-        return { success: false, error: profileError }
+      const { error } = await deleteUserPermanently(userId)
+      if (error) {
+        await supabase.from('profiles').delete().eq('id', userId)
       }
-
-      set((state) => ({
-        users: state.users.filter((u) => u.id !== userId),
-      }))
-
+      set((state) => ({ users: state.users.filter((u) => u.id !== userId) }))
       return { success: true }
     } catch (error) {
       console.error('Delete user error:', error)
@@ -446,7 +492,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   inviteUser: async (data) => {
     try {
-      // Usa um client temporário para não sobrescrever a sessão do admin atual
       const tempClient = createClient(
         import.meta.env.VITE_SUPABASE_URL as string,
         import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
@@ -470,7 +515,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (error) return { success: false, error }
 
       if (authData.user) {
-        // Garante que o usuário apareça imediatamente no banco de dados como pendente
         await supabase.from('profiles').upsert(
           {
             id: authData.user.id,
@@ -479,13 +523,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             role: data.role,
             company_id: data.companyId,
             status: 'pending',
+            subscription_status: 'pending',
+            access_allowed: false,
           },
           { onConflict: 'id' },
         )
 
-        // Envia um email de recuperação para que o usuário possa definir sua senha
         await tempClient.auth.resetPasswordForEmail(data.email)
-
         await get().fetchUsers()
         return { success: true }
       }
@@ -522,6 +566,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (data.emergencyContactPhone !== undefined)
       dbUpdates.emergency_contact_phone = data.emergencyContactPhone
     if (data.avatarUrl !== undefined) dbUpdates.avatar_url = data.avatarUrl
+    if (data.subscriptionStatus !== undefined)
+      dbUpdates.subscription_status = data.subscriptionStatus
+    if (data.accessAllowed !== undefined)
+      dbUpdates.access_allowed = data.accessAllowed
+    if (data.accessExpiresAt !== undefined)
+      dbUpdates.access_expires_at = data.accessExpiresAt
     const { error } = await supabase
       .from('profiles')
       .update(dbUpdates)
@@ -591,6 +641,96 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           u.id === userId ? { ...u, [permission]: newValue } : u,
         ),
       }))
+    }
+  },
+
+  releaseUser: async (userId, accessAllowed, subscriptionStatus) => {
+    try {
+      const { error } = await releaseUserAccess(
+        userId,
+        accessAllowed,
+        subscriptionStatus,
+      )
+      if (error) return { success: false, error }
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === userId ? { ...u, accessAllowed, subscriptionStatus } : u,
+        ),
+      }))
+      return { success: true }
+    } catch (error) {
+      console.error('Release user error:', error)
+      return { success: false, error }
+    }
+  },
+
+  checkSessionValidity: async () => {
+    const { currentUser } = get()
+    if (!currentUser) return
+
+    const localSessionId = localStorage.getItem('app_session_id')
+    if (!localSessionId) return
+
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select(
+          'current_session_id, access_allowed, subscription_status, status',
+        )
+        .eq('id', currentUser.id)
+        .single()
+
+      if (error || !profile) {
+        sessionStorage.setItem(
+          'session_invalidated_message',
+          'Sua conta foi removida ou não está mais disponível.',
+        )
+        await supabase.auth.signOut()
+        localStorage.removeItem('app_session_id')
+        set({
+          currentUser: null,
+          currentCompany: null,
+          session: null,
+          isLoading: false,
+        })
+        return
+      }
+
+      if (
+        profile.current_session_id &&
+        profile.current_session_id !== localSessionId
+      ) {
+        sessionStorage.setItem(
+          'session_invalidated_message',
+          'Este usuário já está conectado em outro dispositivo.',
+        )
+        await supabase.auth.signOut()
+        localStorage.removeItem('app_session_id')
+        set({
+          currentUser: null,
+          currentCompany: null,
+          session: null,
+          isLoading: false,
+        })
+        return
+      }
+
+      const isAdmin = currentUser.isSuperAdmin || currentUser.role === 'ADMIN'
+      if (!isAdmin) {
+        if (profile.status === 'blocked') {
+          await supabase.auth.signOut()
+          localStorage.removeItem('app_session_id')
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+          return
+        }
+      }
+    } catch {
+      // Silent fail for polling
     }
   },
 }))

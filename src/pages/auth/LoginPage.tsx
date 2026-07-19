@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
-import { Loader2, Smartphone, AlertCircle } from 'lucide-react'
+import { Loader2, Smartphone, AlertCircle, ShieldAlert } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -38,9 +38,18 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const [localLoading, setLocalLoading] = useState(false)
+  const [sessionMessage, setSessionMessage] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
   const { login, currentUser, isLoading, logout } = useAuthStore()
+
+  useEffect(() => {
+    const msg = sessionStorage.getItem('session_invalidated_message')
+    if (msg) {
+      setSessionMessage(msg)
+      sessionStorage.removeItem('session_invalidated_message')
+    }
+  }, [])
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -58,14 +67,19 @@ export default function LoginPage() {
         return
       }
 
+      const isAdmin = currentUser.isSuperAdmin || currentUser.role === 'ADMIN'
       const from = (location.state as any)?.from?.pathname || '/'
 
-      if (
-        currentUser.status === 'active' ||
-        currentUser.role === 'ADMIN' ||
-        currentUser.isSuperAdmin
-      ) {
-        navigate(from, { replace: true })
+      if (currentUser.status === 'active' || isAdmin) {
+        if (
+          !isAdmin &&
+          (!currentUser.accessAllowed ||
+            currentUser.subscriptionStatus === 'expired')
+        ) {
+          navigate('/access-denied', { replace: true })
+        } else {
+          navigate(from, { replace: true })
+        }
       } else if (currentUser.status === 'pending') {
         navigate('/pending', { replace: true })
       }
@@ -127,6 +141,17 @@ export default function LoginPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
+              {sessionMessage && (
+                <Alert
+                  variant="destructive"
+                  className="bg-amber-50 text-amber-900 border-amber-200 flex items-start py-3"
+                >
+                  <ShieldAlert className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                  <AlertDescription className="ml-2 font-medium">
+                    {sessionMessage}
+                  </AlertDescription>
+                </Alert>
+              )}
               {form.formState.errors.root && (
                 <Alert
                   variant="destructive"

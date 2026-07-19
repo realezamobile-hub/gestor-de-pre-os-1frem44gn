@@ -27,6 +27,14 @@ export default function DashboardLayout() {
     return <Navigate to="/login" replace />
   }
 
+  const isAdmin = currentUser.isSuperAdmin || currentUser.role === 'ADMIN'
+  if (
+    !isAdmin &&
+    (!currentUser.accessAllowed || currentUser.subscriptionStatus === 'expired')
+  ) {
+    return <Navigate to="/access-denied" replace />
+  }
+
   return (
     <div className="flex h-screen bg-gray-50/50">
       <Sidebar />

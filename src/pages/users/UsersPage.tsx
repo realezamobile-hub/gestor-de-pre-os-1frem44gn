@@ -13,12 +13,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Lock, Unlock, Pencil, Search, Users } from 'lucide-react'
+import {
+  Lock,
+  Unlock,
+  Pencil,
+  Search,
+  Users,
+  CircleDollarSign,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { User } from '@/types'
 import { UserEditDialog } from '@/components/admin/UserEditDialog'
 import { UserInviteDialog } from '@/components/admin/UserInviteDialog'
 import { useDebounce } from '@/hooks/use-debounce'
+import { cn } from '@/lib/utils'
 
 export default function UsersPage() {
   const {
@@ -26,6 +34,7 @@ export default function UsersPage() {
     users,
     fetchUsers,
     updateUserStatus,
+    releaseUser,
     isLoading: isAuthLoading,
   } = useAuthStore()
   const { companies, fetchCompanies } = useCompanyStore()
@@ -69,10 +78,29 @@ export default function UsersPage() {
     setIsEditDialogOpen(true)
   }
 
+  const handleReleaseToggle = async (user: User) => {
+    const newAccessAllowed = !user.accessAllowed
+    const newStatus = newAccessAllowed ? 'active' : 'expired'
+    const result = await releaseUser(user.id, newAccessAllowed, newStatus)
+    if (result.success) {
+      toast.success(
+        newAccessAllowed ? 'Acesso liberado com sucesso!' : 'Acesso bloqueado!',
+      )
+    } else {
+      toast.error('Erro ao atualizar acesso do usuário')
+    }
+  }
+
   const canEditUser = (targetUser: User) => {
     if (isSuperAdmin) return true
     if (targetUser.id === currentUser?.id) return false
     if (targetUser.isSuperAdmin) return false
+    return true
+  }
+
+  const canManageAccess = (targetUser: User) => {
+    if (!canEditUser(targetUser)) return false
+    if (targetUser.role === 'ADMIN' || targetUser.isSuperAdmin) return false
     return true
   }
 
@@ -83,7 +111,7 @@ export default function UsersPage() {
           Gestão de Usuários
         </h1>
         <p className="text-muted-foreground">
-          Gerencie o acesso e permissões dos usuários do sistema.
+          Gerencie o acesso, permissões e assinaturas dos usuários do sistema.
         </p>
       </div>
 
@@ -111,6 +139,7 @@ export default function UsersPage() {
               {isSuperAdmin && <TableHead>Empresa</TableHead>}
               <TableHead>Função</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Assinatura</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -118,7 +147,7 @@ export default function UsersPage() {
             {isAuthLoading && users.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={isSuperAdmin ? 5 : 4}
+                  colSpan={isSuperAdmin ? 6 : 5}
                   className="h-24 text-center"
                 >
                   <div className="flex justify-center">
@@ -129,7 +158,7 @@ export default function UsersPage() {
             ) : filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={isSuperAdmin ? 5 : 4}
+                  colSpan={isSuperAdmin ? 6 : 5}
                   className="h-24 text-center text-muted-foreground"
                 >
                   <div className="flex flex-col items-center justify-center py-6">
@@ -141,6 +170,7 @@ export default function UsersPage() {
             ) : (
               filteredUsers.map((user) => {
                 const canEdit = canEditUser(user)
+                const canRelease = canManageAccess(user)
                 const companyName =
                   companies.find((c) => c.id === user.companyId)
                     ?.nome_fantasia || '-'
@@ -190,13 +220,13 @@ export default function UsersPage() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={
+                        className={cn(
                           user.status === 'active'
                             ? 'bg-green-50 text-green-700 border-green-200'
                             : user.status === 'pending'
                               ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-red-50 text-red-700 border-red-200'
-                        }
+                              : 'bg-red-50 text-red-700 border-red-200',
+                        )}
                       >
                         {user.status === 'active'
                           ? 'Ativo'
@@ -204,6 +234,36 @@ export default function UsersPage() {
                             ? 'Pendente'
                             : 'Bloqueado'}
                       </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      {user.isSuperAdmin || user.role === 'ADMIN' ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-blue-50 text-blue-700 border-blue-200"
+                        >
+                          Total
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            user.accessAllowed &&
+                              user.subscriptionStatus === 'active'
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : user.subscriptionStatus === 'expired'
+                                ? 'bg-red-50 text-red-700 border-red-200'
+                                : 'bg-amber-50 text-amber-700 border-amber-200',
+                          )}
+                        >
+                          {user.accessAllowed &&
+                          user.subscriptionStatus === 'active'
+                            ? 'Acesso Liberado'
+                            : user.subscriptionStatus === 'expired'
+                              ? 'Expirado'
+                              : 'Aguardando Pagamento'}
+                        </Badge>
+                      )}
                     </TableCell>
 
                     <TableCell className="text-right">
@@ -219,6 +279,27 @@ export default function UsersPage() {
                               <Pencil className="w-3 h-3 mr-2" />
                               Editar
                             </Button>
+
+                            {canRelease && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleReleaseToggle(user)}
+                                className={cn(
+                                  'h-9 w-9',
+                                  user.accessAllowed
+                                    ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                                    : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50',
+                                )}
+                                title={
+                                  user.accessAllowed
+                                    ? 'Bloquear Acesso'
+                                    : 'Liberar Usuário'
+                                }
+                              >
+                                <CircleDollarSign className="w-4 h-4" />
+                              </Button>
+                            )}
 
                             {user.status === 'active' ? (
                               <Button

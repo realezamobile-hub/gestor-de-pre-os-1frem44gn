@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Role, User, UserStatus, Company } from '@/types'
+import { Role, User, UserStatus, Company, SubscriptionStatus } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
 import { Loader2, Camera, Upload, Trash2 } from 'lucide-react'
@@ -79,6 +79,9 @@ export function UserEditDialog({
         canAccessEvaluation: user.canAccessEvaluation,
         canDeleteRecords: user.canDeleteRecords,
         canViewAllLists: user.canViewAllLists,
+        subscriptionStatus: user.subscriptionStatus,
+        accessAllowed: user.accessAllowed,
+        accessExpiresAt: user.accessExpiresAt,
       })
       setAvatarFile(null)
       setCropImage(null)
@@ -233,6 +236,9 @@ export function UserEditDialog({
             <TabsList className="w-full justify-start overflow-x-auto">
               <TabsTrigger value="basic">Básico & Foto</TabsTrigger>
               <TabsTrigger value="docs">Documentos</TabsTrigger>
+              <TabsTrigger value="subscription">
+                Assinatura & Acesso
+              </TabsTrigger>
               <TabsTrigger value="permissions">Permissões</TabsTrigger>
             </TabsList>
 
@@ -403,6 +409,70 @@ export function UserEditDialog({
                     />
                   </div>
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="subscription" className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="subscriptionStatus">Status da Assinatura</Label>
+                <Select
+                  value={formData.subscriptionStatus || 'pending'}
+                  onValueChange={(val: SubscriptionStatus) =>
+                    handleChange('subscriptionStatus', val)
+                  }
+                >
+                  <SelectTrigger id="subscriptionStatus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">
+                      Aguardando Pagamento
+                    </SelectItem>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="expired">Expirado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div className="space-y-0.5">
+                  <Label htmlFor="accessAllowed" className="text-base">
+                    Acesso Liberado
+                  </Label>
+                  <div className="text-xs text-muted-foreground">
+                    Permite que o usuário acesse o sistema
+                  </div>
+                </div>
+                <Switch
+                  id="accessAllowed"
+                  checked={!!formData.accessAllowed}
+                  onCheckedChange={(checked) =>
+                    handleChange('accessAllowed', checked)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="accessExpiresAt">Expira em</Label>
+                <Input
+                  id="accessExpiresAt"
+                  type="date"
+                  value={
+                    formData.accessExpiresAt
+                      ? new Date(formData.accessExpiresAt)
+                          .toISOString()
+                          .split('T')[0]
+                      : ''
+                  }
+                  onChange={(e) =>
+                    handleChange(
+                      'accessExpiresAt',
+                      e.target.value
+                        ? new Date(e.target.value).toISOString()
+                        : null,
+                    )
+                  }
+                />
               </div>
             </TabsContent>
 

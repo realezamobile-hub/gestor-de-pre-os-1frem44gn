@@ -8,6 +8,7 @@ import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage'
 import PendingApprovalPage from './pages/auth/PendingApprovalPage'
+import AccessDeniedPage from './pages/auth/AccessDeniedPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import ListGeneratorPage from './pages/generator/ListGeneratorPage'
 import AdminPage from './pages/admin/AdminPage'
@@ -45,6 +46,7 @@ const App = () => {
             element={<UpdatePasswordPage />}
           />
           <Route path="/pending" element={<PendingApprovalPage />} />
+          <Route path="/access-denied" element={<AccessDeniedPage />} />
 
           {/* Protected Routes */}
           <Route element={<DashboardLayout />}>

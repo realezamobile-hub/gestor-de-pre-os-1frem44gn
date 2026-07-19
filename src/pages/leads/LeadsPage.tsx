@@ -78,7 +78,7 @@ export default function LeadsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
             <MessageSquare className="w-8 h-8 text-primary" />
-            Gestão de Leads
+            Leads
           </h1>
           <p className="text-muted-foreground">
             Acompanhe e responda às mensagens recebidas via campanha.

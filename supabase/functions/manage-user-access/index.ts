@@ -108,7 +108,6 @@ Deno.serve(async (req: Request) => {
         }
 
         await adminClient.from('profiles').delete().eq('id', target_user_id)
-
         return new Response(JSON.stringify({ success: true }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
         })
@@ -151,6 +150,80 @@ Deno.serve(async (req: Request) => {
         })
       }
 
+      case 'renew_access': {
+        const { target_user_id } = body
+        if (!target_user_id) {
+          return new Response(
+            JSON.stringify({ error: 'target_user_id required' }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
+        }
+
+        const { data: profile, error: profileError } = await adminClient
+          .from('profiles')
+          .select('monthly_fee, subscription_type, next_billing_date')
+          .eq('id', target_user_id)
+          .single()
+
+        if (profileError || !profile) {
+          return new Response(JSON.stringify({ error: 'Profile not found' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          })
+        }
+
+        const amount = Number(profile.monthly_fee) || 0
+
+        const baseDate = profile.next_billing_date
+          ? new Date(profile.next_billing_date)
+          : new Date()
+        const newBillingDate = new Date(baseDate)
+        newBillingDate.setMonth(newBillingDate.getMonth() + 1)
+
+        if (newBillingDate < new Date()) {
+          newBillingDate.setMonth(new Date().getMonth() + 1)
+          newBillingDate.setDate(new Date().getDate())
+        }
+
+        await adminClient.from('payment_logs').insert({
+          profile_id: target_user_id,
+          amount,
+          payment_date: new Date().toISOString(),
+          created_by_admin_id: user.id,
+        })
+
+        const { error: updateError } = await adminClient
+          .from('profiles')
+          .update({
+            access_allowed: true,
+            subscription_status: 'active',
+            next_billing_date: newBillingDate.toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', target_user_id)
+
+        if (updateError) {
+          return new Response(JSON.stringify({ error: updateError.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          })
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            new_billing_date: newBillingDate.toISOString(),
+            amount,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          },
+        )
+      }
+
       case 'validate_session': {
         const { target_user_id, session_id } = body
         if (!target_user_id || !session_id) {
@@ -166,7 +239,7 @@ Deno.serve(async (req: Request) => {
         const { data: profile, error: profileError } = await adminClient
           .from('profiles')
           .select(
-            'current_session_id, access_allowed, subscription_status, status',
+            'current_session_id, access_allowed, subscription_status, status, next_billing_date, subscription_type',
           )
           .eq('id', target_user_id)
           .single()
@@ -174,26 +247,30 @@ Deno.serve(async (req: Request) => {
         if (profileError || !profile) {
           return new Response(
             JSON.stringify({ valid: false, reason: 'profile_not_found' }),
-            {
-              headers: { 'Content-Type': 'application/json', ...corsHeaders },
-            },
+            { headers: { 'Content-Type': 'application/json', ...corsHeaders } },
           )
         }
+
+        await adminClient.rpc('block_expired_users')
 
         const sessionValid =
           !profile.current_session_id ||
           profile.current_session_id === session_id
 
+        const billingExpired =
+          profile.next_billing_date &&
+          new Date(profile.next_billing_date) < new Date()
+
         return new Response(
           JSON.stringify({
-            valid: sessionValid,
-            access_allowed: profile.access_allowed,
-            subscription_status: profile.subscription_status,
+            valid: sessionValid && !billingExpired,
+            access_allowed: profile.access_allowed && !billingExpired,
+            subscription_status: billingExpired
+              ? 'expired'
+              : profile.subscription_status,
             status: profile.status,
           }),
-          {
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          },
+          { headers: { 'Content-Type': 'application/json', ...corsHeaders } },
         )
       }
 

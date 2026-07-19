@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 import { BulkCleanup } from '@/components/admin/BulkCleanup'
 import { DomainSettings } from '@/components/admin/DomainSettings'
 import { SupplierBlacklist } from '@/components/admin/SupplierBlacklist'
-import { FinancialControl } from '@/components/admin/FinancialControl'
+import { FinancialDashboard } from '@/components/admin/FinancialDashboard'
 
 export default function AdminPage() {
   const { currentUser, fetchUsers } = useAuthStore()
@@ -42,16 +42,16 @@ export default function AdminPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="maintenance" className="space-y-4">
+      <Tabs defaultValue="financial" className="space-y-4">
         <div className="overflow-x-auto pb-2">
           <TabsList className="inline-flex">
-            <TabsTrigger value="maintenance">
-              <Wrench className="w-4 h-4 mr-2" />
-              Manutenção
-            </TabsTrigger>
             <TabsTrigger value="financial">
               <DollarSign className="w-4 h-4 mr-2" />
               Financeiro
+            </TabsTrigger>
+            <TabsTrigger value="maintenance">
+              <Wrench className="w-4 h-4 mr-2" />
+              Manutenção
             </TabsTrigger>
             <TabsTrigger value="domain">
               <Globe className="w-4 h-4 mr-2" />
@@ -64,12 +64,12 @@ export default function AdminPage() {
           </TabsList>
         </div>
 
-        <TabsContent value="maintenance">
-          <BulkCleanup />
+        <TabsContent value="financial">
+          <FinancialDashboard />
         </TabsContent>
 
-        <TabsContent value="financial">
-          <FinancialControl />
+        <TabsContent value="maintenance">
+          <BulkCleanup />
         </TabsContent>
 
         <TabsContent value="domain">

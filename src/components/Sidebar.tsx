@@ -38,33 +38,35 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
     return false
   }
 
+  const hasModule = (module: string) => {
+    if (currentUser?.isSuperAdmin || currentUser?.role === 'ADMIN') return true
+    return currentUser?.activeModules?.includes(module) ?? false
+  }
+
   const mainItems = [
     {
       label: 'Melhor Preço',
       icon: LayoutDashboard,
       path: '/',
-      visible: true,
+      visible: hasModule('melhor_preco'),
     },
     {
-      label: 'Leads Realeza',
+      label: 'Leads',
       icon: MessageSquare,
       path: '/leads',
-      visible: true, // Access to Leads module
+      visible: hasModule('leads'),
     },
     {
       label: 'Gerador de Lista',
       icon: ListChecks,
       path: '/generator',
-      visible: currentUser?.canCreateList || currentUser?.role === 'ADMIN',
+      visible: hasModule('generator'),
     },
     {
       label: 'Avaliação Técnica',
       icon: ClipboardCheck,
       path: '/evaluation',
-      visible:
-        currentUser?.canAccessEvaluation ||
-        currentUser?.role === 'TECNICO' ||
-        currentUser?.role === 'ADMIN',
+      visible: hasModule('evaluation'),
     },
   ]
 
@@ -73,11 +75,13 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       label: 'Clientes',
       icon: Users,
       path: '/clients',
+      visible: hasModule('cadastro'),
     },
     {
       label: 'Usuários',
       icon: UserPlus,
       path: '/users',
+      visible: hasModule('cadastro'),
     },
   ]
 
@@ -86,15 +90,17 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
       label: 'Relatórios',
       icon: BarChart3,
       path: '/reports',
-      visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
+      visible: hasModule('reports'),
     },
     {
       label: 'Configurações',
       icon: Settings,
       path: '/admin',
-      visible: currentUser?.role === 'ADMIN' || currentUser?.isSuperAdmin,
+      visible: hasModule('admin'),
     },
   ]
+
+  const cadastroVisible = cadastroItems.some((item) => item.visible)
 
   return (
     <aside
@@ -151,52 +157,20 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
             </Link>
           ))}
 
-        {/* Cadastro Group */}
-        <Collapsible
-          open={isCadastroOpen}
-          onOpenChange={setIsCadastroOpen}
-          className="space-y-1"
-        >
-          <CollapsibleTrigger
-            className={cn(
-              'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap text-slate-400 hover:text-slate-100 hover:bg-slate-800',
-              isDesktop && 'justify-start',
-            )}
+        {cadastroVisible && (
+          <Collapsible
+            open={isCadastroOpen}
+            onOpenChange={setIsCadastroOpen}
+            className="space-y-1"
           >
-            <div className="flex items-center gap-3">
-              <Users className="w-5 h-5 flex-shrink-0" />
-              <span
-                className={cn(
-                  'transition-opacity duration-300',
-                  isDesktop
-                    ? 'opacity-0 group-hover:opacity-100'
-                    : 'opacity-100',
-                )}
-              >
-                Cadastro
-              </span>
-            </div>
-            <ChevronDown
+            <CollapsibleTrigger
               className={cn(
-                'w-4 h-4 transition-transform duration-200',
-                isCadastroOpen ? '' : '-rotate-90',
-                isDesktop && 'opacity-0 group-hover:opacity-100',
+                'flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap text-slate-400 hover:text-slate-100 hover:bg-slate-800',
+                isDesktop && 'justify-start',
               )}
-            />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-1">
-            {cadastroItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'flex items-center gap-3 pl-11 pr-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
-                  isActive(item.path)
-                    ? 'text-primary'
-                    : 'text-slate-500 hover:text-slate-200',
-                  isDesktop && !isCadastroOpen && 'hidden',
-                )}
-              >
+            >
+              <div className="flex items-center gap-3">
+                <Users className="w-5 h-5 flex-shrink-0" />
                 <span
                   className={cn(
                     'transition-opacity duration-300',
@@ -205,12 +179,47 @@ export function Sidebar({ mode = 'desktop' }: SidebarProps) {
                       : 'opacity-100',
                   )}
                 >
-                  {item.label}
+                  Cadastro
                 </span>
-              </Link>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+              </div>
+              <ChevronDown
+                className={cn(
+                  'w-4 h-4 transition-transform duration-200',
+                  isCadastroOpen ? '' : '-rotate-90',
+                  isDesktop && 'opacity-0 group-hover:opacity-100',
+                )}
+              />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-1">
+              {cadastroItems
+                .filter((item) => item.visible)
+                .map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      'flex items-center gap-3 pl-11 pr-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+                      isActive(item.path)
+                        ? 'text-primary'
+                        : 'text-slate-500 hover:text-slate-200',
+                      isDesktop && !isCadastroOpen && 'hidden',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'transition-opacity duration-300',
+                        isDesktop
+                          ? 'opacity-0 group-hover:opacity-100'
+                          : 'opacity-100',
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                ))}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
         {bottomItems
           .filter((item) => item.visible)

@@ -3,6 +3,7 @@ import { Database } from '@/lib/supabase/types'
 export type Role = 'ADMIN' | 'VENDEDOR' | 'TECNICO' | 'ADMINISTRATIVO'
 export type UserStatus = 'pending' | 'active' | 'blocked'
 export type SubscriptionStatus = 'pending' | 'active' | 'expired'
+export type SubscriptionType = 'trial' | 'monthly'
 
 export interface User {
   id: string
@@ -30,6 +31,19 @@ export interface User {
   accessExpiresAt?: string | null
   currentSessionId?: string | null
   lastLoginAt?: string | null
+  subscriptionType: SubscriptionType
+  monthlyFee: number | null
+  nextBillingDate: string | null
+  activeModules: string[]
+}
+
+export interface PaymentLog {
+  id: string
+  profile_id: string
+  amount: number
+  payment_date: string
+  created_by_admin_id: string | null
+  created_at: string
 }
 
 export interface Company {

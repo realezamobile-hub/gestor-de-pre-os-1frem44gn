@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -27,14 +28,23 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Role, User, UserStatus, Company, SubscriptionStatus } from '@/types'
+import {
+  Role,
+  User,
+  UserStatus,
+  Company,
+  SubscriptionStatus,
+  SubscriptionType,
+} from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
-import { Loader2, Camera, Upload, Trash2 } from 'lucide-react'
+import { Loader2, Camera, Upload, Trash2, RefreshCw } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AvatarSelection } from '@/components/common/AvatarSelection'
 import { ImageCropper } from '@/components/common/ImageCropper'
 import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface UserEditDialogProps {
   user: User | null
@@ -44,6 +54,16 @@ interface UserEditDialogProps {
   isSuperAdmin?: boolean
 }
 
+const ALL_MODULES = [
+  { key: 'melhor_preco', label: 'Melhor Preço' },
+  { key: 'leads', label: 'Leads' },
+  { key: 'generator', label: 'Gerador de Lista' },
+  { key: 'evaluation', label: 'Avaliação Técnica' },
+  { key: 'cadastro', label: 'Cadastro' },
+  { key: 'reports', label: 'Relatórios' },
+  { key: 'admin', label: 'Configurações' },
+]
+
 export function UserEditDialog({
   user,
   open,
@@ -51,9 +71,11 @@ export function UserEditDialog({
   companies = [],
   isSuperAdmin = false,
 }: UserEditDialogProps) {
-  const { adminUpdateUser, adminUploadAvatar, deleteUser } = useAuthStore()
+  const { adminUpdateUser, adminUploadAvatar, deleteUser, renewUser } =
+    useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isRenewing, setIsRenewing] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [cropImage, setCropImage] = useState<string | null>(null)
@@ -82,6 +104,10 @@ export function UserEditDialog({
         subscriptionStatus: user.subscriptionStatus,
         accessAllowed: user.accessAllowed,
         accessExpiresAt: user.accessExpiresAt,
+        subscriptionType: user.subscriptionType,
+        monthlyFee: user.monthlyFee,
+        nextBillingDate: user.nextBillingDate,
+        activeModules: user.activeModules || ['melhor_preco'],
       })
       setAvatarFile(null)
       setCropImage(null)
@@ -90,6 +116,14 @@ export function UserEditDialog({
 
   const handleChange = (key: keyof User, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const toggleModule = (moduleKey: string) => {
+    const current = formData.activeModules || []
+    const updated = current.includes(moduleKey)
+      ? current.filter((m) => m !== moduleKey)
+      : [...current, moduleKey]
+    handleChange('activeModules', updated)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,11 +157,9 @@ export function UserEditDialog({
 
   const handleSave = async () => {
     if (!user) return
-
     setIsLoading(true)
     try {
       const updatedFormData = { ...formData }
-
       if (avatarFile) {
         const uploadResult = await adminUploadAvatar(user.id, avatarFile)
         if (!uploadResult.success) {
@@ -136,9 +168,7 @@ export function UserEditDialog({
           updatedFormData.avatarUrl = uploadResult.url
         }
       }
-
       const result = await adminUpdateUser(user.id, updatedFormData)
-
       if (result.success) {
         toast.success('Usuário atualizado com sucesso')
         onOpenChange(false)
@@ -146,10 +176,26 @@ export function UserEditDialog({
         toast.error('Erro ao atualizar usuário')
       }
     } catch (error) {
-      console.error('Error updating user:', error)
       toast.error('Erro ao atualizar usuário')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleRenew = async () => {
+    if (!user) return
+    setIsRenewing(true)
+    try {
+      const result = await renewUser(user.id)
+      if (result.success) {
+        toast.success('Renovação OK! Acesso estendido.')
+      } else {
+        toast.error('Erro ao renovar acesso')
+      }
+    } catch {
+      toast.error('Erro inesperado ao renovar')
+    } finally {
+      setIsRenewing(false)
     }
   }
 
@@ -163,13 +209,9 @@ export function UserEditDialog({
         setShowDeleteDialog(false)
         onOpenChange(false)
       } else {
-        toast.error(
-          result.error?.message ||
-            'Erro ao excluir usuário. Verifique dependências ou restrições.',
-        )
+        toast.error(result.error?.message || 'Erro ao excluir usuário.')
       }
     } catch (error: any) {
-      console.error('Error deleting user:', error)
       toast.error(error?.message || 'Erro inesperado ao excluir usuário')
     } finally {
       setIsDeleting(false)
@@ -181,6 +223,12 @@ export function UserEditDialog({
   const displayAvatar = avatarFile
     ? URL.createObjectURL(avatarFile)
     : formData.avatarUrl
+  const daysRemaining = formData.nextBillingDate
+    ? Math.ceil(
+        (new Date(formData.nextBillingDate).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
+      )
+    : null
 
   return (
     <>
@@ -202,9 +250,7 @@ export function UserEditDialog({
             <AlertDialogTitle>Excluir Usuário</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir o usuário{' '}
-              <strong>{user.name}</strong>? Esta ação não pode ser desfeita e
-              todos os dados vinculados a este perfil serão permanentemente
-              removidos.
+              <strong>{user.name}</strong>? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -239,7 +285,7 @@ export function UserEditDialog({
               <TabsTrigger value="subscription">
                 Assinatura & Acesso
               </TabsTrigger>
-              <TabsTrigger value="permissions">Permissões</TabsTrigger>
+              <TabsTrigger value="modules">Módulos</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6 pt-4">
@@ -262,26 +308,23 @@ export function UserEditDialog({
                       <Upload className="w-6 h-6 text-white" />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 w-full">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs w-full"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Camera className="w-3 h-3 mr-1.5" />
-                      Upload
-                    </Button>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      accept="image/png, image/jpeg, image/webp"
-                      onChange={handleFileChange}
-                    />
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs w-full"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="w-3 h-3 mr-1.5" />
+                    Upload
+                  </Button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/webp"
+                    onChange={handleFileChange}
+                  />
                 </div>
-
                 <div className="flex-1 space-y-4 w-full">
                   <Label>Avatar Predefinido</Label>
                   <AvatarSelection
@@ -382,7 +425,6 @@ export function UserEditDialog({
                   />
                 </div>
               </div>
-
               <div className="border-t pt-4 mt-2">
                 <h3 className="text-sm font-medium mb-3">
                   Contato de Emergência
@@ -413,26 +455,66 @@ export function UserEditDialog({
             </TabsContent>
 
             <TabsContent value="subscription" className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionStatus">Status da Assinatura</Label>
-                <Select
-                  value={formData.subscriptionStatus || 'pending'}
-                  onValueChange={(val: SubscriptionStatus) =>
-                    handleChange('subscriptionStatus', val)
-                  }
-                >
-                  <SelectTrigger id="subscriptionStatus">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">
-                      Aguardando Pagamento
-                    </SelectItem>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="expired">Expirado</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionType">Tipo de Assinatura</Label>
+                  <Select
+                    value={formData.subscriptionType || 'trial'}
+                    onValueChange={(val: SubscriptionType) =>
+                      handleChange('subscriptionType', val)
+                    }
+                  >
+                    <SelectTrigger id="subscriptionType">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="trial">Trial (10 dias)</SelectItem>
+                      <SelectItem value="monthly">Mensal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionStatus">
+                    Status da Assinatura
+                  </Label>
+                  <Select
+                    value={formData.subscriptionStatus || 'pending'}
+                    onValueChange={(val: SubscriptionStatus) =>
+                      handleChange('subscriptionStatus', val)
+                    }
+                  >
+                    <SelectTrigger id="subscriptionStatus">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">
+                        Aguardando Pagamento
+                      </SelectItem>
+                      <SelectItem value="active">Ativo</SelectItem>
+                      <SelectItem value="expired">Expirado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
+              {formData.subscriptionType === 'monthly' && (
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyFee">Mensalidade (R$)</Label>
+                  <Input
+                    id="monthlyFee"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.monthlyFee ?? ''}
+                    onChange={(e) =>
+                      handleChange(
+                        'monthlyFee',
+                        e.target.value ? Number(e.target.value) : null,
+                      )
+                    }
+                  />
+                </div>
+              )}
 
               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                 <div className="space-y-0.5">
@@ -474,9 +556,41 @@ export function UserEditDialog({
                   }
                 />
               </div>
-            </TabsContent>
 
-            <TabsContent value="permissions" className="space-y-4 pt-4">
+              {formData.nextBillingDate && (
+                <div className="bg-blue-50 p-3 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      Próxima Cobrança
+                    </p>
+                    <p className="text-xs text-blue-700">
+                      {format(
+                        new Date(formData.nextBillingDate),
+                        "dd 'de' MMMM 'de' yyyy",
+                        { locale: ptBR },
+                      )}
+                      {daysRemaining !== null &&
+                        ` • ${daysRemaining > 0 ? `${daysRemaining} dia(s) restante(s)` : 'Expirado'}`}
+                    </p>
+                  </div>
+                  {formData.subscriptionType === 'monthly' && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={handleRenew}
+                      disabled={isRenewing}
+                    >
+                      {isRenewing ? (
+                        <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                      )}
+                      Renovação OK
+                    </Button>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="status">Status da Conta</Label>
                 <Select
@@ -495,64 +609,102 @@ export function UserEditDialog({
                   </SelectContent>
                 </Select>
               </div>
+            </TabsContent>
 
-              <div className="grid gap-4 mt-4">
-                {[
-                  {
-                    key: 'canCreateList',
-                    label: 'Criar Listas',
-                    desc: 'Gerar catálogos e listas',
-                  },
-                  {
-                    key: 'canAccessEvaluation',
-                    label: 'Avaliação Técnica',
-                    desc: 'Acesso ao checklist',
-                  },
-                  {
-                    key: 'canViewAllLists',
-                    label: 'Ver Histórico Global',
-                    desc: 'Ver listas de outros',
-                  },
-                  {
-                    key: 'canDeleteRecords',
-                    label: 'Deletar Registros',
-                    desc: 'Excluir dados (Perigoso)',
-                    danger: true,
-                  },
-                ].map((perm) => (
-                  <div
-                    key={perm.key}
-                    className={cn(
-                      'flex items-center justify-between rounded-lg border p-3 shadow-sm',
-                      perm.danger && 'border-red-100 bg-red-50/20',
-                    )}
-                  >
-                    <div className="space-y-0.5">
-                      <Label
-                        htmlFor={`perm-${perm.key}`}
-                        className={cn(
-                          'text-base',
-                          perm.danger && 'text-red-900',
-                        )}
-                      >
-                        {perm.label}
-                      </Label>
-                      <div className="text-xs text-muted-foreground">
-                        {perm.desc}
+            <TabsContent value="modules" className="space-y-4 pt-4">
+              <div>
+                <h3 className="text-sm font-medium mb-1">Módulos do Sistema</h3>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Selecione quais módulos este usuário pode acessar.
+                </p>
+                <div className="grid gap-3">
+                  {ALL_MODULES.map((mod) => (
+                    <div
+                      key={mod.key}
+                      className="flex items-center justify-between rounded-lg border p-3 shadow-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`mod-${mod.key}`}
+                          checked={
+                            formData.activeModules?.includes(mod.key) ?? false
+                          }
+                          onCheckedChange={() => toggleModule(mod.key)}
+                        />
+                        <Label
+                          htmlFor={`mod-${mod.key}`}
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          {mod.label}
+                        </Label>
                       </div>
                     </div>
-                    <Switch
-                      id={`perm-${perm.key}`}
-                      checked={!!formData[perm.key as keyof User]}
-                      onCheckedChange={(checked) =>
-                        handleChange(perm.key as keyof User, checked)
-                      }
-                      className={
-                        perm.danger ? 'data-[state=checked]:bg-red-600' : ''
-                      }
-                    />
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-3">
+                  Permissões Avançadas
+                </h3>
+                <div className="grid gap-3">
+                  {[
+                    {
+                      key: 'canCreateList',
+                      label: 'Criar Listas',
+                      desc: 'Gerar catálogos e listas',
+                    },
+                    {
+                      key: 'canAccessEvaluation',
+                      label: 'Avaliação Técnica',
+                      desc: 'Acesso ao checklist',
+                    },
+                    {
+                      key: 'canViewAllLists',
+                      label: 'Ver Histórico Global',
+                      desc: 'Ver listas de outros',
+                    },
+                    {
+                      key: 'canDeleteRecords',
+                      label: 'Deletar Registros',
+                      desc: 'Excluir dados (Perigoso)',
+                      danger: true,
+                    },
+                  ].map((perm) => (
+                    <div
+                      key={perm.key}
+                      className={cn(
+                        'flex items-center justify-between rounded-lg border p-3 shadow-sm',
+                        perm.danger && 'border-red-100 bg-red-50/20',
+                      )}
+                    >
+                      <div className="space-y-0.5">
+                        <Label
+                          htmlFor={`perm-${perm.key}`}
+                          className={cn(
+                            'text-sm font-medium',
+                            perm.danger && 'text-red-900',
+                          )}
+                        >
+                          {perm.label}
+                        </Label>
+                        <div className="text-xs text-muted-foreground">
+                          {perm.desc}
+                        </div>
+                      </div>
+                      <Switch
+                        id={`perm-${perm.key}`}
+                        checked={!!formData[perm.key as keyof User]}
+                        onCheckedChange={(checked) =>
+                          handleChange(perm.key as keyof User, checked)
+                        }
+                        className={
+                          perm.danger ? 'data-[state=checked]:bg-red-600' : ''
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </TabsContent>
           </Tabs>

@@ -1,11 +1,18 @@
 import { Outlet, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { TopHeader } from './TopHeader'
 import { useAuthStore } from '@/stores/useAuthStore'
 
 export default function DashboardLayout() {
-  const { currentUser, isLoading } = useAuthStore()
+  const { currentUser, isLoading, checkSessionValidity } = useAuthStore()
   const location = useLocation()
+
+  useEffect(() => {
+    if (currentUser) {
+      checkSessionValidity()
+    }
+  }, [location.pathname, currentUser, checkSessionValidity])
 
   if (isLoading) {
     return (
@@ -31,11 +38,15 @@ export default function DashboardLayout() {
   const isExpired =
     currentUser.accessExpiresAt &&
     new Date(currentUser.accessExpiresAt) < new Date()
+  const isBillingExpired =
+    currentUser.nextBillingDate &&
+    new Date(currentUser.nextBillingDate) < new Date()
   if (
     !isAdmin &&
     (!currentUser.accessAllowed ||
       currentUser.subscriptionStatus === 'expired' ||
-      isExpired)
+      isExpired ||
+      isBillingExpired)
   ) {
     return <Navigate to="/access-denied" replace />
   }

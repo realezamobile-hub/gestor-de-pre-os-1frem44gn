@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Role, Company } from '@/types'
+import { Role, Company, SubscriptionType } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
 import { Loader2, UserPlus } from 'lucide-react'
@@ -44,6 +44,8 @@ export function UserInviteDialog({
     password: '',
     role: 'VENDEDOR' as Role,
     companyId: currentCompanyId || '',
+    subscriptionType: 'trial' as SubscriptionType,
+    monthlyFee: '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,20 +58,35 @@ export function UserInviteDialog({
       toast.error('A senha deve ter no mínimo 6 caracteres')
       return
     }
+    if (formData.subscriptionType === 'monthly' && !formData.monthlyFee) {
+      toast.error('Informe o valor da mensalidade')
+      return
+    }
 
     setIsLoading(true)
     try {
-      const result = await inviteUser(formData)
+      const result = await inviteUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        companyId: formData.companyId || undefined,
+        subscriptionType: formData.subscriptionType,
+        monthlyFee:
+          formData.subscriptionType === 'monthly'
+            ? Number(formData.monthlyFee)
+            : undefined,
+      })
       if (result.success) {
-        toast.success(
-          'Usuário criado com sucesso! Um email de confirmação foi enviado.',
-        )
+        toast.success('Usuário criado com sucesso!')
         setFormData({
           name: '',
           email: '',
           password: '',
           role: 'VENDEDOR',
           companyId: currentCompanyId || '',
+          subscriptionType: 'trial',
+          monthlyFee: '',
         })
         onOpenChange(false)
       } else {
@@ -88,8 +105,8 @@ export function UserInviteDialog({
         <DialogHeader>
           <DialogTitle>Criar Novo Usuário</DialogTitle>
           <DialogDescription>
-            Crie um novo usuário no sistema. Um email de confirmação será
-            enviado.
+            Crie um novo usuário no sistema. As credenciais serão gerenciadas
+            pelo administrador.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -158,6 +175,44 @@ export function UserInviteDialog({
               </SelectContent>
             </Select>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subscriptionType">Tipo de Assinatura</Label>
+            <Select
+              value={formData.subscriptionType}
+              onValueChange={(val: SubscriptionType) =>
+                setFormData({ ...formData, subscriptionType: val })
+              }
+            >
+              <SelectTrigger id="subscriptionType">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="trial">Trial (10 dias)</SelectItem>
+                <SelectItem value="monthly">Mensal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.subscriptionType === 'monthly' && (
+            <div className="space-y-2">
+              <Label htmlFor="monthlyFee">
+                Mensalidade (R$) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="monthlyFee"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Ex: 99.90"
+                value={formData.monthlyFee}
+                onChange={(e) =>
+                  setFormData({ ...formData, monthlyFee: e.target.value })
+                }
+                required
+              />
+            </div>
+          )}
 
           {isSuperAdmin && companies.length > 0 && (
             <div className="space-y-2">

@@ -1,5 +1,14 @@
 import { create } from 'zustand'
-import { User, UserStatus, Role, Company, SubscriptionStatus } from '@/types'
+import {
+  User,
+  UserStatus,
+  Role,
+  Company,
+  SubscriptionStatus,
+  SubscriptionType,
+  PaymentLog,
+} from '@/types'
+import { renewUserAccess } from '@/services/manage-user-access'
 import { supabase } from '@/lib/supabase/client'
 import { Session, createClient } from '@supabase/supabase-js'
 import {
@@ -72,6 +81,8 @@ interface AuthState {
     password: string
     role: Role
     companyId?: string
+    subscriptionType: SubscriptionType
+    monthlyFee?: number
   }) => Promise<{ success: boolean; error?: any }>
   releaseUser: (
     userId: string,
@@ -79,8 +90,11 @@ interface AuthState {
     subscriptionStatus: SubscriptionStatus,
   ) => Promise<{ success: boolean; error?: any }>
   grantTrial: (userId: string) => Promise<{ success: boolean; error?: any }>
+  renewUser: (userId: string) => Promise<{ success: boolean; error?: any }>
   fetchOnlineUsers: () => Promise<void>
   onlineUsers: User[]
+  paymentLogs: PaymentLog[]
+  fetchPayments: () => Promise<void>
   checkSessionValidity: () => Promise<void>
 }
 
@@ -124,6 +138,23 @@ const mapProfileToUser = (profile: any): User => {
     accessExpiresAt: profile.access_expires_at,
     currentSessionId: profile.current_session_id,
     lastLoginAt: profile.last_login_at,
+    subscriptionType:
+      (profile.subscription_type as SubscriptionType) || 'trial',
+    monthlyFee: profile.monthly_fee ?? null,
+    nextBillingDate: profile.next_billing_date ?? null,
+    activeModules:
+      profile.active_modules ||
+      (isSuperAdmin || role === 'ADMIN'
+        ? [
+            'melhor_preco',
+            'leads',
+            'generator',
+            'evaluation',
+            'cadastro',
+            'reports',
+            'admin',
+          ]
+        : ['melhor_preco']),
   }
 }
 
@@ -134,6 +165,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   initialized: false,
   users: [],
+  paymentLogs: [],
   onlineUsers: [],
 
   syncUser: async (session: Session | null) => {
@@ -519,6 +551,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (error) return { success: false, error }
 
       if (authData.user) {
+        const billingDate = new Date()
+        billingDate.setDate(
+          billingDate.getDate() + (data.subscriptionType === 'trial' ? 10 : 30),
+        )
+
         await supabase.from('profiles').upsert(
           {
             id: authData.user.id,
@@ -529,6 +566,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             status: 'pending',
             subscription_status: 'pending',
             access_allowed: false,
+            subscription_type: data.subscriptionType,
+            monthly_fee: data.monthlyFee || 0,
+            next_billing_date: billingDate.toISOString(),
+            active_modules: ['melhor_preco'],
           },
           { onConflict: 'id' },
         )
@@ -575,6 +616,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       dbUpdates.access_allowed = data.accessAllowed
     if (data.accessExpiresAt !== undefined)
       dbUpdates.access_expires_at = data.accessExpiresAt
+    if (data.subscriptionType !== undefined)
+      dbUpdates.subscription_type = data.subscriptionType
+    if (data.monthlyFee !== undefined) dbUpdates.monthly_fee = data.monthlyFee
+    if (data.nextBillingDate !== undefined)
+      dbUpdates.next_billing_date = data.nextBillingDate
+    if (data.activeModules !== undefined)
+      dbUpdates.active_modules = data.activeModules
     const { error } = await supabase
       .from('profiles')
       .update(dbUpdates)
@@ -677,17 +725,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         access_expires_at: trialEndIso,
         access_allowed: true,
         subscription_status: 'active',
+        subscription_type: 'trial',
+        next_billing_date: trialEndIso,
       })
       .eq('id', userId)
     if (error) return { success: false, error }
     set((state) => ({
       users: state.users.map((u) =>
         u.id === userId
-          ? { ...u, accessExpiresAt: trialEndIso, accessAllowed: true }
+          ? {
+              ...u,
+              accessExpiresAt: trialEndIso,
+              accessAllowed: true,
+              subscriptionType: 'trial',
+              nextBillingDate: trialEndIso,
+            }
           : u,
       ),
     }))
     return { success: true }
+  },
+
+  renewUser: async (userId) => {
+    try {
+      const { error } = await renewUserAccess(userId)
+      if (error) return { success: false, error }
+      await get().fetchUsers()
+      await get().fetchPayments()
+      return { success: true }
+    } catch (error) {
+      console.error('Renew user error:', error)
+      return { success: false, error }
+    }
+  },
+
+  fetchPayments: async () => {
+    const { data, error } = await supabase
+      .from('payment_logs')
+      .select('*')
+      .order('payment_date', { ascending: false })
+    if (!error && data) {
+      set({ paymentLogs: data as PaymentLog[] })
+    }
   },
 
   fetchOnlineUsers: async () => {
@@ -713,7 +792,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data: profile, error } = await supabase
         .from('profiles')
         .select(
-          'current_session_id, access_allowed, subscription_status, status, access_expires_at',
+          'current_session_id, access_allowed, subscription_status, status, access_expires_at, next_billing_date, subscription_type',
         )
         .eq('id', currentUser.id)
         .single()
@@ -756,6 +835,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const isAdmin = currentUser.isSuperAdmin || currentUser.role === 'ADMIN'
       if (!isAdmin) {
         if (profile.status === 'blocked') {
+          await supabase.auth.signOut()
+          localStorage.removeItem('app_session_id')
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+          return
+        }
+
+        if (
+          profile.next_billing_date &&
+          new Date(profile.next_billing_date) < new Date()
+        ) {
+          await supabase
+            .from('profiles')
+            .update({ access_allowed: false, subscription_status: 'expired' })
+            .eq('id', currentUser.id)
+          sessionStorage.setItem(
+            'session_invalidated_message',
+            'Sua assinatura expirou. Entre em contato com o administrador para renovar.',
+          )
           await supabase.auth.signOut()
           localStorage.removeItem('app_session_id')
           set({

@@ -29,6 +29,16 @@ export const releaseUserAccess = async (
   return { data, error }
 }
 
+export const renewUserAccess = async (userId: string) => {
+  const { data, error } = await supabase.functions.invoke(
+    'manage-user-access',
+    {
+      body: { action: 'renew_access', target_user_id: userId },
+    },
+  )
+  return { data, error }
+}
+
 export const validateSession = async (userId: string, sessionId: string) => {
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',

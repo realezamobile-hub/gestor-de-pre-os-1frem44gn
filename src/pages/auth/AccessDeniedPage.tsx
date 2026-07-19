@@ -21,9 +21,14 @@ export default function AccessDeniedPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-gray-600">
-            Seu acesso ainda não foi liberado. Para utilizar o sistema, é
-            necessário confirmar o pagamento da sua assinatura.
+            Seu acesso ao sistema está restrito. Isso pode ocorrer pelos
+            seguintes motivos:
           </p>
+          <ul className="text-sm text-gray-600 list-disc list-inside space-y-1 text-left">
+            <li>Seu acesso ainda não foi liberado pelo administrador</li>
+            <li>Seu período de assinatura expirou</li>
+            <li>Seu acesso foi revogado</li>
+          </ul>
           <div className="bg-amber-50 p-4 rounded-lg text-left">
             <p className="text-sm text-amber-800">
               Entre em contato com o administrador responsável para liberar seu

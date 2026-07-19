@@ -698,6 +698,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_allowed: boolean | null
+          access_expires_at: string | null
           address: string | null
           avatar_url: string | null
           can_access_evaluation: boolean | null
@@ -707,20 +709,25 @@ export type Database = {
           company_id: string | null
           cpf: string | null
           created_at: string | null
+          current_session_id: string | null
           email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           id: string
           is_super_admin: boolean | null
           last_active: string | null
+          last_login_at: string | null
           name: string | null
           phone: string | null
           rg: string | null
           role: string | null
           status: string | null
+          subscription_status: string | null
           updated_at: string | null
         }
         Insert: {
+          access_allowed?: boolean | null
+          access_expires_at?: string | null
           address?: string | null
           avatar_url?: string | null
           can_access_evaluation?: boolean | null
@@ -730,20 +737,25 @@ export type Database = {
           company_id?: string | null
           cpf?: string | null
           created_at?: string | null
+          current_session_id?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           id: string
           is_super_admin?: boolean | null
           last_active?: string | null
+          last_login_at?: string | null
           name?: string | null
           phone?: string | null
           rg?: string | null
           role?: string | null
           status?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Update: {
+          access_allowed?: boolean | null
+          access_expires_at?: string | null
           address?: string | null
           avatar_url?: string | null
           can_access_evaluation?: boolean | null
@@ -753,17 +765,20 @@ export type Database = {
           company_id?: string | null
           cpf?: string | null
           created_at?: string | null
+          current_session_id?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           id?: string
           is_super_admin?: boolean | null
           last_active?: string | null
+          last_login_at?: string | null
           name?: string | null
           phone?: string | null
           rg?: string | null
           role?: string | null
           status?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Relationships: [

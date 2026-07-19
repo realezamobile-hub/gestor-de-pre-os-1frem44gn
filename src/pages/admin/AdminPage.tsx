@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Lock, ShieldCheck, Globe, Wrench } from 'lucide-react'
+import { Lock, ShieldCheck, Globe, Wrench, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { BulkCleanup } from '@/components/admin/BulkCleanup'
 import { DomainSettings } from '@/components/admin/DomainSettings'
 import { SupplierBlacklist } from '@/components/admin/SupplierBlacklist'
+import { FinancialControl } from '@/components/admin/FinancialControl'
 
 export default function AdminPage() {
   const { currentUser, fetchUsers } = useAuthStore()
@@ -48,6 +49,10 @@ export default function AdminPage() {
               <Wrench className="w-4 h-4 mr-2" />
               Manutenção
             </TabsTrigger>
+            <TabsTrigger value="financial">
+              <DollarSign className="w-4 h-4 mr-2" />
+              Financeiro
+            </TabsTrigger>
             <TabsTrigger value="domain">
               <Globe className="w-4 h-4 mr-2" />
               Domínio
@@ -61,6 +66,10 @@ export default function AdminPage() {
 
         <TabsContent value="maintenance">
           <BulkCleanup />
+        </TabsContent>
+
+        <TabsContent value="financial">
+          <FinancialControl />
         </TabsContent>
 
         <TabsContent value="domain">

@@ -71,10 +71,14 @@ export default function LoginPage() {
       const from = (location.state as any)?.from?.pathname || '/'
 
       if (currentUser.status === 'active' || isAdmin) {
+        const isExpired =
+          currentUser.accessExpiresAt &&
+          new Date(currentUser.accessExpiresAt) < new Date()
         if (
           !isAdmin &&
           (!currentUser.accessAllowed ||
-            currentUser.subscriptionStatus === 'expired')
+            currentUser.subscriptionStatus === 'expired' ||
+            isExpired)
         ) {
           navigate('/access-denied', { replace: true })
         } else {

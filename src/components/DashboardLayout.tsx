@@ -28,9 +28,14 @@ export default function DashboardLayout() {
   }
 
   const isAdmin = currentUser.isSuperAdmin || currentUser.role === 'ADMIN'
+  const isExpired =
+    currentUser.accessExpiresAt &&
+    new Date(currentUser.accessExpiresAt) < new Date()
   if (
     !isAdmin &&
-    (!currentUser.accessAllowed || currentUser.subscriptionStatus === 'expired')
+    (!currentUser.accessAllowed ||
+      currentUser.subscriptionStatus === 'expired' ||
+      isExpired)
   ) {
     return <Navigate to="/access-denied" replace />
   }

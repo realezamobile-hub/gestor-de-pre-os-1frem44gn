@@ -69,6 +69,7 @@ interface AuthState {
   inviteUser: (data: {
     email: string
     name: string
+    password: string
     role: Role
     companyId?: string
   }) => Promise<{ success: boolean; error?: any }>
@@ -77,6 +78,9 @@ interface AuthState {
     accessAllowed: boolean,
     subscriptionStatus: SubscriptionStatus,
   ) => Promise<{ success: boolean; error?: any }>
+  grantTrial: (userId: string) => Promise<{ success: boolean; error?: any }>
+  fetchOnlineUsers: () => Promise<void>
+  onlineUsers: User[]
   checkSessionValidity: () => Promise<void>
 }
 
@@ -130,6 +134,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   initialized: false,
   users: [],
+  onlineUsers: [],
 
   syncUser: async (session: Session | null) => {
     if (session?.user) {
@@ -498,17 +503,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         { auth: { persistSession: false, autoRefreshToken: false } },
       )
 
-      const randomPassword = Math.random().toString(36).slice(-12) + 'Aa1@'
-
       const { data: authData, error } = await tempClient.auth.signUp({
         email: data.email,
-        password: randomPassword,
+        password: data.password,
         options: {
           data: {
             name: data.name,
             role: data.role,
             company_id: data.companyId,
           },
+          emailRedirectTo: window.location.origin,
         },
       })
 
@@ -529,7 +533,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           { onConflict: 'id' },
         )
 
-        await tempClient.auth.resetPasswordForEmail(data.email)
         await get().fetchUsers()
         return { success: true }
       }
@@ -664,6 +667,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  grantTrial: async (userId) => {
+    const trialEnd = new Date()
+    trialEnd.setDate(trialEnd.getDate() + 10)
+    const trialEndIso = trialEnd.toISOString()
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        access_expires_at: trialEndIso,
+        access_allowed: true,
+        subscription_status: 'active',
+      })
+      .eq('id', userId)
+    if (error) return { success: false, error }
+    set((state) => ({
+      users: state.users.map((u) =>
+        u.id === userId
+          ? { ...u, accessExpiresAt: trialEndIso, accessAllowed: true }
+          : u,
+      ),
+    }))
+    return { success: true }
+  },
+
+  fetchOnlineUsers: async () => {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .gte('last_active', fiveMinutesAgo)
+      .order('last_active', { ascending: false })
+    if (!error && data) {
+      set({ onlineUsers: data.map(mapProfileToUser) })
+    }
+  },
+
   checkSessionValidity: async () => {
     const { currentUser } = get()
     if (!currentUser) return
@@ -675,7 +713,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data: profile, error } = await supabase
         .from('profiles')
         .select(
-          'current_session_id, access_allowed, subscription_status, status',
+          'current_session_id, access_allowed, subscription_status, status, access_expires_at',
         )
         .eq('id', currentUser.id)
         .single()
@@ -728,7 +766,47 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           })
           return
         }
+
+        if (
+          profile.access_expires_at &&
+          new Date(profile.access_expires_at) < new Date()
+        ) {
+          sessionStorage.setItem(
+            'session_invalidated_message',
+            'Seu período de acesso expirou. Entre em contato com o administrador.',
+          )
+          await supabase.auth.signOut()
+          localStorage.removeItem('app_session_id')
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+          return
+        }
+
+        if (profile.access_allowed === false) {
+          sessionStorage.setItem(
+            'session_invalidated_message',
+            'Seu acesso foi revogado. Entre em contato com o administrador.',
+          )
+          await supabase.auth.signOut()
+          localStorage.removeItem('app_session_id')
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+          return
+        }
       }
+
+      await supabase
+        .from('profiles')
+        .update({ last_active: new Date().toISOString() })
+        .eq('id', currentUser.id)
     } catch {
       // Silent fail for polling
     }

@@ -19,7 +19,7 @@ import {
 import { Role, Company } from '@/types'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { toast } from 'sonner'
-import { Loader2, Mail } from 'lucide-react'
+import { Loader2, UserPlus } from 'lucide-react'
 
 interface UserInviteDialogProps {
   open: boolean
@@ -41,14 +41,19 @@ export function UserInviteDialog({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     role: 'VENDEDOR' as Role,
     companyId: currentCompanyId || '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.email) {
-      toast.error('Preencha os campos obrigatórios')
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error('Preencha todos os campos obrigatórios')
+      return
+    }
+    if (formData.password.length < 6) {
+      toast.error('A senha deve ter no mínimo 6 caracteres')
       return
     }
 
@@ -57,20 +62,21 @@ export function UserInviteDialog({
       const result = await inviteUser(formData)
       if (result.success) {
         toast.success(
-          'Convite enviado com sucesso! O usuário receberá um email de confirmação.',
+          'Usuário criado com sucesso! Um email de confirmação foi enviado.',
         )
         setFormData({
           name: '',
           email: '',
+          password: '',
           role: 'VENDEDOR',
           companyId: currentCompanyId || '',
         })
         onOpenChange(false)
       } else {
-        toast.error(result.error?.message || 'Erro ao enviar convite')
+        toast.error(result.error?.message || 'Erro ao criar usuário')
       }
     } catch (error: any) {
-      toast.error(error?.message || 'Erro inesperado ao enviar convite')
+      toast.error(error?.message || 'Erro inesperado ao criar usuário')
     } finally {
       setIsLoading(false)
     }
@@ -80,10 +86,10 @@ export function UserInviteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Convidar Novo Usuário</DialogTitle>
+          <DialogTitle>Criar Novo Usuário</DialogTitle>
           <DialogDescription>
-            Envie um convite por email para que um novo usuário acesse o
-            sistema.
+            Crie um novo usuário no sistema. Um email de confirmação será
+            enviado.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -112,6 +118,21 @@ export function UserInviteDialog({
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">
+              Senha <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
               }
               required
             />
@@ -173,9 +194,9 @@ export function UserInviteDialog({
               {isLoading ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
-                <Mail className="w-4 h-4 mr-2" />
+                <UserPlus className="w-4 h-4 mr-2" />
               )}
-              Enviar Convite
+              Criar Usuário
             </Button>
           </div>
         </form>

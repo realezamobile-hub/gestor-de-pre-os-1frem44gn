@@ -44,7 +44,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: callerProfile } = await adminClient
       .from('profiles')
-      .select('is_super_admin, role')
+      .select('id, is_super_admin, role, company_id')
       .eq('id', user.id)
       .single()
 
@@ -286,6 +286,7 @@ Deno.serve(async (req: Request) => {
           monthly_fee,
           active_modules,
         } = body
+
         if (!target_email || !target_password || !target_name) {
           return new Response(
             JSON.stringify({
@@ -299,6 +300,9 @@ Deno.serve(async (req: Request) => {
           )
         }
 
+        const resolvedCompanyId =
+          target_company_id || callerProfile?.company_id || null
+
         const { data: authData, error: authError } =
           await adminClient.auth.admin.createUser({
             email: target_email,
@@ -307,13 +311,44 @@ Deno.serve(async (req: Request) => {
             user_metadata: {
               name: target_name,
               role: target_role || 'VENDEDOR',
-              company_id: target_company_id || null,
+              company_id: resolvedCompanyId,
             },
           })
 
         if (authError) {
-          return new Response(JSON.stringify({ error: authError.message }), {
-            status: 500,
+          let errorMsg = authError.message
+          const lowerMsg = authError.message.toLowerCase()
+          if (
+            lowerMsg.includes('already') ||
+            lowerMsg.includes('duplicate') ||
+            lowerMsg.includes('registered')
+          ) {
+            errorMsg = 'Este email já está cadastrado no sistema.'
+          } else if (lowerMsg.includes('password')) {
+            errorMsg = 'A senha não atende aos requisitos mínimos de segurança.'
+          } else if (
+            lowerMsg.includes('email') &&
+            lowerMsg.includes('invalid')
+          ) {
+            errorMsg = 'O formato do email é inválido.'
+          } else if (
+            lowerMsg.includes('database error') ||
+            lowerMsg.includes('trigger') ||
+            lowerMsg.includes('constraint') ||
+            lowerMsg.includes('check')
+          ) {
+            errorMsg =
+              'Erro interno ao criar usuário no banco de dados. Tente novamente.'
+          } else if (
+            lowerMsg.includes('network') ||
+            lowerMsg.includes('timeout') ||
+            lowerMsg.includes('connection')
+          ) {
+            errorMsg =
+              'Erro de conexão. Verifique sua internet e tente novamente.'
+          }
+          return new Response(JSON.stringify({ error: errorMsg }), {
+            status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
           })
         }
@@ -334,33 +369,44 @@ Deno.serve(async (req: Request) => {
           nextBillingDate = expiry.toISOString()
         }
 
+        const parsedMonthlyFee = Number(monthly_fee) || 0
+        const parsedModules =
+          Array.isArray(active_modules) && active_modules.length > 0
+            ? active_modules
+            : ['melhor_preco']
+
+        const profileData = {
+          id: authData.user.id,
+          email: target_email,
+          name: target_name,
+          role: target_role || 'VENDEDOR',
+          company_id: resolvedCompanyId,
+          status: 'active',
+          access_allowed: true,
+          subscription_status: 'active',
+          subscription_type: subscription_type || 'trial',
+          monthly_fee: parsedMonthlyFee,
+          access_expires_at: accessExpiresAt,
+          next_billing_date: nextBillingDate,
+          active_modules: parsedModules,
+          updated_at: now.toISOString(),
+        }
+
         const { error: profileError } = await adminClient
           .from('profiles')
-          .upsert(
-            {
-              id: authData.user.id,
-              email: target_email,
-              name: target_name,
-              role: target_role || 'VENDEDOR',
-              company_id: target_company_id || null,
-              status: 'active',
-              access_allowed: true,
-              subscription_status: 'active',
-              subscription_type: subscription_type || 'trial',
-              monthly_fee: monthly_fee || 0,
-              access_expires_at: accessExpiresAt,
-              next_billing_date: nextBillingDate,
-              active_modules: active_modules || ['melhor_preco'],
-              updated_at: now.toISOString(),
-            },
-            { onConflict: 'id' },
-          )
+          .upsert(profileData, { onConflict: 'id' })
 
         if (profileError) {
-          return new Response(JSON.stringify({ error: profileError.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          })
+          await adminClient.auth.admin.deleteUser(authData.user.id)
+          return new Response(
+            JSON.stringify({
+              error: `Erro ao criar perfil do usuário: ${profileError.message}`,
+            }),
+            {
+              status: 500,
+              headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            },
+          )
         }
 
         return new Response(

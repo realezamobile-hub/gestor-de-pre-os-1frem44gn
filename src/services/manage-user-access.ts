@@ -1,5 +1,28 @@
 import { supabase } from '@/lib/supabase/client'
 
+function extractErrorMessage(error: any, fallback: string): string {
+  if (!error) return fallback
+  if (typeof error === 'string') return error
+  if (error.error && typeof error.error === 'string') return error.error
+  if (error.data?.error && typeof error.data.error === 'string')
+    return error.data.error
+  if (error.context?.error && typeof error.context.error === 'string')
+    return error.context.error
+  if (error.message && typeof error.message === 'string') {
+    if (
+      error.message.includes('non-2xx') ||
+      error.message.includes('An error occurred') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('Edge Function') ||
+      error.message.includes('NetworkError')
+    ) {
+      return fallback
+    }
+    return error.message
+  }
+  return fallback
+}
+
 export const deleteUserPermanently = async (userId: string) => {
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
@@ -72,14 +95,41 @@ export const createUser = async (data: {
         target_password: data.password,
         target_name: data.name,
         target_role: data.role,
-        target_company_id: data.companyId,
+        target_company_id: data.companyId || null,
         subscription_type: data.subscriptionType,
-        monthly_fee: data.monthlyFee,
+        monthly_fee: data.monthlyFee ?? 0,
         active_modules: data.activeModules,
       },
     },
   )
-  return { data: result, error }
+
+  if (error) {
+    let message = extractErrorMessage(result, '')
+    if (!message) {
+      message = extractErrorMessage(error, 'Erro ao criar usuário')
+    }
+    if (!message || message === 'Erro ao criar usuário') {
+      try {
+        const ctx = error as any
+        if (ctx?.context) {
+          const body =
+            typeof ctx.context === 'string'
+              ? JSON.parse(ctx.context)
+              : ctx.context
+          message = extractErrorMessage(body, 'Erro ao criar usuário')
+        }
+      } catch {
+        // keep default message
+      }
+    }
+    return { data: null, error: { message } }
+  }
+
+  if (result?.error) {
+    return { data: null, error: { message: String(result.error) } }
+  }
+
+  return { data: result, error: null }
 }
 
 export const adminChangePassword = async (
@@ -96,5 +146,14 @@ export const adminChangePassword = async (
       },
     },
   )
-  return { data, error }
+
+  if (error) {
+    let message = extractErrorMessage(data, '')
+    if (!message) {
+      message = extractErrorMessage(error, 'Erro ao alterar senha')
+    }
+    return { data: null, error: { message } }
+  }
+
+  return { data, error: null }
 }

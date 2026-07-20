@@ -87,11 +87,11 @@ export function UserInviteDialog({
         monthlyFee:
           formData.subscriptionType === 'monthly'
             ? Number(formData.monthlyFee)
-            : undefined,
+            : 0,
         activeModules: formData.activeModules,
       })
       if (result.success) {
-        toast.success('Usuário criado com sucesso!')
+        toast.success('Usuário criado com sucesso! Já pode fazer login.')
         setFormData({
           name: '',
           email: '',
@@ -104,7 +104,11 @@ export function UserInviteDialog({
         })
         onOpenChange(false)
       } else {
-        toast.error(result.error?.message || 'Erro ao criar usuário')
+        const errorMsg =
+          (result.error as any)?.message ||
+          (typeof result.error === 'string' ? result.error : '') ||
+          'Erro ao criar usuário. Verifique os dados e tente novamente.'
+        toast.error(errorMsg, { duration: 6000 })
       }
     } catch (error: any) {
       toast.error(error?.message || 'Erro inesperado ao criar usuário')

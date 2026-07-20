@@ -19,6 +19,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Session } from '@supabase/supabase-js'
 
 let _skipSessionCheck = false
+let _adminActionInProgress = false
 
 interface AuthState {
   currentUser: User | null
@@ -521,6 +522,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   deleteUser: async (userId) => {
+    _adminActionInProgress = true
     try {
       const { error } = await deleteUserPermanently(userId)
       if (error) {
@@ -531,29 +533,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Delete user error:', error)
       return { success: false, error }
+    } finally {
+      _adminActionInProgress = false
     }
   },
 
   inviteUser: async (data) => {
+    _adminActionInProgress = true
     try {
-      const { error } = await createUser({
+      const result = await createUser({
         email: data.email,
         password: data.password,
         name: data.name,
         role: data.role,
         companyId: data.companyId,
         subscriptionType: data.subscriptionType,
-        monthlyFee: data.monthlyFee,
+        monthlyFee: data.monthlyFee ?? 0,
         activeModules: data.activeModules,
       })
 
-      if (error) return { success: false, error }
+      if (result.error) {
+        return { success: false, error: result.error }
+      }
 
       await get().fetchUsers()
       return { success: true }
     } catch (error) {
       console.error('Invite user error:', error)
-      return { success: false, error }
+      return {
+        success: false,
+        error: { message: (error as Error)?.message || 'Erro inesperado' },
+      }
+    } finally {
+      _adminActionInProgress = false
     }
   },
 
@@ -717,6 +729,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   renewUser: async (userId) => {
+    _adminActionInProgress = true
     try {
       const { error } = await renewUserAccess(userId)
       if (error) return { success: false, error }
@@ -726,10 +739,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Renew user error:', error)
       return { success: false, error }
+    } finally {
+      _adminActionInProgress = false
     }
   },
 
   changeUserPassword: async (userId, newPassword) => {
+    _adminActionInProgress = true
     try {
       const { error } = await adminChangePassword(userId, newPassword)
       if (error) return { success: false, error }
@@ -737,6 +753,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Change password error:', error)
       return { success: false, error }
+    } finally {
+      _adminActionInProgress = false
     }
   },
 
@@ -765,6 +783,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   checkSessionValidity: async () => {
     const { currentUser } = get()
     if (!currentUser) return
+    if (_adminActionInProgress) return
 
     const localSessionId = localStorage.getItem('app_session_id')
     if (!localSessionId) return
@@ -779,18 +798,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .single()
 
       if (error || !profile) {
-        sessionStorage.setItem(
-          'session_invalidated_message',
-          'Sua conta foi removida ou não está mais disponível.',
-        )
-        await supabase.auth.signOut()
-        localStorage.removeItem('app_session_id')
-        set({
-          currentUser: null,
-          currentCompany: null,
-          session: null,
-          isLoading: false,
-        })
         return
       }
 

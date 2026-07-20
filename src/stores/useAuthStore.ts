@@ -245,24 +245,42 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             .update({ last_active: new Date().toISOString() })
             .eq('id', profile.id)
         } else {
-          await supabase.auth.signOut()
-          set({
-            currentUser: null,
-            currentCompany: null,
-            session: null,
-            isLoading: false,
-          })
+          const isAuthError =
+            error &&
+            (error.message?.includes('JWT') ||
+              error.message?.includes('Invalid token') ||
+              error.message?.includes('Session expired') ||
+              error.message?.includes('invalid claim'))
+          if (isAuthError) {
+            await supabase.auth.signOut()
+            set({
+              currentUser: null,
+              currentCompany: null,
+              session: null,
+              isLoading: false,
+            })
+          } else {
+            set({ isLoading: false })
+          }
         }
       } catch (e) {
         console.error('Exception fetching profile', e)
         if (!_adminActionInProgress) {
-          await supabase.auth.signOut()
-          set({
-            currentUser: null,
-            currentCompany: null,
-            session: null,
-            isLoading: false,
-          })
+          const isAuthError =
+            e?.message?.includes('JWT') ||
+            e?.message?.includes('Invalid token') ||
+            e?.message?.includes('Session expired')
+          if (isAuthError) {
+            await supabase.auth.signOut()
+            set({
+              currentUser: null,
+              currentCompany: null,
+              session: null,
+              isLoading: false,
+            })
+          } else {
+            set({ isLoading: false })
+          }
         }
       }
     } else {

@@ -44,9 +44,9 @@ export function DraftListGrouped({
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center border-2 border-dashed rounded-lg bg-gray-50/50">
-        <p>Sua lista está vazia.</p>
+        <p className="font-medium">Nenhum produto selecionado.</p>
         <p className="text-sm mt-2">
-          Adicione produtos através do catálogo para começar.
+          Por favor, selecione produtos no catálogo primeiro.
         </p>
       </div>
     )

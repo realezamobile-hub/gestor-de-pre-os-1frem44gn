@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useProductStore } from '@/stores/useProductStore'
 import { useDebounce } from '@/hooks/use-debounce'
-import { Search, ListChecks, Plus } from 'lucide-react'
+import { Search, ListChecks, Plus, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { Product } from '@/types'
@@ -35,6 +35,7 @@ export default function DashboardPage() {
     Record<number, Product>
   >({})
   const [isFetchingAll, setIsFetchingAll] = useState(false)
+  const [isAddingToDraft, setIsAddingToDraft] = useState(false)
 
   const prevFiltersRef = useRef(filters)
 
@@ -101,9 +102,33 @@ export default function DashboardPage() {
   const handleAddSelected = async () => {
     const productsToAdd = Object.values(selectedProductsMap)
     if (productsToAdd.length > 0) {
-      await addToDraft(productsToAdd)
-      setSelectedProductsMap({})
+      setIsAddingToDraft(true)
+      try {
+        await addToDraft(productsToAdd)
+        setSelectedProductsMap({})
+      } catch (error) {
+        toast.error('Erro ao adicionar produtos à lista. Tente novamente.')
+      } finally {
+        setIsAddingToDraft(false)
+      }
     }
+  }
+
+  const handleNavigateToGenerator = async () => {
+    const productsToAdd = Object.values(selectedProductsMap)
+    if (productsToAdd.length > 0) {
+      setIsAddingToDraft(true)
+      try {
+        await addToDraft(productsToAdd)
+        setSelectedProductsMap({})
+      } catch (error) {
+        toast.error('Erro ao salvar produtos selecionados.')
+        return
+      } finally {
+        setIsAddingToDraft(false)
+      }
+    }
+    navigate('/generator')
   }
 
   const localSelectedIds = useMemo(
@@ -174,12 +199,19 @@ export default function DashboardPage() {
             {canCreateList && (
               <Button
                 size="sm"
-                onClick={() => navigate('/generator')}
+                onClick={handleNavigateToGenerator}
+                disabled={isAddingToDraft}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9"
               >
-                <ListChecks className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Gerar Lista</span>
-                {draftItems.length > 0 && (
+                {isAddingToDraft ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <ListChecks className="w-4 h-4 mr-2" />
+                )}
+                <span className="hidden sm:inline">
+                  {isAddingToDraft ? 'Salvando...' : 'Gerar Lista'}
+                </span>
+                {draftItems.length > 0 && !isAddingToDraft && (
                   <span className="ml-1.5 bg-white/20 px-1.5 py-0.5 rounded text-xs font-semibold">
                     {draftItems.length}
                   </span>
@@ -202,10 +234,15 @@ export default function DashboardPage() {
             <Button
               size="sm"
               onClick={handleAddSelected}
+              disabled={isAddingToDraft}
               className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-8"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar Selecionados
+              {isAddingToDraft ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4 mr-2" />
+              )}
+              {isAddingToDraft ? 'Adicionando...' : 'Adicionar Selecionados'}
             </Button>
           </div>
 

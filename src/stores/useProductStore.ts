@@ -337,8 +337,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
 
-    if (!error && data) {
-      const selectedIds = new Set(data.map((i) => i.product_id))
+    if (error) {
+      console.error('Error fetching draft items:', error)
+      return
+    }
+    if (data) {
+      const selectedIds = new Set(data.map((i) => i.product_id).filter(Boolean))
       set({ draftItems: data as any, selectedProductIds: selectedIds })
     }
   },
@@ -393,6 +397,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       newIds.add(product.id)
       set({ draftItems: newItems, selectedProductIds: newIds })
 
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('id', user.id)
+        .single()
+
       const { data, error } = await supabase
         .from('whatsapp_draft_items')
         .insert({
@@ -402,6 +412,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           custom_model: fullDescription,
           custom_price: product.valor,
           custom_details: '',
+          company_id: profileData?.company_id || null,
         })
         .select('*, product:produtos(*)')
         .single()
@@ -424,6 +435,12 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     } = await supabase.auth.getUser()
     if (!user || products.length === 0) return
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('company_id')
+      .eq('id', user.id)
+      .single()
+
     set({ isLoading: true })
     const itemsToInsert = products.map((p) => ({
       user_id: user.id,
@@ -432,17 +449,23 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       custom_model: formatProductDescription(p),
       custom_price: p.valor,
       custom_details: '',
+      company_id: profile?.company_id || null,
     }))
 
-    const { error } = await supabase
-      .from('whatsapp_draft_items')
-      .upsert(itemsToInsert, { onConflict: 'user_id, product_id' })
+    try {
+      const { error } = await supabase
+        .from('whatsapp_draft_items')
+        .upsert(itemsToInsert, { onConflict: 'user_id, product_id' })
 
-    if (error) {
-      toast.error('Erro ao adicionar produtos')
-    } else {
-      await get().fetchDraftItems()
-      toast.success(`${products.length} produtos adicionados ao rascunho`)
+      if (error) {
+        toast.error('Erro ao adicionar produtos')
+      } else {
+        await get().fetchDraftItems()
+        toast.success(`${products.length} produtos adicionados ao rascunho`)
+      }
+    } catch (e) {
+      console.error('Error adding to draft:', e)
+      toast.error('Erro de conexão ao adicionar produtos.')
     }
     set({ isLoading: false })
   },
@@ -652,7 +675,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     const { data, error } = await query
 
-    if (!error && data) {
+    if (error) {
+      console.error('Error fetching generated lists:', error)
+      return
+    }
+    if (data) {
       set({ generatedLists: data as GeneratedList[] })
     }
   },
@@ -685,21 +712,26 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .eq('id', user.id)
       .single()
 
-    const { error } = await supabase.from('generated_lists').insert({
-      user_id: user.id,
-      title,
-      content,
-      type,
-      header_footer_data: config as any,
-      items_snapshot: itemsSnapshot as any,
-      company_id: profile?.company_id,
-    })
+    try {
+      const { error } = await supabase.from('generated_lists').insert({
+        user_id: user.id,
+        title,
+        content,
+        type,
+        header_footer_data: config as any,
+        items_snapshot: itemsSnapshot as any,
+        company_id: profile?.company_id,
+      })
 
-    if (error) {
-      return { success: false, error }
+      if (error) {
+        return { success: false, error }
+      }
+      await get().fetchGeneratedLists()
+      return { success: true }
+    } catch (e) {
+      console.error('Error saving generated list:', e)
+      return { success: false, error: e }
     }
-    await get().fetchGeneratedLists()
-    return { success: true }
   },
 
   generateListFromFilters: async (date, categories) => {

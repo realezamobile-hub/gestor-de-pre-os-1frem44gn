@@ -104,6 +104,7 @@ export default function ListGeneratorPage() {
 
   // Trigger to auto-refresh previews after global operations
   const [triggerRefresh, setTriggerRefresh] = useState(false)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   // Load preview persistence
   useEffect(() => {
@@ -120,9 +121,20 @@ export default function ListGeneratorPage() {
   }, [customerText, internalText])
 
   useEffect(() => {
-    fetchCategories()
-    fetchDraftItems()
-    fetchGeneratedLists()
+    const loadInitialData = async () => {
+      try {
+        await Promise.all([
+          fetchCategories(),
+          fetchDraftItems(),
+          fetchGeneratedLists(),
+        ])
+      } catch (error) {
+        toast.error('Erro ao carregar dados do gerador. Tente novamente.')
+      } finally {
+        setIsInitialLoading(false)
+      }
+    }
+    loadInitialData()
   }, [])
 
   const generateContent = (internal: boolean) => {
@@ -273,6 +285,15 @@ export default function ListGeneratorPage() {
         <Button asChild>
           <Link to="/">Voltar ao Painel</Link>
         </Button>
+      </div>
+    )
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground">Carregando gerador de listas...</p>
       </div>
     )
   }

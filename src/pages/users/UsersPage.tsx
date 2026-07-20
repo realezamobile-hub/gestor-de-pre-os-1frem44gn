@@ -94,6 +94,18 @@ export default function UsersPage() {
     )
   }
 
+  if (!currentUser?.isSuperAdmin && currentUser?.role !== 'ADMIN') {
+    return (
+      <div className="text-center py-12">
+        <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+        <p className="mb-4">Acesso restrito a administradores.</p>
+        <Button asChild>
+          <Link to="/">Voltar ao Painel</Link>
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -254,16 +266,6 @@ export default function UsersPage() {
         isSuperAdmin={isSuperAdmin}
         currentCompanyId={currentCompanyId}
       />
-
-      {!currentUser?.isSuperAdmin && currentUser?.role !== 'ADMIN' && (
-        <div className="text-center py-12">
-          <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <p className="mb-4">Acesso restrito a administradores.</p>
-          <Button asChild>
-            <Link to="/">Voltar ao Painel</Link>
-          </Button>
-        </div>
-      )}
     </div>
   )
 }

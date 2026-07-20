@@ -119,7 +119,15 @@ export function UserInviteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => {
+          if (isLoading) e.preventDefault()
+        }}
+        onEscapeKeyDown={(e) => {
+          if (isLoading) e.preventDefault()
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Criar Novo Usuário</DialogTitle>
           <DialogDescription>

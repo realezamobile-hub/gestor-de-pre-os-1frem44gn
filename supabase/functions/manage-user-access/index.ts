@@ -332,10 +332,14 @@ Deno.serve(async (req: Request) => {
           ) {
             errorMsg = 'O formato do email é inválido.'
           } else if (
-            lowerMsg.includes('database error') ||
-            lowerMsg.includes('trigger') ||
             lowerMsg.includes('constraint') ||
             lowerMsg.includes('check')
+          ) {
+            errorMsg =
+              'Erro de restrição do banco de dados ao criar perfil. Contate o suporte.'
+          } else if (
+            lowerMsg.includes('database error') ||
+            lowerMsg.includes('trigger')
           ) {
             errorMsg =
               'Erro interno ao criar usuário no banco de dados. Tente novamente.'

@@ -1,5 +1,25 @@
 import { supabase } from '@/lib/supabase/client'
 
+async function getAuthHeaders(): Promise<Record<string, string> | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session?.access_token) {
+    return null
+  }
+  return { Authorization: `Bearer ${session.access_token}` }
+}
+
+function sessionExpiredError() {
+  return {
+    data: null,
+    error: {
+      message:
+        'Sessão expirada. Faça login novamente antes de realizar esta ação.',
+    },
+  }
+}
+
 function extractErrorMessage(error: any, fallback: string): string {
   if (!error) return fallback
   if (typeof error === 'string') return error
@@ -24,10 +44,13 @@ function extractErrorMessage(error: any, fallback: string): string {
 }
 
 export const deleteUserPermanently = async (userId: string) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
       body: { action: 'delete_user', target_user_id: userId },
+      headers,
     },
   )
   return { data, error }
@@ -38,6 +61,8 @@ export const releaseUserAccess = async (
   accessAllowed: boolean,
   subscriptionStatus: string,
 ) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
@@ -47,22 +72,28 @@ export const releaseUserAccess = async (
         access_allowed: accessAllowed,
         subscription_status: subscriptionStatus,
       },
+      headers,
     },
   )
   return { data, error }
 }
 
 export const renewUserAccess = async (userId: string) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
       body: { action: 'renew_access', target_user_id: userId },
+      headers,
     },
   )
   return { data, error }
 }
 
 export const validateSession = async (userId: string, sessionId: string) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
@@ -71,6 +102,7 @@ export const validateSession = async (userId: string, sessionId: string) => {
         target_user_id: userId,
         session_id: sessionId,
       },
+      headers,
     },
   )
   return { data, error }
@@ -86,6 +118,9 @@ export const createUser = async (data: {
   monthlyFee?: number
   activeModules: string[]
 }) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
+
   const { data: result, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
@@ -100,6 +135,7 @@ export const createUser = async (data: {
         monthly_fee: data.monthlyFee ?? 0,
         active_modules: data.activeModules,
       },
+      headers,
     },
   )
 
@@ -136,6 +172,9 @@ export const adminChangePassword = async (
   userId: string,
   newPassword: string,
 ) => {
+  const headers = await getAuthHeaders()
+  if (!headers) return sessionExpiredError()
+
   const { data, error } = await supabase.functions.invoke(
     'manage-user-access',
     {
@@ -144,6 +183,7 @@ export const adminChangePassword = async (
         target_user_id: userId,
         new_password: newPassword,
       },
+      headers,
     },
   )
 

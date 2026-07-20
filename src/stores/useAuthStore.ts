@@ -20,6 +20,19 @@ import { Session } from '@supabase/supabase-js'
 
 let _skipSessionCheck = false
 let _adminActionInProgress = false
+let _adminActionTimeout: ReturnType<typeof setTimeout> | null = null
+
+function setAdminActionInProgress(value: boolean) {
+  _adminActionInProgress = value
+  if (_adminActionTimeout) {
+    clearTimeout(_adminActionTimeout)
+  }
+  if (value) {
+    _adminActionTimeout = setTimeout(() => {
+      _adminActionInProgress = false
+    }, 30000)
+  }
+}
 
 interface AuthState {
   currentUser: User | null
@@ -186,7 +199,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .single()
 
         if (profile && !error) {
-          if (!_skipSessionCheck) {
+          if (!_skipSessionCheck && !_adminActionInProgress) {
             const localSessionId = localStorage.getItem('app_session_id')
             const dbSessionId = profile.current_session_id
             if (
@@ -242,13 +255,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
       } catch (e) {
         console.error('Exception fetching profile', e)
-        await supabase.auth.signOut()
-        set({
-          currentUser: null,
-          currentCompany: null,
-          session: null,
-          isLoading: false,
-        })
+        if (!_adminActionInProgress) {
+          await supabase.auth.signOut()
+          set({
+            currentUser: null,
+            currentCompany: null,
+            session: null,
+            isLoading: false,
+          })
+        }
       }
     } else {
       set({
@@ -280,12 +295,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+        if (_adminActionInProgress) {
+          set({ session })
+          return
+        }
         const currentId = get().currentUser?.id
         if (currentId !== session?.user.id) {
           set({ isLoading: true })
           await syncUser(session)
         }
       } else if (event === 'SIGNED_OUT') {
+        if (_adminActionInProgress) return
         set({
           session: null,
           currentUser: null,
@@ -522,7 +542,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   deleteUser: async (userId) => {
-    _adminActionInProgress = true
+    setAdminActionInProgress(true)
     try {
       const { error } = await deleteUserPermanently(userId)
       if (error) {
@@ -534,12 +554,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Delete user error:', error)
       return { success: false, error }
     } finally {
-      _adminActionInProgress = false
+      setAdminActionInProgress(false)
     }
   },
 
   inviteUser: async (data) => {
-    _adminActionInProgress = true
+    setAdminActionInProgress(true)
     try {
       const result = await createUser({
         email: data.email,
@@ -565,7 +585,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         error: { message: (error as Error)?.message || 'Erro inesperado' },
       }
     } finally {
-      _adminActionInProgress = false
+      setAdminActionInProgress(false)
     }
   },
 
@@ -729,7 +749,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   renewUser: async (userId) => {
-    _adminActionInProgress = true
+    setAdminActionInProgress(true)
     try {
       const { error } = await renewUserAccess(userId)
       if (error) return { success: false, error }
@@ -740,12 +760,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Renew user error:', error)
       return { success: false, error }
     } finally {
-      _adminActionInProgress = false
+      setAdminActionInProgress(false)
     }
   },
 
   changeUserPassword: async (userId, newPassword) => {
-    _adminActionInProgress = true
+    setAdminActionInProgress(true)
     try {
       const { error } = await adminChangePassword(userId, newPassword)
       if (error) return { success: false, error }
@@ -754,7 +774,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Change password error:', error)
       return { success: false, error }
     } finally {
-      _adminActionInProgress = false
+      setAdminActionInProgress(false)
     }
   },
 
